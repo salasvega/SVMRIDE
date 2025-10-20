@@ -34,11 +34,11 @@ export function Home() {
 
       <Section className="relative bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#111111] text-white py-24 md:py-32 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-80"
+          className="absolute inset-0 bg-cover bg-center opacity-90"
           style={{ backgroundImage: 'url(/image.png)' }}
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#111111]/70 via-[#111111]/50 to-[#111111]/90" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#111111]/50 via-[#111111]/30 to-[#111111]/70" aria-hidden="true" />
         <Container className="relative z-10">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
