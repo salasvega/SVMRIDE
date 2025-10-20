@@ -94,7 +94,7 @@ export function Footer() {
               to="/admin/login"
               className="text-xs text-[#666666] hover:text-[#AAAAAA] transition-colors"
             >
-              Administration
+              Le bureau du patron (Admin)
             </Link>
           </div>
         </div>
