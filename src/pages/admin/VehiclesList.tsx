@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
 import { Vehicle } from '../../types/vehicle';
 import { formatPrice } from '../../utils/vehicle-filters';
+import { siteConfig } from '../../config/site';
 
 export function VehiclesList() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -110,7 +111,7 @@ export function VehiclesList() {
                   <tr key={vehicle.id} className="hover:bg-[#F9F9F9]">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <a
-                        href={`/vehicules/${vehicle.slug}`}
+                        href={`${siteConfig.baseUrl}/vehicules/${vehicle.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block"
