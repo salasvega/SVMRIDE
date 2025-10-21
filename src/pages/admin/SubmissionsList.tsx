@@ -224,6 +224,15 @@ export default function SubmissionsList() {
     );
   };
 
+  const getRowBackgroundColor = (status: string) => {
+    const colors: Record<string, string> = {
+      new: 'bg-red-50',
+      in_progress: 'bg-yellow-50',
+      completed: 'bg-green-50',
+    };
+    return colors[status] || 'bg-white';
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -303,7 +312,7 @@ export default function SubmissionsList() {
                 </thead>
                 <tbody className="divide-y divide-[#E5E5E5]">
                   {filteredSubmissions.map((submission) => (
-                    <tr key={submission.id} className="hover:bg-[#F9F9F9]">
+                    <tr key={submission.id} className={`${getRowBackgroundColor(submission.status)} hover:opacity-80 transition-opacity`}>
                       <td className="px-6 py-4 text-sm text-[#666666]">
                         {new Date(submission.created_at).toLocaleDateString('fr-FR')}
                       </td>
