@@ -34,13 +34,99 @@ export default function SubmissionsList() {
 
   const loadSubmissions = async () => {
     try {
-      const { data, error } = await supabase
-        .from('contact_submissions')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const [contactRes, financingRes, tradeInRes, customSearchRes] = await Promise.all([
+        supabase.from('contact_submissions').select('*'),
+        supabase.from('financing_submissions').select('*'),
+        supabase.from('trade_in_submissions').select('*'),
+        supabase.from('custom_search_submissions').select('*'),
+      ]);
 
-      if (error) throw error;
-      setSubmissions(data || []);
+      const allSubmissions: Submission[] = [];
+
+      if (contactRes.data) {
+        allSubmissions.push(
+          ...contactRes.data.map((item) => ({
+            id: item.id,
+            type: 'contact' as const,
+            status: item.status,
+            name: item.name,
+            email: item.email,
+            phone: '',
+            subject: item.subject,
+            message: item.message,
+            created_at: item.created_at,
+          }))
+        );
+      }
+
+      if (financingRes.data) {
+        allSubmissions.push(
+          ...financingRes.data.map((item) => ({
+            id: item.id,
+            type: 'financing' as const,
+            status: item.status,
+            name: item.name,
+            email: item.email,
+            phone: item.phone,
+            created_at: item.created_at,
+            data: {
+              montant: item.amount,
+              durée: item.duration,
+            },
+          }))
+        );
+      }
+
+      if (tradeInRes.data) {
+        allSubmissions.push(
+          ...tradeInRes.data.map((item) => ({
+            id: item.id,
+            type: 'trade_in' as const,
+            status: item.status,
+            name: item.name,
+            email: item.email,
+            phone: item.phone,
+            created_at: item.created_at,
+            data: {
+              marque: item.brand,
+              modèle: item.model,
+              année: item.year,
+              kilométrage: item.mileage,
+              état: item.condition,
+              commentaires: item.comments,
+            },
+          }))
+        );
+      }
+
+      if (customSearchRes.data) {
+        allSubmissions.push(
+          ...customSearchRes.data.map((item) => ({
+            id: item.id,
+            type: 'custom_search' as const,
+            status: item.status,
+            name: item.name,
+            email: item.email,
+            phone: item.phone,
+            created_at: item.created_at,
+            data: {
+              type_véhicule: item.type,
+              marque: item.brand,
+              cylindrée: item.displacement,
+              année_min: item.year_min,
+              budget_max: item.budget_max,
+              délai: item.deadline,
+              commentaires: item.comments,
+            },
+          }))
+        );
+      }
+
+      allSubmissions.sort((a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      setSubmissions(allSubmissions);
     } catch (error) {
       console.error('Error loading submissions:', error);
     } finally {
@@ -49,9 +135,20 @@ export default function SubmissionsList() {
   };
 
   const handleStatusChange = async (id: string, newStatus: string) => {
+    const submission = submissions.find((s) => s.id === id);
+    if (!submission) return;
+
     try {
+      const tableNames: Record<string, string> = {
+        contact: 'contact_submissions',
+        financing: 'financing_submissions',
+        trade_in: 'trade_in_submissions',
+        custom_search: 'custom_search_submissions',
+      };
+
+      const tableName = tableNames[submission.type];
       const { error } = await supabase
-        .from('contact_submissions')
+        .from(tableName)
         .update({ status: newStatus })
         .eq('id', id);
 
@@ -69,8 +166,19 @@ export default function SubmissionsList() {
   const handleDelete = async () => {
     if (!submissionToDelete) return;
 
+    const submission = submissions.find((s) => s.id === submissionToDelete);
+    if (!submission) return;
+
     try {
-      const { error } = await supabase.from('contact_submissions').delete().eq('id', submissionToDelete);
+      const tableNames: Record<string, string> = {
+        contact: 'contact_submissions',
+        financing: 'financing_submissions',
+        trade_in: 'trade_in_submissions',
+        custom_search: 'custom_search_submissions',
+      };
+
+      const tableName = tableNames[submission.type];
+      const { error } = await supabase.from(tableName).delete().eq('id', submissionToDelete);
 
       if (error) throw error;
 
