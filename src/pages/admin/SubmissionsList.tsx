@@ -4,6 +4,7 @@ import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
 import { supabase } from '../../lib/supabase';
+import { SubmissionDetailsModal } from '../../components/admin/SubmissionDetailsModal';
 
 type Submission = {
   id: string;
@@ -13,6 +14,7 @@ type Submission = {
   email: string;
   phone: string;
   message?: string;
+  subject?: string;
   created_at: string;
   data?: Record<string, any>;
 };
@@ -22,6 +24,7 @@ export default function SubmissionsList() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
 
   useEffect(() => {
     loadSubmissions();
@@ -219,15 +222,15 @@ export default function SubmissionsList() {
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
                           <button
-                            onClick={() => alert(JSON.stringify(submission, null, 2))}
-                            className="p-2 text-[#666666] hover:text-[#D10000] hover:bg-[#F9F9F9] rounded"
+                            onClick={() => setSelectedSubmission(submission)}
+                            className="p-2 text-[#666666] hover:text-[#D10000] hover:bg-[#F9F9F9] rounded transition-colors"
                             title="Voir les détails"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(submission.id)}
-                            className="p-2 text-[#666666] hover:text-red-600 hover:bg-[#F9F9F9] rounded"
+                            className="p-2 text-[#666666] hover:text-red-600 hover:bg-[#F9F9F9] rounded transition-colors"
                             title="Supprimer"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -240,6 +243,13 @@ export default function SubmissionsList() {
               </table>
             </div>
           </div>
+        )}
+
+        {selectedSubmission && (
+          <SubmissionDetailsModal
+            submission={selectedSubmission}
+            onClose={() => setSelectedSubmission(null)}
+          />
         )}
       </Container>
     </AdminLayout>
