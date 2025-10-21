@@ -81,7 +81,7 @@ export function Financing() {
 
       <Section background="white" className="!py-8">
         <Container size="md">
-          <div className="bg-gradient-to-br from-[#E85555] to-[#D14444] text-white p-8 md:p-12 rounded-xl mb-12">
+          <div className="bg-gradient-to-br from-[#2C2C2C] to-[#1A1A1A] text-white p-8 md:p-12 rounded-xl mb-12">
             <div className="flex items-center gap-3 mb-6">
               <Calculator className="w-8 h-8" aria-hidden="true" />
               <h2 className="text-2xl md:text-3xl font-bold">Simulateur de crédit</h2>
@@ -99,7 +99,7 @@ export function Financing() {
                   step="500"
                   value={simulatorData.amount}
                   onChange={(e) => setSimulatorData({ ...simulatorData, amount: Number(e.target.value) })}
-                  className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
                 />
               </div>
 
@@ -114,7 +114,7 @@ export function Financing() {
                   step="6"
                   value={simulatorData.duration}
                   onChange={(e) => setSimulatorData({ ...simulatorData, duration: Number(e.target.value) })}
-                  className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
                 />
               </div>
 
@@ -129,11 +129,11 @@ export function Financing() {
                   step="0.5"
                   value={simulatorData.rate}
                   onChange={(e) => setSimulatorData({ ...simulatorData, rate: Number(e.target.value) })}
-                  className="w-full h-2 bg-white/30 rounded-lg appearance-none cursor-pointer"
+                  className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
                 />
               </div>
 
-              <div className="bg-white/20 backdrop-blur-sm p-6 rounded-lg mt-8">
+              <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg mt-8 border border-white/20">
                 <p className="text-sm mb-2">Mensualité estimée</p>
                 <p className="text-4xl font-bold">{calculateMonthlyPayment()} €</p>
                 <p className="text-sm mt-2 opacity-90">par mois sur {simulatorData.duration} mois</p>

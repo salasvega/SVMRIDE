@@ -27,3 +27,38 @@
     text-wrap: balance;
   }
 }
+
+/* Styles pour les curseurs du simulateur */
+input[type="range"].range-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #D10000;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+input[type="range"].range-slider::-webkit-slider-thumb:hover {
+  background: #C00000;
+  transform: scale(1.1);
+}
+
+input[type="range"].range-slider::-moz-range-thumb {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #D10000;
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+input[type="range"].range-slider::-moz-range-thumb:hover {
+  background: #C00000;
+  transform: scale(1.1);
+}
