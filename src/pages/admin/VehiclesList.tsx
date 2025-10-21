@@ -7,10 +7,12 @@ import { supabase } from '../../lib/supabase';
 import { Vehicle } from '../../types/vehicle';
 import { formatPrice } from '../../utils/vehicle-filters';
 import { siteConfig } from '../../config/site';
+import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 
 export function VehiclesList() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
+  const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     fetchVehicles();
@@ -40,15 +42,16 @@ export function VehiclesList() {
     }
   }
 
-  async function deleteVehicle(id: string) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce véhicule ?')) {
-      return;
-    }
+  async function deleteVehicle() {
+    if (!vehicleToDelete) return;
 
-    const { error } = await supabase.from('vehicles').delete().eq('id', id);
+    const { error } = await supabase.from('vehicles').delete().eq('id', vehicleToDelete);
 
     if (!error) {
       fetchVehicles();
+      setVehicleToDelete(null);
+    } else {
+      alert('Erreur lors de la suppression du véhicule');
     }
   }
 
@@ -192,7 +195,7 @@ export function VehiclesList() {
                           <Edit className="w-4 h-4" />
                         </Link>
                         <button
-                          onClick={() => deleteVehicle(vehicle.id)}
+                          onClick={() => setVehicleToDelete(vehicle.id)}
                           className="text-red-600 hover:text-red-800 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -205,6 +208,15 @@ export function VehiclesList() {
             </table>
           </div>
         </div>
+
+        {vehicleToDelete && (
+          <DeleteConfirmModal
+            title="Confirmer la suppression"
+            message="Êtes-vous sûr de vouloir supprimer ce véhicule ? Cette action est irréversible et supprimera toutes les données associées."
+            onConfirm={deleteVehicle}
+            onCancel={() => setVehicleToDelete(null)}
+          />
+        )}
       </div>
     </AdminLayout>
   );
