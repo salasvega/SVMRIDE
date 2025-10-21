@@ -22,7 +22,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center space-x-8">
               <Link to="/admin/dashboard" className="flex items-center space-x-2">
                 <Crown className="w-6 h-6 text-[#C62E2E]" />
-                <span className="text-xl font-bold text-[#111111]">SVM Ride Admin</span>
+                <span className="text-xl font-bold text-[#111111]">Admin</span>
               </Link>
 
               <div className="hidden md:flex space-x-4">
