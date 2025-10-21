@@ -4,6 +4,7 @@ import { SEOHead } from '../components/layout/SEOHead';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 
@@ -20,6 +21,7 @@ export function Financing() {
     phone: '',
     amount: '',
     duration: '',
+    comments: '',
     consent: false,
   });
 
@@ -31,6 +33,7 @@ export function Financing() {
         phone: '',
         amount: '',
         duration: '',
+        comments: '',
         consent: false,
       });
     },
@@ -49,7 +52,7 @@ export function Financing() {
     await submit(`${supabaseUrl}/functions/v1/financing-form`, formData);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -249,6 +252,15 @@ export function Financing() {
                     min="12"
                     max="60"
                     value={formData.duration}
+                    onChange={handleChange}
+                  />
+
+                  <Textarea
+                    label="Commentaires"
+                    name="comments"
+                    rows={4}
+                    placeholder="Posez vos questions ou ajoutez des informations complémentaires..."
+                    value={formData.comments}
                     onChange={handleChange}
                   />
 

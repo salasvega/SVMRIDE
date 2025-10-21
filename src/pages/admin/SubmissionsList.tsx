@@ -69,6 +69,7 @@ export default function SubmissionsList() {
             email: item.email,
             phone: item.phone,
             created_at: item.created_at,
+            message: item.comments,
             data: {
               montant: item.amount,
               durée: item.duration,

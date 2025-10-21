@@ -13,6 +13,7 @@ interface FinancingFormData {
   phone: string;
   amount: string;
   duration: string;
+  comments?: string;
   consent: boolean;
 }
 
@@ -69,6 +70,7 @@ Deno.serve(async (req: Request) => {
       phone: formData.phone,
       amount: formData.amount,
       duration: formData.duration,
+      comments: formData.comments || null,
       submitted_at: new Date().toISOString(),
     });
 
