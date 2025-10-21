@@ -312,7 +312,11 @@ export default function SubmissionsList() {
                 </thead>
                 <tbody className="divide-y divide-[#E5E5E5]">
                   {filteredSubmissions.map((submission) => (
-                    <tr key={submission.id} className="hover:bg-[#F9F9F9]">
+                    <tr
+                      key={submission.id}
+                      className="hover:bg-[#F9F9F9] cursor-pointer"
+                      onDoubleClick={() => setSelectedSubmission(submission)}
+                    >
                       <td className="px-6 py-4 text-sm text-[#666666]">
                         {new Date(submission.created_at).toLocaleDateString('fr-FR')}
                       </td>
