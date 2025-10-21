@@ -83,6 +83,9 @@ export function VehiclesList() {
               <thead className="bg-[#F9F9F9] border-b border-[#E5E5E5]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Photo
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
                     Véhicule
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
@@ -105,6 +108,20 @@ export function VehiclesList() {
               <tbody className="divide-y divide-[#E5E5E5]">
                 {vehicles.map((vehicle) => (
                   <tr key={vehicle.id} className="hover:bg-[#F9F9F9]">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <a
+                        href={`/vehicules/${vehicle.slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
+                      >
+                        <img
+                          src={vehicle.images && vehicle.images.length > 0 ? vehicle.images[0] : '/placeholder-vehicle.jpg'}
+                          alt={`${vehicle.brand} ${vehicle.model}`}
+                          className="w-16 h-16 object-cover rounded-lg hover:opacity-80 transition-opacity"
+                        />
+                      </a>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div>
