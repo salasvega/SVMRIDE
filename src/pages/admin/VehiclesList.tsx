@@ -101,6 +101,9 @@ export function VehiclesList() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
                     Statut
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Visibilité
+                  </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-[#666666] uppercase tracking-wider">
                     Actions
                   </th>
@@ -145,6 +148,22 @@ export function VehiclesList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-[#666666]">
                       {vehicle.year}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {(() => {
+                        const status = (vehicle as any).status || 'available';
+                        const statusConfig = {
+                          available: { label: 'Disponible', color: 'bg-green-100 text-green-800' },
+                          reserved: { label: 'Réservé', color: 'bg-orange-100 text-orange-800' },
+                          sold: { label: 'Vendu', color: 'bg-red-100 text-red-800' }
+                        };
+                        const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.available;
+                        return (
+                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${config.color}`}>
+                            {config.label}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <button
