@@ -262,18 +262,18 @@ export function VehicleForm() {
             />
 
             <Input
-              label="Garantie"
-              value={formData.warranty}
-              onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
-              placeholder="ex: Garantie 12 mois pièces et main d'œuvre"
-            />
-
-            <Input
               label="Équipements (séparés par des virgules)"
               value={featuresInput}
               onChange={(e) => setFeaturesInput(e.target.value)}
               placeholder="ex: ABS, LED, Quickshifter, TFT"
               helperText="Séparez chaque équipement par une virgule"
+            />
+
+            <Input
+              label="Garantie"
+              value={formData.warranty}
+              onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
+              placeholder="ex: Garantie 12 mois pièces et main d'œuvre"
             />
 
             <Select
