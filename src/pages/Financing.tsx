@@ -81,7 +81,7 @@ export function Financing() {
 
       <Section background="white" className="!py-8">
         <Container size="md">
-          <div className="bg-gradient-to-br from-[#D10000] to-[#A00000] text-white p-8 md:p-12 rounded-xl mb-12">
+          <div className="bg-gradient-to-br from-[#E85555] to-[#D14444] text-white p-8 md:p-12 rounded-xl mb-12">
             <div className="flex items-center gap-3 mb-6">
               <Calculator className="w-8 h-8" aria-hidden="true" />
               <h2 className="text-2xl md:text-3xl font-bold">Simulateur de crédit</h2>
