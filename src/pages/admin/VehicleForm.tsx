@@ -31,6 +31,7 @@ export function VehicleForm() {
     images: [] as string[],
     features: [] as string[],
     warranty: 'Garantie 6 mois pièces et main d\'œuvre',
+    status: 'available' as 'available' | 'reserved' | 'sold',
     available: true,
   });
 
@@ -72,6 +73,7 @@ export function VehicleForm() {
         images: vehicle.images || [],
         features: vehicle.features || [],
         warranty: vehicle.warranty || 'Garantie 6 mois pièces et main d\'œuvre',
+        status: (vehicle as any).status || 'available',
         available: vehicle.available,
       });
       setFeaturesInput(vehicle.features?.join(', ') || '');
@@ -92,6 +94,7 @@ export function VehicleForm() {
     const vehicleData = {
       ...formData,
       features,
+      available: formData.status === 'available' && formData.available,
     };
 
     try {
@@ -272,6 +275,17 @@ export function VehicleForm() {
               placeholder="ex: ABS, LED, Quickshifter, TFT"
               helperText="Séparez chaque équipement par une virgule"
             />
+
+            <Select
+              label="Statut"
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value as 'available' | 'reserved' | 'sold' })}
+              required
+            >
+              <option value="available">Disponible</option>
+              <option value="reserved">Réservé</option>
+              <option value="sold">Vendu</option>
+            </Select>
 
             <label className="flex items-center space-x-2">
               <input
