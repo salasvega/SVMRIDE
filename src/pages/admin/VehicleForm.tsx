@@ -74,9 +74,13 @@ export function VehicleForm() {
         price: formData.price,
         description: formData.description,
         status: formData.status,
-        images: formData.images,
-        features: formData.features,
+        images: formData.images || [],
+        features: formData.features || [],
         slug: generateSlug(formData.brand!, formData.model!),
+        displacement: 0,
+        condition: 'occasion',
+        warranty: '',
+        available: formData.status === 'available',
       };
 
       if (isEdit) {
