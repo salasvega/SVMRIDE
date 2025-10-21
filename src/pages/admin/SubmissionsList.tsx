@@ -224,11 +224,11 @@ export default function SubmissionsList() {
     );
   };
 
-  const getRowBackgroundColor = (status: string) => {
+  const getSelectBackgroundColor = (status: string) => {
     const colors: Record<string, string> = {
-      new: 'bg-red-50',
-      in_progress: 'bg-yellow-50',
-      completed: 'bg-green-50',
+      new: 'bg-red-50 border-red-200',
+      in_progress: 'bg-yellow-50 border-yellow-200',
+      completed: 'bg-green-50 border-green-200',
     };
     return colors[status] || 'bg-white';
   };
@@ -312,7 +312,7 @@ export default function SubmissionsList() {
                 </thead>
                 <tbody className="divide-y divide-[#E5E5E5]">
                   {filteredSubmissions.map((submission) => (
-                    <tr key={submission.id} className={`${getRowBackgroundColor(submission.status)} hover:opacity-80 transition-opacity`}>
+                    <tr key={submission.id} className="hover:bg-[#F9F9F9]">
                       <td className="px-6 py-4 text-sm text-[#666666]">
                         {new Date(submission.created_at).toLocaleDateString('fr-FR')}
                       </td>
@@ -332,7 +332,7 @@ export default function SubmissionsList() {
                         <Select
                           value={submission.status}
                           onChange={(e) => handleStatusChange(submission.id, e.target.value)}
-                          className="text-sm"
+                          className={`text-sm ${getSelectBackgroundColor(submission.status)}`}
                         >
                           <option value="new">Nouvelle</option>
                           <option value="in_progress">En cours</option>
