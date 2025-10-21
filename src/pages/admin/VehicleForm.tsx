@@ -66,7 +66,16 @@ export function VehicleForm() {
 
     try {
       const vehicleData = {
-        ...formData,
+        brand: formData.brand,
+        model: formData.model,
+        type: formData.type,
+        year: formData.year,
+        mileage: formData.mileage,
+        price: formData.price,
+        description: formData.description,
+        status: formData.status,
+        images: formData.images,
+        features: formData.features,
         slug: generateSlug(formData.brand!, formData.model!),
       };
 
