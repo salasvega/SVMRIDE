@@ -5,6 +5,7 @@ import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
 import { supabase } from '../../lib/supabase';
 import { SubmissionDetailsModal } from '../../components/admin/SubmissionDetailsModal';
+import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 
 type Submission = {
   id: string;
@@ -25,6 +26,7 @@ export default function SubmissionsList() {
   const [filter, setFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
+  const [submissionToDelete, setSubmissionToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     loadSubmissions();
@@ -64,15 +66,16 @@ export default function SubmissionsList() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette demande ?')) return;
+  const handleDelete = async () => {
+    if (!submissionToDelete) return;
 
     try {
-      const { error } = await supabase.from('contact_submissions').delete().eq('id', id);
+      const { error } = await supabase.from('contact_submissions').delete().eq('id', submissionToDelete);
 
       if (error) throw error;
 
-      setSubmissions(submissions.filter((sub) => sub.id !== id));
+      setSubmissions(submissions.filter((sub) => sub.id !== submissionToDelete));
+      setSubmissionToDelete(null);
     } catch (error) {
       console.error('Error deleting submission:', error);
       alert('Erreur lors de la suppression');
@@ -229,7 +232,7 @@ export default function SubmissionsList() {
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDelete(submission.id)}
+                            onClick={() => setSubmissionToDelete(submission.id)}
                             className="p-2 text-[#666666] hover:text-red-600 hover:bg-[#F9F9F9] rounded transition-colors"
                             title="Supprimer"
                           >
@@ -249,6 +252,15 @@ export default function SubmissionsList() {
           <SubmissionDetailsModal
             submission={selectedSubmission}
             onClose={() => setSelectedSubmission(null)}
+          />
+        )}
+
+        {submissionToDelete && (
+          <DeleteConfirmModal
+            title="Confirmer la suppression"
+            message="Êtes-vous sûr de vouloir supprimer cette demande ? Cette action est irréversible."
+            onConfirm={handleDelete}
+            onCancel={() => setSubmissionToDelete(null)}
           />
         )}
       </Container>
