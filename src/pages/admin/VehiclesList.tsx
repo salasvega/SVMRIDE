@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Edit, Trash2, Eye, EyeOff, Plus } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Button } from '../../components/ui/Button';
@@ -10,6 +10,7 @@ import { siteConfig } from '../../config/site';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 
 export function VehiclesList() {
+  const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
@@ -53,6 +54,10 @@ export function VehiclesList() {
     } else {
       alert('Erreur lors de la suppression du véhicule');
     }
+  }
+
+  function handleRowDoubleClick(vehicleId: string) {
+    navigate(`/admin/vehicles/edit/${vehicleId}`);
   }
 
   if (loading) {
@@ -114,7 +119,11 @@ export function VehiclesList() {
               </thead>
               <tbody className="divide-y divide-[#E5E5E5]">
                 {vehicles.map((vehicle) => (
-                  <tr key={vehicle.id} className="hover:bg-[#F9F9F9]">
+                  <tr
+                    key={vehicle.id}
+                    className="hover:bg-[#F9F9F9] cursor-pointer"
+                    onDoubleClick={() => handleRowDoubleClick(vehicle.id)}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <a
                         href={`${siteConfig.baseUrl}/vehicules/${vehicle.slug}`}
