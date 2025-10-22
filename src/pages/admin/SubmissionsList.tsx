@@ -155,9 +155,14 @@ export default function SubmissionsList() {
 
       if (error) throw error;
 
-      setSubmissions(
-        submissions.map((sub) => (sub.id === id ? { ...sub, status: newStatus as any } : sub))
+      const updatedSubmissions = submissions.map((sub) =>
+        sub.id === id ? { ...sub, status: newStatus as any } : sub
       );
+      setSubmissions(updatedSubmissions);
+
+      if (selectedSubmission && selectedSubmission.id === id) {
+        setSelectedSubmission({ ...selectedSubmission, status: newStatus as any });
+      }
     } catch (error) {
       console.error('Error updating status:', error);
       alert('Erreur lors de la mise à jour du statut');
