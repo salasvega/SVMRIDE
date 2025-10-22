@@ -155,7 +155,7 @@ export function Financing() {
             </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
             <div>
               <h2 className="text-2xl font-bold text-[#111111] mb-6">
                 Pourquoi financer avec nous ?
