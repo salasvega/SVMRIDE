@@ -1,5 +1,6 @@
 import { X, Mail, Phone, Calendar, MessageSquare, Tag, User } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { Select } from '../ui/Select';
 
 type Submission = {
   id: string;
@@ -17,9 +18,10 @@ type Submission = {
 interface SubmissionDetailsModalProps {
   submission: Submission;
   onClose: () => void;
+  onStatusChange?: (id: string, newStatus: string) => void;
 }
 
-export function SubmissionDetailsModal({ submission, onClose }: SubmissionDetailsModalProps) {
+export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: SubmissionDetailsModalProps) {
   const getTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
       contact: 'Contact',
@@ -38,6 +40,21 @@ export function SubmissionDetailsModal({ submission, onClose }: SubmissionDetail
       custom_search: 'bg-purple-100 text-purple-800',
     };
     return colors[type] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getSelectBackgroundColor = (status: string) => {
+    const colors: Record<string, string> = {
+      new: 'bg-red-50 border-red-200',
+      in_progress: 'bg-yellow-50 border-yellow-200',
+      completed: 'bg-green-50 border-green-200',
+    };
+    return colors[status] || 'bg-white';
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    if (onStatusChange) {
+      onStatusChange(submission.id, newStatus);
+    }
   };
 
   return (
@@ -66,10 +83,21 @@ export function SubmissionDetailsModal({ submission, onClose }: SubmissionDetail
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 justify-between">
               <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getTypeColor(submission.type)}`}>
                 {getTypeLabel(submission.type)}
               </span>
+              <div className="flex-shrink-0">
+                <Select
+                  value={submission.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className={`text-sm ${getSelectBackgroundColor(submission.status)}`}
+                >
+                  <option value="new">Nouvelle</option>
+                  <option value="in_progress">En cours</option>
+                  <option value="completed">Terminée</option>
+                </Select>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

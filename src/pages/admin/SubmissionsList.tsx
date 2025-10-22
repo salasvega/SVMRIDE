@@ -374,6 +374,7 @@ export default function SubmissionsList() {
           <SubmissionDetailsModal
             submission={selectedSubmission}
             onClose={() => setSelectedSubmission(null)}
+            onStatusChange={handleStatusChange}
           />
         )}
 
