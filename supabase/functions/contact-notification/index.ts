@@ -125,8 +125,8 @@ Deno.serve(async (req: Request) => {
         "Authorization": `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: "notifications@votre-domaine.com",
-        to: ["votre-email@exemple.com"],
+        from: "onboarding@resend.dev",
+        to: ["salasvega@gmail.com"],
         subject: `Nouveau contact: ${subject}`,
         html: emailHtml,
         reply_to: email,
