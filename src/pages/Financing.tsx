@@ -81,8 +81,17 @@ export function Financing() {
 
       <Section background="white" className="!py-8">
         <Container size="md">
-          <div className="bg-gradient-to-br from-[#2C2C2C] to-[#1A1A1A] text-white p-8 md:p-12 rounded-xl mb-12">
-            <div className="flex items-center gap-3 mb-6">
+          <div className="relative bg-gradient-to-br from-[#2C2C2C] to-[#1A1A1A] text-white p-8 md:p-12 rounded-xl mb-12 overflow-hidden">
+            <div className="absolute inset-0 opacity-20">
+              <img
+                src="/image copy copy.png"
+                alt=""
+                className="w-full h-full object-cover"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-6">
               <Calculator className="w-8 h-8" aria-hidden="true" />
               <h2 className="text-2xl md:text-3xl font-bold">Simulateur de crédit</h2>
             </div>
@@ -142,6 +151,7 @@ export function Financing() {
               <p className="text-xs opacity-80">
                 Cette simulation est indicative et ne constitue pas une offre de crédit.
               </p>
+            </div>
             </div>
           </div>
 
