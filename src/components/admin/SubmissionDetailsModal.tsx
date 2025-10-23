@@ -226,9 +226,9 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
                 <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-3">Informations complémentaires</p>
                 <div className="bg-white rounded-lg p-4 border border-[#E5E5E5] space-y-2">
                   {Object.entries(submission.data).map(([key, value]) => (
-                    <div key={key} className="flex justify-between items-start py-2 border-b border-[#E5E5E5] last:border-0">
+                    <div key={key} className={`py-2 border-b border-[#E5E5E5] last:border-0 ${key === 'comments' || key === 'commentaires' ? 'flex flex-col gap-2' : 'flex justify-between items-start'}`}>
                       <span className="text-sm font-medium text-[#666666] capitalize">{key.replace(/_/g, ' ')}</span>
-                      <span className="text-sm text-[#111111] text-right ml-4">{String(value)}</span>
+                      <span className={`text-sm text-[#111111] ${key === 'comments' || key === 'commentaires' ? '' : 'text-right ml-4'}`}>{String(value)}</span>
                     </div>
                   ))}
                 </div>
