@@ -7,6 +7,13 @@ import { supabase } from '../../lib/supabase';
 import { SubmissionDetailsModal } from '../../components/admin/SubmissionDetailsModal';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 
+type Attachment = {
+  filename: string;
+  path: string;
+  size: number;
+  mime_type: string;
+};
+
 type Submission = {
   id: string;
   type: 'contact' | 'financing' | 'trade_in' | 'custom_search';
@@ -18,6 +25,7 @@ type Submission = {
   subject?: string;
   created_at: string;
   data?: Record<string, any>;
+  attachments?: Attachment[];
 };
 
 export default function SubmissionsList() {
@@ -55,6 +63,7 @@ export default function SubmissionsList() {
             subject: item.subject,
             message: item.message,
             created_at: item.created_at,
+            attachments: item.attachments || [],
           }))
         );
       }
@@ -74,6 +83,7 @@ export default function SubmissionsList() {
               montant: item.amount,
               durée: item.duration,
             },
+            attachments: item.attachments || [],
           }))
         );
       }
@@ -96,6 +106,7 @@ export default function SubmissionsList() {
               état: item.condition,
               commentaires: item.comments,
             },
+            attachments: item.attachments || [],
           }))
         );
       }
@@ -119,6 +130,7 @@ export default function SubmissionsList() {
               délai: item.deadline,
               commentaires: item.comments,
             },
+            attachments: item.attachments || [],
           }))
         );
       }
