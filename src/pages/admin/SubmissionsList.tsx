@@ -345,6 +345,9 @@ export default function SubmissionsList() {
                 <thead className="bg-[#F9F9F9] border-b border-[#E5E5E5]">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666666] uppercase tracking-wider">
+                      Statut
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666666] uppercase tracking-wider">
                       Date
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666666] uppercase tracking-wider">
@@ -355,9 +358,6 @@ export default function SubmissionsList() {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-[#666666] uppercase tracking-wider">
                       Contact
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-[#666666] uppercase tracking-wider">
-                      Statut
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-semibold text-[#666666] uppercase tracking-wider">
                       Actions
@@ -371,6 +371,17 @@ export default function SubmissionsList() {
                       className="hover:bg-[#F9F9F9] cursor-pointer"
                       onDoubleClick={() => setSelectedSubmission(submission)}
                     >
+                      <td className="px-6 py-4">
+                        <Select
+                          value={submission.status}
+                          onChange={(e) => handleStatusChange(submission.id, e.target.value)}
+                          className={`text-sm ${getSelectBackgroundColor(submission.status)}`}
+                        >
+                          <option value="new">Nouvelle</option>
+                          <option value="in_progress">En cours</option>
+                          <option value="completed">Terminée</option>
+                        </Select>
+                      </td>
                       <td className="px-6 py-4 text-sm text-[#666666]">
                         {new Date(submission.created_at).toLocaleDateString('fr-FR')}
                       </td>
@@ -385,17 +396,6 @@ export default function SubmissionsList() {
                       <td className="px-6 py-4">
                         <p className="text-sm text-[#666666]">{submission.email}</p>
                         <p className="text-sm text-[#666666]">{submission.phone}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <Select
-                          value={submission.status}
-                          onChange={(e) => handleStatusChange(submission.id, e.target.value)}
-                          className={`text-sm ${getSelectBackgroundColor(submission.status)}`}
-                        >
-                          <option value="new">Nouvelle</option>
-                          <option value="in_progress">En cours</option>
-                          <option value="completed">Terminée</option>
-                        </Select>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
