@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Eye, Trash2, Filter } from 'lucide-react';
+import { Eye, Trash2, Filter, Search } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
@@ -33,6 +33,7 @@ export default function SubmissionsList() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null);
   const [submissionToDelete, setSubmissionToDelete] = useState<string | null>(null);
 
@@ -211,6 +212,21 @@ export default function SubmissionsList() {
   const filteredSubmissions = submissions.filter((sub) => {
     if (filter !== 'all' && sub.type !== filter) return false;
     if (statusFilter !== 'all' && sub.status !== statusFilter) return false;
+
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const searchableText = [
+        sub.name,
+        sub.email,
+        sub.phone,
+        sub.message,
+        sub.subject,
+        JSON.stringify(sub.data)
+      ].join(' ').toLowerCase();
+
+      if (!searchableText.includes(query)) return false;
+    }
+
     return true;
   });
 
@@ -272,29 +288,49 @@ export default function SubmissionsList() {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex items-center gap-4">
-            <Filter className="w-5 h-5 text-[#666666]" />
-            <Select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="flex-1"
-            >
-              <option value="all">Tous les types</option>
-              <option value="contact">Contact</option>
-              <option value="financing">Financement</option>
-              <option value="trade_in">Reprise</option>
-              <option value="custom_search">Recherche personnalisée</option>
-            </Select>
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="flex-1"
-            >
-              <option value="all">Tous les statuts</option>
-              <option value="new">Nouvelles</option>
-              <option value="in_progress">En cours</option>
-              <option value="completed">Terminées</option>
-            </Select>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-4">
+              <Filter className="w-5 h-5 text-[#666666]" />
+              <Select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="flex-1"
+              >
+                <option value="all">Tous les types</option>
+                <option value="contact">Contact</option>
+                <option value="financing">Financement</option>
+                <option value="trade_in">Reprise</option>
+                <option value="custom_search">Recherche personnalisée</option>
+              </Select>
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="flex-1"
+              >
+                <option value="all">Tous les statuts</option>
+                <option value="new">Nouvelles</option>
+                <option value="in_progress">En cours</option>
+                <option value="completed">Terminées</option>
+              </Select>
+            </div>
+            <div className="flex items-center gap-4">
+              <Search className="w-5 h-5 text-[#666666]" />
+              <input
+                type="text"
+                placeholder="Rechercher par nom, email, téléphone, message..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 px-4 py-2 border border-[#E5E5E5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D10000] focus:border-transparent"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-sm text-[#666666] hover:text-[#D10000] transition-colors"
+                >
+                  Effacer
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
