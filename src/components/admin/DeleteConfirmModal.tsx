@@ -1,5 +1,4 @@
 import { AlertTriangle, X } from 'lucide-react';
-import { Button } from '../ui/Button';
 
 interface DeleteConfirmModalProps {
   title?: string;
@@ -36,18 +35,18 @@ export function DeleteConfirmModal({
         </div>
 
         <div className="bg-[#F9F9F9] px-6 py-4 flex gap-3">
-          <Button
+          <button
             onClick={onCancel}
             className="flex-1 bg-white hover:bg-[#F9F9F9] text-[#111111] border border-[#E5E5E5] font-semibold py-3 rounded-xl transition-colors"
           >
             Annuler
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={onConfirm}
             className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition-colors"
           >
             Supprimer
-          </Button>
+          </button>
         </div>
       </div>
     </div>
