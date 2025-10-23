@@ -1,6 +1,14 @@
-import { X, Mail, Phone, Calendar, MessageSquare, Tag, User } from 'lucide-react';
+import { X, Mail, Phone, Calendar, MessageSquare, Tag, User, Paperclip, Download, FileText } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
+import { supabase } from '../../lib/supabase';
+
+type Attachment = {
+  filename: string;
+  path: string;
+  size: number;
+  mime_type: string;
+};
 
 type Submission = {
   id: string;
@@ -13,6 +21,7 @@ type Submission = {
   subject?: string;
   created_at: string;
   data?: Record<string, any>;
+  attachments?: Attachment[];
 };
 
 interface SubmissionDetailsModalProps {
@@ -55,6 +64,36 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
     if (onStatusChange) {
       onStatusChange(submission.id, newStatus);
     }
+  };
+
+  const handleDownloadAttachment = async (attachment: Attachment) => {
+    try {
+      const { data, error } = await supabase.storage
+        .from('form-attachments')
+        .download(attachment.path);
+
+      if (error) {
+        console.error('Error downloading file:', error);
+        return;
+      }
+
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = attachment.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   return (
@@ -203,6 +242,48 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
                       <span className="text-sm text-[#111111] text-right ml-4">{String(value)}</span>
                     </div>
                   ))}
+                </div>
+              </div>
+            )}
+
+            {submission.attachments && submission.attachments.length > 0 && (
+              <div className="bg-[#F9F9F9] rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-2 bg-white rounded-lg">
+                    <Paperclip className="w-5 h-5 text-[#C62E2E]" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-3">
+                      Pièces jointes ({submission.attachments.length})
+                    </p>
+                    <div className="bg-white rounded-lg border border-[#E5E5E5] divide-y divide-[#E5E5E5]">
+                      {submission.attachments.map((attachment, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 hover:bg-[#F9F9F9] transition-colors"
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <FileText className="w-5 h-5 text-[#666666] flex-shrink-0" />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-[#111111] truncate">
+                                {attachment.filename}
+                              </p>
+                              <p className="text-xs text-[#666666]">
+                                {formatFileSize(attachment.size)}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleDownloadAttachment(attachment)}
+                            className="ml-3 p-2 hover:bg-[#C62E2E]/10 rounded-lg transition-colors flex-shrink-0 group"
+                            title="Télécharger"
+                          >
+                            <Download className="w-5 h-5 text-[#C62E2E] group-hover:text-[#A02525]" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
