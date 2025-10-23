@@ -99,48 +99,48 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-        <div className="sticky top-0 bg-gradient-to-r from-[#C62E2E] to-[#D10000] text-white px-6 py-5 flex items-center justify-between relative overflow-hidden">
+        <div className="sticky top-0 bg-gradient-to-r from-[#C62E2E] to-[#D10000] text-white px-6 py-5 relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/fond_carbonne_nid_abeilles.png')] bg-center bg-cover opacity-80"></div>
-          <div className="relative z-10">
-            <h2 className="text-2xl font-bold">{getTypeLabel(submission.type)}</h2>
-            <p className="text-sm text-white/80 mt-1">
-              {new Date(submission.created_at).toLocaleDateString('fr-FR', {
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              })}
-            </p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded-full transition-colors relative z-10"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
-
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-          <div className="space-y-6">
-            <div className="flex items-center gap-4">
-              <div className="flex-shrink-0">
+          <div className="relative z-10 flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <div className="mb-3">
                 <Select
                   value={submission.status}
                   onChange={(e) => handleStatusChange(e.target.value)}
-                  className={`text-sm ${getSelectBackgroundColor(submission.status)}`}
+                  className={`text-sm ${getSelectBackgroundColor(submission.status)} border-2`}
                 >
                   <option value="new">Nouvelle</option>
                   <option value="in_progress">En cours</option>
                   <option value="completed">Terminée</option>
                 </Select>
               </div>
-              <div className="flex items-center gap-2 text-[#666666]">
-                <User className="w-4 h-4" />
-                <span className="text-sm font-medium">
-                  {submission.name}
-                </span>
-              </div>
+              <h2 className="text-2xl font-bold">{getTypeLabel(submission.type)}</h2>
+              <p className="text-sm text-white/80 mt-1">
+                {new Date(submission.created_at).toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/20 rounded-full transition-colors"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 bg-[#F9F9F9] rounded-xl p-4">
+              <User className="w-6 h-6 text-[#C62E2E]" />
+              <span className="text-lg font-semibold text-[#111111]">
+                {submission.name}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
