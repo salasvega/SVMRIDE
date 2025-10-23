@@ -330,6 +330,8 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
                 </div>
               </div>
             </div>
+
+            <div className="h-6"></div>
           </div>
         </div>
 
