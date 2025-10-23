@@ -1,10 +1,18 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.57.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
+
+interface Attachment {
+  filename: string;
+  path: string;
+  size: number;
+  mime_type: string;
+}
 
 interface WebhookPayload {
   type: string;
@@ -15,6 +23,7 @@ interface WebhookPayload {
     email: string;
     subject: string;
     message: string;
+    attachments?: Attachment[];
     submitted_at: string;
   };
   schema: string;
@@ -65,13 +74,57 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const { name, email, subject, message, submitted_at } = payload.record;
+    const { name, email, subject, message, attachments, submitted_at } = payload.record;
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const resendAttachments = [];
+
+    if (attachments && attachments.length > 0) {
+      for (const attachment of attachments) {
+        try {
+          const { data, error } = await supabase.storage
+            .from('form-attachments')
+            .download(attachment.path);
+
+          if (!error && data) {
+            const buffer = await data.arrayBuffer();
+            const base64Content = btoa(
+              new Uint8Array(buffer).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ''
+              )
+            );
+
+            resendAttachments.push({
+              filename: attachment.filename,
+              content: base64Content,
+            });
+          }
+        } catch (err) {
+          console.error(`Error processing attachment ${attachment.filename}:`, err);
+        }
+      }
+    }
+
+    let attachmentsHtml = '';
+    if (attachments && attachments.length > 0) {
+      attachmentsHtml = '<p><strong>Pi\u00e8ces jointes:</strong></p><ul>';
+      for (const attachment of attachments) {
+        const sizeKB = (attachment.size / 1024).toFixed(2);
+        attachmentsHtml += `<li>${attachment.filename} (${sizeKB} KB)</li>`;
+      }
+      attachmentsHtml += '</ul>';
+    }
 
     const emailHtml = `
       <p><strong>Nom:</strong> ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Sujet:</strong> ${subject}</p>
       <p><strong>Message:</strong> ${message.replace(/\n/g, '<br>')}</p>
+      ${attachmentsHtml}
       <p><strong>Date de soumission:</strong> ${new Date(submitted_at).toLocaleString('fr-FR')}</p>
     `;
 
@@ -87,6 +140,7 @@ Deno.serve(async (req: Request) => {
         subject: `Nouveau contact: ${subject}`,
         html: emailHtml,
         reply_to: email,
+        attachments: resendAttachments,
       }),
     });
 

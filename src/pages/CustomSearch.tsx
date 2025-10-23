@@ -7,7 +7,9 @@ import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
+import { FileUpload } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
+import { supabase } from '../lib/supabase';
 
 export function CustomSearch() {
   const [formData, setFormData] = useState({
@@ -24,6 +26,8 @@ export function CustomSearch() {
     consent: false,
   });
 
+  const [files, setFiles] = useState<File[]>([]);
+
   const { submit, isSubmitting, success, error } = useFormSubmit({
     onSuccess: () => {
       setFormData({
@@ -39,13 +43,42 @@ export function CustomSearch() {
         comments: '',
         consent: false,
       });
+      setFiles([]);
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const attachments = [];
+
+    for (const file of files) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `custom-search/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('form-attachments')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        continue;
+      }
+
+      attachments.push({
+        filename: file.name,
+        path: filePath,
+        size: file.size,
+        mime_type: file.type,
+      });
+    }
+
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    await submit(`${supabaseUrl}/functions/v1/custom-search-form`, formData);
+    await submit(`${supabaseUrl}/functions/v1/custom-search-form`, {
+      ...formData,
+      attachments,
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -257,6 +290,13 @@ export function CustomSearch() {
                     placeholder="Modèle précis, couleur, équipements souhaités..."
                     value={formData.comments}
                     onChange={handleChange}
+                  />
+
+                  <FileUpload
+                    label="Pièces jointes (optionnel)"
+                    maxFiles={5}
+                    maxSizeMB={10}
+                    onChange={setFiles}
                   />
 
                   <div className="flex items-start gap-3">

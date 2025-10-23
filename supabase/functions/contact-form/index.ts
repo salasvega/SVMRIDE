@@ -7,12 +7,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
+interface Attachment {
+  filename: string;
+  path: string;
+  size: number;
+  mime_type: string;
+}
+
 interface ContactFormData {
   name: string;
   email: string;
   subject: string;
   message: string;
   consent: boolean;
+  attachments?: Attachment[];
 }
 
 Deno.serve(async (req: Request) => {
@@ -67,6 +75,7 @@ Deno.serve(async (req: Request) => {
       email: formData.email,
       subject: formData.subject,
       message: formData.message,
+      attachments: formData.attachments || [],
       submitted_at: new Date().toISOString(),
     });
 

@@ -7,6 +7,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
+interface Attachment {
+  filename: string;
+  path: string;
+  size: number;
+  mime_type: string;
+}
+
 interface CustomSearchFormData {
   name: string;
   email: string;
@@ -19,6 +26,7 @@ interface CustomSearchFormData {
   deadline: string;
   comments?: string;
   consent: boolean;
+  attachments?: Attachment[];
 }
 
 Deno.serve(async (req: Request) => {
@@ -79,6 +87,7 @@ Deno.serve(async (req: Request) => {
       budget_max: formData.budgetMax,
       deadline: formData.deadline,
       comments: formData.comments || '',
+      attachments: formData.attachments || [],
       submitted_at: new Date().toISOString(),
     });
 
