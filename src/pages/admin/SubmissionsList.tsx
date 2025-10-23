@@ -260,9 +260,9 @@ export default function SubmissionsList() {
 
   const getSelectBackgroundColor = (status: string) => {
     const colors: Record<string, string> = {
-      new: 'bg-blue-50 border-blue-200',
-      in_progress: 'bg-yellow-50 border-yellow-200',
-      completed: 'bg-green-50 border-green-200',
+      new: 'bg-blue-100 border-blue-300',
+      in_progress: 'bg-yellow-100 border-yellow-300',
+      completed: 'bg-green-100 border-green-300',
     };
     return colors[status] || 'bg-white';
   };
