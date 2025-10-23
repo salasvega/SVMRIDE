@@ -123,7 +123,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
-            <div className="flex items-center gap-3 justify-start">
+            <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
                 <Select
                   value={submission.status}
@@ -134,6 +134,12 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
                   <option value="in_progress">En cours</option>
                   <option value="completed">Terminée</option>
                 </Select>
+              </div>
+              <div className="flex items-center gap-2 text-[#666666]">
+                <Calendar className="w-4 h-4" />
+                <span className="text-sm font-medium">
+                  {new Date(submission.created_at).toLocaleDateString('fr-FR')}
+                </span>
               </div>
             </div>
 
@@ -180,20 +186,6 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
                     >
                       {submission.phone}
                     </a>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-[#F9F9F9] rounded-xl p-4 space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-white rounded-lg">
-                    <Calendar className="w-5 h-5 text-[#C62E2E]" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-1">Date</p>
-                    <p className="text-[#111111] font-semibold">
-                      {new Date(submission.created_at).toLocaleDateString('fr-FR')}
-                    </p>
                   </div>
                 </div>
               </div>
