@@ -306,13 +306,13 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
               </div>
             )}
 
-            <div className="bg-[#FFF8E1] rounded-xl p-4 border-2 border-[#FFD54F]">
+            <div className="bg-[#F5F5F5] rounded-xl p-4 border-2 border-[#E0E0E0]">
               <div className="flex items-start gap-3">
                 <div className="p-2 bg-white rounded-lg">
-                  <FileEdit className="w-5 h-5 text-[#F57C00]" />
+                  <FileEdit className="w-5 h-5 text-[#666666]" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-[#F57C00] font-medium uppercase tracking-wide mb-3">Mes Notes (Privées)</p>
+                  <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-3">Mes Notes (Privées)</p>
                   <Textarea
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
@@ -323,7 +323,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
                   <button
                     onClick={handleSaveAdminNotes}
                     disabled={isSavingNotes}
-                    className="mt-3 px-4 py-2 bg-[#F57C00] hover:bg-[#E65100] disabled:bg-[#CCCCCC] text-white font-semibold rounded-lg transition-colors"
+                    className="mt-3 px-4 py-2 bg-[#666666] hover:bg-[#555555] disabled:bg-[#CCCCCC] text-white font-semibold rounded-lg transition-colors"
                   >
                     {isSavingNotes ? 'Enregistrement...' : 'Enregistrer les notes'}
                   </button>
