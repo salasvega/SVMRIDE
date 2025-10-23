@@ -1,6 +1,8 @@
-import { X, Mail, Phone, Calendar, MessageSquare, Tag, User, Paperclip, Download, FileText } from 'lucide-react';
+import { X, Mail, Phone, Calendar, MessageSquare, Tag, User, Paperclip, Download, FileText, FileEdit } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
+import { Textarea } from '../ui/Textarea';
 import { supabase } from '../../lib/supabase';
 
 type Attachment = {
@@ -22,6 +24,7 @@ type Submission = {
   created_at: string;
   data?: Record<string, any>;
   attachments?: Attachment[];
+  admin_notes?: string;
 };
 
 interface SubmissionDetailsModalProps {
@@ -31,6 +34,13 @@ interface SubmissionDetailsModalProps {
 }
 
 export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: SubmissionDetailsModalProps) {
+  const [adminNotes, setAdminNotes] = useState(submission.admin_notes || '');
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
+
+  useEffect(() => {
+    setAdminNotes(submission.admin_notes || '');
+  }, [submission.admin_notes]);
+
   const getTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
       contact: 'Contact',
@@ -63,6 +73,29 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
   const handleStatusChange = (newStatus: string) => {
     if (onStatusChange) {
       onStatusChange(submission.id, newStatus);
+    }
+  };
+
+  const handleSaveAdminNotes = async () => {
+    setIsSavingNotes(true);
+    try {
+      const tableName = {
+        contact: 'contact_submissions',
+        financing: 'financing_submissions',
+        trade_in: 'trade_in_submissions',
+        custom_search: 'custom_search_submissions',
+      }[submission.type];
+
+      const { error } = await supabase
+        .from(tableName)
+        .update({ admin_notes: adminNotes })
+        .eq('id', submission.id);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error saving admin notes:', error);
+    } finally {
+      setIsSavingNotes(false);
     }
   };
 
@@ -267,6 +300,31 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
                 </div>
               </div>
             )}
+
+            <div className="bg-[#FFF8E1] rounded-xl p-4 border-2 border-[#FFD54F]">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-white rounded-lg">
+                  <FileEdit className="w-5 h-5 text-[#F57C00]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs text-[#F57C00] font-medium uppercase tracking-wide mb-3">Mes Notes (Privées)</p>
+                  <Textarea
+                    value={adminNotes}
+                    onChange={(e) => setAdminNotes(e.target.value)}
+                    placeholder="Ajoutez vos notes, actions effectuées, remarques..."
+                    rows={4}
+                    className="bg-white text-[#111111] placeholder-[#999999]"
+                  />
+                  <button
+                    onClick={handleSaveAdminNotes}
+                    disabled={isSavingNotes}
+                    className="mt-3 px-4 py-2 bg-[#F57C00] hover:bg-[#E65100] disabled:bg-[#CCCCCC] text-white font-semibold rounded-lg transition-colors"
+                  >
+                    {isSavingNotes ? 'Enregistrement...' : 'Enregistrer les notes'}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

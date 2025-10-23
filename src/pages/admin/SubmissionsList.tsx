@@ -26,6 +26,7 @@ type Submission = {
   created_at: string;
   data?: Record<string, any>;
   attachments?: Attachment[];
+  admin_notes?: string;
 };
 
 export default function SubmissionsList() {
