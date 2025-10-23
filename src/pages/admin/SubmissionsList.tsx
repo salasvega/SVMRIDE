@@ -66,6 +66,7 @@ export default function SubmissionsList() {
             message: item.message,
             created_at: item.created_at,
             attachments: item.attachments || [],
+            admin_notes: item.admin_notes || '',
           }))
         );
       }
@@ -86,6 +87,7 @@ export default function SubmissionsList() {
               durée: item.duration,
             },
             attachments: item.attachments || [],
+            admin_notes: item.admin_notes || '',
           }))
         );
       }
@@ -109,6 +111,7 @@ export default function SubmissionsList() {
               commentaires: item.comments,
             },
             attachments: item.attachments || [],
+            admin_notes: item.admin_notes || '',
           }))
         );
       }
@@ -133,6 +136,7 @@ export default function SubmissionsList() {
               commentaires: item.comments,
             },
             attachments: item.attachments || [],
+            admin_notes: item.admin_notes || '',
           }))
         );
       }
