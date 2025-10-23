@@ -38,6 +38,8 @@ Deno.serve(async (req: Request) => {
     const recipientEmail = Deno.env.get("RECIPIENT_EMAIL")!;
 
     const payload: WebhookPayload = await req.json();
+    console.log("Custom search webhook received:", payload);
+    
     const record = payload.record;
 
     const emailHtml = `
