@@ -183,6 +183,17 @@ export default function SubmissionsList() {
     }
   };
 
+  const handleAdminNotesChange = (id: string, notes: string) => {
+    const updatedSubmissions = submissions.map((sub) =>
+      sub.id === id ? { ...sub, admin_notes: notes } : sub
+    );
+    setSubmissions(updatedSubmissions);
+
+    if (selectedSubmission && selectedSubmission.id === id) {
+      setSelectedSubmission({ ...selectedSubmission, admin_notes: notes });
+    }
+  };
+
   const handleDelete = async () => {
     if (!submissionToDelete) return;
 
@@ -429,6 +440,7 @@ export default function SubmissionsList() {
             submission={selectedSubmission}
             onClose={() => setSelectedSubmission(null)}
             onStatusChange={handleStatusChange}
+            onAdminNotesChange={handleAdminNotesChange}
           />
         )}
 

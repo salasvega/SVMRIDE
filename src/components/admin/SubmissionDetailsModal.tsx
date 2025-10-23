@@ -31,9 +31,10 @@ interface SubmissionDetailsModalProps {
   submission: Submission;
   onClose: () => void;
   onStatusChange?: (id: string, newStatus: string) => void;
+  onAdminNotesChange?: (id: string, notes: string) => void;
 }
 
-export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: SubmissionDetailsModalProps) {
+export function SubmissionDetailsModal({ submission, onClose, onStatusChange, onAdminNotesChange }: SubmissionDetailsModalProps) {
   const [adminNotes, setAdminNotes] = useState(submission.admin_notes || '');
   const [isSavingNotes, setIsSavingNotes] = useState(false);
 
@@ -92,6 +93,10 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
         .eq('id', submission.id);
 
       if (error) throw error;
+
+      if (onAdminNotesChange) {
+        onAdminNotesChange(submission.id, adminNotes);
+      }
     } catch (error) {
       console.error('Error saving admin notes:', error);
     } finally {
