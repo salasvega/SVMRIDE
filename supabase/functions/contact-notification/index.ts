@@ -68,7 +68,6 @@ Deno.serve(async (req: Request) => {
     const { name, email, subject, message, submitted_at } = payload.record;
 
     const emailHtml = `
-      <h2>Nouveau Message de Contact</h2>
       <p><strong>Nom:</strong> ${name}</p>
       <p><strong>Email:</strong> ${email}</p>
       <p><strong>Sujet:</strong> ${subject}</p>
