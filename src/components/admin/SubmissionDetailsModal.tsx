@@ -102,7 +102,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
         <div className="sticky top-0 bg-gradient-to-r from-[#C62E2E] to-[#D10000] text-white px-6 py-5 flex items-center justify-between relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/fond_carbonne_nid_abeilles.png')] bg-center bg-cover opacity-80"></div>
           <div className="relative z-10">
-            <h2 className="text-2xl font-bold">Détails de la demande</h2>
+            <h2 className="text-2xl font-bold">{getTypeLabel(submission.type)}</h2>
             <p className="text-sm text-white/80 mt-1">
               {new Date(submission.created_at).toLocaleDateString('fr-FR', {
                 day: 'numeric',
