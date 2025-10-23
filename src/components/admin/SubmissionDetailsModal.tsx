@@ -136,25 +136,14 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
                 </Select>
               </div>
               <div className="flex items-center gap-2 text-[#666666]">
-                <Calendar className="w-4 h-4" />
+                <User className="w-4 h-4" />
                 <span className="text-sm font-medium">
-                  {new Date(submission.created_at).toLocaleDateString('fr-FR')}
+                  {submission.name}
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-[#F9F9F9] rounded-xl p-4 space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-white rounded-lg">
-                    <User className="w-5 h-5 text-[#C62E2E]" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-1">Nom</p>
-                    <p className="text-[#111111] font-semibold">{submission.name}</p>
-                  </div>
-                </div>
-              </div>
 
               <div className="bg-[#F9F9F9] rounded-xl p-4 space-y-3">
                 <div className="flex items-start gap-3">
