@@ -53,11 +53,11 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
 
   const getSelectBackgroundColor = (status: string) => {
     const colors: Record<string, string> = {
-      new: 'bg-blue-50 border-2 border-blue-500 text-blue-900 font-semibold rounded-lg',
-      in_progress: 'bg-orange-50 border-2 border-orange-500 text-orange-900 font-semibold rounded-lg',
-      completed: 'bg-green-50 border-2 border-green-500 text-green-900 font-semibold rounded-lg',
+      new: 'bg-white border-2 border-blue-200 text-black font-semibold rounded-lg',
+      in_progress: 'bg-white border-2 border-orange-200 text-black font-semibold rounded-lg',
+      completed: 'bg-white border-2 border-green-200 text-black font-semibold rounded-lg',
     };
-    return colors[status] || 'bg-white border-2 border-gray-300 rounded-lg';
+    return colors[status] || 'bg-white border-2 border-gray-200 rounded-lg';
   };
 
   const handleStatusChange = (newStatus: string) => {
