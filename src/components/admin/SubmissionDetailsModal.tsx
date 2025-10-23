@@ -124,9 +124,6 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
           <div className="space-y-6">
             <div className="flex items-center gap-3 justify-between">
-              <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getTypeColor(submission.type)}`}>
-                {getTypeLabel(submission.type)}
-              </span>
               <div className="flex-shrink-0">
                 <Select
                   value={submission.status}
@@ -138,6 +135,9 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange }: 
                   <option value="completed">Terminée</option>
                 </Select>
               </div>
+              <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getTypeColor(submission.type)}`}>
+                {getTypeLabel(submission.type)}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
