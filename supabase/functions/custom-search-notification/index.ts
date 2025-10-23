@@ -43,7 +43,6 @@ Deno.serve(async (req: Request) => {
     const record = payload.record;
 
     const emailHtml = `
-      <h2>Nouvelle Recherche Personnalisée</h2>
       <p><strong>Nom:</strong> ${record.name}</p>
       <p><strong>Email:</strong> ${record.email}</p>
       <p><strong>Téléphone:</strong> ${record.phone}</p>
