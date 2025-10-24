@@ -207,4 +207,4 @@ Pour toute question: contact@svmride.com
 
 ---
 
-© 2025 SVM Ride. Tous droits réservés.
+© 2025 SVM Ride. Tous droits réservés. By Tonton Design
