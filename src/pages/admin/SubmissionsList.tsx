@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Eye, Trash2, Filter, Search, Circle, Clock, CheckCircle2 } from 'lucide-react';
+import { Trash2, Filter, Search, Circle, Clock, CheckCircle2 } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
@@ -416,13 +416,6 @@ export default function SubmissionsList() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => setSelectedSubmission(submission)}
-                            className="p-2 text-[#D10000] hover:bg-[#F9F9F9] rounded transition-colors"
-                            title="Voir les détails"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
                           <button
                             onClick={() => setSubmissionToDelete(submission.id)}
                             className="p-2 text-[#D10000] hover:bg-[#F9F9F9] rounded transition-colors"
