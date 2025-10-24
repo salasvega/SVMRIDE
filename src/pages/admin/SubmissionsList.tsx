@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Eye, Trash2, Filter, Search } from 'lucide-react';
+import { Eye, Trash2, Filter, Search, Circle, Clock, CheckCircle2 } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
@@ -256,21 +256,30 @@ export default function SubmissionsList() {
     return labels[type] || type;
   };
 
-  const getStatusBadge = (status: string) => {
-    const styles: Record<string, string> = {
-      new: 'bg-blue-100 text-blue-800',
-      in_progress: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-green-100 text-green-800',
+  const getStatusIcon = (status: string) => {
+    const iconProps = { className: 'w-5 h-5' };
+    const icons: Record<string, { icon: JSX.Element; color: string; label: string }> = {
+      new: {
+        icon: <Circle {...iconProps} />,
+        color: 'text-blue-500',
+        label: 'Nouvelle'
+      },
+      in_progress: {
+        icon: <Clock {...iconProps} />,
+        color: 'text-orange-500',
+        label: 'En cours'
+      },
+      completed: {
+        icon: <CheckCircle2 {...iconProps} />,
+        color: 'text-green-500',
+        label: 'Terminée'
+      },
     };
-    const labels: Record<string, string> = {
-      new: 'Nouvelle',
-      in_progress: 'En cours',
-      completed: 'Terminée',
-    };
+    const statusInfo = icons[status] || icons.new;
     return (
-      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${styles[status]}`}>
-        {labels[status]}
-      </span>
+      <div className={`flex items-center justify-center ${statusInfo.color}`} title={statusInfo.label}>
+        {statusInfo.icon}
+      </div>
     );
   };
 
@@ -388,15 +397,7 @@ export default function SubmissionsList() {
                       onDoubleClick={() => setSelectedSubmission(submission)}
                     >
                       <td className="px-6 py-4">
-                        <Select
-                          value={submission.status}
-                          onChange={(e) => handleStatusChange(submission.id, e.target.value)}
-                          className={`text-sm ${getSelectBackgroundColor(submission.status)}`}
-                        >
-                          <option value="new">Nouvelle</option>
-                          <option value="in_progress">En cours</option>
-                          <option value="completed">Terminée</option>
-                        </Select>
+                        {getStatusIcon(submission.status)}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#666666]">
                         {new Date(submission.created_at).toLocaleDateString('fr-FR')}
