@@ -314,7 +314,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
                 <div className="flex-1">
                   <p className="text-xs text-[#666666] font-small uppercase tracking-wide mb-3">Mes Notes</p>
                   <Textarea
-                    value={adminNotes}
+                    value={adminNotes}réduis l
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder="Ajoutez vos notes, actions effectuées, remarques..."
                     rows={4}
