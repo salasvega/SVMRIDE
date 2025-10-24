@@ -36,7 +36,12 @@ export function LegalNotice() {
             <p className="text-[#444444] mb-6">
               M. Mattia SARAVIA
             </p>
-
+ 
+            <h2 className="text-2xl font-bold text-[#111111] mb-4 mt-8">Hébergement</h2>
+            <p className="text-[#444444] mb-6">
+              Le site est crée par: SALAS VEGA @ AXSDESIGN : salasvega@gmail.com<br />
+              
+            </p>
             <h2 className="text-2xl font-bold text-[#111111] mb-4 mt-8">Hébergement</h2>
             <p className="text-[#444444] mb-6">
               Le site est hébergé par: AMEN.fr<br />
