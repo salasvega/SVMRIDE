@@ -312,13 +312,13 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
                   <FileEdit className="w-5 h-5 text-[#666666]" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xs text-[#666666] font-small uppercase tracking-wide mb-3">Mes Notes</p>
+                  <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-3">Mes Notes (Privées)</p>
                   <Textarea
-                    value={adminNotes}réduis l
+                    value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
                     placeholder="Ajoutez vos notes, actions effectuées, remarques..."
                     rows={4}
-                    className="bg-white text-[#111111] placeholder-[#999999]"
+                    className="bg-white text-[#111111] placeholder-[#999999] text-sm"
                   />
                   <button
                     onClick={handleSaveAdminNotes}
