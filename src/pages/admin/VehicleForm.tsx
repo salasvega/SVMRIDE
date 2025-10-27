@@ -21,9 +21,7 @@ export function VehicleForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Helper: on normalise les images qui viennent de la base
-  // - si c'est déjà {url, path}, on garde
-  // - si c'est juste une string (ancienne version), on la transforme en {url: string, path: ''}
+  // helper: normalisation images DB
   function normalizeImagesFromDB(rawImages: any): UploadedImage[] {
     if (!rawImages || !Array.isArray(rawImages)) return [];
     return rawImages.map((img: any) => {
@@ -96,7 +94,11 @@ export function VehicleForm() {
           | 'correct'
           | 'a-reviser',
         description: vehicle.description || '',
-        images: normalizeImagesFromDB((vehicle as any).images || []),
+        images: normalizeImagesFromDB(
+          (vehicle as any).images_v2 ||
+            (vehicle as any).images ||
+            []
+        ),
         features: vehicle.features || [],
         warranty:
           vehicle.warranty ||
@@ -116,21 +118,29 @@ export function VehicleForm() {
     setError('');
     setLoading(true);
 
-    // transforme "ABS, led, ..." en tableau propre
     const features = featuresInput
       .split(',')
       .map((f) => f.trim())
       .filter((f) => f.length > 0);
 
-    // point important :
-    // on enregistre seulement les URL (string[])
-    // car on suppose que ta colonne "images" dans Supabase est text[]
-    // et pas encore un jsonb complexe
+    // en base, si tu utilises encore images:text[]
+    // const vehicleData = {
+    //   ...formData,
+    //   features,
+    //   images: formData.images.map((img) => img.url),
+    //   available: formData.status === 'available' && formData.available,
+    // };
+
+    // en base, si tu es passé à images_v2: jsonb (recommandé)
     const vehicleData = {
       ...formData,
       features,
-      images: formData.images.map((img) => img.url),
-      available: formData.status === 'available' && formData.available,
+      images_v2: formData.images.map((img) => ({
+        url: img.url,
+        path: img.path || '',
+      })),
+      available:
+        formData.status === 'available' && formData.available,
     };
 
     try {
@@ -160,13 +170,49 @@ export function VehicleForm() {
   const generateSlug = () => {
     const slug = `${formData.brand}-${formData.model}-${formData.year}`
       .toLowerCase()
-      .normalize('NFD') // enlève les accents
+      .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
     setFormData({ ...formData, slug });
   };
+
+  // ---------
+  // APERÇU PUBLIC (carte vitrine)
+  // ---------
+
+  const mainPhotoUrl = formData.images[0]?.url || '';
+  const title =
+    [formData.brand, formData.model, formData.year]
+      .filter(Boolean)
+      .join(' ');
+  const priceLabel =
+    formData.price > 0
+      ? new Intl.NumberFormat('fr-FR', {
+          style: 'currency',
+          currency: 'EUR',
+          maximumFractionDigits: 0,
+        }).format(formData.price)
+      : '';
+  const kmLabel =
+    formData.mileage > 0
+      ? `${formData.mileage.toLocaleString('fr-FR')} km`
+      : '';
+  const statusLabel =
+    formData.status === 'available'
+      ? 'Disponible'
+      : formData.status === 'reserved'
+      ? 'Réservé'
+      : 'Vendu';
+
+  // Style badge statut
+  const statusColor =
+    formData.status === 'available'
+      ? 'bg-green-600'
+      : formData.status === 'reserved'
+      ? 'bg-yellow-500'
+      : 'bg-gray-500';
 
   return (
     <AdminLayout>
@@ -192,14 +238,14 @@ export function VehicleForm() {
           </div>
         </div>
 
-        {/* Error global */}
+        {/* Erreur globale */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
 
-        {/* Form */}
+        {/* FORMULAIRE PRINCIPAL */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Bloc infos générales */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] space-y-6">
@@ -441,21 +487,86 @@ export function VehicleForm() {
             </label>
           </div>
 
-          {/* Bloc images */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
-            <h2 className="text-xl font-bold text-[#111111] mb-4">
-              Photos
-            </h2>
+          {/* Bloc images + uploader */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] space-y-6">
+            <div>
+              <h2 className="text-xl font-bold text-[#111111] mb-4">
+                Photos
+              </h2>
 
-            <ImageUpload
-              images={formData.images}
-              onChange={(images) =>
-                setFormData({
-                  ...formData,
-                  images,
-                })
-              }
-            />
+              <ImageUpload
+                images={formData.images}
+                onChange={(images) =>
+                  setFormData({
+                    ...formData,
+                    images,
+                  })
+                }
+              />
+            </div>
+
+            {/* Aperçu "carte produit publique" */}
+            <div className="border border-[#E5E5E5] rounded-xl shadow-sm overflow-hidden bg-white">
+              {/* zone image */}
+              <div className="relative w-full h-48 bg-[#F5F5F5] flex items-center justify-center overflow-hidden">
+                {mainPhotoUrl ? (
+                  <img
+                    src={mainPhotoUrl}
+                    alt={title || 'Aperçu véhicule'}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-[#999999] text-sm flex flex-col items-center">
+                    <div className="w-12 h-12 rounded-lg bg-[#E5E5E5] flex items-center justify-center text-[#666666] mb-2 text-xs">
+                      IMG
+                    </div>
+                    <span>Aucune photo principale</span>
+                  </div>
+                )}
+
+                {/* badge statut */}
+                <div
+                  className={`absolute top-2 left-2 text-[10px] font-semibold text-white px-2 py-1 rounded ${statusColor}`}
+                >
+                  {statusLabel}
+                </div>
+
+                {/* prix en bas à droite */}
+                {priceLabel && (
+                  <div className="absolute bottom-2 right-2 bg-black/75 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow-lg">
+                    {priceLabel}
+                  </div>
+                )}
+              </div>
+
+              {/* zone texte */}
+              <div className="p-4 space-y-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <div className="text-[#111111] font-semibold leading-tight text-base">
+                      {title || 'Titre véhicule'}
+                    </div>
+                    <div className="text-[#666666] text-sm">
+                      {formData.displacement
+                        ? `${formData.displacement} cc`
+                        : 'Cylindrée'}
+                      {kmLabel ? ` • ${kmLabel}` : ''}
+                    </div>
+                  </div>
+
+                  {/* garantie / confiance vendeur */}
+                  <div className="text-[10px] text-right text-[#111111] bg-[#FFE9E9] border border-[#C62E2E]/30 rounded-md px-2 py-1 leading-tight max-w-[120px]">
+                    {formData.warranty ||
+                      'Garantie atelier'}
+                  </div>
+                </div>
+
+                {/* extrait descriptif */}
+                <div className="text-[12px] text-[#444444] line-clamp-2">
+                  {formData.description || 'Description du véhicule...'}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Actions */}
