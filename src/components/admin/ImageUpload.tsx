@@ -1,27 +1,33 @@
-import { useState } from 'react';
-import { Upload, X, Image as ImageIcon, AlertTriangle, GripVertical } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import {
+  Upload,
+  X,
+  Image as ImageIcon,
+  AlertTriangle,
+  GripVertical,
+} from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 export interface UploadedImage {
-  url: string;   // URL publique pour affichage
-  path: string;  // chemin interne dans le bucket pour suppression
+  url: string;
+  path: string;
 }
 
 interface ImageUploadProps {
   images: UploadedImage[];
   onChange: (images: UploadedImage[]) => void;
   maxImages?: number;
-  maxFileSizeMB?: number; // taille max AVANT compression, pour éviter les énormes trucs genre 80 Mo
+  maxFileSizeMB?: number; // taille max AVANT compression
   maxWidthPx?: number;
   maxHeightPx?: number;
-  quality?: number; // qualité de sortie JPEG/WebP entre 0 et 1
+  quality?: number; // 0-1
 }
 
 export function ImageUpload({
   images,
   onChange,
   maxImages = 8,
-  maxFileSizeMB = 20, // on autorise gros en entrée, car on va compresser
+  maxFileSizeMB = 20,
   maxWidthPx = 1600,
   maxHeightPx = 1600,
   quality = 0.8,
@@ -30,14 +36,17 @@ export function ImageUpload({
   const [error, setError] = useState('');
   const [dragIndex, setDragIndex] = useState<number | null>(null);
 
-  // ========= COMPRESSION IMAGE AVANT UPLOAD =========
+  // état visuel pour le drag&drop de fichiers dans la zone d'upload
+  const [isDropTarget, setIsDropTarget] = useState(false);
+
+  // ========== UTIL: compression image ==========
   async function compressImage(file: File): Promise<Blob> {
     return new Promise((resolve, reject) => {
       const img = new Image();
       const reader = new FileReader();
 
       reader.onload = (e) => {
-        if (!e.target) return reject(new Error("Lecture fichier échouée"));
+        if (!e.target) return reject(new Error('Lecture fichier échouée'));
         img.src = e.target.result as string;
       };
 
@@ -46,15 +55,13 @@ export function ImageUpload({
       };
 
       img.onload = () => {
-        // dimensions originales
         const originalWidth = img.width;
         const originalHeight = img.height;
 
-        // calcul du redimensionnement proportionnel
         let targetWidth = originalWidth;
         let targetHeight = originalHeight;
 
-        // si ça dépasse nos limites, on scale
+        // redimension proportionnel
         if (targetWidth > maxWidthPx) {
           const ratio = maxWidthPx / targetWidth;
           targetWidth = maxWidthPx;
@@ -72,19 +79,16 @@ export function ImageUpload({
 
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          reject(new Error("Canvas context non dispo"));
+          reject(new Error('Canvas context non dispo'));
           return;
         }
 
-        // dessin dans le canvas redimensionné
         ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
 
-        // export en blob compressé
-        // note: "image/jpeg" + quality 0.8 = excellent ratio qualité/poids pour annonces
         canvas.toBlob(
           (blob) => {
             if (!blob) {
-              reject(new Error("Compression échouée"));
+              reject(new Error('Compression échouée'));
               return;
             }
             resolve(blob);
@@ -102,73 +106,128 @@ export function ImageUpload({
     });
   }
 
-  // ========= UPLOAD (avec compression) =========
-  const uploadImage = async (file: File) => {
-    // 1. validation basique avant de consommer du CPU
-    if (!file.type.startsWith('image/')) {
-      setError('Fichier non supporté. Images uniquement.');
-      return;
-    }
+  // ========== UPLOAD D'UNE SEULE IMAGE (interne) ==========
+  const uploadSingleFile = useCallback(
+    async (file: File): Promise<UploadedImage | null> => {
+      // 1. validation avant compression
+      if (!file.type.startsWith('image/')) {
+        setError('Fichier non supporté. Images uniquement.');
+        return null;
+      }
 
-    const sizeMB = file.size / (1024 * 1024);
-    if (sizeMB > maxFileSizeMB) {
-      setError(`Image trop lourde (${sizeMB.toFixed(1)} Mo). Max ${maxFileSizeMB} Mo avant compression.`);
-      return;
-    }
+      const sizeMB = file.size / (1024 * 1024);
+      if (sizeMB > maxFileSizeMB) {
+        setError(
+          `Image trop lourde (${sizeMB.toFixed(
+            1
+          )} Mo). Max ${maxFileSizeMB} Mo avant compression.`
+        );
+        return null;
+      }
 
-    if (images.length >= maxImages) {
-      setError(`Limite atteinte (${maxImages} images max).`);
-      return;
-    }
+      try {
+        const compressedBlob = await compressImage(file);
 
-    try {
+        const fileExt = 'jpg';
+        const fileName = `${Math.random()
+          .toString(36)
+          .substring(2)}-${Date.now()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('vehicle-images')
+          .upload(filePath, compressedBlob, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: 'image/jpeg',
+          });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('vehicle-images').getPublicUrl(filePath);
+
+        return { url: publicUrl, path: filePath };
+      } catch (err) {
+        console.error('Error uploading image:', err);
+        setError("Erreur lors de l’upload de l’image");
+        return null;
+      }
+    },
+    [maxFileSizeMB, quality, maxWidthPx, maxHeightPx]
+  );
+
+  // ========== UPLOAD MULTI (sélection OU drop) ==========
+  const handleFilesBatch = useCallback(
+    async (fileList: FileList | File[]) => {
+      if (!fileList || fileList.length === 0) return;
+
+      // limite nombre max avant même d'essayer
+      const availableSlots = maxImages - images.length;
+      if (availableSlots <= 0) {
+        setError(`Limite atteinte (${maxImages} images max).`);
+        return;
+      }
+
+      // on convertit FileList en vrai array pour map/filter
+      const filesArray = Array.from(fileList).slice(0, availableSlots);
+
       setUploading(true);
       setError('');
 
-      // 2. compresser/redimensionner en Blob JPEG
-      const compressedBlob = await compressImage(file);
+      const uploadedResults: UploadedImage[] = [];
 
-      // 3. on fabrique un File-like pour l'upload Supabase
-      const fileExt = 'jpg'; // on force jpg car on encode en jpeg
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      // séquentiel simple mais batché: on accumule puis on pousse une seule fois
+      for (const file of filesArray) {
+        const uploaded = await uploadSingleFile(file);
+        if (uploaded) {
+          uploadedResults.push(uploaded);
+        }
+      }
 
-      const { error: uploadError } = await supabase.storage
-        .from('vehicle-images')
-        .upload(filePath, compressedBlob, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: 'image/jpeg',
-        });
-
-      if (uploadError) throw uploadError;
-
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from('vehicle-images').getPublicUrl(filePath);
-
-      onChange([...images, { url: publicUrl, path: filePath }]);
-    } catch (err) {
-      console.error('Error uploading image:', err);
-      setError('Erreur lors de l’upload de l’image');
-    } finally {
       setUploading(false);
-    }
-  };
 
+      if (uploadedResults.length > 0) {
+        onChange([...images, ...uploadedResults]);
+      }
+    },
+    [images, maxImages, uploadSingleFile, onChange]
+  );
+
+  // ========== INPUT FILE "classique" ==========
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    // upload séquentiel (simple et sûr)
-    for (let i = 0; i < files.length; i++) {
-      await uploadImage(files[i]);
-    }
-
+    await handleFilesBatch(files ?? []);
     e.target.value = '';
   };
 
-  // ========= SUPPRESSION (bucket + state) =========
+  // ========== DROP DIRECTEMENT DANS LA ZONE D'UPLOAD ==========
+  const handleDropZoneDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // feedback visuel
+    if (!isDropTarget) setIsDropTarget(true);
+  };
+
+  const handleDropZoneDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDropTarget(false);
+  };
+
+  const handleDropZoneDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDropTarget(false);
+
+    const dt = e.dataTransfer;
+    if (!dt || !dt.files || dt.files.length === 0) return;
+
+    await handleFilesBatch(dt.files);
+  };
+
+  // ========== SUPPRESSION ==========
   const removeImage = async (index: number) => {
     const imgToRemove = images[index];
 
@@ -188,16 +247,16 @@ export function ImageUpload({
     onChange(newImages);
   };
 
-  // ========= DRAG & DROP (réordonnancement local) =========
-  const handleDragStart = (index: number) => {
+  // ========== RÉORDONNANCEMENT (drag des vignettes) ==========
+  const handleDragStartReorder = (index: number) => {
     setDragIndex(index);
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault(); // requis pour autoriser le drop
+  const handleDragOverReorder = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
   };
 
-  const handleDrop = (dropIndex: number) => {
+  const handleDropReorder = (dropIndex: number) => {
     if (dragIndex === null || dragIndex === dropIndex) return;
 
     const reordered = [...images];
@@ -208,7 +267,7 @@ export function ImageUpload({
     onChange(reordered);
   };
 
-  // ========= RENDER =========
+  // ========== RENDER ==========
   return (
     <div className="space-y-4">
       <label className="block text-sm font-medium text-[#111111] mb-2">
@@ -230,9 +289,9 @@ export function ImageUpload({
               dragIndex === index ? 'opacity-50' : ''
             }`}
             draggable
-            onDragStart={() => handleDragStart(index)}
-            onDragOver={handleDragOver}
-            onDrop={() => handleDrop(index)}
+            onDragStart={() => handleDragStartReorder(index)}
+            onDragOver={handleDragOverReorder}
+            onDrop={() => handleDropReorder(index)}
           >
             <div className="relative w-full h-32 overflow-hidden bg-[#F5F5F5] flex items-center justify-center">
               <img
@@ -270,8 +329,19 @@ export function ImageUpload({
           </div>
         ))}
 
+        {/* Zone d'upload avec input + drop */}
         {images.length < maxImages && (
-          <label className="border-2 border-dashed border-[#CCCCCC] rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer hover:border-[#C62E2E] hover:bg-[#C62E2E]/5 transition-all">
+          <label
+            className={[
+              'border-2 border-dashed rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer transition-all text-center px-2',
+              isDropTarget
+                ? 'border-[#C62E2E] bg-[#C62E2E]/10'
+                : 'border-[#CCCCCC] hover:border-[#C62E2E] hover:bg-[#C62E2E]/5',
+            ].join(' ')}
+            onDragOver={handleDropZoneDragOver}
+            onDragLeave={handleDropZoneDragLeave}
+            onDrop={handleDropZoneDrop}
+          >
             <input
               type="file"
               accept="image/*"
@@ -284,18 +354,22 @@ export function ImageUpload({
             {uploading ? (
               <div className="text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C62E2E] mx-auto mb-2"></div>
-                <p className="text-xs text-[#666666]">Upload & compression...</p>
+                <p className="text-xs text-[#666666]">
+                  Upload & compression...
+                </p>
               </div>
             ) : (
               <>
-                <Upload className="w-8 h-8 text-[#AAAAAA] mb-2" />
-                <span className="text-sm text-[#666666] text-center">
-                  Ajouter des photos
-                </span>
-                <span className="text-xs text-[#AAAAAA] mt-1 text-center leading-tight">
-                  Redimensionnées en {maxWidthPx}px max,
+                <Upload className="w-8 h-8 text-[#AAAAAA] mb-2 pointer-events-none" />
+                <span className="text-sm text-[#666666] leading-snug">
+                  Glissez-déposez
                   <br />
-                  qualité {Math.round(quality * 100)}%
+                  ou cliquez
+                </span>
+                <span className="text-[10px] text-[#AAAAAA] mt-1 leading-tight block">
+                  Plusieurs fichiers autorisés
+                  <br />
+                  ({images.length}/{maxImages})
                 </span>
               </>
             )}
@@ -305,11 +379,13 @@ export function ImageUpload({
 
       <p className="text-xs text-[#666666]">
         <ImageIcon className="w-3 h-3 inline mr-1" />
-        Les images sont compressées avant l’upload pour charger plus vite sur le site.
+        Glissez pour réordonner les photos. La première est utilisée comme visuel principal.
       </p>
 
-      <p className="text-[10px] text-[#999999]">
-        {images.length}/{maxImages} photos
+      <p className="text-[10px] text-[#999999] leading-snug">
+        Les images sont redimensionnées (max {maxWidthPx}px) et compressées (~
+        {Math.round(quality * 100)}% qualité) avant l’upload pour charger vite
+        sur mobile.
       </p>
     </div>
   );
