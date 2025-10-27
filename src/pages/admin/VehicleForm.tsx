@@ -6,7 +6,10 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
-import { ImageUpload } from '../../components/admin/ImageUpload';
+import {
+  ImageUpload,
+  type UploadedImage,
+} from '../../components/admin/ImageUpload';
 import { supabase } from '../../lib/supabase';
 import { Vehicle } from '../../types/vehicle';
 
@@ -17,6 +20,23 @@ export function VehicleForm() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Helper: on normalise les images qui viennent de la base
+  // - si c'est déjà {url, path}, on garde
+  // - si c'est juste une string (ancienne version), on la transforme en {url: string, path: ''}
+  function normalizeImagesFromDB(rawImages: any): UploadedImage[] {
+    if (!rawImages || !Array.isArray(rawImages)) return [];
+    return rawImages.map((img: any) => {
+      if (typeof img === 'string') {
+        return { url: img, path: '' };
+      }
+      if (img && typeof img === 'object' && 'url' in img) {
+        return { url: img.url, path: img.path || '' };
+      }
+      return { url: String(img), path: '' };
+    });
+  }
+
   const [formData, setFormData] = useState({
     slug: '',
     brand: '',
@@ -28,9 +48,9 @@ export function VehicleForm() {
     mileage: 0,
     condition: 'excellent' as 'excellent' | 'bon' | 'correct' | 'a-reviser',
     description: '',
-    images: [] as string[],
+    images: [] as UploadedImage[],
     features: [] as string[],
-    warranty: 'Garantie 6 mois pièces et main d\'œuvre',
+    warranty: "Garantie 6 mois pièces et main d'œuvre",
     status: 'available' as 'available' | 'reserved' | 'sold',
     available: true,
   });
@@ -45,6 +65,7 @@ export function VehicleForm() {
 
   async function fetchVehicle(vehicleId: string) {
     setLoading(true);
+
     const { data, error } = await supabase
       .from('vehicles')
       .select('*')
@@ -59,25 +80,34 @@ export function VehicleForm() {
 
     if (data) {
       const vehicle = data as Vehicle;
+
       setFormData({
         slug: vehicle.slug,
         brand: vehicle.brand,
         model: vehicle.model,
         year: vehicle.year,
-        type: vehicle.type,
+        type: vehicle.type as 'moto' | 'scooter',
         displacement: vehicle.displacement,
         price: vehicle.price,
         mileage: vehicle.mileage,
-        condition: vehicle.condition,
+        condition: vehicle.condition as
+          | 'excellent'
+          | 'bon'
+          | 'correct'
+          | 'a-reviser',
         description: vehicle.description || '',
-        images: vehicle.images || [],
+        images: normalizeImagesFromDB((vehicle as any).images || []),
         features: vehicle.features || [],
-        warranty: vehicle.warranty || 'Garantie 6 mois pièces et main d\'œuvre',
+        warranty:
+          vehicle.warranty ||
+          "Garantie 6 mois pièces et main d'œuvre",
         status: (vehicle as any).status || 'available',
         available: vehicle.available,
       });
+
       setFeaturesInput(vehicle.features?.join(', ') || '');
     }
+
     setLoading(false);
   }
 
@@ -86,14 +116,20 @@ export function VehicleForm() {
     setError('');
     setLoading(true);
 
+    // transforme "ABS, led, ..." en tableau propre
     const features = featuresInput
       .split(',')
       .map((f) => f.trim())
       .filter((f) => f.length > 0);
 
+    // point important :
+    // on enregistre seulement les URL (string[])
+    // car on suppose que ta colonne "images" dans Supabase est text[]
+    // et pas encore un jsonb complexe
     const vehicleData = {
       ...formData,
       features,
+      images: formData.images.map((img) => img.url),
       available: formData.status === 'available' && formData.available,
     };
 
@@ -116,7 +152,7 @@ export function VehicleForm() {
       navigate('/admin/vehicles');
     } catch (err) {
       console.error('Error saving vehicle:', err);
-      setError('Erreur lors de l\'enregistrement du véhicule');
+      setError("Erreur lors de l'enregistrement du véhicule");
       setLoading(false);
     }
   };
@@ -124,16 +160,18 @@ export function VehicleForm() {
   const generateSlug = () => {
     const slug = `${formData.brand}-${formData.model}-${formData.year}`
       .toLowerCase()
-      .normalize('NFD')
+      .normalize('NFD') // enlève les accents
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
+
     setFormData({ ...formData, slug });
   };
 
   return (
     <AdminLayout>
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* Header */}
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/admin/vehicles')}
@@ -143,29 +181,42 @@ export function VehicleForm() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">
-              {isEditing ? 'Modifier le véhicule' : 'Ajouter un véhicule'}
+              {isEditing
+                ? 'Modifier le véhicule'
+                : 'Ajouter un véhicule'}
             </h1>
             <p className="text-[#666666] mt-1">
-              Remplissez tous les champs pour créer ou modifier une fiche véhicule
+              Remplissez tous les champs pour créer ou modifier une
+              fiche véhicule
             </p>
           </div>
         </div>
 
+        {/* Error global */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Bloc infos générales */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] space-y-6">
-            <h2 className="text-xl font-bold text-[#111111]">Informations générales</h2>
+            <h2 className="text-xl font-bold text-[#111111]">
+              Informations générales
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
                 label="Marque"
                 value={formData.brand}
-                onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    brand: e.target.value,
+                  })
+                }
                 onBlur={generateSlug}
                 required
                 placeholder="ex: Yamaha"
@@ -174,7 +225,12 @@ export function VehicleForm() {
               <Input
                 label="Modèle"
                 value={formData.model}
-                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    model: e.target.value,
+                  })
+                }
                 onBlur={generateSlug}
                 required
                 placeholder="ex: MT-07"
@@ -183,7 +239,13 @@ export function VehicleForm() {
               <Select
                 label="Type"
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value as 'moto' | 'scooter' })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    type: e.target
+                      .value as 'moto' | 'scooter',
+                  })
+                }
                 required
               >
                 <option value="moto">Moto</option>
@@ -194,7 +256,12 @@ export function VehicleForm() {
                 label="Année"
                 type="number"
                 value={formData.year}
-                onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    year: Number(e.target.value),
+                  })
+                }
                 onBlur={generateSlug}
                 required
                 min="1900"
@@ -205,7 +272,14 @@ export function VehicleForm() {
                 label="Cylindrée (cc)"
                 type="number"
                 value={formData.displacement}
-                onChange={(e) => setFormData({ ...formData, displacement: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    displacement: Number(
+                      e.target.value
+                    ),
+                  })
+                }
                 required
                 min="50"
                 placeholder="ex: 689"
@@ -215,7 +289,14 @@ export function VehicleForm() {
                 label="Prix (€)"
                 type="number"
                 value={formData.price}
-                onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    price: Number(
+                      e.target.value
+                    ),
+                  })
+                }
                 required
                 min="0"
                 placeholder="ex: 6490"
@@ -225,7 +306,14 @@ export function VehicleForm() {
                 label="Kilométrage"
                 type="number"
                 value={formData.mileage}
-                onChange={(e) => setFormData({ ...formData, mileage: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    mileage: Number(
+                      e.target.value
+                    ),
+                  })
+                }
                 required
                 min="0"
                 placeholder="ex: 12500"
@@ -234,20 +322,40 @@ export function VehicleForm() {
               <Select
                 label="État"
                 value={formData.condition}
-                onChange={(e) => setFormData({ ...formData, condition: e.target.value as any })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    condition: e.target.value as
+                      | 'excellent'
+                      | 'bon'
+                      | 'correct'
+                      | 'a-reviser',
+                  })
+                }
                 required
               >
-                <option value="excellent">Excellent</option>
+                <option value="excellent">
+                  Excellent
+                </option>
                 <option value="bon">Bon</option>
-                <option value="correct">Correct</option>
-                <option value="a-reviser">À réviser</option>
+                <option value="correct">
+                  Correct
+                </option>
+                <option value="a-reviser">
+                  À réviser
+                </option>
               </Select>
             </div>
 
             <Input
               label="Slug (URL)"
               value={formData.slug}
-              onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  slug: e.target.value,
+                })
+              }
               required
               placeholder="yamaha-mt-07-2020"
               helperText="Généré automatiquement. Format: marque-modele-annee"
@@ -256,7 +364,12 @@ export function VehicleForm() {
             <Textarea
               label="Description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  description: e.target.value,
+                })
+              }
               rows={4}
               placeholder="Décrivez l'état général, l'entretien effectué, les points forts..."
             />
@@ -264,7 +377,9 @@ export function VehicleForm() {
             <Input
               label="Équipements (séparés par des virgules)"
               value={featuresInput}
-              onChange={(e) => setFeaturesInput(e.target.value)}
+              onChange={(e) =>
+                setFeaturesInput(e.target.value)
+              }
               placeholder="ex: ABS, LED, Quickshifter, TFT"
               helperText="Séparez chaque équipement par une virgule"
             />
@@ -272,26 +387,52 @@ export function VehicleForm() {
             <Input
               label="Garantie"
               value={formData.warranty}
-              onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  warranty: e.target.value,
+                })
+              }
               placeholder="ex: Garantie 12 mois pièces et main d'œuvre"
             />
 
             <Select
               label="Statut"
               value={formData.status}
-              onChange={(e) => setFormData({ ...formData, status: e.target.value as 'available' | 'reserved' | 'sold' })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  status: e.target
+                    .value as
+                    | 'available'
+                    | 'reserved'
+                    | 'sold',
+                })
+              }
               required
             >
-              <option value="available">Disponible</option>
-              <option value="reserved">Réservé</option>
-              <option value="sold">Vendu</option>
+              <option value="available">
+                Disponible
+              </option>
+              <option value="reserved">
+                Réservé
+              </option>
+              <option value="sold">
+                Vendu
+              </option>
             </Select>
 
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={formData.available}
-                onChange={(e) => setFormData({ ...formData, available: e.target.checked })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    available:
+                      e.target.checked,
+                  })
+                }
                 className="w-4 h-4 text-[#C62E2E] border-gray-300 rounded focus:ring-[#C62E2E]"
               />
               <span className="text-sm font-medium text-[#111111]">
@@ -300,25 +441,46 @@ export function VehicleForm() {
             </label>
           </div>
 
+          {/* Bloc images */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
-            <h2 className="text-xl font-bold text-[#111111] mb-4">Photos</h2>
+            <h2 className="text-xl font-bold text-[#111111] mb-4">
+              Photos
+            </h2>
+
             <ImageUpload
               images={formData.images}
-              onChange={(images) => setFormData({ ...formData, images })}
+              onChange={(images) =>
+                setFormData({
+                  ...formData,
+                  images,
+                })
+              }
             />
           </div>
 
+          {/* Actions */}
           <div className="flex justify-end space-x-4">
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate('/admin/vehicles')}
+              onClick={() =>
+                navigate('/admin/vehicles')
+              }
             >
               Annuler
             </Button>
-            <Button type="submit" disabled={loading} className="flex items-center space-x-2">
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="flex items-center space-x-2"
+            >
               <Save className="w-4 h-4" />
-              <span>{loading ? 'Enregistrement...' : 'Enregistrer'}</span>
+              <span>
+                {loading
+                  ? 'Enregistrement...'
+                  : 'Enregistrer'}
+              </span>
             </Button>
           </div>
         </form>
