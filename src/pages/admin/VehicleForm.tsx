@@ -10,6 +10,7 @@ import {
   ImageUpload,
   type UploadedImage,
 } from '../../components/admin/ImageUpload';
+import { VehicleCard } from '../../components/VehicleCard';
 import { supabase } from '../../lib/supabase';
 import { Vehicle } from '../../types/vehicle';
 
@@ -21,7 +22,10 @@ export function VehicleForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // helper: normalisation images DB
+  // Normalise ce qui vient de la base pour l'uploader
+  // On transforme:
+  //   ["https://..."]  => { url:"https://...", path:"" }
+  //   [{url:"...", path:"..."}] => identique
   function normalizeImagesFromDB(rawImages: any): UploadedImage[] {
     if (!rawImages || !Array.isArray(rawImages)) return [];
     return rawImages.map((img: any) => {
@@ -44,7 +48,11 @@ export function VehicleForm() {
     displacement: 0,
     price: 0,
     mileage: 0,
-    condition: 'excellent' as 'excellent' | 'bon' | 'correct' | 'a-reviser',
+    condition: 'excellent' as
+      | 'excellent'
+      | 'bon'
+      | 'correct'
+      | 'a-reviser',
     description: '',
     images: [] as UploadedImage[],
     features: [] as string[],
@@ -53,12 +61,15 @@ export function VehicleForm() {
     available: true,
   });
 
+  // champ texte pour les features
   const [featuresInput, setFeaturesInput] = useState('');
 
+  // au montage / lors d'un edit
   useEffect(() => {
     if (isEditing && id) {
       fetchVehicle(id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isEditing]);
 
   async function fetchVehicle(vehicleId: string) {
@@ -71,13 +82,19 @@ export function VehicleForm() {
       .single();
 
     if (error) {
+      console.error(error);
       setError('Véhicule non trouvé');
       setLoading(false);
       return;
     }
 
     if (data) {
-      const vehicle = data as Vehicle;
+      // Vehicle de la base peut avoir images ou images_v2
+      const vehicle = data as Vehicle & {
+        images?: any;
+        images_v2?: any;
+        status?: 'available' | 'reserved' | 'sold';
+      };
 
       setFormData({
         slug: vehicle.slug,
@@ -95,8 +112,8 @@ export function VehicleForm() {
           | 'a-reviser',
         description: vehicle.description || '',
         images: normalizeImagesFromDB(
-          (vehicle as any).images_v2 ||
-            (vehicle as any).images ||
+          (vehicle as any).images_v2 ??
+            (vehicle as any).images ??
             []
         ),
         features: vehicle.features || [],
@@ -113,25 +130,22 @@ export function VehicleForm() {
     setLoading(false);
   }
 
+  // enregistrement en base (insert/update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
+    // transformer "ABS, LED, ..." en tableau
     const features = featuresInput
       .split(',')
       .map((f) => f.trim())
       .filter((f) => f.length > 0);
 
-    // en base, si tu utilises encore images:text[]
-    // const vehicleData = {
-    //   ...formData,
-    //   features,
-    //   images: formData.images.map((img) => img.url),
-    //   available: formData.status === 'available' && formData.available,
-    // };
-
-    // en base, si tu es passé à images_v2: jsonb (recommandé)
+    // version "propre" pour la DB :
+    // - on écrit dans images_v2 (JSONB)
+    // - chaque image: { url, path }
+    // - on force le champ available pour le site vitrine
     const vehicleData = {
       ...formData,
       features,
@@ -140,7 +154,8 @@ export function VehicleForm() {
         path: img.path || '',
       })),
       available:
-        formData.status === 'available' && formData.available,
+        formData.status === 'available' &&
+        formData.available,
     };
 
     try {
@@ -152,9 +167,10 @@ export function VehicleForm() {
 
         if (updateError) throw updateError;
       } else {
-        const { error: insertError } = await supabase
-          .from('vehicles')
-          .insert([vehicleData]);
+        const { error: insertError } =
+          await supabase
+            .from('vehicles')
+            .insert([vehicleData]);
 
         if (insertError) throw insertError;
       }
@@ -162,62 +178,37 @@ export function VehicleForm() {
       navigate('/admin/vehicles');
     } catch (err) {
       console.error('Error saving vehicle:', err);
-      setError("Erreur lors de l'enregistrement du véhicule");
+      setError(
+        "Erreur lors de l'enregistrement du véhicule"
+      );
       setLoading(false);
     }
   };
 
+  // génère le slug automatiquement
   const generateSlug = () => {
-    const slug = `${formData.brand}-${formData.model}-${formData.year}`
+    const slugBase = `${formData.brand}-${formData.model}-${formData.year}`
       .toLowerCase()
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-    setFormData({ ...formData, slug });
+    setFormData({ ...formData, slug: slugBase });
   };
 
-  // ---------
-  // APERÇU PUBLIC (carte vitrine)
-  // ---------
-
-  const mainPhotoUrl = formData.images[0]?.url || '';
-  const title =
-    [formData.brand, formData.model, formData.year]
-      .filter(Boolean)
-      .join(' ');
-  const priceLabel =
-    formData.price > 0
-      ? new Intl.NumberFormat('fr-FR', {
-          style: 'currency',
-          currency: 'EUR',
-          maximumFractionDigits: 0,
-        }).format(formData.price)
-      : '';
-  const kmLabel =
-    formData.mileage > 0
-      ? `${formData.mileage.toLocaleString('fr-FR')} km`
-      : '';
-  const statusLabel =
-    formData.status === 'available'
-      ? 'Disponible'
-      : formData.status === 'reserved'
-      ? 'Réservé'
-      : 'Vendu';
-
-  // Style badge statut
-  const statusColor =
-    formData.status === 'available'
-      ? 'bg-green-600'
-      : formData.status === 'reserved'
-      ? 'bg-yellow-500'
-      : 'bg-gray-500';
+  // Prépare les données pour l'aperçu VehicleCard dans l'admin.
+  // On passe images tel quel (UploadedImage[]) et ça marchera car
+  // VehicleCard sait lire soit string[], soit {url,path}[].
+  const previewVehicleForCard = {
+    ...formData,
+    images: formData.images,
+  };
 
   return (
     <AdminLayout>
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
+        {/* Header de la page */}
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/admin/vehicles')}
@@ -225,6 +216,7 @@ export function VehicleForm() {
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
+
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">
               {isEditing
@@ -232,8 +224,8 @@ export function VehicleForm() {
                 : 'Ajouter un véhicule'}
             </h1>
             <p className="text-[#666666] mt-1">
-              Remplissez tous les champs pour créer ou modifier une
-              fiche véhicule
+              Remplissez tous les champs pour créer
+              ou modifier une fiche véhicule
             </p>
           </div>
         </div>
@@ -245,8 +237,11 @@ export function VehicleForm() {
           </div>
         )}
 
-        {/* FORMULAIRE PRINCIPAL */}
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {/* FORMULAIRE */}
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-6"
+        >
           {/* Bloc infos générales */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] space-y-6">
             <h2 className="text-xl font-bold text-[#111111]">
@@ -289,13 +284,19 @@ export function VehicleForm() {
                   setFormData({
                     ...formData,
                     type: e.target
-                      .value as 'moto' | 'scooter',
+                      .value as
+                      | 'moto'
+                      | 'scooter',
                   })
                 }
                 required
               >
-                <option value="moto">Moto</option>
-                <option value="scooter">Scooter</option>
+                <option value="moto">
+                  Moto
+                </option>
+                <option value="scooter">
+                  Scooter
+                </option>
               </Select>
 
               <Input
@@ -305,13 +306,18 @@ export function VehicleForm() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    year: Number(e.target.value),
+                    year: Number(
+                      e.target.value
+                    ),
                   })
                 }
                 onBlur={generateSlug}
                 required
                 min="1900"
-                max={new Date().getFullYear() + 1}
+                max={
+                  new Date().getFullYear() +
+                  1
+                }
               />
 
               <Input
@@ -321,9 +327,10 @@ export function VehicleForm() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    displacement: Number(
-                      e.target.value
-                    ),
+                    displacement:
+                      Number(
+                        e.target.value
+                      ),
                   })
                 }
                 required
@@ -355,9 +362,10 @@ export function VehicleForm() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    mileage: Number(
-                      e.target.value
-                    ),
+                    mileage:
+                      Number(
+                        e.target.value
+                      ),
                   })
                 }
                 required
@@ -371,11 +379,13 @@ export function VehicleForm() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    condition: e.target.value as
-                      | 'excellent'
-                      | 'bon'
-                      | 'correct'
-                      | 'a-reviser',
+                    condition:
+                      e.target
+                        .value as
+                        | 'excellent'
+                        | 'bon'
+                        | 'correct'
+                        | 'a-reviser',
                   })
                 }
                 required
@@ -383,7 +393,9 @@ export function VehicleForm() {
                 <option value="excellent">
                   Excellent
                 </option>
-                <option value="bon">Bon</option>
+                <option value="bon">
+                  Bon
+                </option>
                 <option value="correct">
                   Correct
                 </option>
@@ -413,7 +425,8 @@ export function VehicleForm() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  description: e.target.value,
+                  description:
+                    e.target.value,
                 })
               }
               rows={4}
@@ -424,7 +437,9 @@ export function VehicleForm() {
               label="Équipements (séparés par des virgules)"
               value={featuresInput}
               onChange={(e) =>
-                setFeaturesInput(e.target.value)
+                setFeaturesInput(
+                  e.target.value
+                )
               }
               placeholder="ex: ABS, LED, Quickshifter, TFT"
               helperText="Séparez chaque équipement par une virgule"
@@ -436,7 +451,8 @@ export function VehicleForm() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  warranty: e.target.value,
+                  warranty:
+                    e.target.value,
                 })
               }
               placeholder="ex: Garantie 12 mois pièces et main d'œuvre"
@@ -448,11 +464,12 @@ export function VehicleForm() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  status: e.target
-                    .value as
-                    | 'available'
-                    | 'reserved'
-                    | 'sold',
+                  status:
+                    e.target
+                      .value as
+                      | 'available'
+                      | 'reserved'
+                      | 'sold',
                 })
               }
               required
@@ -471,12 +488,15 @@ export function VehicleForm() {
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={formData.available}
+                checked={
+                  formData.available
+                }
                 onChange={(e) =>
                   setFormData({
                     ...formData,
                     available:
-                      e.target.checked,
+                      e.target
+                        .checked,
                   })
                 }
                 className="w-4 h-4 text-[#C62E2E] border-gray-300 rounded focus:ring-[#C62E2E]"
@@ -487,7 +507,7 @@ export function VehicleForm() {
             </label>
           </div>
 
-          {/* Bloc images + uploader */}
+          {/* Bloc images + aperçu vitrine publique */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] space-y-6">
             <div>
               <h2 className="text-xl font-bold text-[#111111] mb-4">
@@ -505,71 +525,30 @@ export function VehicleForm() {
               />
             </div>
 
-            {/* Aperçu "carte produit publique" */}
-            <div className="border border-[#E5E5E5] rounded-xl shadow-sm overflow-hidden bg-white">
-              {/* zone image */}
-              <div className="relative w-full h-48 bg-[#F5F5F5] flex items-center justify-center overflow-hidden">
-                {mainPhotoUrl ? (
-                  <img
-                    src={mainPhotoUrl}
-                    alt={title || 'Aperçu véhicule'}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-[#999999] text-sm flex flex-col items-center">
-                    <div className="w-12 h-12 rounded-lg bg-[#E5E5E5] flex items-center justify-center text-[#666666] mb-2 text-xs">
-                      IMG
-                    </div>
-                    <span>Aucune photo principale</span>
-                  </div>
-                )}
+            {/* Preview carte publique telle qu'elle apparaît dans la liste */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[#111111]">
+                Aperçu vitrine publique
+              </h3>
 
-                {/* badge statut */}
-                <div
-                  className={`absolute top-2 left-2 text-[10px] font-semibold text-white px-2 py-1 rounded ${statusColor}`}
-                >
-                  {statusLabel}
-                </div>
+              <VehicleCard
+                vehicle={
+                  previewVehicleForCard as any
+                }
+                disableLink={true}
+              />
 
-                {/* prix en bas à droite */}
-                {priceLabel && (
-                  <div className="absolute bottom-2 right-2 bg-black/75 text-white text-sm font-semibold px-3 py-1 rounded-lg shadow-lg">
-                    {priceLabel}
-                  </div>
-                )}
-              </div>
-
-              {/* zone texte */}
-              <div className="p-4 space-y-2">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="text-[#111111] font-semibold leading-tight text-base">
-                      {title || 'Titre véhicule'}
-                    </div>
-                    <div className="text-[#666666] text-sm">
-                      {formData.displacement
-                        ? `${formData.displacement} cc`
-                        : 'Cylindrée'}
-                      {kmLabel ? ` • ${kmLabel}` : ''}
-                    </div>
-                  </div>
-
-                  {/* garantie / confiance vendeur */}
-                  <div className="text-[10px] text-right text-[#111111] bg-[#FFE9E9] border border-[#C62E2E]/30 rounded-md px-2 py-1 leading-tight max-w-[120px]">
-                    {formData.warranty ||
-                      'Garantie atelier'}
-                  </div>
-                </div>
-
-                {/* extrait descriptif */}
-                <div className="text-[12px] text-[#444444] line-clamp-2">
-                  {formData.description || 'Description du véhicule...'}
-                </div>
-              </div>
+              <p className="text-[11px] text-[#666666] leading-snug">
+                Ceci est l’aperçu tel qu’il
+                apparaîtra dans la grille des
+                véhicules. La première image est la
+                photo principale (tu peux la définir
+                dans la visionneuse en plein écran).
+              </p>
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Boutons d'action */}
           <div className="flex justify-end space-x-4">
             <Button
               type="button"
