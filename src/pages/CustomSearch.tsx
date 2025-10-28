@@ -12,7 +12,7 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 
 export function CustomSearch() {
-  // Données du formulaire "je cherche une moto précise"
+  // Données du formulaire "je cherche un véhicule précis"
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -30,7 +30,10 @@ export function CustomSearch() {
   // Fichiers uploadés (nouveau format enrichi UploadedDoc[])
   const [files, setFiles] = useState<UploadedDoc[]>([]);
 
-  // Hook de soumission
+  // Indicateur de progression spécifique à l'upload des pièces jointes
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+
+  // Hook de soumission (appelle ta function edge côté Supabase)
   const { submit, isSubmitting, success, error } = useFormSubmit({
     onSuccess: () => {
       setFormData({
@@ -50,11 +53,13 @@ export function CustomSearch() {
     },
   });
 
-  // Envoi du formulaire :
-  // 1. upload des fichiers vers Supabase Storage
-  // 2. envoi du payload + metadata à la function edge custom-search-form
+  // Soumission finale :
+  // 1. Upload des pièces dans Supabase Storage
+  // 2. Envoi du payload à la function edge "custom-search-form"
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setUploadingFiles(true);
 
     const attachments: Array<{
       filename: string;
@@ -77,7 +82,7 @@ export function CustomSearch() {
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
-        // On continue avec les autres pour ne pas bloquer tout le formulaire
+        // on continue quand même les autres fichiers
         continue;
       }
 
@@ -94,9 +99,11 @@ export function CustomSearch() {
       ...formData,
       attachments,
     });
+
+    setUploadingFiles(false);
   };
 
-  // Mise à jour contrôlée des champs
+  // Gestion des champs de formulaire
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -140,7 +147,7 @@ export function CustomSearch() {
       <Section background="white" className="!py-8">
         <Container size="md">
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Colonne gauche : texte marketing / étapes */}
+            {/* Colonne gauche : explication du service */}
             <div>
               <h2 className="text-2xl font-bold text-[#111111] mb-6">
                 Un service sur-mesure
@@ -278,7 +285,9 @@ export function CustomSearch() {
                     <option value="">Sélectionnez...</option>
                     <option value="moto">Moto</option>
                     <option value="scooter">Scooter</option>
-                    <option value="indifferent">Indifférent</option>
+                    <option value="indifferent">
+                      Indifférent
+                    </option>
                   </Select>
 
                   <Input
@@ -296,12 +305,16 @@ export function CustomSearch() {
                     value={formData.displacement}
                     onChange={handleChange}
                   >
-                    <option value="">Indifférent</option>
+                    <option value="">
+                      Indifférent
+                    </option>
                     <option value="125">125 cc</option>
                     <option value="300">300 cc</option>
                     <option value="500">500 cc</option>
                     <option value="650">650 cc</option>
-                    <option value="800+">800 cc et plus</option>
+                    <option value="800+">
+                      800 cc et plus
+                    </option>
                   </Select>
 
                   <Input
@@ -337,8 +350,12 @@ export function CustomSearch() {
                       Urgent (moins de 2 semaines)
                     </option>
                     <option value="1-month">1 mois</option>
-                    <option value="2-months">2 mois</option>
-                    <option value="flexible">Flexible</option>
+                    <option value="2-months">
+                      2 mois
+                    </option>
+                    <option value="flexible">
+                      Flexible
+                    </option>
                   </Select>
 
                   <Textarea
@@ -374,7 +391,8 @@ export function CustomSearch() {
                       className="text-sm text-[#444444]"
                     >
                       J'accepte que mes données soient utilisées
-                      pour traiter ma recherche conformément à la{' '}
+                      pour traiter ma recherche conformément à
+                      la{' '}
                       <a
                         href="/politique-confidentialite"
                         className="text-[#D10000] hover:underline"
@@ -382,7 +400,9 @@ export function CustomSearch() {
                         politique de confidentialité
                       </a>
                       .{' '}
-                      <span className="text-[#D10000]">*</span>
+                      <span className="text-[#D10000]">
+                        *
+                      </span>
                     </label>
                   </div>
 
@@ -392,13 +412,22 @@ export function CustomSearch() {
                     </div>
                   )}
 
+                  {/* Indicateur visuel pendant upload */}
+                  {uploadingFiles && (
+                    <div className="text-sm text-[#444444] bg-white/70 border border-[#E5E5E5] rounded-lg px-3 py-2 flex items-center justify-center">
+                      Téléversement des documents...
+                    </div>
+                  )}
+
                   <Button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || uploadingFiles}
                     fullWidth
                     size="lg"
                   >
-                    {isSubmitting
+                    {uploadingFiles
+                      ? 'Téléversement des documents...'
+                      : isSubmitting
                       ? 'Envoi en cours...'
                       : 'Lancer la recherche'}
                   </Button>
