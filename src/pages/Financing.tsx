@@ -358,7 +358,7 @@ export function Financing() {
       className="inline-block mt-3"
     >
       <img
-        src="public/alma-logo_frame.png"
+        src="/public/alma-logo_frame.png"
         alt="Paiement en plusieurs fois avec Alma"
         className="h-6 opacity-90 hover:opacity-100 transition-opacity"
       />
