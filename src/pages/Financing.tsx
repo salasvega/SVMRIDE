@@ -16,6 +16,7 @@ export function Financing() {
   // ex: /financement?vehicle=Yamaha%20MT-07%202021&price=6500&slug=yamaha-mt07-2021
   const [searchParams] = useSearchParams();
   const vehicleFromURL = searchParams.get('vehicle') || '';
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   const priceFromURL = searchParams.get('price');
   const slugFromURL = searchParams.get('slug') || '';
   const parsedPrice = priceFromURL ? Number(priceFromURL) : null;
@@ -24,7 +25,7 @@ export function Financing() {
   const [simulatorData, setSimulatorData] = useState({
     amount: parsedPrice && !Number.isNaN(parsedPrice) ? parsedPrice : 5000,
     duration: 36,
-    rate: 3.5,
+    rate: 6.5,
   });
 
   // Formulaire envoyé côté serveur
@@ -123,47 +124,51 @@ export function Financing() {
   // 1. upload fichiers vers Supabase Storage
   // 2. appel fonction edge financing-form avec toutes les infos (dont vehicleSlug)
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const attachments: Array<{
-      filename: string;
-      path: string;
-      size: number;
-      mime_type: string;
-    }> = [];
+  setUploadingFiles(true);
 
-    for (const doc of files) {
-      const file = doc.file;
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random()
-        .toString(36)
-        .substring(7)}.${fileExt}`;
-      const filePath = `financing/${fileName}`;
+  const attachments: Array<{
+    filename: string;
+    path: string;
+    size: number;
+    mime_type: string;
+  }> = [];
 
-      const { error: uploadError } = await supabase.storage
-        .from('form-attachments')
-        .upload(filePath, file);
+  for (const doc of files) {
+    const file = doc.file;
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(7)}.${fileExt}`;
+    const filePath = `financing/${fileName}`;
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        continue;
-      }
+    const { error: uploadError } = await supabase.storage
+      .from('form-attachments')
+      .upload(filePath, file);
 
-      attachments.push({
-        filename: file.name,
-        path: filePath,
-        size: file.size,
-        mime_type: file.type,
-      });
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      continue;
     }
 
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-
-    await submit(`${supabaseUrl}/functions/v1/financing-form`, {
-      ...formData,
-      attachments,
+    attachments.push({
+      filename: file.name,
+      path: filePath,
+      size: file.size,
+      mime_type: file.type,
     });
-  };
+  }
+
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  await submit(`${supabaseUrl}/functions/v1/financing-form`, {
+    ...formData,
+    attachments,
+  });
+
+  setUploadingFiles(false);
+};
+
 
   return (
     <>
@@ -471,15 +476,18 @@ export function Financing() {
                   )}
 
                   <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    fullWidth
-                    size="lg"
-                  >
-                    {isSubmitting
-                      ? 'Envoi en cours...'
-                      : 'Demander un devis'}
-                  </Button>
+  type="submit"
+  disabled={isSubmitting || uploadingFiles}
+  fullWidth
+  size="lg"
+>
+  {uploadingFiles
+    ? 'Téléversement des documents...'
+    : isSubmitting
+    ? 'Envoi en cours...'
+    : 'Demander un devis'}
+</Button>
+
                 </form>
               )}
             </div>
