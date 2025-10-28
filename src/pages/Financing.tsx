@@ -248,8 +248,9 @@ export function Financing() {
                     }
                     className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
                   />
+                  
                 </div>
-  <div></div>
+                <div></div>
 <label className="block text-sm font-medium mb-2">
                     Taux (TAEG): {simulatorData.rate} %
                   </label>
@@ -350,7 +351,7 @@ export function Financing() {
       . Simple, rapide et 100&nbsp;% en ligne.
     </p>
 
-    {/* Logo Alma (tu peux placer le fichier dans /alma-logo_frame.png) */}
+    {/* Logo Alma (tu peux placer le fichier dans /public/alma-logo_frame.png) */}
     <a
       href="https://almapay.com/fr-FR"
       target="_blank"
