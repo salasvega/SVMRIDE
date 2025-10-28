@@ -7,11 +7,12 @@ import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
-import { FileUpload } from '../components/ui/FileUpload';
+import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 
 export function TradeIn() {
+  // Données du formulaire de reprise
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -25,8 +26,10 @@ export function TradeIn() {
     consent: false,
   });
 
-  const [files, setFiles] = useState<File[]>([]);
+  // Photos / documents fournis par l'utilisateur, avec preview et métadonnées
+  const [files, setFiles] = useState<UploadedDoc[]>([]);
 
+  // Hook d'envoi
   const { submit, isSubmitting, success, error } = useFormSubmit({
     onSuccess: () => {
       setFormData({
@@ -45,14 +48,25 @@ export function TradeIn() {
     },
   });
 
+  // Soumission finale
+  // 1. Upload des fichiers dans Supabase Storage (bucket "form-attachments")
+  // 2. Appel de la fonction edge "trade-in-form" avec les métadonnées et le formulaire
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const attachments = [];
+    const attachments: Array<{
+      filename: string;
+      path: string;
+      size: number;
+      mime_type: string;
+    }> = [];
 
-    for (const file of files) {
+    for (const doc of files) {
+      const file = doc.file;
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(7)}.${fileExt}`;
       const filePath = `trade-in/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -61,6 +75,7 @@ export function TradeIn() {
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
+        // On n'arrête pas tout le formulaire si une seule image échoue
         continue;
       }
 
@@ -73,17 +88,26 @@ export function TradeIn() {
     }
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+
     await submit(`${supabaseUrl}/functions/v1/trade-in-form`, {
       ...formData,
       attachments,
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  // Gestion champs contrôlés
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      [name]:
+        type === 'checkbox'
+          ? (e.target as HTMLInputElement).checked
+          : value,
     }));
   };
 
@@ -109,6 +133,7 @@ export function TradeIn() {
       <Section background="white" className="!py-8">
         <Container size="md">
           <div className="grid lg:grid-cols-2 gap-12">
+            {/* Colonne gauche : explication du process */}
             <div>
               <h2 className="text-2xl font-bold text-[#111111] mb-6">
                 Comment ça marche ?
@@ -120,9 +145,13 @@ export function TradeIn() {
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-2">Remplissez le formulaire</h3>
+                    <h3 className="font-semibold text-[#111111] mb-2">
+                      Remplissez le formulaire
+                    </h3>
                     <p className="text-[#444444] leading-relaxed">
-                      Décrivez votre véhicule et son état en quelques clics. Plus vous êtes précis, plus notre estimation sera juste.
+                      Décrivez votre véhicule et son état en quelques
+                      clics. Plus vous êtes précis, plus notre estimation
+                      sera juste.
                     </p>
                   </div>
                 </div>
@@ -132,9 +161,12 @@ export function TradeIn() {
                     2
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-2">Recevez une estimation</h3>
+                    <h3 className="font-semibold text-[#111111] mb-2">
+                      Recevez une estimation
+                    </h3>
                     <p className="text-[#444444] leading-relaxed">
-                      Notre équipe étudie votre demande et vous contacte sous 24h avec une première estimation.
+                      Notre équipe étudie votre demande et vous contacte
+                      sous 24h avec une première estimation.
                     </p>
                   </div>
                 </div>
@@ -144,9 +176,12 @@ export function TradeIn() {
                     3
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-2">Expertise sur place</h3>
+                    <h3 className="font-semibold text-[#111111] mb-2">
+                      Expertise sur place
+                    </h3>
                     <p className="text-[#444444] leading-relaxed">
-                      Un rendez-vous est organisé pour examiner le véhicule et finaliser l'offre.
+                      Un rendez-vous est organisé pour examiner le
+                      véhicule et finaliser l'offre.
                     </p>
                   </div>
                 </div>
@@ -156,27 +191,39 @@ export function TradeIn() {
                     4
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-2">Virement immédiat</h3>
+                    <h3 className="font-semibold text-[#111111] mb-2">
+                      Virement immédiat
+                    </h3>
                     <p className="text-[#444444] leading-relaxed">
-                      Si vous acceptez l'offre, le paiement est effectué immédiatement et nous gérons toutes les démarches.
+                      Si vous acceptez l'offre, le paiement est effectué
+                      immédiatement et nous gérons toutes les démarches.
                     </p>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Colonne droite : formulaire de reprise */}
             <div>
               {success ? (
                 <div className="bg-green-50 border-2 border-green-500 rounded-xl p-8 text-center">
                   <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-green-900 mb-2">Demande envoyée !</h3>
+                  <h3 className="text-2xl font-bold text-green-900 mb-2">
+                    Demande envoyée !
+                  </h3>
                   <p className="text-green-800">
-                    Nous avons bien reçu votre demande de reprise. Notre équipe vous contactera sous 24h.
+                    Nous avons bien reçu votre demande de reprise. Notre
+                    équipe vous contactera sous 24h.
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl">
-                  <h2 className="text-2xl font-bold text-[#111111] mb-4">Demande de reprise</h2>
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
+                >
+                  <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                    Demande de reprise
+                  </h2>
 
                   <Input
                     label="Nom complet"
@@ -251,10 +298,14 @@ export function TradeIn() {
                     onChange={handleChange}
                   >
                     <option value="">Sélectionnez...</option>
-                    <option value="excellent">Excellent</option>
+                    <option value="excellent">
+                      Excellent
+                    </option>
                     <option value="bon">Bon</option>
                     <option value="correct">Correct</option>
-                    <option value="a-reviser">À réviser</option>
+                    <option value="a-reviser">
+                      À réviser
+                    </option>
                   </Select>
 
                   <Textarea
@@ -268,8 +319,10 @@ export function TradeIn() {
 
                   <FileUpload
                     label="Photos du véhicule (fortement recommandé)"
-                    maxFiles={5}
+                    maxFiles={10}
                     maxSizeMB={10}
+                    accept="image/*,application/pdf"
+                    value={files}
                     onChange={setFiles}
                   />
 
@@ -283,12 +336,23 @@ export function TradeIn() {
                       onChange={handleChange}
                       className="mt-1 w-4 h-4 text-[#D10000] focus:ring-[#D10000] rounded"
                     />
-                    <label htmlFor="consent" className="text-sm text-[#444444]">
-                      J'accepte que mes données soient utilisées pour traiter ma demande de reprise conformément à la{' '}
-                      <a href="/politique-confidentialite" className="text-[#D10000] hover:underline">
+                    <label
+                      htmlFor="consent"
+                      className="text-sm text-[#444444]"
+                    >
+                      J'accepte que mes données soient utilisées
+                      pour traiter ma demande de reprise
+                      conformément à la{' '}
+                      <a
+                        href="/politique-confidentialite"
+                        className="text-[#D10000] hover:underline"
+                      >
                         politique de confidentialité
                       </a>
-                      . <span className="text-[#D10000]">*</span>
+                      .{' '}
+                      <span className="text-[#D10000]">
+                        *
+                      </span>
                     </label>
                   </div>
 
@@ -298,8 +362,15 @@ export function TradeIn() {
                     </div>
                   )}
 
-                  <Button type="submit" disabled={isSubmitting} fullWidth size="lg">
-                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma demande'}
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    fullWidth
+                    size="lg"
+                  >
+                    {isSubmitting
+                      ? 'Envoi en cours...'
+                      : 'Envoyer ma demande'}
                   </Button>
                 </form>
               )}
