@@ -22,21 +22,27 @@ import { supabase } from '../lib/supabase';
 export function Contact() {
   // Si on arrive depuis une fiche véhicule, on a passé `state={{ vehicle: "Yamaha MT-07 2021" }}`
   const location = useLocation();
-  const vehicleRef = (location.state as { vehicle?: string } | undefined)?.vehicle || '';
+  const vehicleRef =
+    (location.state as { vehicle?: string } | undefined)?.vehicle || '';
 
   // Données du formulaire (côté client)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    subject: vehicleRef ? `Demande d'information - ${vehicleRef}` : '',
+    subject: vehicleRef
+      ? `Demande d'information - ${vehicleRef}`
+      : '',
     message: '',
     consent: false,
   });
 
-  // Fichiers uploadés (on passe au nouveau format UploadedDoc[])
+  // Fichiers uploadés (nouveau format enrichi UploadedDoc[])
   const [files, setFiles] = useState<UploadedDoc[]>([]);
 
-  // Hook de soumission vers Supabase
+  // Indicateur de progression spécifique à l'upload des pièces jointes
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+
+  // Hook de soumission vers Supabase (envoi du lead après upload)
   const { submit, isSubmitting, success, error } = useFormSubmit({
     onSuccess: () => {
       setFormData({
@@ -50,11 +56,14 @@ export function Contact() {
     },
   });
 
-  // Envoi du formulaire
+  // Envoi du formulaire :
+  // 1. on uploade chaque fichier dans Supabase Storage (bucket "form-attachments")
+  // 2. on envoie le payload complet (avec attachments) à la fonction edge contact-form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // On va stocker ici les pièces jointes uploadées
+    setUploadingFiles(true);
+
     const attachments: Array<{
       filename: string;
       path: string;
@@ -62,7 +71,6 @@ export function Contact() {
       mime_type: string;
     }> = [];
 
-    // Upload des fichiers dans Supabase Storage
     for (const doc of files) {
       const file = doc.file;
       const fileExt = file.name.split('.').pop();
@@ -77,7 +85,7 @@ export function Contact() {
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
-        // on continue quand même les autres fichiers
+        // On ne bloque pas tout le formulaire si un seul fichier échoue
         continue;
       }
 
@@ -89,15 +97,16 @@ export function Contact() {
       });
     }
 
-    // Appel de ta fonction edge Supabase (contact-form)
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     await submit(`${supabaseUrl}/functions/v1/contact-form`, {
       ...formData,
       attachments,
     });
+
+    setUploadingFiles(false);
   };
 
-  // Mise à jour champs texte / checkbox
+  // Mise à jour des champs texte / checkbox
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -260,10 +269,9 @@ export function Contact() {
                     Message envoyé !
                   </h3>
                   <p className="text-green-800">
-                    Nous avons bien reçu votre
-                    message. Notre équipe vous
-                    répondra dans les plus
-                    brefs délais.
+                    Nous avons bien reçu votre message. Notre
+                    équipe vous répondra dans les plus brefs
+                    délais.
                   </p>
                 </div>
               ) : (
@@ -334,17 +342,14 @@ export function Contact() {
                       htmlFor="consent"
                       className="text-sm text-[#444444]"
                     >
-                      J'accepte que mes
-                      données soient
-                      utilisées pour traiter
-                      ma demande conformément
-                      à la{' '}
+                      J'accepte que mes données soient
+                      utilisées pour traiter ma demande
+                      conformément à la{' '}
                       <a
                         href="/politique-confidentialite"
                         className="text-[#D10000] hover:underline"
                       >
-                        politique de
-                        confidentialité
+                        politique de confidentialité
                       </a>
                       .{' '}
                       <span className="text-[#D10000]">
@@ -359,13 +364,22 @@ export function Contact() {
                     </div>
                   )}
 
+                  {/* Indicateur visuel pendant l'envoi des pièces jointes */}
+                  {uploadingFiles && (
+                    <div className="text-sm text-[#444444] bg-white/70 border border-[#E5E5E5] rounded-lg px-3 py-2 flex items-center justify-center">
+                      Téléversement des documents...
+                    </div>
+                  )}
+
                   <Button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || uploadingFiles}
                     fullWidth
                     size="lg"
                   >
-                    {isSubmitting
+                    {uploadingFiles
+                      ? 'Téléversement des documents...'
+                      : isSubmitting
                       ? 'Envoi en cours...'
                       : 'Envoyer le message'}
                   </Button>
