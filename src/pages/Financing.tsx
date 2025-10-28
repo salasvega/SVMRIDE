@@ -347,7 +347,7 @@ export function Financing() {
       . Simple, rapide et 100&nbsp;% en ligne.
     </p>
 
-    {/* Logo Alma (tu peux placer le fichier dans /public/logos/alma-logo.png) */}
+    {/* Logo Alma (tu peux placer le fichier dans /public/alma-logo_frame.png) */}
     <a
       href="https://almapay.com/fr-FR"
       target="_blank"
