@@ -16,11 +16,19 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-[#EEEEEE] shadow-sm">
+    <header
+      className={`
+        sticky top-0 z-50 border-b border-[#EEEEEE] shadow-sm
+        transition-colors duration-300
+        ${mobileMenuOpen
+          ? 'bg-white/70 backdrop-blur-md'
+          : 'bg-white'
+        }
+      `}
+    >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Barre du haut */}
         <div className="flex justify-between items-center h-20">
-          {/* Logo + nom */}
+          {/* Logo + Nom du site */}
           <Link
             to="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -35,7 +43,7 @@ export function Header() {
             </span>
           </Link>
 
-          {/* Navigation desktop */}
+          {/* Liens Desktop */}
           <div className="hidden lg:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
@@ -56,7 +64,7 @@ export function Header() {
             </Link>
           </div>
 
-          {/* Bouton burger mobile */}
+          {/* Bouton Menu Mobile */}
           <button
             type="button"
             className="lg:hidden p-2 text-[#111111] hover:bg-[#F9F9F9] rounded-lg transition-colors"
@@ -72,11 +80,12 @@ export function Header() {
           </button>
         </div>
 
-        {/* Menu mobile déroulant */}
+        {/* Menu Mobile avec slide + fade + easing custom */}
         <div
           className={`
             lg:hidden border-t border-[#EEEEEE] overflow-hidden
-            transition-all duration-300 ease-out
+            transition-all duration-300
+            [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]
             ${mobileMenuOpen
               ? 'max-h-[500px] opacity-100 translate-y-0 pointer-events-auto py-4'
               : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none py-0'
