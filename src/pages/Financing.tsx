@@ -249,7 +249,10 @@ export function Financing() {
                     className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
                   />
                 </div>
-
+  <div></div>
+<label className="block text-sm font-medium mb-2">
+                    Taux (TAEG): {simulatorData.rate} %
+                  </label>
                 {/* Taux *
                 <div>
                   <label className="block text-sm font-medium mb-2">
