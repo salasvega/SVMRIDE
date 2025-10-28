@@ -24,7 +24,7 @@ export function Financing() {
   // Simulateur de crédit -> initialisé avec le prix du véhicule si dispo
   const [simulatorData, setSimulatorData] = useState({
     amount: parsedPrice && !Number.isNaN(parsedPrice) ? parsedPrice : 5000,
-    duration: 36,
+    duration: 24,
     rate: 7,
   });
 
@@ -240,7 +240,7 @@ export function Financing() {
                   <input
                     type="range"
                     min="12"
-                    max="60"
+                    max="72"
                     step="6"
                     value={simulatorData.duration}
                     onChange={(e) =>
