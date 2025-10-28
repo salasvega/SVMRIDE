@@ -297,53 +297,99 @@ export function Financing() {
           {/* Deux colonnes */}
           <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
             {/* Avantages commerciaux */}
-            <div>
-              <h2 className="text-2xl font-bold text-[#111111] mb-6">
-                Pourquoi financer avec nous ?
-              </h2>
+          <div>
+  <h2 className="text-2xl font-bold text-[#111111] mb-6">
+    Pourquoi financer avec nous ?
+  </h2>
 
-              <div className="space-y-4">
-                <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
-                  <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">Réponse rapide</h3>
-                    <p className="text-sm text-[#444444]">
-                      Obtenez une réponse de principe en quelques heures
-                    </p>
-                  </div>
-                </div>
+  <div className="space-y-4">
+    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
+      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+      <div>
+        <h3 className="font-semibold text-[#111111] mb-1">Réponse rapide</h3>
+        <p className="text-sm text-[#444444]">
+          Obtenez une réponse de principe en quelques heures
+        </p>
+      </div>
+    </div>
 
-                <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
-                  <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">Taux compétitifs</h3>
-                    <p className="text-sm text-[#444444]">
-                      Nous négocions les meilleurs taux pour vous
-                    </p>
-                  </div>
-                </div>
+    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
+      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+      <div>
+        <h3 className="font-semibold text-[#111111] mb-1">Taux compétitifs</h3>
+        <p className="text-sm text-[#444444]">
+          Nous négocions les meilleurs taux pour vous
+        </p>
+      </div>
+    </div>
 
-                <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
-                  <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">Sans frais de dossier</h3>
-                    <p className="text-sm text-[#444444]">
-                      Aucun frais caché, tout est transparent
-                    </p>
-                  </div>
-                </div>
+    {/* Paiement en plusieurs fois via Alma */}
+<div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
+  <CheckCircle
+    className="w-6 h-6 text-[#D10000] flex-shrink-0"
+    aria-hidden="true"
+  />
+  <div>
+    <h3 className="font-semibold text-[#111111] mb-1">
+      Paiement en 3x, 4x ou 10x par carte
+    </h3>
+    <p className="text-sm text-[#444444] leading-snug">
+      Réglez votre moto ou scooter en plusieurs fois par carte bancaire
+      grâce à notre partenaire&nbsp;
+      <a
+        href="https://almapay.com/fr-FR"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-[#D10000] font-medium hover:underline"
+      >
+        Alma
+      </a>
+      . Simple, rapide et 100&nbsp;% en ligne.
+    </p>
 
-                <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-                  <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
-                  <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">Accompagnement personnalisé</h3>
-                    <p className="text-sm text-[#444444]">
-                      Un conseiller dédié pour vous guider
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+    {/* Logo Alma (tu peux placer le fichier dans /public/logos/alma-logo.png) */}
+    <a
+      href="https://almapay.com/fr-FR"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-block mt-3"
+    >
+      <img
+        src="/logos/alma-logo_frame.png"
+        alt="Paiement en plusieurs fois avec Alma"
+        className="h-6 opacity-90 hover:opacity-100 transition-opacity"
+      />
+    </a>
+
+    <p className="text-[11px] text-[#777777] mt-2">
+      Offre de financement soumise à conditions, proposée par Alma.
+    </p>
+  </div>
+</div>
+
+
+    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
+      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+      <div>
+        <h3 className="font-semibold text-[#111111] mb-1">Sans frais de dossier</h3>
+        <p className="text-sm text-[#444444]">
+          Aucun frais caché, tout est transparent
+        </p>
+      </div>
+    </div>
+
+    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
+      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+      <div>
+        <h3 className="font-semibold text-[#111111] mb-1">Accompagnement personnalisé</h3>
+        <p className="text-sm text-[#444444]">
+          Un conseiller dédié pour vous guider
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
 
             {/* Formulaire */}
             <div>
