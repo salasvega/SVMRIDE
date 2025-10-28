@@ -35,7 +35,7 @@ export function Financing() {
     email: '',
     phone: '',
     amount: (parsedPrice && !Number.isNaN(parsedPrice) ? parsedPrice : 5000).toString(),
-    duration: '36',
+    duration: '24',
     comments: vehicleFromURL
       ? `Je souhaite financer ${vehicleFromURL}${parsedPrice ? ` affiché à ${parsedPrice} €` : ''}.`
       : '',
