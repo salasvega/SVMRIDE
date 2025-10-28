@@ -37,6 +37,7 @@ export function VehicleDetail() {
     );
   }
 
+  // Pour le SEO / balisage produit
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -60,6 +61,12 @@ export function VehicleDetail() {
     },
   };
 
+  // On prépare le texte véhicule pour l'envoi vers /financement
+  const vehicleLabel = `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
+  const financingLink = `/financement?vehicle=${encodeURIComponent(
+    vehicleLabel
+  )}&price=${encodeURIComponent(String(vehicle.price))}`;
+
   return (
     <>
       <SEOHead
@@ -72,7 +79,10 @@ export function VehicleDetail() {
 
       <Section background="gray" className="!py-6">
         <Container>
-          <Link to="/vehicules" className="inline-flex items-center gap-2 text-[#D10000] hover:underline">
+          <Link
+            to="/vehicules"
+            className="inline-flex items-center gap-2 text-[#D10000] hover:underline"
+          >
             <ArrowLeft className="w-4 h-4" />
             Retour aux véhicules
           </Link>
@@ -82,6 +92,7 @@ export function VehicleDetail() {
       <Section background="white" className="!py-8">
         <Container>
           <div className="grid lg:grid-cols-2 gap-12">
+            {/* --- Colonne gauche : galerie photos --- */}
             <div>
               <div className="aspect-[4/3] rounded-xl overflow-hidden bg-[#F9F9F9] mb-4">
                 <img
@@ -98,7 +109,9 @@ export function VehicleDetail() {
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
                       className={`aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all ${
-                        currentImageIndex === index ? 'border-[#D10000]' : 'border-transparent'
+                        currentImageIndex === index
+                          ? 'border-[#D10000]'
+                          : 'border-transparent'
                       }`}
                     >
                       <img
@@ -112,53 +125,79 @@ export function VehicleDetail() {
               )}
             </div>
 
+            {/* --- Colonne droite : infos véhicule + actions --- */}
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-[#111111] mb-2">
                 {vehicle.brand} {vehicle.model}
               </h1>
-              <p className="text-3xl font-bold text-[#D10000] mb-6">{formatPrice(vehicle.price)}</p>
+
+              <p className="text-3xl font-bold text-[#D10000] mb-6">
+                {formatPrice(vehicle.price)}
+              </p>
 
               <div className="grid grid-cols-2 gap-4 mb-8 p-6 bg-[#F9F9F9] rounded-xl">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Année</p>
-                    <p className="font-semibold text-[#111111]">{vehicle.year}</p>
+                    <p className="font-semibold text-[#111111]">
+                      {vehicle.year}
+                    </p>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <Gauge className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Cylindrée</p>
-                    <p className="font-semibold text-[#111111]">{vehicle.displacement} cc</p>
+                    <p className="font-semibold text-[#111111]">
+                      {vehicle.displacement} cc
+                    </p>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <MapPin className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Kilométrage</p>
-                    <p className="font-semibold text-[#111111]">{formatMileage(vehicle.mileage)}</p>
+                    <p className="font-semibold text-[#111111]">
+                      {formatMileage(vehicle.mileage)}
+                    </p>
                   </div>
                 </div>
+
                 <div className="flex items-center gap-2">
                   <Shield className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Type</p>
-                    <p className="font-semibold text-[#111111] capitalize">{vehicle.type}</p>
+                    <p className="font-semibold text-[#111111] capitalize">
+                      {vehicle.type}
+                    </p>
                   </div>
                 </div>
               </div>
 
+              {/* Description */}
               <div className="mb-8">
-                <h2 className="text-xl font-bold text-[#111111] mb-3">Description</h2>
-                <p className="text-[#444444] leading-relaxed">{vehicle.description}</p>
+                <h2 className="text-xl font-bold text-[#111111] mb-3">
+                  Description
+                </h2>
+                <p className="text-[#444444] leading-relaxed">
+                  {vehicle.description}
+                </p>
               </div>
 
+              {/* Équipements */}
               <div className="mb-8">
-                <h2 className="text-xl font-bold text-[#111111] mb-3">Équipements</h2>
+                <h2 className="text-xl font-bold text-[#111111] mb-3">
+                  Équipements
+                </h2>
                 <ul className="grid grid-cols-2 gap-2">
                   {vehicle.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2 text-[#444444]">
+                    <li
+                      key={index}
+                      className="flex items-center gap-2 text-[#444444]"
+                    >
                       <span className="w-2 h-2 bg-[#D10000] rounded-full"></span>
                       {feature}
                     </li>
@@ -166,6 +205,7 @@ export function VehicleDetail() {
                 </ul>
               </div>
 
+              {/* Garantie */}
               <div className="p-4 bg-[#F9F9F9] rounded-xl mb-8">
                 <div className="flex items-center gap-2 text-[#D10000] mb-1">
                   <Shield className="w-5 h-5" aria-hidden="true" />
@@ -174,11 +214,33 @@ export function VehicleDetail() {
                 <p className="text-[#444444]">{vehicle.warranty}</p>
               </div>
 
-              <Link to="/contact" state={{ vehicle: `${vehicle.brand} ${vehicle.model} ${vehicle.year}` }}>
-                <Button size="lg" fullWidth>
-                  Demander des informations
-                </Button>
-              </Link>
+              {/* CTA contact + CTA financement */}
+              <div className="space-y-4">
+                <Link
+                  to="/contact"
+                  state={{
+                    vehicle: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+                  }}
+                >
+                  <Button size="lg" fullWidth>
+                    Demander des informations
+                  </Button>
+                </Link>
+
+                <Link
+                  to={financingLink}
+                  // Exemple: /financement?vehicle=Yamaha%20MT-07%202021&price=6500
+                >
+                  <Button
+                    size="lg"
+                    fullWidth
+                    variant="outline"
+                    className="border-[#D10000] text-[#D10000] hover:bg-[#D10000] hover:text-white hover:border-[#D10000]"
+                  >
+                    Demander un financement
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </Container>
