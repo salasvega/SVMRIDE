@@ -1,21 +1,30 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { CheckCircle, Mail, Phone, Instagram, MapPin, Clock } from 'lucide-react';
+import {
+  CheckCircle,
+  Mail,
+  Phone,
+  Instagram,
+  MapPin,
+  Clock,
+} from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
-import { FileUpload } from '../components/ui/FileUpload';
+import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { siteConfig } from '../config/site';
 import { supabase } from '../lib/supabase';
 
 export function Contact() {
+  // Si on arrive depuis une fiche véhicule, on a passé `state={{ vehicle: "Yamaha MT-07 2021" }}`
   const location = useLocation();
-  const vehicleRef = location.state?.vehicle || '';
+  const vehicleRef = (location.state as { vehicle?: string } | undefined)?.vehicle || '';
 
+  // Données du formulaire (côté client)
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,8 +33,10 @@ export function Contact() {
     consent: false,
   });
 
-  const [files, setFiles] = useState<File[]>([]);
+  // Fichiers uploadés (on passe au nouveau format UploadedDoc[])
+  const [files, setFiles] = useState<UploadedDoc[]>([]);
 
+  // Hook de soumission vers Supabase
   const { submit, isSubmitting, success, error } = useFormSubmit({
     onSuccess: () => {
       setFormData({
@@ -39,14 +50,25 @@ export function Contact() {
     },
   });
 
+  // Envoi du formulaire
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const attachments = [];
+    // On va stocker ici les pièces jointes uploadées
+    const attachments: Array<{
+      filename: string;
+      path: string;
+      size: number;
+      mime_type: string;
+    }> = [];
 
-    for (const file of files) {
+    // Upload des fichiers dans Supabase Storage
+    for (const doc of files) {
+      const file = doc.file;
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const fileName = `${Date.now()}-${Math.random()
+        .toString(36)
+        .substring(7)}.${fileExt}`;
       const filePath = `contact/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
@@ -55,6 +77,7 @@ export function Contact() {
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
+        // on continue quand même les autres fichiers
         continue;
       }
 
@@ -66,6 +89,7 @@ export function Contact() {
       });
     }
 
+    // Appel de ta fonction edge Supabase (contact-form)
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
     await submit(`${supabaseUrl}/functions/v1/contact-form`, {
       ...formData,
@@ -73,11 +97,17 @@ export function Contact() {
     });
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // Mise à jour champs texte / checkbox
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value, type } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
+      [name]:
+        type === 'checkbox'
+          ? (e.target as HTMLInputElement).checked
+          : value,
     }));
   };
 
@@ -103,29 +133,49 @@ export function Contact() {
       <Section background="white" className="!py-8">
         <Container>
           <div className="grid lg:grid-cols-2 gap-12">
+            {/* Colonne gauche : infos de contact */}
             <div>
-              <h2 className="text-2xl font-bold text-[#111111] mb-6">Nos coordonnées</h2>
+              <h2 className="text-2xl font-bold text-[#111111] mb-6">
+                Nos coordonnées
+              </h2>
 
               <div className="space-y-6 mb-8">
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
                   className="flex items-start gap-4 p-4 bg-[#F9F9F9] rounded-xl hover:bg-[#EEEEEE] transition-colors"
                 >
-                  <Mail className="w-6 h-6 text-[#D10000] flex-shrink-0 mt-1" aria-hidden="true" />
+                  <Mail
+                    className="w-6 h-6 text-[#D10000] flex-shrink-0 mt-1"
+                    aria-hidden="true"
+                  />
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">Email</h3>
-                    <p className="text-[#444444]">{siteConfig.contact.email}</p>
+                    <h3 className="font-semibold text-[#111111] mb-1">
+                      Email
+                    </h3>
+                    <p className="text-[#444444]">
+                      {siteConfig.contact.email}
+                    </p>
                   </div>
                 </a>
 
                 <a
-                  href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
+                  href={`tel:${siteConfig.contact.phone.replace(
+                    /\s/g,
+                    ''
+                  )}`}
                   className="flex items-start gap-4 p-4 bg-[#F9F9F9] rounded-xl hover:bg-[#EEEEEE] transition-colors"
                 >
-                  <Phone className="w-6 h-6 text-[#D10000] flex-shrink-0 mt-1" aria-hidden="true" />
+                  <Phone
+                    className="w-6 h-6 text-[#D10000] flex-shrink-0 mt-1"
+                    aria-hidden="true"
+                  />
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">Téléphone</h3>
-                    <p className="text-[#444444]">{siteConfig.contact.phone}</p>
+                    <h3 className="font-semibold text-[#111111] mb-1">
+                      Téléphone
+                    </h3>
+                    <p className="text-[#444444]">
+                      {siteConfig.contact.phone}
+                    </p>
                   </div>
                 </a>
 
@@ -135,59 +185,95 @@ export function Contact() {
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 p-4 bg-[#F9F9F9] rounded-xl hover:bg-[#EEEEEE] transition-colors"
                 >
-                  <Instagram className="w-6 h-6 text-[#D10000] flex-shrink-0 mt-1" aria-hidden="true" />
+                  <Instagram
+                    className="w-6 h-6 text-[#D10000] flex-shrink-0 mt-1"
+                    aria-hidden="true"
+                  />
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">Instagram</h3>
-                    <p className="text-[#444444]">{siteConfig.contact.instagram}</p>
+                    <h3 className="font-semibold text-[#111111] mb-1">
+                      Instagram
+                    </h3>
+                    <p className="text-[#444444]">
+                      {siteConfig.contact.instagram}
+                    </p>
                   </div>
                 </a>
               </div>
 
               <div className="bg-[#F9F9F9] p-6 rounded-xl mb-8">
                 <div className="flex items-center gap-3 mb-4">
-                  <MapPin className="w-6 h-6 text-[#D10000]" aria-hidden="true" />
-                  <h3 className="font-semibold text-[#111111]">Adresse</h3>
+                  <MapPin
+                    className="w-6 h-6 text-[#D10000]"
+                    aria-hidden="true"
+                  />
+                  <h3 className="font-semibold text-[#111111]">
+                    Adresse
+                  </h3>
                 </div>
                 <p className="text-[#444444]">
-                  Île-de-France<br />
+                  Île-de-France
+                  <br />
                   Sur rendez-vous uniquement
                 </p>
               </div>
 
               <div className="bg-[#F9F9F9] p-6 rounded-xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <Clock className="w-6 h-6 text-[#D10000]" aria-hidden="true" />
-                  <h3 className="font-semibold text-[#111111]">Horaires</h3>
+                  <Clock
+                    className="w-6 h-6 text-[#D10000]"
+                    aria-hidden="true"
+                  />
+                  <h3 className="font-semibold text-[#111111]">
+                    Horaires
+                  </h3>
                 </div>
+
                 <div className="space-y-2 text-[#444444]">
                   <div className="flex justify-between">
                     <span>Lundi - Vendredi:</span>
-                    <span className="font-medium">9h00 - 19h00</span>
+                    <span className="font-medium">
+                      9h00 - 19h00
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Samedi:</span>
-                    <span className="font-medium">10h00 - 18h00</span>
+                    <span className="font-medium">
+                      10h00 - 18h00
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span>Dimanche:</span>
-                    <span className="font-medium">Sur rendez-vous</span>
+                    <span className="font-medium">
+                      Sur rendez-vous
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Colonne droite : formulaire de contact */}
             <div>
               {success ? (
                 <div className="bg-green-50 border-2 border-green-500 rounded-xl p-8 text-center">
                   <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h3 className="text-2xl font-bold text-green-900 mb-2">Message envoyé !</h3>
+                  <h3 className="text-2xl font-bold text-green-900 mb-2">
+                    Message envoyé !
+                  </h3>
                   <p className="text-green-800">
-                    Nous avons bien reçu votre message. Notre équipe vous répondra dans les plus brefs délais.
+                    Nous avons bien reçu votre
+                    message. Notre équipe vous
+                    répondra dans les plus
+                    brefs délais.
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl">
-                  <h2 className="text-2xl font-bold text-[#111111] mb-4">Envoyez-nous un message</h2>
+                <form
+                  onSubmit={handleSubmit}
+                  className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
+                >
+                  <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                    Envoyez-nous un message
+                  </h2>
 
                   <Input
                     label="Nom complet"
@@ -227,8 +313,10 @@ export function Contact() {
 
                   <FileUpload
                     label="Pièces jointes (optionnel)"
-                    maxFiles={5}
+                    maxFiles={10}
                     maxSizeMB={10}
+                    accept="image/*,application/pdf"
+                    value={files}
                     onChange={setFiles}
                   />
 
@@ -242,12 +330,26 @@ export function Contact() {
                       onChange={handleChange}
                       className="mt-1 w-4 h-4 text-[#D10000] focus:ring-[#D10000] rounded"
                     />
-                    <label htmlFor="consent" className="text-sm text-[#444444]">
-                      J'accepte que mes données soient utilisées pour traiter ma demande conformément à la{' '}
-                      <a href="/politique-confidentialite" className="text-[#D10000] hover:underline">
-                        politique de confidentialité
+                    <label
+                      htmlFor="consent"
+                      className="text-sm text-[#444444]"
+                    >
+                      J'accepte que mes
+                      données soient
+                      utilisées pour traiter
+                      ma demande conformément
+                      à la{' '}
+                      <a
+                        href="/politique-confidentialite"
+                        className="text-[#D10000] hover:underline"
+                      >
+                        politique de
+                        confidentialité
                       </a>
-                      . <span className="text-[#D10000]">*</span>
+                      .{' '}
+                      <span className="text-[#D10000]">
+                        *
+                      </span>
                     </label>
                   </div>
 
@@ -257,8 +359,15 @@ export function Contact() {
                     </div>
                   )}
 
-                  <Button type="submit" disabled={isSubmitting} fullWidth size="lg">
-                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting}
+                    fullWidth
+                    size="lg"
+                  >
+                    {isSubmitting
+                      ? 'Envoi en cours...'
+                      : 'Envoyer le message'}
                   </Button>
                 </form>
               )}
