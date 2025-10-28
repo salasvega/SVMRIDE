@@ -350,7 +350,7 @@ export function Financing() {
       . Simple, rapide et 100&nbsp;% en ligne.
     </p>
 
-    {/* Logo Alma (tu peux placer le fichier dans /public/alma-logo_frame.png) */}
+    {/* Logo Alma (tu peux placer le fichier dans /alma-logo_frame.png) */}
     <a
       href="https://almapay.com/fr-FR"
       target="_blank"
@@ -358,7 +358,7 @@ export function Financing() {
       className="inline-block mt-3"
     >
       <img
-        src="/public/alma-logo_frame.png"
+        src="/alma-logo_frame.png"
         alt="Paiement en plusieurs fois avec Alma"
         className="h-6 opacity-90 hover:opacity-100 transition-opacity"
       />
