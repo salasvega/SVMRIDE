@@ -26,10 +26,13 @@ export function TradeIn() {
     consent: false,
   });
 
-  // Photos / documents fournis par l'utilisateur, avec preview et métadonnées
+  // Photos / documents fournis par l'utilisateur (nouveau format enrichi)
   const [files, setFiles] = useState<UploadedDoc[]>([]);
 
-  // Hook d'envoi
+  // Indicateur d'activité pendant l'upload des pièces jointes
+  const [uploadingFiles, setUploadingFiles] = useState(false);
+
+  // Hook d'envoi global (envoie vers ta Edge Function trade-in-form)
   const { submit, isSubmitting, success, error } = useFormSubmit({
     onSuccess: () => {
       setFormData({
@@ -48,11 +51,13 @@ export function TradeIn() {
     },
   });
 
-  // Soumission finale
-  // 1. Upload des fichiers dans Supabase Storage (bucket "form-attachments")
-  // 2. Appel de la fonction edge "trade-in-form" avec les métadonnées et le formulaire
+  // Soumission :
+  // 1. upload des photos dans Supabase Storage
+  // 2. envoi du payload final à la fonction edge "trade-in-form"
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setUploadingFiles(true);
 
     const attachments: Array<{
       filename: string;
@@ -75,7 +80,7 @@ export function TradeIn() {
 
       if (uploadError) {
         console.error('Upload error:', uploadError);
-        // On n'arrête pas tout le formulaire si une seule image échoue
+        // On continue quand même les autres fichiers
         continue;
       }
 
@@ -88,14 +93,15 @@ export function TradeIn() {
     }
 
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-
     await submit(`${supabaseUrl}/functions/v1/trade-in-form`, {
       ...formData,
       attachments,
     });
+
+    setUploadingFiles(false);
   };
 
-  // Gestion champs contrôlés
+  // Gestion champs contrôlés (text, select, textarea, checkbox)
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -150,8 +156,8 @@ export function TradeIn() {
                     </h3>
                     <p className="text-[#444444] leading-relaxed">
                       Décrivez votre véhicule et son état en quelques
-                      clics. Plus vous êtes précis, plus notre estimation
-                      sera juste.
+                      clics. Plus vous êtes précis, plus notre
+                      estimation sera juste.
                     </p>
                   </div>
                 </div>
@@ -165,8 +171,8 @@ export function TradeIn() {
                       Recevez une estimation
                     </h3>
                     <p className="text-[#444444] leading-relaxed">
-                      Notre équipe étudie votre demande et vous contacte
-                      sous 24h avec une première estimation.
+                      Notre équipe étudie votre demande et vous
+                      contacte sous 24h avec une première estimation.
                     </p>
                   </div>
                 </div>
@@ -195,8 +201,9 @@ export function TradeIn() {
                       Virement immédiat
                     </h3>
                     <p className="text-[#444444] leading-relaxed">
-                      Si vous acceptez l'offre, le paiement est effectué
-                      immédiatement et nous gérons toutes les démarches.
+                      Si vous acceptez l'offre, le paiement est
+                      effectué immédiatement et nous gérons toutes les
+                      démarches.
                     </p>
                   </div>
                 </div>
@@ -212,8 +219,8 @@ export function TradeIn() {
                     Demande envoyée !
                   </h3>
                   <p className="text-green-800">
-                    Nous avons bien reçu votre demande de reprise. Notre
-                    équipe vous contactera sous 24h.
+                    Nous avons bien reçu votre demande de reprise.
+                    Notre équipe vous contactera sous 24h.
                   </p>
                 </div>
               ) : (
@@ -298,14 +305,10 @@ export function TradeIn() {
                     onChange={handleChange}
                   >
                     <option value="">Sélectionnez...</option>
-                    <option value="excellent">
-                      Excellent
-                    </option>
+                    <option value="excellent">Excellent</option>
                     <option value="bon">Bon</option>
                     <option value="correct">Correct</option>
-                    <option value="a-reviser">
-                      À réviser
-                    </option>
+                    <option value="a-reviser">À réviser</option>
                   </Select>
 
                   <Textarea
@@ -340,9 +343,9 @@ export function TradeIn() {
                       htmlFor="consent"
                       className="text-sm text-[#444444]"
                     >
-                      J'accepte que mes données soient utilisées
-                      pour traiter ma demande de reprise
-                      conformément à la{' '}
+                      J'accepte que mes données soient
+                      utilisées pour traiter ma demande de
+                      reprise conformément à la{' '}
                       <a
                         href="/politique-confidentialite"
                         className="text-[#D10000] hover:underline"
@@ -362,13 +365,22 @@ export function TradeIn() {
                     </div>
                   )}
 
+                  {/* Indicateur visuel pendant upload */}
+                  {uploadingFiles && (
+                    <div className="text-sm text-[#444444] bg-white/70 border border-[#E5E5E5] rounded-lg px-3 py-2 flex items-center justify-center">
+                      Téléversement des documents...
+                    </div>
+                  )}
+
                   <Button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || uploadingFiles}
                     fullWidth
                     size="lg"
                   >
-                    {isSubmitting
+                    {uploadingFiles
+                      ? 'Téléversement des documents...'
+                      : isSubmitting
                       ? 'Envoi en cours...'
                       : 'Envoyer ma demande'}
                   </Button>
