@@ -25,7 +25,7 @@ export function Financing() {
   const [simulatorData, setSimulatorData] = useState({
     amount: parsedPrice && !Number.isNaN(parsedPrice) ? parsedPrice : 5000,
     duration: 36,
-    rate: 6.5,
+    rate: 7,
   });
 
   // Formulaire envoyé côté serveur
