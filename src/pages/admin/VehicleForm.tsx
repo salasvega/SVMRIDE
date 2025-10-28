@@ -10,7 +10,6 @@ import {
   ImageUpload,
   type UploadedImage,
 } from '../../components/admin/ImageUpload';
-import { VehicleCard } from '../../components/VehicleCard';
 import { supabase } from '../../lib/supabase';
 import { Vehicle } from '../../types/vehicle';
 
@@ -22,10 +21,9 @@ export function VehicleForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Normalise ce qui vient de la base pour l'uploader
-  // On transforme:
-  //   ["https://..."]  => { url:"https://...", path:"" }
-  //   [{url:"...", path:"..."}] => identique
+  // Helper: on normalise les images qui viennent de la base
+  // - si c'est déjà {url, path}, on garde
+  // - si c'est juste une string (ancienne version), on la transforme en {url: string, path: ''}
   function normalizeImagesFromDB(rawImages: any): UploadedImage[] {
     if (!rawImages || !Array.isArray(rawImages)) return [];
     return rawImages.map((img: any) => {
@@ -48,11 +46,7 @@ export function VehicleForm() {
     displacement: 0,
     price: 0,
     mileage: 0,
-    condition: 'excellent' as
-      | 'excellent'
-      | 'bon'
-      | 'correct'
-      | 'a-reviser',
+    condition: 'excellent' as 'excellent' | 'bon' | 'correct' | 'a-reviser',
     description: '',
     images: [] as UploadedImage[],
     features: [] as string[],
@@ -61,15 +55,12 @@ export function VehicleForm() {
     available: true,
   });
 
-  // champ texte pour les features
   const [featuresInput, setFeaturesInput] = useState('');
 
-  // au montage / lors d'un edit
   useEffect(() => {
     if (isEditing && id) {
       fetchVehicle(id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, isEditing]);
 
   async function fetchVehicle(vehicleId: string) {
@@ -82,19 +73,13 @@ export function VehicleForm() {
       .single();
 
     if (error) {
-      console.error(error);
       setError('Véhicule non trouvé');
       setLoading(false);
       return;
     }
 
     if (data) {
-      // Vehicle de la base peut avoir images ou images_v2
-      const vehicle = data as Vehicle & {
-        images?: any;
-        images_v2?: any;
-        status?: 'available' | 'reserved' | 'sold';
-      };
+      const vehicle = data as Vehicle;
 
       setFormData({
         slug: vehicle.slug,
@@ -111,11 +96,7 @@ export function VehicleForm() {
           | 'correct'
           | 'a-reviser',
         description: vehicle.description || '',
-        images: normalizeImagesFromDB(
-          (vehicle as any).images_v2 ??
-            (vehicle as any).images ??
-            []
-        ),
+        images: normalizeImagesFromDB((vehicle as any).images || []),
         features: vehicle.features || [],
         warranty:
           vehicle.warranty ||
@@ -130,32 +111,26 @@ export function VehicleForm() {
     setLoading(false);
   }
 
-  // enregistrement en base (insert/update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // transformer "ABS, LED, ..." en tableau
+    // transforme "ABS, led, ..." en tableau propre
     const features = featuresInput
       .split(',')
       .map((f) => f.trim())
       .filter((f) => f.length > 0);
 
-    // version "propre" pour la DB :
-    // - on écrit dans images_v2 (JSONB)
-    // - chaque image: { url, path }
-    // - on force le champ available pour le site vitrine
+    // point important :
+    // on enregistre seulement les URL (string[])
+    // car on suppose que ta colonne "images" dans Supabase est text[]
+    // et pas encore un jsonb complexe
     const vehicleData = {
       ...formData,
       features,
-      images_v2: formData.images.map((img) => ({
-        url: img.url,
-        path: img.path || '',
-      })),
-      available:
-        formData.status === 'available' &&
-        formData.available,
+      images: formData.images.map((img) => img.url),
+      available: formData.status === 'available' && formData.available,
     };
 
     try {
@@ -167,10 +142,9 @@ export function VehicleForm() {
 
         if (updateError) throw updateError;
       } else {
-        const { error: insertError } =
-          await supabase
-            .from('vehicles')
-            .insert([vehicleData]);
+        const { error: insertError } = await supabase
+          .from('vehicles')
+          .insert([vehicleData]);
 
         if (insertError) throw insertError;
       }
@@ -178,37 +152,26 @@ export function VehicleForm() {
       navigate('/admin/vehicles');
     } catch (err) {
       console.error('Error saving vehicle:', err);
-      setError(
-        "Erreur lors de l'enregistrement du véhicule"
-      );
+      setError("Erreur lors de l'enregistrement du véhicule");
       setLoading(false);
     }
   };
 
-  // génère le slug automatiquement
   const generateSlug = () => {
-    const slugBase = `${formData.brand}-${formData.model}-${formData.year}`
+    const slug = `${formData.brand}-${formData.model}-${formData.year}`
       .toLowerCase()
-      .normalize('NFD')
+      .normalize('NFD') // enlève les accents
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
 
-    setFormData({ ...formData, slug: slugBase });
-  };
-
-  // Prépare les données pour l'aperçu VehicleCard dans l'admin.
-  // On passe images tel quel (UploadedImage[]) et ça marchera car
-  // VehicleCard sait lire soit string[], soit {url,path}[].
-  const previewVehicleForCard = {
-    ...formData,
-    images: formData.images,
+    setFormData({ ...formData, slug });
   };
 
   return (
     <AdminLayout>
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header de la page */}
+        {/* Header */}
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/admin/vehicles')}
@@ -216,7 +179,6 @@ export function VehicleForm() {
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
-
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">
               {isEditing
@@ -224,24 +186,21 @@ export function VehicleForm() {
                 : 'Ajouter un véhicule'}
             </h1>
             <p className="text-[#666666] mt-1">
-              Remplissez tous les champs pour créer
-              ou modifier une fiche véhicule
+              Remplissez tous les champs pour créer ou modifier une
+              fiche véhicule
             </p>
           </div>
         </div>
 
-        {/* Erreur globale */}
+        {/* Error global */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
         )}
 
-        {/* FORMULAIRE */}
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-6"
-        >
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Bloc infos générales */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] space-y-6">
             <h2 className="text-xl font-bold text-[#111111]">
@@ -284,19 +243,13 @@ export function VehicleForm() {
                   setFormData({
                     ...formData,
                     type: e.target
-                      .value as
-                      | 'moto'
-                      | 'scooter',
+                      .value as 'moto' | 'scooter',
                   })
                 }
                 required
               >
-                <option value="moto">
-                  Moto
-                </option>
-                <option value="scooter">
-                  Scooter
-                </option>
+                <option value="moto">Moto</option>
+                <option value="scooter">Scooter</option>
               </Select>
 
               <Input
@@ -306,18 +259,13 @@ export function VehicleForm() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    year: Number(
-                      e.target.value
-                    ),
+                    year: Number(e.target.value),
                   })
                 }
                 onBlur={generateSlug}
                 required
                 min="1900"
-                max={
-                  new Date().getFullYear() +
-                  1
-                }
+                max={new Date().getFullYear() + 1}
               />
 
               <Input
@@ -327,10 +275,9 @@ export function VehicleForm() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    displacement:
-                      Number(
-                        e.target.value
-                      ),
+                    displacement: Number(
+                      e.target.value
+                    ),
                   })
                 }
                 required
@@ -362,10 +309,9 @@ export function VehicleForm() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    mileage:
-                      Number(
-                        e.target.value
-                      ),
+                    mileage: Number(
+                      e.target.value
+                    ),
                   })
                 }
                 required
@@ -379,13 +325,11 @@ export function VehicleForm() {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    condition:
-                      e.target
-                        .value as
-                        | 'excellent'
-                        | 'bon'
-                        | 'correct'
-                        | 'a-reviser',
+                    condition: e.target.value as
+                      | 'excellent'
+                      | 'bon'
+                      | 'correct'
+                      | 'a-reviser',
                   })
                 }
                 required
@@ -393,9 +337,7 @@ export function VehicleForm() {
                 <option value="excellent">
                   Excellent
                 </option>
-                <option value="bon">
-                  Bon
-                </option>
+                <option value="bon">Bon</option>
                 <option value="correct">
                   Correct
                 </option>
@@ -425,8 +367,7 @@ export function VehicleForm() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  description:
-                    e.target.value,
+                  description: e.target.value,
                 })
               }
               rows={4}
@@ -437,9 +378,7 @@ export function VehicleForm() {
               label="Équipements (séparés par des virgules)"
               value={featuresInput}
               onChange={(e) =>
-                setFeaturesInput(
-                  e.target.value
-                )
+                setFeaturesInput(e.target.value)
               }
               placeholder="ex: ABS, LED, Quickshifter, TFT"
               helperText="Séparez chaque équipement par une virgule"
@@ -451,8 +390,7 @@ export function VehicleForm() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  warranty:
-                    e.target.value,
+                  warranty: e.target.value,
                 })
               }
               placeholder="ex: Garantie 12 mois pièces et main d'œuvre"
@@ -464,12 +402,11 @@ export function VehicleForm() {
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  status:
-                    e.target
-                      .value as
-                      | 'available'
-                      | 'reserved'
-                      | 'sold',
+                  status: e.target
+                    .value as
+                    | 'available'
+                    | 'reserved'
+                    | 'sold',
                 })
               }
               required
@@ -488,15 +425,12 @@ export function VehicleForm() {
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={
-                  formData.available
-                }
+                checked={formData.available}
                 onChange={(e) =>
                   setFormData({
                     ...formData,
                     available:
-                      e.target
-                        .checked,
+                      e.target.checked,
                   })
                 }
                 className="w-4 h-4 text-[#C62E2E] border-gray-300 rounded focus:ring-[#C62E2E]"
@@ -507,48 +441,24 @@ export function VehicleForm() {
             </label>
           </div>
 
-          {/* Bloc images + aperçu vitrine publique */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-[#111111] mb-4">
-                Photos
-              </h2>
+          {/* Bloc images */}
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
+            <h2 className="text-xl font-bold text-[#111111] mb-4">
+              Photos
+            </h2>
 
-              <ImageUpload
-                images={formData.images}
-                onChange={(images) =>
-                  setFormData({
-                    ...formData,
-                    images,
-                  })
-                }
-              />
-            </div>
-
-            {/* Preview carte publique telle qu'elle apparaît dans la liste */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-[#111111]">
-                Aperçu vitrine publique
-              </h3>
-
-              <VehicleCard
-                vehicle={
-                  previewVehicleForCard as any
-                }
-                disableLink={true}
-              />
-
-              <p className="text-[11px] text-[#666666] leading-snug">
-                Ceci est l’aperçu tel qu’il
-                apparaîtra dans la grille des
-                véhicules. La première image est la
-                photo principale (tu peux la définir
-                dans la visionneuse en plein écran).
-              </p>
-            </div>
+            <ImageUpload
+              images={formData.images}
+              onChange={(images) =>
+                setFormData({
+                  ...formData,
+                  images,
+                })
+              }
+            />
           </div>
 
-          {/* Boutons d'action */}
+          {/* Actions */}
           <div className="flex justify-end space-x-4">
             <Button
               type="button"
