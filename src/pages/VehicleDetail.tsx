@@ -271,7 +271,7 @@ export function VehicleDetail() {
         tracking-wide
         rounded-xl
         bg-white
-        hover:bg-[#ffeaea]
+        hover:bg-[#000000]
         hover:text-[#b30000]
         hover:border-[#b30000]
         hover:shadow-md
