@@ -263,7 +263,7 @@ export function VehicleDetail() {
       fullWidth
       className="
         w-full
-        bg-[#D10000]
+        bg-[#383131]
         text-white
         font-semibold
         tracking-wide
