@@ -258,7 +258,7 @@ export function VehicleDetail() {
     to={financingLink}
     className="w-full sm:flex-1"
   >
-    <Button
+  <Button
       size="lg"
       fullWidth
       variant="outline"
