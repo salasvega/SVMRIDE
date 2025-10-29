@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, Gauge, MapPin, Shield, ArrowLeft } from 'lucide-react';
+import { Calendar, Gauge, MapPin, Shield, ArrowLeft, MessageCircle, Euro } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
@@ -37,7 +37,6 @@ export function VehicleDetail() {
     );
   }
 
-  // Pour le SEO / balisage produit
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -61,7 +60,6 @@ export function VehicleDetail() {
     },
   };
 
-  // On prépare le texte véhicule pour l'envoi vers /financement
   const vehicleLabel = `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
   const financingLink = `/financement?vehicle=${encodeURIComponent(
     vehicleLabel
@@ -140,9 +138,7 @@ export function VehicleDetail() {
                   <Calendar className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Année</p>
-                    <p className="font-semibold text-[#111111]">
-                      {vehicle.year}
-                    </p>
+                    <p className="font-semibold text-[#111111]">{vehicle.year}</p>
                   </div>
                 </div>
 
@@ -179,25 +175,16 @@ export function VehicleDetail() {
 
               {/* Description */}
               <div className="mb-8">
-                <h2 className="text-xl font-bold text-[#111111] mb-3">
-                  Description
-                </h2>
-                <p className="text-[#444444] leading-relaxed">
-                  {vehicle.description}
-                </p>
+                <h2 className="text-xl font-bold text-[#111111] mb-3">Description</h2>
+                <p className="text-[#444444] leading-relaxed">{vehicle.description}</p>
               </div>
 
               {/* Équipements */}
               <div className="mb-8">
-                <h2 className="text-xl font-bold text-[#111111] mb-3">
-                  Équipements
-                </h2>
+                <h2 className="text-xl font-bold text-[#111111] mb-3">Équipements</h2>
                 <ul className="grid grid-cols-2 gap-2">
                   {vehicle.features.map((feature, index) => (
-                    <li
-                      key={index}
-                      className="flex items-center gap-2 text-[#444444]"
-                    >
+                    <li key={index} className="flex items-center gap-2 text-[#444444]">
                       <span className="w-2 h-2 bg-[#D10000] rounded-full"></span>
                       {feature}
                     </li>
@@ -213,34 +200,103 @@ export function VehicleDetail() {
                 </div>
                 <p className="text-[#444444]">{vehicle.warranty}</p>
               </div>
+{/* CTA contact + CTA financement */}
+<div
+  className="
+    w-full
+    flex
+    flex-col
+    gap-4
+    sm:flex-row
+    sm:gap-6
+  "
+>
+  {/* Bouton primaire : rouge plein */}
+  <Link
+    to="/contact"
+    state={{
+      vehicle: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+    }}
+    className="w-full sm:flex-1"
+  >
+    <Button
+      size="lg"
+      fullWidth
+      className="
+        w-full
+        bg-[#D10000]
+        text-white
+        font-semibold
+        tracking-wide
+        rounded-xl
+        shadow-md
+        hover:bg-[#b30000]
+        hover:shadow-xl
+        hover:scale-105
+        active:scale-100
+        transition
+        duration-200
+        border-0
+        py-4
+        text-base
+        flex
+        items-center
+        justify-center
+        gap-3
+        transform
+      "
+    >
+      <MessageCircle className="w-6 h-6" />
+      <span className="whitespace-nowrap">
+        Demander des informations
+      </span>
+    </Button>
+  </Link>
 
-              {/* CTA contact + CTA financement */}
-              <div className="space-y-4">
-                <Link
-                  to="/contact"
-                  state={{
-                    vehicle: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
-                  }}
-                >
-                  <Button size="lg" fullWidth>
-                    Demander des informations
-                  </Button>
-                </Link>
+  {/* Bouton secondaire : contour rouge, fond blanc */}
+  <Link
+    to={financingLink}
+    className="w-full sm:flex-1"
+  >
+    <Button
+      size="lg"
+      fullWidth
+      variant="outline"
+      className="
+        w-full
+        border-2
+        border-[#D10000]
+        text-[#D10000]
+        font-semibold
+        tracking-wide
+        rounded-xl
+        bg-white
+        hover:bg-[#ffeaea]
+        hover:text-[#b30000]
+        hover:border-[#b30000]
+        hover:shadow-md
+        hover:scale-105
+        active:scale-100
+        transition
+        duration-200
+        py-4
+        text-base
+        flex
+        items-center
+        justify-center
+        gap-3
+        transform
+      "
+    >
+      <Euro className="w-6 h-6" />
+      <span className="whitespace-nowrap">
+        Demander un financement
+      </span>
+    </Button>
+  </Link>
+</div>
 
-                <Link
-                  to={financingLink}
-                  // Exemple: /financement?vehicle=Yamaha%20MT-07%202021&price=6500
-                >
-                  <Button
-                    size="lg"
-                    fullWidth
-                    variant="outline"
-                    className="border-[#D10000] text-[#D10000] hover:bg-[#D10000] hover:text-white hover:border-[#D10000]"
-                  >
-                    Demander un financement
-                  </Button>
-                </Link>
-              </div>
+              
             </div>
           </div>
         </Container>
