@@ -287,7 +287,7 @@ export function VehicleDetail() {
     >
       <Euro className="w-6 h-6" />
       <span className="whitespace-nowrap">
-        Demander un financement.
+        Demander un Financement
       </span>
     </Button>
   </Link>
