@@ -296,6 +296,7 @@ export function VehicleDetail() {
   </Link>
 </div>
 
+
               
             </div>
           </div>
