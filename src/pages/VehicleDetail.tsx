@@ -261,9 +261,8 @@ export function VehicleDetail() {
     <Button
       size="lg"
       fullWidth
-      variant="outline"
       className="
-       w-full
+        w-full
         bg-[#D10000]
         text-white
         font-semibold
