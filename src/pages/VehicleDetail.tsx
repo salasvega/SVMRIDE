@@ -261,24 +261,21 @@ export function VehicleDetail() {
   <Button
       size="lg"
       fullWidth
-      variant="outline"
       className="
         w-full
-        border-2
-        border-[#D10000]
-        text-[#D10000]
+        bg-[#D10000]
+        text-white
         font-semibold
         tracking-wide
         rounded-xl
-        bg-white
-        hover:bg-[#ffeaea]
-        hover:text-[#b30000]
-        hover:border-[#b30000]
-        hover:shadow-md
+        shadow-md
+        hover:bg-[#b30000]
+        hover:shadow-xl
         hover:scale-105
         active:scale-100
         transition
         duration-200
+        border-0
         py-4
         text-base
         flex
