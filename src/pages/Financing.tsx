@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle, Calculator } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
@@ -7,168 +7,318 @@ import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
-import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
-import { useFormSubmit } from '../hooks/useFormSubmit';
-import { supabase } from '../lib/supabase';
+
+type Housing = 'locataire' | 'proprietaire' | 'heberge';
+type Contract = 'cdi' | 'cdd' | 'interim' | 'independant' | 'autre';
+type Marital = 'celibataire' | 'marie' | 'pacs' | 'divorce' | 'veuf';
+
+const REQUIRED_DOCS = [
+  'id_card_recto',
+  'id_card_verso',
+  'license_recto',
+  'license_verso',
+  'proof_address',
+  'payslip_1',
+  'payslip_2',
+  'payslip_3',
+  'tax_notice',
+  'rib',
+] as const;
+type DocKey = typeof REQUIRED_DOCS[number];
+
+const DOC_LABEL: Record<DocKey, string> = {
+  id_card_recto: "Pièce d’identité — recto",
+  id_card_verso: "Pièce d’identité — verso",
+  license_recto: 'Permis de conduire — recto',
+  license_verso: 'Permis de conduire — verso',
+  proof_address: 'Justificatif de domicile (-3 mois)',
+  payslip_1: 'Bulletin de salaire — M-1',
+  payslip_2: 'Bulletin de salaire — M-2',
+  payslip_3: 'Bulletin de salaire — M-3',
+  tax_notice: "Dernier avis d’imposition",
+  rib: 'RIB',
+};
 
 export function Financing() {
-  // Lecture des paramètres passés depuis la fiche véhicule
-  // ex: /financement?vehicle=Yamaha%20MT-07%202021&price=6500&slug=yamaha-mt07-2021
   const [searchParams] = useSearchParams();
   const vehicleFromURL = searchParams.get('vehicle') || '';
-  const [uploadingFiles, setUploadingFiles] = useState(false);
   const priceFromURL = searchParams.get('price');
   const slugFromURL = searchParams.get('slug') || '';
   const parsedPrice = priceFromURL ? Number(priceFromURL) : null;
 
-  // Simulateur de crédit -> initialisé avec le prix du véhicule si dispo
+  // Simulateur de crédit (initialisé avec le prix si fourni)
   const [simulatorData, setSimulatorData] = useState({
     amount: parsedPrice && !Number.isNaN(parsedPrice) ? parsedPrice : 5000,
     duration: 24,
     rate: 7,
   });
 
-  // Formulaire envoyé côté serveur
-  // On rajoute vehicleSlug dans formData pour lier la demande au stock
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+  // Nouveau formulaire complet (pro & RGPD)
+  const [form, setForm] = useState({
+    // Identité & contact
+    last_name: '',
+    first_name: '',
+    birth_zip: '',
+    birth_date: '',
+    address: '',
     phone: '',
+    email: '',
+    // Logement
+    move_in_date: '',
+    housing: '' as Housing | '',
+    rent_or_mortgage: '',
+    hosted_attestation: false,
+    // Emploi & revenus
+    job_title: '',
+    job_start_date: '',
+    contract: '' as Contract | '',
+    net_salary_monthly: '',
+    other_charges: '',
+    other_income: '',
+    // Famille & projet
+    marital: '' as Marital | '',
+    dependents: '',
+    vehicle: vehicleFromURL || '',
+    desired_duration_months: '',
+    // Anciennes infos commerciales (compat)
     amount: (parsedPrice && !Number.isNaN(parsedPrice) ? parsedPrice : 5000).toString(),
     duration: '24',
     comments: vehicleFromURL
       ? `Je souhaite financer ${vehicleFromURL}${parsedPrice ? ` affiché à ${parsedPrice} €` : ''}.`
       : '',
+    vehicleSlug: slugFromURL,
+    // Consentement
     consent: false,
-    vehicleSlug: slugFromURL, // 👈 nouveau champ
   });
 
-  // Fichiers enrichis (preview, qualité, etc.)
-  const [files, setFiles] = useState<UploadedDoc[]>([]);
+  // Dossier côté serveur
+  const [requestId, setRequestId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [uploading, setUploading] = useState<Record<DocKey, boolean>>(
+    () => Object.fromEntries(REQUIRED_DOCS.map(d => [d, false])) as Record<DocKey, boolean>
+  );
+  const [docDone, setDocDone] = useState<Record<DocKey, boolean>>(
+    () => Object.fromEntries(REQUIRED_DOCS.map(d => [d, false])) as Record<DocKey, boolean>
+  );
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Hook qui gère l'envoi à Supabase
-  const { submit, isSubmitting, success, error } = useFormSubmit({
-    onSuccess: () => {
-      // Après envoi, on laisse les infos véhicule pré-remplies pour la lisibilité si la page reste affichée
-      setFormData({
-        name: '',
-        email: '',
+  const API_BASE = import.meta.env.VITE_SUPABASE_URL; // https://xxxx.supabase.co
+
+  // Helpers
+  const onChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, type } = e.target;
+    const value = type === 'checkbox' ? (e.target as HTMLInputElement).checked : e.target.value;
+    setForm(p => ({ ...p, [name]: value }));
+  };
+
+  const handleSimulatorAmountChange = (newAmount: number) => {
+    setSimulatorData(prev => ({ ...prev, amount: newAmount }));
+    setForm(prev => ({ ...prev, amount: String(newAmount) }));
+  };
+  const handleSimulatorDurationChange = (newDuration: number) => {
+    setSimulatorData(prev => ({ ...prev, duration: newDuration }));
+    setForm(prev => ({ ...prev, duration: String(newDuration) }));
+  };
+
+  const calculateMonthlyPayment = () => {
+    const { amount, duration, rate } = simulatorData;
+    const monthlyRate = rate / 100 / 12;
+    if (duration <= 0 || monthlyRate <= 0) return '0.00';
+    const top = amount * monthlyRate * Math.pow(1 + monthlyRate, duration);
+    const bottom = Math.pow(1 + monthlyRate, duration) - 1;
+    return (top / bottom).toFixed(2);
+  };
+
+  // 1) Création du dossier (draft) si besoin
+  const ensureRequest = async () => {
+    if (requestId) return requestId;
+    const requiredSimple =
+      form.last_name && form.first_name && form.birth_zip && form.birth_date &&
+      form.address && form.phone && form.email && form.housing;
+    if (!requiredSimple) {
+      throw new Error('Merci de compléter d’abord Nom, Prénom, CP/Date de naissance, Adresse, Téléphone, Email et Statut de logement.');
+    }
+    const res = await fetch(`${API_BASE}/functions/v1/financing-start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        last_name: form.last_name,
+        first_name: form.first_name,
+        birth_zip: form.birth_zip,
+        birth_date: form.birth_date,
+        email: form.email,
+        phone: form.phone,
+        address: form.address,
+        housing: form.housing,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Erreur création du dossier.');
+    setRequestId(data.request_id);
+    return data.request_id as string;
+  };
+
+  // 2) Upload d’un document via URL signée (PUT direct Storage privé)
+  const uploadDoc = async (doc: DocKey, file: File) => {
+    setError(null);
+    setUploading(prev => ({ ...prev, [doc]: true }));
+    try {
+      const rid = await ensureRequest();
+      // Appel function pour obtenir l’URL signée + référencer la pièce
+      const r = await fetch(`${API_BASE}/functions/v1/financing-upload-url`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request_id: rid, doc, filename: file.name }),
+      });
+      const j = await r.json();
+      if (!r.ok || !j.signedUrl) throw new Error(j.error || 'URL signée indisponible');
+
+      // PUT du fichier vers l’URL signée
+      const put = await fetch(j.signedUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': file.type || 'application/octet-stream' },
+        body: file,
+      });
+      if (!put.ok) throw new Error('Échec de l’upload');
+
+      setDocDone(prev => ({ ...prev, [doc]: true }));
+    } catch (e: any) {
+      setError(e.message || 'Upload impossible');
+      setDocDone(prev => ({ ...prev, [doc]: false }));
+    } finally {
+      setUploading(prev => ({ ...prev, [doc]: false }));
+    }
+  };
+
+  const allDocsOk = useMemo(() => REQUIRED_DOCS.every(d => !!docDone[d]), [docDone]);
+
+  // 3) Soumission finale du dossier
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (!form.consent) {
+      setError('Merci de cocher la case de consentement RGPD.');
+      return;
+    }
+    if (form.housing === 'heberge' && !form.hosted_attestation) {
+      setError("Vous avez indiqué être hébergé : l'attestation d’hébergement est obligatoire.");
+      return;
+    }
+    if (!allDocsOk) {
+      setError('Merci de déposer tous les documents obligatoires.');
+      return;
+    }
+
+    try {
+      const rid = await ensureRequest();
+      setSubmitting(true);
+
+      const res = await fetch(`${API_BASE}/functions/v1/financing-submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          request_id: rid,
+          // Adresse & logement
+          address: form.address,
+          move_in_date: form.move_in_date || null,
+          housing: form.housing || null,
+          rent_or_mortgage: form.rent_or_mortgage ? Number(form.rent_or_mortgage) : null,
+          hosted_attestation: !!form.hosted_attestation,
+          // Emploi & revenus
+          job_title: form.job_title || null,
+          job_start_date: form.job_start_date || null,
+          contract: form.contract || null,
+          net_salary_monthly: form.net_salary_monthly ? Number(form.net_salary_monthly) : null,
+          other_charges: form.other_charges ? Number(form.other_charges) : 0,
+          other_income: form.other_income ? Number(form.other_income) : 0,
+          // Famille & projet
+          marital: form.marital || null,
+          dependents: form.dependents ? Number(form.dependents) : 0,
+          vehicle: form.vehicle || null,
+          desired_duration_months: form.desired_duration_months ? Number(form.desired_duration_months) : null,
+          // Compat champs existants
+          amount: form.amount ? Number(form.amount) : null,
+          duration: form.duration ? Number(form.duration) : null,
+          comments: form.comments || null,
+          vehicle_slug: form.vehicleSlug || null,
+          // Trace
+          ip: '', // (optionnel) peut être injecté côté serveur
+          user_agent: navigator.userAgent,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur envoi');
+
+      setSuccess(true);
+      // Reset (on conserve les infos véhicule pour lisibilité)
+      setForm(prev => ({
+        ...prev,
+        // on garde les infos liées au simulateur et au véhicule
+        last_name: '',
+        first_name: '',
+        birth_zip: '',
+        birth_date: '',
+        address: '',
         phone: '',
+        email: '',
+        move_in_date: '',
+        housing: '' as Housing | '',
+        rent_or_mortgage: '',
+        hosted_attestation: false,
+        job_title: '',
+        job_start_date: '',
+        contract: '' as Contract | '',
+        net_salary_monthly: '',
+        other_charges: '',
+        other_income: '',
+        marital: '' as Marital | '',
+        dependents: '',
+        vehicle: vehicleFromURL || '',
+        desired_duration_months: '',
         amount: simulatorData.amount.toString(),
         duration: simulatorData.duration.toString(),
         comments: vehicleFromURL
           ? `Je souhaite financer ${vehicleFromURL}${parsedPrice ? ` affiché à ${parsedPrice} €` : ''}.`
           : '',
-        consent: false,
         vehicleSlug: slugFromURL,
-      });
-      setFiles([]);
-    },
-  });
-
-  // Calcul mensualité estimée (crédit amortissable)
-  const calculateMonthlyPayment = () => {
-    const { amount, duration, rate } = simulatorData;
-    const monthlyRate = rate / 100 / 12;
-
-    if (duration <= 0 || monthlyRate <= 0) {
-      return '0.00';
+        consent: false,
+      }));
+      setRequestId(null);
+      setDocDone(Object.fromEntries(REQUIRED_DOCS.map(d => [d, false])) as Record<DocKey, boolean>);
+    } catch (e: any) {
+      setError(e.message || 'Une erreur est survenue.');
+    } finally {
+      setSubmitting(false);
     }
-
-    const top = amount * monthlyRate * Math.pow(1 + monthlyRate, duration);
-    const bottom = Math.pow(1 + monthlyRate, duration) - 1;
-    const payment = top / bottom;
-    return payment.toFixed(2);
   };
 
-  // Quand on bouge le slider montant, on sync simulateur + formulaire
-  const handleSimulatorAmountChange = (newAmount: number) => {
-    setSimulatorData((prev) => ({
-      ...prev,
-      amount: newAmount,
-    }));
-    setFormData((prev) => ({
-      ...prev,
-      amount: newAmount.toString(),
-    }));
-  };
-
-  // Pareil pour la durée
-  const handleSimulatorDurationChange = (newDuration: number) => {
-    setSimulatorData((prev) => ({
-      ...prev,
-      duration: newDuration,
-    }));
-    setFormData((prev) => ({
-      ...prev,
-      duration: newDuration.toString(),
-    }));
-  };
-
-  // Gestion des champs du formulaire manuel
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value, type } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        type === 'checkbox'
-          ? (e.target as HTMLInputElement).checked
-          : value,
-    }));
-  };
-
-  // Envoi du formulaire :
-  // 1. upload fichiers vers Supabase Storage
-  // 2. appel fonction edge financing-form avec toutes les infos (dont vehicleSlug)
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-
-  setUploadingFiles(true);
-
-  const attachments: Array<{
-    filename: string;
-    path: string;
-    size: number;
-    mime_type: string;
-  }> = [];
-
-  for (const doc of files) {
-    const file = doc.file;
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .substring(7)}.${fileExt}`;
-    const filePath = `financing/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('form-attachments')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      console.error('Upload error:', uploadError);
-      continue;
-    }
-
-    attachments.push({
-      filename: file.name,
-      path: filePath,
-      size: file.size,
-      mime_type: file.type,
-    });
-  }
-
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  await submit(`${supabaseUrl}/functions/v1/financing-form`, {
-    ...formData,
-    attachments,
-  });
-
-  setUploadingFiles(false);
-};
-
+  // UI pour un champ fichier lié à un doc requis
+  const DocInput: React.FC<{ doc: DocKey }> = ({ doc }) => (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-[#111]">
+        {DOC_LABEL[doc]} <span className="text-[#D10000]">*</span>
+      </label>
+      <input
+        type="file"
+        accept="image/*,application/pdf"
+        onChange={async (e) => {
+          const f = e.target.files?.[0];
+          if (!f) return;
+          await uploadDoc(doc, f);
+        }}
+        className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#111] file:text-white hover:file:bg-[#333]"
+        required
+      />
+      {uploading[doc] && <p className="text-sm text-[#666]">Téléversement en cours…</p>}
+      {docDone[doc] ? (
+        <p className="text-green-600 text-sm">Fichier chargé ✅</p>
+      ) : (
+        !uploading[doc] && <p className="text-xs text-[#666]">PDF/JPG/PNG – 20 Mo max</p>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -248,32 +398,12 @@ export function Financing() {
                     }
                     className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
                   />
-                  
                 </div>
-                <div></div>
-<label className="block text-sm font-medium mb-2">
-                    Taux (TAEG): {simulatorData.rate} %
-                  </label>
-                {/* Taux *
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Taux (TAEG): {simulatorData.rate} %
-                  </label>
-                  <input
-                    type="range"
-                    min="2"
-                    max="10"
-                    step="0.5"
-                    value={simulatorData.rate}
-                    onChange={(e) =>
-                      setSimulatorData((prev) => ({
-                        ...prev,
-                        rate: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
-                  />
-                </div>*/}
+
+                {/* Taux (affiché, non éditable ici) */}
+                <label className="block text-sm font-medium mb-2">
+                  Taux (TAEG): {simulatorData.rate} %
+                </label>
 
                 {/* Estimation */}
                 <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg mt-8 border border-white/20">
@@ -301,99 +431,28 @@ export function Financing() {
           {/* Deux colonnes */}
           <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
             {/* Avantages commerciaux */}
-          <div>
-  <h2 className="text-2xl font-bold text-[#111111] mb-6">
-    Pourquoi financer avec nous ?
-  </h2>
+            <div>
+              <h2 className="text-2xl font-bold text-[#111111] mb-6">
+                Pourquoi financer avec nous ?
+              </h2>
 
-  <div className="space-y-4">
-    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
-      <div>
-        <h3 className="font-semibold text-[#111111] mb-1">Réponse rapide</h3>
-        <p className="text-sm text-[#444444]">
-          Obtenez une réponse de principe en quelques heures
-        </p>
-      </div>
-    </div>
-
-    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
-      <div>
-        <h3 className="font-semibold text-[#111111] mb-1">Taux compétitifs</h3>
-        <p className="text-sm text-[#444444]">
-          Nous négocions les meilleurs taux pour vous
-        </p>
-      </div>
-    </div>
-
-    {/* Paiement en plusieurs fois via Alma */}
-<div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-  <CheckCircle
-    className="w-6 h-6 text-[#D10000] flex-shrink-0"
-    aria-hidden="true"
-  />
-  <div>
-    <h3 className="font-semibold text-[#111111] mb-1">
-      Paiement en 3x, 4x ou 10x par carte
-    </h3>
-    <p className="text-sm text-[#444444] leading-snug">
-      Réglez votre moto ou scooter en plusieurs fois par carte bancaire
-      grâce à notre partenaire&nbsp;
-      <a
-        href="https://almapay.com/fr-FR"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-[#D10000] font-medium hover:underline"
-      >
-        Alma
-      </a>
-      . Simple, rapide et 100&nbsp;% en ligne.
-    </p>
-
-    {/* Logo Alma (tu peux placer le fichier dans /public/alma-logo_frame.png) */}
-    <a
-      href="https://almapay.com/fr-FR"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-block mt-3"
-    >
-      <img
-        src="/alma-logo_frame.png"
-        alt="Paiement en plusieurs fois avec Alma"
-        className="h-6 opacity-90 hover:opacity-100 transition-opacity"
-      />
-    </a>
-
-    <p className="text-[11px] text-[#777777] mt-2">
-      Offre de financement soumise à conditions, proposée par Alma.
-    </p>
-  </div>
-</div>
-
-
-    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
-      <div>
-        <h3 className="font-semibold text-[#111111] mb-1">Sans frais de dossier</h3>
-        <p className="text-sm text-[#444444]">
-          Aucun frais caché, tout est transparent
-        </p>
-      </div>
-    </div>
-
-    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
-      <div>
-        <h3 className="font-semibold text-[#111111] mb-1">Accompagnement personnalisé</h3>
-        <p className="text-sm text-[#444444]">
-          Un conseiller dédié pour vous guider
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
+              <div className="space-y-4">
+                {[
+                  { t: 'Réponse rapide', d: 'Obtenez une réponse de principe en quelques heures' },
+                  { t: 'Taux compétitifs', d: 'Nous négocions les meilleurs taux pour vous' },
+                  { t: 'Sans frais de dossier', d: 'Aucun frais caché, tout est transparent' },
+                  { t: 'Accompagnement personnalisé', d: 'Un conseiller dédié pour vous guider' },
+                ].map((x, i) => (
+                  <div key={i} className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
+                    <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+                    <div>
+                      <h3 className="font-semibold text-[#111111] mb-1">{x.t}</h3>
+                      <p className="text-sm text-[#444444]">{x.d}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Formulaire */}
             <div>
@@ -409,113 +468,121 @@ export function Financing() {
                   </p>
                 </div>
               ) : (
-                <form
-                  onSubmit={handleSubmit}
-                  className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
-                >
+                <form onSubmit={handleSubmit} className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl">
                   <h2 className="text-2xl font-bold text-[#111111] mb-4">
                     Demande de financement
                   </h2>
 
-                  <Input
-                    label="Nom complet"
-                    name="name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                  />
+                  {/* Identité */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Input label="Nom" name="last_name" required value={form.last_name} onChange={onChange} />
+                    <Input label="Prénom" name="first_name" required value={form.first_name} onChange={onChange} />
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Input label="Code postal de naissance" name="birth_zip" required value={form.birth_zip} onChange={onChange} />
+                    <Input label="Date de naissance" name="birth_date" type="date" required value={form.birth_date} onChange={onChange} />
+                  </div>
 
-                  <Input
-                    label="Email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
+                  {/* Contact & adresse */}
+                  <Input label="Adresse actuelle" name="address" required value={form.address} onChange={onChange} />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Input label="Téléphone" name="phone" type="tel" required value={form.phone} onChange={onChange} />
+                    <Input label="Email" name="email" type="email" required value={form.email} onChange={onChange} />
+                  </div>
 
-                  <Input
-                    label="Téléphone"
-                    name="phone"
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
+                  {/* Logement */}
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Occupation (logement) <span className="text-[#D10000]">*</span></label>
+                      <select name="housing" required value={form.housing} onChange={onChange} className="w-full border rounded-lg px-3 py-2">
+                        <option value="">—</option>
+                        <option value="locataire">Locataire</option>
+                        <option value="proprietaire">Propriétaire</option>
+                        <option value="heberge">Hébergé</option>
+                      </select>
+                    </div>
+                    <Input label="Date d’entrée dans le logement" name="move_in_date" type="date" value={form.move_in_date} onChange={onChange} />
+                    <Input label="Montant du loyer/crédit (€)" name="rent_or_mortgage" type="number" value={form.rent_or_mortgage} onChange={onChange} />
+                  </div>
+                  {form.housing === 'heberge' && (
+                    <div className="flex items-center gap-3">
+                      <input type="checkbox" id="hosted_attestation" name="hosted_attestation" checked={form.hosted_attestation} onChange={onChange} className="w-4 h-4" />
+                      <label htmlFor="hosted_attestation" className="text-sm">
+                        Je fournis une attestation d’hébergement et la pièce d’identité de l’hébergeur
+                      </label>
+                    </div>
+                  )}
 
-                  <Input
-                    label="Montant souhaité (€)"
-                    name="amount"
-                    type="number"
-                    required
-                    min="1000"
-                    value={formData.amount}
-                    onChange={handleChange}
-                  />
+                  {/* Emploi & revenus */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Input label="Emploi / poste occupé" name="job_title" value={form.job_title} onChange={onChange} />
+                    <Input label="Date d’entrée (emploi)" name="job_start_date" type="date" value={form.job_start_date} onChange={onChange} />
+                  </div>
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Type de contrat</label>
+                      <select name="contract" value={form.contract} onChange={onChange} className="w-full border rounded-lg px-3 py-2">
+                        <option value="">—</option>
+                        <option value="cdi">CDI</option>
+                        <option value="cdd">CDD</option>
+                        <option value="interim">Intérim</option>
+                        <option value="independant">Indépendant</option>
+                        <option value="autre">Autre</option>
+                      </select>
+                    </div>
+                    <Input label="Salaire net mensuel (€)" name="net_salary_monthly" type="number" value={form.net_salary_monthly} onChange={onChange} />
+                    <Input label="Autres charges / crédits (€)" name="other_charges" type="number" value={form.other_charges} onChange={onChange} />
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Input label="Autres sources de revenus (€)" name="other_income" type="number" value={form.other_income} onChange={onChange} />
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Situation maritale</label>
+                      <select name="marital" value={form.marital} onChange={onChange} className="w-full border rounded-lg px-3 py-2">
+                        <option value="">—</option>
+                        <option value="celibataire">Célibataire</option>
+                        <option value="marie">Marié(e)</option>
+                        <option value="pacs">Pacsé(e)</option>
+                        <option value="divorce">Divorcé(e)</option>
+                        <option value="veuf">Veuf/Veuve</option>
+                      </select>
+                    </div>
+                  </div>
+                  <Input label="Nombre de personnes à charge" name="dependents" type="number" value={form.dependents} onChange={onChange} />
 
-                  <Input
-                    label="Durée souhaitée (mois)"
-                    name="duration"
-                    type="number"
-                    required
-                    min="12"
-                    max="60"
-                    value={formData.duration}
-                    onChange={handleChange}
-                  />
+                  {/* Projet */}
+                  <Input label="Véhicule à financer" name="vehicle" value={form.vehicle} onChange={onChange} />
+                  <Input label="Durée souhaitée (mois)" name="desired_duration_months" type="number" value={form.desired_duration_months} onChange={onChange} />
 
-                  <Textarea
-                    label="Commentaires"
-                    name="comments"
-                    rows={4}
-                    placeholder="Posez vos questions ou ajoutez des informations complémentaires..."
-                    value={formData.comments}
-                    onChange={handleChange}
-                  />
+                  {/* Champs “compat” (ton historique prod) */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Input label="Montant souhaité (€)" name="amount" type="number" min="1000" value={form.amount} onChange={onChange} />
+                    <Input label="Durée souhaitée (mois / compat)" name="duration" type="number" min="12" max="72" value={form.duration} onChange={onChange} />
+                  </div>
+                  <Textarea label="Commentaires" name="comments" rows={4} placeholder="Infos complémentaires…" value={form.comments} onChange={onChange} />
+                  <input type="hidden" name="vehicleSlug" value={form.vehicleSlug} readOnly />
 
-                  {/* Champ caché côté UI, mais envoyé quand même */}
-                  {/* Tu peux le rendre visible si tu veux debugger / l'exposer au client */}
-                  <input
-                    type="hidden"
-                    name="vehicleSlug"
-                    value={formData.vehicleSlug}
-                    readOnly
-                  />
+                  {/* Documents obligatoires */}
+                  <div className="grid md:grid-cols-2 gap-6 bg-white p-4 rounded-xl border">
+                    <h3 className="md:col-span-2 text-lg font-semibold">Documents obligatoires</h3>
+                    {REQUIRED_DOCS.map((d) => (
+                      <DocInput key={d} doc={d} />
+                    ))}
+                  </div>
 
-                  <FileUpload
-                    label="Documents justificatifs (optionnel)"
-                    maxFiles={10}
-                    maxSizeMB={10}
-                    accept="image/*,application/pdf"
-                    value={files}
-                    onChange={setFiles}
-                  />
-
+                  {/* Consentement */}
                   <div className="flex items-start gap-3">
                     <input
                       type="checkbox"
                       id="consent"
                       name="consent"
                       required
-                      checked={formData.consent}
-                      onChange={handleChange}
+                      checked={form.consent}
+                      onChange={onChange}
                       className="mt-1 w-4 h-4 text-[#D10000] focus:ring-[#D10000] rounded"
                     />
-                    <label
-                      htmlFor="consent"
-                      className="text-sm text-[#444444]"
-                    >
-                      J'accepte que mes données soient utilisées pour
-                      traiter ma demande de financement conformément à
-                      la{' '}
-                      <a
-                        href="/politique-confidentialite"
-                        className="text-[#D10000] hover:underline"
-                      >
-                        politique de confidentialité
-                      </a>
-                      . <span className="text-[#D10000]">*</span>
+                    <label htmlFor="consent" className="text-sm text-[#444444]">
+                      J’accepte que mes données soient utilisées pour traiter ma demande de financement conformément à la{' '}
+                      <a href="/politique-confidentialite" className="text-[#D10000] hover:underline">politique de confidentialité</a>. <span className="text-[#D10000]">*</span>
                     </label>
                   </div>
 
@@ -525,19 +592,9 @@ export function Financing() {
                     </div>
                   )}
 
-                  <Button
-  type="submit"
-  disabled={isSubmitting || uploadingFiles}
-  fullWidth
-  size="lg"
->
-  {uploadingFiles
-    ? 'Téléversement des documents...'
-    : isSubmitting
-    ? 'Envoi en cours...'
-    : 'Demander un devis'}
-</Button>
-
+                  <Button type="submit" disabled={submitting} fullWidth size="lg">
+                    {submitting ? 'Envoi en cours...' : 'Demander un devis'}
+                  </Button>
                 </form>
               )}
             </div>
