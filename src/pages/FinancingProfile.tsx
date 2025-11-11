@@ -345,6 +345,13 @@ export function FinancingProfile() {
 
       console.log('Deleting profile:', profile.id);
 
+      const { error } = await supabase
+        .from('user_financing_profiles')
+        .delete()
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
       const documentFields = [
         'id_card_front', 'id_card_back', 'driver_license_front', 'driver_license_back',
         'proof_of_residence', 'payslip_1', 'payslip_2', 'payslip_3',
@@ -359,36 +366,18 @@ export function FinancingProfile() {
         }
       }
 
-      console.log('Files to delete:', filesToDelete);
-
       if (filesToDelete.length > 0) {
+        console.log('Attempting to delete', filesToDelete.length, 'files from storage');
         const { error: storageError } = await supabase.storage
           .from('financing-documents')
           .remove(filesToDelete);
 
         if (storageError) {
-          console.error('Error deleting files from storage:', storageError);
+          console.error('Error deleting files from storage (non-blocking):', storageError);
         } else {
           console.log('Successfully deleted', filesToDelete.length, 'files from storage');
         }
       }
-
-      if (userEmail) {
-        const { data: folderFiles } = await supabase.storage
-          .from('financing-documents')
-          .list(userEmail);
-
-        if (folderFiles && folderFiles.length === 0) {
-          console.log('Folder is empty, no additional cleanup needed');
-        }
-      }
-
-      const { error } = await supabase
-        .from('user_financing_profiles')
-        .delete()
-        .eq('id', profile.id);
-
-      if (error) throw error;
 
       console.log('Profile deleted successfully');
       setMessage({ type: 'success', text: 'Dossier supprimé avec succès' });
