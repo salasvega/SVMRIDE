@@ -269,9 +269,16 @@ export function FinancingProfile() {
     setMessage(null);
 
     try {
+      const cleanedProfile = {
+        ...profile,
+        birth_date: profile.birth_date || null,
+        housing_entry_date: profile.housing_entry_date || null,
+        employment_start_date: profile.employment_start_date || null,
+      };
+
       const { error } = await supabase
         .from('user_financing_profiles')
-        .upsert(profile, { onConflict: 'user_email' });
+        .upsert(cleanedProfile, { onConflict: 'user_email' });
 
       if (error) throw error;
 
@@ -291,14 +298,19 @@ export function FinancingProfile() {
     setMessage(null);
 
     try {
+      const cleanedProfile = {
+        ...profile,
+        birth_date: profile.birth_date || null,
+        housing_entry_date: profile.housing_entry_date || null,
+        employment_start_date: profile.employment_start_date || null,
+        status: 'submitted',
+        is_complete: true,
+        submitted_at: new Date().toISOString(),
+      };
+
       const { error } = await supabase
         .from('user_financing_profiles')
-        .upsert({
-          ...profile,
-          status: 'submitted',
-          is_complete: true,
-          submitted_at: new Date().toISOString(),
-        }, { onConflict: 'user_email' });
+        .upsert(cleanedProfile, { onConflict: 'user_email' });
 
       if (error) throw error;
 
