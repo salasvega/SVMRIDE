@@ -46,7 +46,7 @@ export default function Toast({ type, message, onClose, duration = 5000 }: Toast
   const { icon: Icon, bgColor, borderColor, textColor, iconColor } = config[type];
 
   return (
-    <div className="fixed top-4 right-4 z-50 animate-slide-in-right max-w-md">
+    <div className="fixed top-4 right-4 z-[9999] animate-slide-in-right max-w-md">
       <div className={`${bgColor} border-l-4 ${borderColor} rounded-lg shadow-lg p-4 flex items-start gap-3`}>
         <Icon className={`${iconColor} flex-shrink-0 mt-0.5`} size={24} />
         <p className={`${textColor} flex-1 font-medium`}>{message}</p>
