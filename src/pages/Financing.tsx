@@ -448,7 +448,7 @@ export function Financing() {
                     fullWidth
                     size="lg"
                   >
-                    {isSubmitting ? 'Envoi en cours...' : 'Demander un devis'}
+                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer la demande'}
                   </Button>
 
                   <Link
