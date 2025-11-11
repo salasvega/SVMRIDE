@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
 import { Section } from '../components/ui/Section';
@@ -98,21 +98,13 @@ export function FinancingProfile() {
     is_complete: false,
   });
 
-  useEffect(() => {
-    if (userEmail) {
-      loadProfile();
+  const loadProfile = useCallback(async () => {
+    if (!userEmail) {
+      console.log('No userEmail, skipping load');
+      return;
     }
-  }, [userEmail]);
 
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!emailInput.trim()) return;
-
-    setUserEmail(emailInput.trim());
-    setShowEmailModal(false);
-  };
-
-  const loadProfile = async () => {
+    console.log('Loading profile for:', userEmail);
     setLoading(true);
 
     try {
@@ -130,6 +122,7 @@ export function FinancingProfile() {
       }
 
       if (data) {
+        console.log('Profile data loaded:', data);
         setProfile({
           ...data,
           birth_date: data.birth_date || '',
@@ -139,14 +132,31 @@ export function FinancingProfile() {
           monthly_net_salary: Number(data.monthly_net_salary) || 0,
         });
       } else {
+        console.log('No profile found, creating new');
         setProfile(prev => ({ ...prev, user_email: userEmail, email: userEmail }));
       }
     } catch (error) {
       console.error('Error loading profile:', error);
       setMessage({ type: 'error', text: 'Erreur lors du chargement du profil' });
     } finally {
+      console.log('Loading complete');
       setLoading(false);
     }
+  }, [userEmail]);
+
+  useEffect(() => {
+    if (userEmail) {
+      loadProfile();
+    }
+  }, [userEmail, loadProfile]);
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailInput.trim()) return;
+
+    console.log('Email submitted:', emailInput.trim());
+    setUserEmail(emailInput.trim());
+    setShowEmailModal(false);
   };
 
   const handleInputChange = (field: keyof FinancingProfile, value: any) => {
