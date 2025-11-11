@@ -7,9 +7,10 @@ import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Textarea } from '../components/ui/Textarea';
 import { SingleFileUpload } from '../components/ui/SingleFileUpload';
+import Toast from '../components/ui/Toast';
 import { supabase } from '../lib/supabase';
 import { SEOHead } from '../components/layout/SEOHead';
-import { Save, Send, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
+import { Save, Send, Trash2, CheckCircle } from 'lucide-react';
 
 interface FinancingProfile {
   id?: string;
@@ -66,7 +67,7 @@ export function FinancingProfile() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   const [userEmail, setUserEmail] = useState('');
   const [showEmailModal, setShowEmailModal] = useState(true);
   const [emailInput, setEmailInput] = useState('');
@@ -458,6 +459,14 @@ export function FinancingProfile() {
         description="Gérez votre dossier de financement automobile en ligne"
       />
 
+      {message && (
+        <Toast
+          type={message.type}
+          message={message.text}
+          onClose={() => setMessage(null)}
+        />
+      )}
+
       <Section className="py-12 bg-gray-50">
         <Container>
           <div className="max-w-4xl mx-auto">
@@ -477,18 +486,6 @@ export function FinancingProfile() {
                 )}
               </div>
 
-              {message && (
-                <div className={`mb-6 p-4 rounded-lg flex items-start ${
-                  message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-                }`}>
-                  {message.type === 'success' ? (
-                    <CheckCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
-                  ) : (
-                    <AlertCircle className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" />
-                  )}
-                  <span>{message.text}</span>
-                </div>
-              )}
 
               <form className="space-y-8">
                 <div>
