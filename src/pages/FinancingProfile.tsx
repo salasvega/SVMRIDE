@@ -230,9 +230,9 @@ export function FinancingProfile() {
     const requiredFields = [
       'last_name', 'first_name', 'birth_postal_code', 'birth_date',
       'current_address', 'phone_number', 'email', 'housing_entry_date',
-      'housing_status', 'rent_or_credit_amount', 'job_title',
+      'housing_status', 'job_title',
       'employment_start_date', 'contract_type', 'monthly_net_salary',
-      'marital_status', 'dependents_count', 'vehicle_to_finance', 'desired_duration'
+      'marital_status', 'vehicle_to_finance', 'desired_duration'
     ];
 
     const requiredDocuments = [
@@ -245,6 +245,11 @@ export function FinancingProfile() {
         setMessage({ type: 'error', text: `Le champ "${field}" est obligatoire` });
         return false;
       }
+    }
+
+    if (profile.rent_or_credit_amount < 0 || profile.monthly_net_salary < 0 || profile.financing_amount < 0) {
+      setMessage({ type: 'error', text: 'Les montants ne peuvent pas être négatifs' });
+      return false;
     }
 
     for (const doc of requiredDocuments) {
@@ -658,11 +663,10 @@ export function FinancingProfile() {
                     </Select>
                     <Input
                       type="number"
-                      label="Nombre de personnes à charge *"
+                      label="Nombre de personnes à charge"
                       value={profile.dependents_count}
                       onChange={(e) => handleInputChange('dependents_count', parseInt(e.target.value) || 0)}
                       disabled={isSubmitted}
-                      required
                     />
                   </div>
                 </div>
