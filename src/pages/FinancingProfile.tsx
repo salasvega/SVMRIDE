@@ -166,19 +166,27 @@ export function FinancingProfile() {
   const handleSingleFileUpload = async (field: keyof FinancingProfile, file: File) => {
     if (!userEmail) return;
 
+    console.log('Starting file upload:', { field, fileName: file.name, fileSize: file.size });
+
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${userEmail}/${field}_${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage
+      console.log('Uploading to storage:', fileName);
+
+      const { data, error: uploadError } = await supabase.storage
         .from('financing-documents')
         .upload(fileName, file);
+
+      console.log('Upload result:', { data, error: uploadError });
 
       if (uploadError) throw uploadError;
 
       const { data: { publicUrl } } = supabase.storage
         .from('financing-documents')
         .getPublicUrl(fileName);
+
+      console.log('File uploaded successfully:', { fileName, publicUrl });
 
       handleInputChange(field, fileName);
       setMessage({ type: 'success', text: 'Document téléchargé avec succès' });
