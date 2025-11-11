@@ -23,6 +23,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { VehiclesList } from './pages/admin/VehiclesList';
 import { VehicleForm } from './pages/admin/VehicleForm';
 import SubmissionsList from './pages/admin/SubmissionsList';
+import FinancingProfilesList from './pages/admin/FinancingProfilesList';
 
 function App() {
   return (
@@ -69,6 +70,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <SubmissionsList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/financing-profiles"
+            element={
+              <ProtectedRoute>
+                <FinancingProfilesList />
               </ProtectedRoute>
             }
           />

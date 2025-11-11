@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { LogOut, Home, Crown, Mail } from 'lucide-react';
+import { LogOut, Home, Crown, Mail, FileText } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
@@ -49,6 +49,13 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
+                </Link>
+                <Link
+                  to="/admin/financing-profiles"
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E] transition-colors flex items-center gap-2"
+                >
+                  <FileText className="w-4 h-4" />
+                  Dossiers Financement
                 </Link>
               </div>
             </div>
