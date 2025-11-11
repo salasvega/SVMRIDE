@@ -861,15 +861,17 @@ export function FinancingProfile() {
                       </Button>
                     </>
                   )}
-                  <Button
-                    type="button"
-                    onClick={handleDeleteClick}
-                    variant="secondary"
-                    className="ml-auto bg-red-600 text-white hover:bg-red-700 border-2 border-red-600 font-semibold"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Supprimer le dossier
-                  </Button>
+                  {profile.id && (
+                    <Button
+                      type="button"
+                      onClick={handleDeleteClick}
+                      variant="secondary"
+                      className="ml-auto bg-red-600 text-white hover:bg-red-700 border-2 border-red-600 font-semibold"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Supprimer le dossier
+                    </Button>
+                  )}
                 </div>
               </form>
             </div>
