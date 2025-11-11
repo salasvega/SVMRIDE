@@ -403,7 +403,7 @@ export function FinancingProfile() {
     return (
       <>
         <SEOHead
-          title="Mon Dossier Financement - Garage Vaillant"
+          title="Mon Dossier Financement - SVM-RIDE"
           description="Gérez votre dossier de financement automobile en ligne"
         />
         <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
