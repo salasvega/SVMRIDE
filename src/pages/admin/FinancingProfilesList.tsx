@@ -5,6 +5,7 @@ import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
 import { supabase } from '../../lib/supabase';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
+import Toast from '../../components/ui/Toast';
 
 type FinancingProfile = {
   id: string;
@@ -58,6 +59,7 @@ export default function FinancingProfilesList() {
   const [profileToDelete, setProfileToDelete] = useState<string | null>(null);
   const [adminNotes, setAdminNotes] = useState<string>('');
   const [savingNotes, setSavingNotes] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
 
   useEffect(() => {
     loadProfiles();
@@ -75,6 +77,7 @@ export default function FinancingProfilesList() {
       setProfiles(data || []);
     } catch (error) {
       console.error('Error loading profiles:', error);
+      setMessage({ type: 'error', text: 'Erreur lors du chargement des dossiers' });
     } finally {
       setLoading(false);
     }
@@ -93,9 +96,10 @@ export default function FinancingProfilesList() {
 
       setProfiles(profiles.filter((p) => p.id !== profileToDelete));
       setProfileToDelete(null);
+      setMessage({ type: 'success', text: 'Dossier supprimé avec succès' });
     } catch (error) {
       console.error('Error deleting profile:', error);
-      alert('Erreur lors de la suppression du dossier');
+      setMessage({ type: 'error', text: 'Erreur lors de la suppression du dossier' });
     }
   };
 
@@ -115,9 +119,10 @@ export default function FinancingProfilesList() {
       if (selectedProfile?.id === profileId) {
         setSelectedProfile({ ...selectedProfile, status: newStatus });
       }
+      setMessage({ type: 'success', text: 'Statut mis à jour avec succès' });
     } catch (error) {
       console.error('Error updating status:', error);
-      alert('Erreur lors de la mise à jour du statut');
+      setMessage({ type: 'error', text: 'Erreur lors de la mise à jour du statut' });
     }
   };
 
@@ -139,9 +144,10 @@ export default function FinancingProfilesList() {
         )
       );
       setSelectedProfile({ ...selectedProfile, admin_notes: adminNotes });
+      setMessage({ type: 'success', text: 'Notes enregistrées avec succès' });
     } catch (error) {
       console.error('Error saving notes:', error);
-      alert('Erreur lors de la sauvegarde des notes');
+      setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde des notes' });
     } finally {
       setSavingNotes(false);
     }
@@ -163,9 +169,10 @@ export default function FinancingProfilesList() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      setMessage({ type: 'success', text: 'Document téléchargé avec succès' });
     } catch (error) {
       console.error('Error downloading document:', error);
-      alert('Erreur lors du téléchargement du document');
+      setMessage({ type: 'error', text: 'Erreur lors du téléchargement du document' });
     }
   };
 
@@ -233,6 +240,13 @@ export default function FinancingProfilesList() {
 
   return (
     <AdminLayout>
+      {message && (
+        <Toast
+          type={message.type}
+          message={message.text}
+          onClose={() => setMessage(null)}
+        />
+      )}
       <Container className="py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
