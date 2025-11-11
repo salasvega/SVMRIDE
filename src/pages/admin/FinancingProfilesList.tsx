@@ -304,6 +304,9 @@ export default function FinancingProfilesList() {
                       Statut
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
                       Client
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
@@ -314,9 +317,6 @@ export default function FinancingProfilesList() {
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
                       Durée
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
-                      Date
                     </th>
                     <th className="px-6 py-3 text-right text-xs font-medium text-[#666666] uppercase tracking-wider">
                       Actions
@@ -336,6 +336,9 @@ export default function FinancingProfilesList() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(profile.status)}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#666666]">
+                        {profile.submitted_at ? formatDate(profile.submitted_at) : formatDate(profile.created_at)}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="text-sm font-medium text-[#111111]">
                           {profile.first_name} {profile.last_name}
@@ -350,9 +353,6 @@ export default function FinancingProfilesList() {
                       </td>
                       <td className="px-6 py-4 text-sm text-[#666666]">
                         {profile.desired_duration} mois
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#666666]">
-                        {profile.submitted_at ? formatDate(profile.submitted_at) : formatDate(profile.created_at)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end gap-2">
