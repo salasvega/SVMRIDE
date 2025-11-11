@@ -10,6 +10,7 @@ import { SingleFileUpload } from '../components/ui/SingleFileUpload';
 import Toast from '../components/ui/Toast';
 import { supabase } from '../lib/supabase';
 import { SEOHead } from '../components/layout/SEOHead';
+import { DeleteConfirmModal } from '../components/admin/DeleteConfirmModal';
 import { Save, Send, Trash2, CheckCircle } from 'lucide-react';
 
 interface FinancingProfile {
@@ -72,6 +73,7 @@ export function FinancingProfile() {
   const [userEmail, setUserEmail] = useState('');
   const [showEmailModal, setShowEmailModal] = useState(true);
   const [emailInput, setEmailInput] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [profile, setProfile] = useState<FinancingProfile>({
     user_email: '',
     last_name: '',
@@ -332,14 +334,15 @@ export function FinancingProfile() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer votre dossier ? Cette action est irréversible.')) {
-      return;
-    }
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
 
+  const handleDeleteConfirm = async () => {
     try {
       if (!profile.id) {
         setMessage({ type: 'error', text: 'Aucun dossier à supprimer' });
+        setShowDeleteModal(false);
         return;
       }
 
@@ -380,11 +383,13 @@ export function FinancingProfile() {
       }
 
       console.log('Profile deleted successfully');
+      setShowDeleteModal(false);
       setMessage({ type: 'success', text: 'Dossier supprimé avec succès' });
       setTimeout(() => navigate('/financement'), 2000);
     } catch (error) {
       console.error('Error deleting profile:', error);
       setMessage({ type: 'error', text: 'Erreur lors de la suppression du dossier' });
+      setShowDeleteModal(false);
     }
   };
 
@@ -858,7 +863,7 @@ export function FinancingProfile() {
                   )}
                   <Button
                     type="button"
-                    onClick={handleDelete}
+                    onClick={handleDeleteClick}
                     variant="secondary"
                     className="ml-auto bg-red-600 text-white hover:bg-red-700 border-2 border-red-600 font-semibold"
                   >
@@ -871,6 +876,15 @@ export function FinancingProfile() {
           </div>
         </Container>
       </Section>
+
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          title="Supprimer le dossier"
+          message="Êtes-vous sûr de vouloir supprimer ce dossier de financement ? Cette action est irréversible."
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setShowDeleteModal(false)}
+        />
+      )}
     </>
   );
 }
