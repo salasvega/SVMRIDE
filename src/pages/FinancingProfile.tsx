@@ -53,11 +53,13 @@ interface FinancingProfile {
 
 export function FinancingProfile() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [userEmail, setUserEmail] = useState('');
+  const [showEmailModal, setShowEmailModal] = useState(true);
+  const [emailInput, setEmailInput] = useState('');
   const [profile, setProfile] = useState<FinancingProfile>({
     user_email: '',
     last_name: '',
@@ -97,35 +99,47 @@ export function FinancingProfile() {
   });
 
   useEffect(() => {
-    loadProfile();
-  }, []);
+    if (userEmail) {
+      loadProfile();
+    }
+  }, [userEmail]);
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailInput.trim()) return;
+
+    setUserEmail(emailInput.trim());
+    setShowEmailModal(false);
+  };
 
   const loadProfile = async () => {
-    const email = prompt('Veuillez entrer votre adresse email pour accéder à votre dossier :');
-
-    if (!email) {
-      navigate('/financement');
-      return;
-    }
-
-    setUserEmail(email);
     setLoading(true);
 
     try {
       const { data, error } = await supabase
         .from('user_financing_profiles')
         .select('*')
-        .eq('user_email', email)
+        .eq('user_email', userEmail)
         .maybeSingle();
 
+      console.log('Query result:', { data, error });
+
       if (error && error.code !== 'PGRST116') {
+        console.error('Query error:', error);
         throw error;
       }
 
       if (data) {
-        setProfile(data);
+        setProfile({
+          ...data,
+          birth_date: data.birth_date || '',
+          housing_entry_date: data.housing_entry_date || '',
+          employment_start_date: data.employment_start_date || '',
+          rent_or_credit_amount: Number(data.rent_or_credit_amount) || 0,
+          monthly_net_salary: Number(data.monthly_net_salary) || 0,
+        });
       } else {
-        setProfile(prev => ({ ...prev, user_email: email, email }));
+        setProfile(prev => ({ ...prev, user_email: userEmail, email: userEmail }));
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -291,6 +305,48 @@ export function FinancingProfile() {
       setMessage({ type: 'error', text: 'Erreur lors de la suppression du dossier' });
     }
   };
+
+  if (showEmailModal) {
+    return (
+      <>
+        <SEOHead
+          title="Mon Dossier Financement - Garage Vaillant"
+          description="Gérez votre dossier de financement automobile en ligne"
+        />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Accès au Dossier</h2>
+            <p className="text-gray-600 mb-6">
+              Veuillez entrer votre adresse email pour accéder à votre dossier de financement.
+            </p>
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
+              <Input
+                label="Adresse email"
+                type="email"
+                required
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                placeholder="exemple@email.com"
+              />
+              <div className="flex gap-3">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => navigate('/financement')}
+                  className="flex-1"
+                >
+                  Annuler
+                </Button>
+                <Button type="submit" className="flex-1">
+                  Accéder
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (loading) {
     return (
