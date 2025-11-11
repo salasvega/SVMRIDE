@@ -406,37 +406,41 @@ export function FinancingProfile() {
           title="Mon Dossier Financement - SVM-RIDE"
           description="Gérez votre dossier de financement automobile en ligne"
         />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Accès au Dossier</h2>
-            <p className="text-gray-600 mb-6">
-              Veuillez entrer votre adresse email pour accéder à votre dossier de financement.
-            </p>
-            <form onSubmit={handleEmailSubmit} className="space-y-4">
-              <Input
-                label="Adresse email"
-                type="email"
-                required
-                value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
-                placeholder="exemple@email.com"
-              />
-              <div className="flex gap-3">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={() => navigate('/financement')}
-                  className="flex-1"
-                >
-                  Annuler
-                </Button>
-                <Button type="submit" className="flex-1">
-                  Accéder
-                </Button>
+        <Section className="py-12 bg-gray-50">
+          <Container>
+            <div className="max-w-md mx-auto">
+              <div className="bg-white rounded-lg shadow-lg p-8">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Accès au Dossier</h2>
+                <p className="text-gray-600 mb-6">
+                  Veuillez entrer votre adresse email pour accéder à votre dossier de financement.
+                </p>
+                <form onSubmit={handleEmailSubmit} className="space-y-4">
+                  <Input
+                    label="Adresse email"
+                    type="email"
+                    required
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    placeholder="exemple@email.com"
+                  />
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => navigate('/financement')}
+                      className="flex-1"
+                    >
+                      Annuler
+                    </Button>
+                    <Button type="submit" className="flex-1">
+                      Accéder
+                    </Button>
+                  </div>
+                </form>
               </div>
-            </form>
-          </div>
-        </div>
+            </div>
+          </Container>
+        </Section>
       </>
     );
   }
