@@ -63,7 +63,7 @@ export function VehicleDetail() {
   const vehicleLabel = `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
   const financingLink = `/financement?vehicle=${encodeURIComponent(
     vehicleLabel
-  )}&price=${encodeURIComponent(String(vehicle.price))}`;
+  )}&price=${encodeURIComponent(String(vehicle.price))}&duration=24`;
 
   return (
     <>

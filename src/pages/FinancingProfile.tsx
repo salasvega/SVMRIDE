@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Container } from '../components/ui/Container';
 import { Section } from '../components/ui/Section';
 import { Button } from '../components/ui/Button';
@@ -53,6 +53,15 @@ interface FinancingProfile {
 
 export function FinancingProfile() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const vehicleFromURL = searchParams.get('vehicle') || '';
+  const priceFromURL = searchParams.get('price');
+  const durationFromURL = searchParams.get('duration');
+
+  const parsedPrice = priceFromURL ? Number(priceFromURL) : 0;
+  const parsedDuration = durationFromURL ? Number(durationFromURL) : 0;
+
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -80,8 +89,8 @@ export function FinancingProfile() {
     other_income_sources: '',
     marital_status: '',
     dependents_count: 0,
-    vehicle_to_finance: '',
-    desired_duration: 0,
+    vehicle_to_finance: vehicleFromURL || '',
+    desired_duration: parsedDuration || 0,
     id_card_front: '',
     id_card_back: '',
     driver_license_front: '',
