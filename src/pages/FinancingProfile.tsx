@@ -11,7 +11,7 @@ import Toast from '../components/ui/Toast';
 import { supabase } from '../lib/supabase';
 import { SEOHead } from '../components/layout/SEOHead';
 import { DeleteConfirmModal } from '../components/admin/DeleteConfirmModal';
-import { Save, Send, Trash2, CheckCircle } from 'lucide-react';
+import { Save, Send, Trash2, CheckCircle, Edit } from 'lucide-react';
 
 interface FinancingProfile {
   id?: string;
@@ -390,6 +390,36 @@ export function FinancingProfile() {
       console.error('Error deleting profile:', error);
       setMessage({ type: 'error', text: 'Erreur lors de la suppression du dossier' });
       setShowDeleteModal(false);
+    }
+  };
+
+  const handleReopen = async () => {
+    try {
+      if (!profile.id) {
+        setMessage({ type: 'error', text: 'Aucun dossier à modifier' });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('user_financing_profiles')
+        .update({
+          status: 'draft',
+          is_complete: false
+        })
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      setProfile(prev => ({
+        ...prev,
+        status: 'draft',
+        is_complete: false
+      }));
+
+      setMessage({ type: 'success', text: 'Dossier réouvert pour modification' });
+    } catch (error) {
+      console.error('Error reopening profile:', error);
+      setMessage({ type: 'error', text: 'Erreur lors de la réouverture du dossier' });
     }
   };
 
@@ -860,6 +890,17 @@ export function FinancingProfile() {
                         {submitting ? 'Envoi...' : 'Soumettre la demande'}
                       </Button>
                     </>
+                  )}
+                  {isSubmitted && profile.id && (
+                    <Button
+                      type="button"
+                      onClick={handleReopen}
+                      variant="secondary"
+                      className="bg-blue-600 text-white hover:bg-blue-700 border-2 border-blue-600 font-semibold"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Modifier le dossier
+                    </Button>
                   )}
                   {profile.id && (
                     <Button
