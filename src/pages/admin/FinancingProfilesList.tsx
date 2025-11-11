@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Trash2, Filter, Search, Circle, Clock, CheckCircle2, Download, Eye, FileText } from 'lucide-react';
+import { Trash2, Filter, Search, Circle, Clock, CheckCircle2, Download, FileText } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
@@ -325,7 +325,14 @@ export default function FinancingProfilesList() {
                 </thead>
                 <tbody className="bg-white divide-y divide-[#E5E5E5]">
                   {filteredProfiles.map((profile) => (
-                    <tr key={profile.id} className="hover:bg-gray-50">
+                    <tr
+                      key={profile.id}
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onDoubleClick={() => {
+                        setSelectedProfile(profile);
+                        setAdminNotes(profile.admin_notes || '');
+                      }}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#666666]">
                         {profile.submitted_at ? formatDate(profile.submitted_at) : formatDate(profile.created_at)}
                       </td>
@@ -350,18 +357,12 @@ export default function FinancingProfilesList() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex justify-end gap-2">
                           <button
-                            onClick={() => {
-                              setSelectedProfile(profile);
-                              setAdminNotes(profile.admin_notes || '');
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setProfileToDelete(profile.id);
                             }}
-                            className="text-[#E31837] hover:text-[#C1132E] flex items-center gap-1"
-                          >
-                            <Eye className="w-4 h-4" />
-                            Voir
-                          </button>
-                          <button
-                            onClick={() => setProfileToDelete(profile.id)}
                             className="text-red-600 hover:text-red-800"
+                            title="Supprimer"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
