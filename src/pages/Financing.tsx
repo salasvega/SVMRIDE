@@ -7,7 +7,6 @@ import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
-import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 
@@ -16,7 +15,6 @@ export function Financing() {
   // ex: /financement?vehicle=Yamaha%20MT-07%202021&price=6500&slug=yamaha-mt07-2021
   const [searchParams] = useSearchParams();
   const vehicleFromURL = searchParams.get('vehicle') || '';
-  const [uploadingFiles, setUploadingFiles] = useState(false);
   const priceFromURL = searchParams.get('price');
   const slugFromURL = searchParams.get('slug') || '';
   const parsedPrice = priceFromURL ? Number(priceFromURL) : null;
@@ -39,12 +37,8 @@ export function Financing() {
     comments: vehicleFromURL
       ? `Je souhaite financer ${vehicleFromURL}${parsedPrice ? ` affiché à ${parsedPrice} €` : ''}.`
       : '',
-    consent: false,
     vehicleSlug: slugFromURL, // 👈 nouveau champ
   });
-
-  // Fichiers enrichis (preview, qualité, etc.)
-  const [files, setFiles] = useState<UploadedDoc[]>([]);
 
   // Hook qui gère l'envoi à Supabase
   const { submit, isSubmitting, success, error } = useFormSubmit({
@@ -59,10 +53,8 @@ export function Financing() {
         comments: vehicleFromURL
           ? `Je souhaite financer ${vehicleFromURL}${parsedPrice ? ` affiché à ${parsedPrice} €` : ''}.`
           : '',
-        consent: false,
         vehicleSlug: slugFromURL,
       });
-      setFiles([]);
     },
   });
 
@@ -120,54 +112,13 @@ export function Financing() {
     }));
   };
 
-  // Envoi du formulaire :
-  // 1. upload fichiers vers Supabase Storage
-  // 2. appel fonction edge financing-form avec toutes les infos (dont vehicleSlug)
+  // Envoi du formulaire
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  setUploadingFiles(true);
-
-  const attachments: Array<{
-    filename: string;
-    path: string;
-    size: number;
-    mime_type: string;
-  }> = [];
-
-  for (const doc of files) {
-    const file = doc.file;
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random()
-      .toString(36)
-      .substring(7)}.${fileExt}`;
-    const filePath = `financing/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from('form-attachments')
-      .upload(filePath, file);
-
-    if (uploadError) {
-      console.error('Upload error:', uploadError);
-      continue;
-    }
-
-    attachments.push({
-      filename: file.name,
-      path: filePath,
-      size: file.size,
-      mime_type: file.type,
-    });
-  }
-
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  await submit(`${supabaseUrl}/functions/v1/financing-form`, {
-    ...formData,
-    attachments,
-  });
-
-  setUploadingFiles(false);
-};
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    await submit(`${supabaseUrl}/functions/v1/financing-form`, formData);
+  };
 
 
   return (
@@ -485,42 +436,6 @@ export function Financing() {
                     readOnly
                   />
 
-                  <FileUpload
-                    label="Documents justificatifs (optionnel)"
-                    maxFiles={10}
-                    maxSizeMB={10}
-                    accept="image/*,application/pdf"
-                    value={files}
-                    onChange={setFiles}
-                  />
-
-                  <div className="flex items-start gap-3">
-                    <input
-                      type="checkbox"
-                      id="consent"
-                      name="consent"
-                      required
-                      checked={formData.consent}
-                      onChange={handleChange}
-                      className="mt-1 w-4 h-4 text-[#D10000] focus:ring-[#D10000] rounded"
-                    />
-                    <label
-                      htmlFor="consent"
-                      className="text-sm text-[#444444]"
-                    >
-                      J'accepte que mes données soient utilisées pour
-                      traiter ma demande de financement conformément à
-                      la{' '}
-                      <a
-                        href="/politique-confidentialite"
-                        className="text-[#D10000] hover:underline"
-                      >
-                        politique de confidentialité
-                      </a>
-                      . <span className="text-[#D10000]">*</span>
-                    </label>
-                  </div>
-
                   {error && (
                     <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
                       {error}
@@ -528,17 +443,13 @@ export function Financing() {
                   )}
 
                   <Button
-  type="submit"
-  disabled={isSubmitting || uploadingFiles}
-  fullWidth
-  size="lg"
->
-  {uploadingFiles
-    ? 'Téléversement des documents...'
-    : isSubmitting
-    ? 'Envoi en cours...'
-    : 'Demander un devis'}
-</Button>
+                    type="submit"
+                    disabled={isSubmitting}
+                    fullWidth
+                    size="lg"
+                  >
+                    {isSubmitting ? 'Envoi en cours...' : 'Demander un devis'}
+                  </Button>
 
                   <Link
                     to={`/financement/dossier?vehicle=${encodeURIComponent(vehicleFromURL)}&price=${priceFromURL || ''}&duration=${formData.duration}`}
