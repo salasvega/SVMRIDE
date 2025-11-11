@@ -145,6 +145,7 @@ export default function FinancingProfilesList() {
       );
       setSelectedProfile({ ...selectedProfile, admin_notes: adminNotes });
       setMessage({ type: 'success', text: 'Notes enregistrées avec succès' });
+      setSelectedProfile(null);
     } catch (error) {
       console.error('Error saving notes:', error);
       setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde des notes' });
