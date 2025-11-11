@@ -307,15 +307,59 @@ export function FinancingProfile() {
     }
 
     try {
-      if (profile.id) {
-        const { error } = await supabase
-          .from('user_financing_profiles')
-          .delete()
-          .eq('id', profile.id);
-
-        if (error) throw error;
+      if (!profile.id) {
+        setMessage({ type: 'error', text: 'Aucun dossier à supprimer' });
+        return;
       }
 
+      console.log('Deleting profile:', profile.id);
+
+      const documentFields = [
+        'id_card_front', 'id_card_back', 'driver_license_front', 'driver_license_back',
+        'proof_of_residence', 'payslip_1', 'payslip_2', 'payslip_3',
+        'tax_notice', 'rib', 'hosting_certificate', 'host_id_card'
+      ];
+
+      const filesToDelete: string[] = [];
+      for (const field of documentFields) {
+        const filePath = profile[field as keyof FinancingProfile] as string;
+        if (filePath) {
+          filesToDelete.push(filePath);
+        }
+      }
+
+      console.log('Files to delete:', filesToDelete);
+
+      if (filesToDelete.length > 0) {
+        const { error: storageError } = await supabase.storage
+          .from('financing-documents')
+          .remove(filesToDelete);
+
+        if (storageError) {
+          console.error('Error deleting files from storage:', storageError);
+        } else {
+          console.log('Successfully deleted', filesToDelete.length, 'files from storage');
+        }
+      }
+
+      if (userEmail) {
+        const { data: folderFiles } = await supabase.storage
+          .from('financing-documents')
+          .list(userEmail);
+
+        if (folderFiles && folderFiles.length === 0) {
+          console.log('Folder is empty, no additional cleanup needed');
+        }
+      }
+
+      const { error } = await supabase
+        .from('user_financing_profiles')
+        .delete()
+        .eq('id', profile.id);
+
+      if (error) throw error;
+
+      console.log('Profile deleted successfully');
       setMessage({ type: 'success', text: 'Dossier supprimé avec succès' });
       setTimeout(() => navigate('/financement'), 2000);
     } catch (error) {
