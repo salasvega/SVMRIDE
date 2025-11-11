@@ -6,7 +6,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
 import { Textarea } from '../components/ui/Textarea';
-import { FileUpload } from '../components/ui/FileUpload';
+import { SingleFileUpload } from '../components/ui/SingleFileUpload';
 import { supabase } from '../lib/supabase';
 import { SEOHead } from '../components/layout/SEOHead';
 import { Save, Send, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
@@ -163,7 +163,7 @@ export function FinancingProfile() {
     setProfile(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleFileUpload = async (field: keyof FinancingProfile, file: File) => {
+  const handleSingleFileUpload = async (field: keyof FinancingProfile, file: File) => {
     if (!userEmail) return;
 
     try {
@@ -620,21 +620,23 @@ export function FinancingProfile() {
                     <div>
                       <h3 className="text-lg font-medium text-gray-900 mb-3">Pièce d'identité</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FileUpload
+                        <SingleSingleFileUpload
                           label="Recto *"
                           value={profile.id_card_front}
-                          onChange={(file) => handleFileUpload('id_card_front', file)}
+                          onChange={(file) => handleSingleFileUpload('id_card_front', file)}
                           onDelete={() => handleDeleteFile('id_card_front')}
                           disabled={isSubmitted}
                           accept="image/*,.pdf"
+                          required
                         />
-                        <FileUpload
+                        <SingleSingleFileUpload
                           label="Verso *"
                           value={profile.id_card_back}
-                          onChange={(file) => handleFileUpload('id_card_back', file)}
+                          onChange={(file) => handleSingleFileUpload('id_card_back', file)}
                           onDelete={() => handleDeleteFile('id_card_back')}
                           disabled={isSubmitted}
                           accept="image/*,.pdf"
+                          required
                         />
                       </div>
                     </div>
@@ -642,18 +644,18 @@ export function FinancingProfile() {
                     <div>
                       <h3 className="text-lg font-medium text-gray-900 mb-3">Permis de conduire</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FileUpload
+                        <SingleFileUpload
                           label="Recto *"
                           value={profile.driver_license_front}
-                          onChange={(file) => handleFileUpload('driver_license_front', file)}
+                          onChange={(file) => handleSingleFileUpload('driver_license_front', file)}
                           onDelete={() => handleDeleteFile('driver_license_front')}
                           disabled={isSubmitted}
                           accept="image/*,.pdf"
                         />
-                        <FileUpload
+                        <SingleFileUpload
                           label="Verso *"
                           value={profile.driver_license_back}
-                          onChange={(file) => handleFileUpload('driver_license_back', file)}
+                          onChange={(file) => handleSingleFileUpload('driver_license_back', file)}
                           onDelete={() => handleDeleteFile('driver_license_back')}
                           disabled={isSubmitted}
                           accept="image/*,.pdf"
@@ -661,10 +663,10 @@ export function FinancingProfile() {
                       </div>
                     </div>
 
-                    <FileUpload
+                    <SingleFileUpload
                       label="Justificatif de domicile (moins de 3 mois) *"
                       value={profile.proof_of_residence}
-                      onChange={(file) => handleFileUpload('proof_of_residence', file)}
+                      onChange={(file) => handleSingleFileUpload('proof_of_residence', file)}
                       onDelete={() => handleDeleteFile('proof_of_residence')}
                       disabled={isSubmitted}
                       accept="image/*,.pdf"
@@ -673,26 +675,26 @@ export function FinancingProfile() {
                     <div>
                       <h3 className="text-lg font-medium text-gray-900 mb-3">Bulletins de salaire</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <FileUpload
+                        <SingleFileUpload
                           label="Bulletin 1 *"
                           value={profile.payslip_1}
-                          onChange={(file) => handleFileUpload('payslip_1', file)}
+                          onChange={(file) => handleSingleFileUpload('payslip_1', file)}
                           onDelete={() => handleDeleteFile('payslip_1')}
                           disabled={isSubmitted}
                           accept="image/*,.pdf"
                         />
-                        <FileUpload
+                        <SingleFileUpload
                           label="Bulletin 2 *"
                           value={profile.payslip_2}
-                          onChange={(file) => handleFileUpload('payslip_2', file)}
+                          onChange={(file) => handleSingleFileUpload('payslip_2', file)}
                           onDelete={() => handleDeleteFile('payslip_2')}
                           disabled={isSubmitted}
                           accept="image/*,.pdf"
                         />
-                        <FileUpload
+                        <SingleFileUpload
                           label="Bulletin 3 *"
                           value={profile.payslip_3}
-                          onChange={(file) => handleFileUpload('payslip_3', file)}
+                          onChange={(file) => handleSingleFileUpload('payslip_3', file)}
                           onDelete={() => handleDeleteFile('payslip_3')}
                           disabled={isSubmitted}
                           accept="image/*,.pdf"
@@ -700,19 +702,19 @@ export function FinancingProfile() {
                       </div>
                     </div>
 
-                    <FileUpload
+                    <SingleFileUpload
                       label="Dernier avis d'imposition *"
                       value={profile.tax_notice}
-                      onChange={(file) => handleFileUpload('tax_notice', file)}
+                      onChange={(file) => handleSingleFileUpload('tax_notice', file)}
                       onDelete={() => handleDeleteFile('tax_notice')}
                       disabled={isSubmitted}
                       accept="image/*,.pdf"
                     />
 
-                    <FileUpload
+                    <SingleFileUpload
                       label="RIB *"
                       value={profile.rib}
-                      onChange={(file) => handleFileUpload('rib', file)}
+                      onChange={(file) => handleSingleFileUpload('rib', file)}
                       onDelete={() => handleDeleteFile('rib')}
                       disabled={isSubmitted}
                       accept="image/*,.pdf"
@@ -722,18 +724,18 @@ export function FinancingProfile() {
                       <div className="border-t pt-6 mt-6">
                         <h3 className="text-lg font-medium text-gray-900 mb-3">Documents si hébergé</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <FileUpload
+                          <SingleFileUpload
                             label="Attestation d'hébergement *"
                             value={profile.hosting_certificate}
-                            onChange={(file) => handleFileUpload('hosting_certificate', file)}
+                            onChange={(file) => handleSingleFileUpload('hosting_certificate', file)}
                             onDelete={() => handleDeleteFile('hosting_certificate')}
                             disabled={isSubmitted}
                             accept="image/*,.pdf"
                           />
-                          <FileUpload
+                          <SingleFileUpload
                             label="Pièce d'identité hébergeur *"
                             value={profile.host_id_card}
-                            onChange={(file) => handleFileUpload('host_id_card', file)}
+                            onChange={(file) => handleSingleFileUpload('host_id_card', file)}
                             onDelete={() => handleDeleteFile('host_id_card')}
                             disabled={isSubmitted}
                             accept="image/*,.pdf"
