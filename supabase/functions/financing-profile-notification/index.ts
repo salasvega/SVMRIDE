@@ -33,6 +33,7 @@ interface WebhookPayload {
     desired_duration: number;
     other_charges_or_credits?: string;
     other_income_sources?: string;
+    comments?: string;
     id_card_front?: string;
     id_card_back?: string;
     driver_license_front?: string;
@@ -159,7 +160,8 @@ Deno.serve(async (req: Request) => {
       <h3>Projet de financement</h3>
       <p><strong>Véhicule:</strong> ${record.vehicle_to_finance}</p>
       <p><strong>Durée souhaitée:</strong> ${record.desired_duration} mois</p>
-      
+      ${record.comments ? `<p><strong>Commentaires:</strong> ${record.comments}</p>` : ''}
+
       ${documentsHtml}
       
       <p><strong>Date de soumission:</strong> ${new Date(record.submitted_at).toLocaleString('fr-FR')}</p>

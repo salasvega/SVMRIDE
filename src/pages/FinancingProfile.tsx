@@ -32,6 +32,7 @@ interface FinancingProfile {
   other_charges_or_credits: string;
   other_income_sources: string;
   marital_status: string;
+  comments?: string;
   dependents_count: number;
   vehicle_to_finance: string;
   financing_amount: number;
@@ -90,6 +91,7 @@ export function FinancingProfile() {
     other_charges_or_credits: '',
     other_income_sources: '',
     marital_status: '',
+    comments: '',
     dependents_count: 0,
     vehicle_to_finance: vehicleFromURL || '',
     financing_amount: parsedPrice || 0,
@@ -697,6 +699,14 @@ export function FinancingProfile() {
                       required
                     />
                   </div>
+                  <Textarea
+                    label="Commentaires"
+                    value={profile.comments || ''}
+                    onChange={(e) => handleInputChange('comments', e.target.value)}
+                    disabled={isSubmitted}
+                    rows={4}
+                    placeholder="Ajoutez des commentaires ou informations complémentaires..."
+                  />
                 </div>
 
                 <div>

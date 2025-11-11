@@ -48,6 +48,7 @@ type FinancingProfile = {
   submitted_at: string;
   created_at: string;
   admin_notes?: string;
+  comments?: string;
 };
 
 export default function FinancingProfilesList() {
@@ -534,6 +535,12 @@ export default function FinancingProfilesList() {
                       <p className="text-sm text-[#666666]">Durée</p>
                       <p className="text-sm font-medium text-[#111111]">{selectedProfile.desired_duration} mois</p>
                     </div>
+                    {selectedProfile.comments && (
+                      <div className="col-span-2">
+                        <p className="text-sm text-[#666666]">Commentaires</p>
+                        <p className="text-sm font-medium text-[#111111] whitespace-pre-wrap">{selectedProfile.comments}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
