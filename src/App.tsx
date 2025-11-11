@@ -10,6 +10,7 @@ import { Vehicles } from './pages/Vehicles';
 import { VehicleDetail } from './pages/VehicleDetail';
 import { TradeIn } from './pages/TradeIn';
 import { Financing } from './pages/Financing';
+import { FinancingProfile } from './pages/FinancingProfile';
 import { CustomSearch } from './pages/CustomSearch';
 import { Contact } from './pages/Contact';
 import { LegalNotice } from './pages/LegalNotice';
@@ -84,6 +85,7 @@ function App() {
                     <Route path="/vehicules/:slug" element={<VehicleDetail />} />
                     <Route path="/reprises" element={<TradeIn />} />
                     <Route path="/financement" element={<Financing />} />
+                    <Route path="/financement/dossier" element={<FinancingProfile />} />
                     <Route path="/recherche-personnalisee" element={<CustomSearch />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/mentions-legales" element={<LegalNotice />} />

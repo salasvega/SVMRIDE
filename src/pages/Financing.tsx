@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { CheckCircle, Calculator } from 'lucide-react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { CheckCircle, Calculator, FileText } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
@@ -181,12 +181,23 @@ export function Financing() {
       {/* Bandeau titre */}
       <Section background="gray" className="!py-8">
         <Container>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#111111] mb-2">
-            Solutions de Financement
-          </h1>
-          <p className="text-lg text-[#444444]">
-            Financez votre deux-roues en toute simplicité
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold text-[#111111] mb-2">
+                Solutions de Financement
+              </h1>
+              <p className="text-lg text-[#444444]">
+                Financez votre deux-roues en toute simplicité
+              </p>
+            </div>
+            <Link
+              to="/financement/dossier"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#D10000] hover:bg-[#A50000] text-white font-semibold rounded-lg transition-colors whitespace-nowrap"
+            >
+              <FileText className="w-5 h-5" />
+              Mon Dossier de Financement
+            </Link>
+          </div>
         </Container>
       </Section>
 
