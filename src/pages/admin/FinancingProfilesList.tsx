@@ -396,6 +396,12 @@ export default function FinancingProfilesList() {
               <div className="p-6 space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
+                    <p className="text-sm text-[#666666]">Date de soumission</p>
+                    <p className="text-sm font-medium text-[#111111] mt-1">
+                      {selectedProfile.submitted_at ? formatDate(selectedProfile.submitted_at) : formatDate(selectedProfile.created_at)}
+                    </p>
+                  </div>
+                  <div className="text-right">
                     <p className="text-sm text-[#666666]">Statut du dossier</p>
                     <Select
                       value={selectedProfile.status}
@@ -407,12 +413,6 @@ export default function FinancingProfilesList() {
                       <option value="in_progress">En cours</option>
                       <option value="completed">Traité</option>
                     </Select>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm text-[#666666]">Date de soumission</p>
-                    <p className="text-sm font-medium text-[#111111] mt-1">
-                      {selectedProfile.submitted_at ? formatDate(selectedProfile.submitted_at) : formatDate(selectedProfile.created_at)}
-                    </p>
                   </div>
                 </div>
 
