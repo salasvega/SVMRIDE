@@ -33,6 +33,7 @@ interface FinancingProfile {
   marital_status: string;
   dependents_count: number;
   vehicle_to_finance: string;
+  financing_amount: number;
   desired_duration: number;
   id_card_front: string;
   id_card_back: string;
@@ -90,6 +91,7 @@ export function FinancingProfile() {
     marital_status: '',
     dependents_count: 0,
     vehicle_to_finance: vehicleFromURL || '',
+    financing_amount: parsedPrice || 0,
     desired_duration: parsedDuration || 0,
     id_card_front: '',
     id_card_back: '',
@@ -662,6 +664,15 @@ export function FinancingProfile() {
                       onChange={(e) => handleInputChange('vehicle_to_finance', e.target.value)}
                       disabled={isSubmitted}
                       placeholder="Marque, modèle, année..."
+                      required
+                    />
+                    <Input
+                      type="number"
+                      label="Montant du financement (€) *"
+                      value={profile.financing_amount}
+                      onChange={(e) => handleInputChange('financing_amount', parseFloat(e.target.value) || 0)}
+                      disabled={isSubmitted}
+                      placeholder="Ex: 15000"
                       required
                     />
                     <Input
