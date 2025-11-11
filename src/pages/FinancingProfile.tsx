@@ -620,7 +620,7 @@ export function FinancingProfile() {
                     <div>
                       <h3 className="text-lg font-medium text-gray-900 mb-3">Pièce d'identité</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <SingleSingleFileUpload
+                        <SingleFileUpload
                           label="Recto *"
                           value={profile.id_card_front}
                           onChange={(file) => handleSingleFileUpload('id_card_front', file)}
@@ -629,7 +629,7 @@ export function FinancingProfile() {
                           accept="image/*,.pdf"
                           required
                         />
-                        <SingleSingleFileUpload
+                        <SingleFileUpload
                           label="Verso *"
                           value={profile.id_card_back}
                           onChange={(file) => handleSingleFileUpload('id_card_back', file)}
