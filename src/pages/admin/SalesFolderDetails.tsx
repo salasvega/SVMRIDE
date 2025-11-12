@@ -11,7 +11,7 @@ import {
   User,
   Calendar,
   DollarSign,
-  Eurosign,
+  EuroSign,
   Package,
   X,
   MapPin,
