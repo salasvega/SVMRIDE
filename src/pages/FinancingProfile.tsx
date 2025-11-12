@@ -342,10 +342,10 @@ export function FinancingProfile() {
 
       if (error) throw error;
 
-      setMessage({ type: 'success', text: 'Dossier sauvegardé avec succès' });
+      setMessage({ type: 'success', text: 'Dossier enregistré avec succès' });
     } catch (error) {
       console.error('Error saving profile:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de la sauvegarde du dossier' });
+      setMessage({ type: 'error', text: 'Erreur lors de l'enregistrement du dossier' });
     } finally {
       setSaving(false);
     }
