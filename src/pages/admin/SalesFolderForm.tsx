@@ -357,7 +357,7 @@ export function SalesFolderForm() {
             </Button>
             <Button type="submit" disabled={loading} className="flex items-center gap-2">
               <Save className="w-5 h-5" />
-              {loading ? 'Sauvegarde...' : 'Sauvegarder'}
+              {loading ? 'Enregistrement...' : 'Enregistrer'}
             </Button>
           </div>
         </form>
