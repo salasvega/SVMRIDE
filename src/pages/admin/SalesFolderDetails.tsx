@@ -13,6 +13,7 @@ import {
   DollarSign,
   Euro,
   Package,
+  Bike,
   X,
   MapPin,
   Gauge,
