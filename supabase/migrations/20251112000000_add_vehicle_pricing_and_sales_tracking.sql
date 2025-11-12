@@ -2,7 +2,7 @@
   # Add Vehicle Pricing and Sales Tracking
 
   1. New Columns
-    - `purchase_price` (numeric) - Prix d'achat du véhicule
+    - `purchase_price` (numeric) - Prix de revient du véhicule
     - `sale_price` (numeric, nullable) - Prix de vente final (uniquement pour véhicules vendus)
     - `sale_date` (timestamptz, nullable) - Date de vente du véhicule
 
