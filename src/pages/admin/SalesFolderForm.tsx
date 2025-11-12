@@ -186,19 +186,7 @@ export function SalesFolderForm() {
         if (data.vehicle_id) {
           const selectedVehicle = vehicles.find(v => v.id === data.vehicle_id);
           if (selectedVehicle?.images && selectedVehicle.images.length > 0) {
-            const mainImage = selectedVehicle.images[0];
-            try {
-              const { data: signedData, error: signedError } = await supabase.storage
-                .from('vehicle-images')
-                .createSignedUrl(mainImage, 3600);
-
-              if (signedError) throw signedError;
-              if (signedData) {
-                setVehicleThumbnail(signedData.signedUrl);
-              }
-            } catch (error) {
-              console.error('Error loading vehicle thumbnail:', error);
-            }
+            setVehicleThumbnail(selectedVehicle.images[0]);
           }
         }
       }
@@ -220,7 +208,7 @@ export function SalesFolderForm() {
     }
   }
 
-  async function handleChange(
+  function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
@@ -229,20 +217,7 @@ export function SalesFolderForm() {
     if (name === 'vehicle_id' && value) {
       const selectedVehicle = vehicles.find(v => v.id === value);
       if (selectedVehicle?.images && selectedVehicle.images.length > 0) {
-        const mainImage = selectedVehicle.images[0];
-        try {
-          const { data, error } = await supabase.storage
-            .from('vehicle-images')
-            .createSignedUrl(mainImage, 3600);
-
-          if (error) throw error;
-          if (data) {
-            setVehicleThumbnail(data.signedUrl);
-          }
-        } catch (error) {
-          console.error('Error loading vehicle thumbnail:', error);
-          setVehicleThumbnail(null);
-        }
+        setVehicleThumbnail(selectedVehicle.images[0]);
       } else {
         setVehicleThumbnail(null);
       }
