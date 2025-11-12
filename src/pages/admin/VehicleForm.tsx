@@ -475,52 +475,54 @@ export function VehicleForm() {
             </Select>
 
             {formData.status === 'sold' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <Input
-                  label="Prix de revient (€)"
-                  type="number"
-                  value={formData.purchase_price}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      purchase_price: Number(
-                        e.target.value
-                      ),
-                    })
-                  }
-                  required
-                  min="0"
-                  placeholder="ex: 5000"
-                  helperText="Somme des couts d'achat du véhicule + des frais engagés pour sa mise en vente"
-                />
-                <Input
-                  label="Prix de vente final (€)"
-                  type="number"
-                  value={formData.sale_price || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sale_price: e.target.value ? Number(e.target.value) : undefined,
-                    })
-                  }
-                  min="0"
-                  placeholder="ex: 6200"
-                  helperText="Prix réel de la vente"
-                />
-                <Input
-                  label="Date de vente"
-                  type="date"
-                  value={formData.sale_date || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      sale_date: e.target.value,
-                    })
-                  }
-                  helperText="Date de finalisation de la vente"
-                />
+              <div className="space-y-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="space-y-4">
+                  <Input
+                    label="Prix de revient (€)"
+                    type="number"
+                    value={formData.purchase_price}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        purchase_price: Number(
+                          e.target.value
+                        ),
+                      })
+                    }
+                    required
+                    min="0"
+                    placeholder="ex: 5000"
+                    helperText="Somme des couts d'achat du véhicule + des frais engagés pour sa mise en vente"
+                  />
+                  <Input
+                    label="Prix de vente final (€)"
+                    type="number"
+                    value={formData.sale_price || ''}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        sale_price: e.target.value ? Number(e.target.value) : undefined,
+                      })
+                    }
+                    min="0"
+                    placeholder="ex: 6200"
+                    helperText="Prix réel de la vente"
+                  />
+                  <Input
+                    label="Date de vente"
+                    type="date"
+                    value={formData.sale_date || ''}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        sale_date: e.target.value,
+                      })
+                    }
+                    helperText="Date de finalisation de la vente"
+                  />
+                </div>
                 {formData.sale_price && formData.purchase_price && (
-                  <div className="col-span-2 p-3 bg-white rounded border border-green-300">
+                  <div className="p-3 bg-white rounded border border-green-300">
                     <p className="text-sm text-[#666666]">Marge réalisée</p>
                     <p className="text-2xl font-bold text-green-600">
                       {(formData.sale_price - formData.purchase_price).toLocaleString('fr-FR')} €
