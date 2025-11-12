@@ -11,6 +11,7 @@ import {
   User,
   Calendar,
   DollarSign,
+  Eurosign,
   Package,
   X,
   MapPin,
@@ -303,7 +304,7 @@ export function SalesFolderDetails() {
 
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <DollarSign className="w-4 h-4 text-[#D10000]" />
+                        <EuroSign className="w-4 h-4 text-[#D10000]" />
                       </div>
                       <div>
                         <p className="text-sm text-[#666666]">Prix affiché</p>
