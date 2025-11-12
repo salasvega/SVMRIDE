@@ -3,11 +3,13 @@ import { LogOut, Home, Crown, Mail, FileText, LayoutDashboard } from 'lucide-rea
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
+import { useFinancingProfilesUnreadCount } from '../../hooks/useFinancingProfilesUnreadCount';
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const { count: unreadCount } = useUnreadCount();
+  const { count: unreadFinancingProfiles } = useFinancingProfilesUnreadCount();
 
   const handleSignOut = async () => {
     await signOut();
@@ -60,10 +62,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 </Link>
                 <Link
                   to="/admin/financing-profiles"
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E] transition-colors flex items-center gap-2"
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E] transition-colors flex items-center gap-2 relative"
                 >
                   <FileText className="w-4 h-4" />
                   Dossiers Financement
+                  {unreadFinancingProfiles > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#C62E2E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {unreadFinancingProfiles > 99 ? '99+' : unreadFinancingProfiles}
+                    </span>
+                  )}
                 </Link>
               </div>
             </div>
