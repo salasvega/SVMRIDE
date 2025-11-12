@@ -39,6 +39,7 @@ interface SalesFolder {
     model: string;
     year: number;
     type: string;
+    price: number;
     images?: string[];
   };
 }
@@ -141,7 +142,7 @@ export function SalesFolderDetails() {
         .select(
           `
           *,
-          vehicle:vehicles(brand, model, year, type, images)
+          vehicle:vehicles(brand, model, year, type, price, images)
         `
         )
         .eq('id', id)
@@ -275,7 +276,7 @@ export function SalesFolderDetails() {
                     </div>
                   </div>
                 )}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div>
                     <p className="text-sm text-[#666666]">Année</p>
                     <p className="text-[#111111]">{folder.vehicle.year}</p>
@@ -283,6 +284,10 @@ export function SalesFolderDetails() {
                   <div>
                     <p className="text-sm text-[#666666]">Type</p>
                     <p className="text-[#111111] capitalize">{folder.vehicle.type}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#666666]">Prix d'origine</p>
+                    <p className="text-[#111111] font-semibold">{folder.vehicle.price.toLocaleString('fr-FR')} €</p>
                   </div>
                 </div>
               </div>
