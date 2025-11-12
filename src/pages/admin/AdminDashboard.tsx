@@ -136,7 +136,7 @@ export function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Link
             to="/admin/submissions"
-            className="group relative bg-gradient-to-br from-white to-orange-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-orange-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+            className="group relative bg-gradient-to-br from-white to-orange-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB] hover:border-orange-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:to-orange-600/10 transition-all duration-300" />
             <div className="relative flex items-center justify-between">
@@ -159,7 +159,7 @@ export function AdminDashboard() {
 
           <Link
             to="/admin/financing-profiles"
-            className="group relative bg-gradient-to-br from-white to-purple-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-purple-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+            className="group relative bg-gradient-to-br from-white to-purple-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB] hover:border-purple-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:to-purple-600/10 transition-all duration-300" />
             <div className="relative flex items-center justify-between">
@@ -184,7 +184,7 @@ export function AdminDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Link
             to="/admin/vehicles"
-            className="group relative bg-gradient-to-br from-white to-gray-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-gray-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+            className="group relative bg-gradient-to-br from-white to-gray-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB] hover:border-gray-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-gray-500/0 to-gray-500/0 group-hover:from-gray-500/5 group-hover:to-gray-600/10 transition-all duration-300" />
             <div className="relative flex items-center justify-between">
@@ -208,7 +208,7 @@ export function AdminDashboard() {
 
           <Link
             to="/admin/vehicles?status=available"
-            className="group relative bg-gradient-to-br from-white to-green-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-green-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+            className="group relative bg-gradient-to-br from-white to-green-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB] hover:border-green-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-green-500/0 to-green-500/0 group-hover:from-green-500/5 group-hover:to-green-600/10 transition-all duration-300" />
             <div className="relative flex items-center justify-between">
@@ -226,7 +226,7 @@ export function AdminDashboard() {
 
           <Link
             to="/admin/vehicles?status=reserved"
-            className="group relative bg-gradient-to-br from-white to-yellow-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-yellow-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+            className="group relative bg-gradient-to-br from-white to-yellow-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB] hover:border-yellow-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/5 group-hover:to-yellow-600/10 transition-all duration-300" />
             <div className="relative flex items-center justify-between">
@@ -244,7 +244,7 @@ export function AdminDashboard() {
 
           <Link
             to="/admin/vehicles?status=sold"
-            className="group relative bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-blue-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+            className="group relative bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB] hover:border-blue-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-blue-600/10 transition-all duration-300" />
             <div className="relative flex items-center justify-between">
@@ -262,7 +262,7 @@ export function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gradient-to-br from-white to-green-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
+          <div className="bg-gradient-to-br from-white to-green-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB]">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center shadow-md">
                 <TrendingUp className="w-6 h-6 text-green-600" />
@@ -277,7 +277,7 @@ export function AdminDashboard() {
             </p>
           </div>
 
-          <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
+          <div className="bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB]">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center shadow-md">
                 <TrendingUp className="w-6 h-6 text-blue-600" />
