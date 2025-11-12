@@ -263,11 +263,20 @@ export function SalesFolderDetails() {
             </div>
             {folder.vehicle ? (
               <div className="space-y-4">
+                {vehicleThumbnail && (
+                  <div className="w-full h-48 rounded-lg overflow-hidden bg-gray-100">
+                    <img
+                      src={vehicleThumbnail}
+                      alt={`${folder.vehicle.brand} ${folder.vehicle.model}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
                 <div>
                   <h3 className="text-2xl font-bold text-[#111111]">
                     {folder.vehicle.brand} {folder.vehicle.model}
                   </h3>
-                 
+
                 </div>
 
                 <div className="bg-[#F5F5F5] rounded-lg p-4">
