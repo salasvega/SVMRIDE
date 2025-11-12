@@ -63,9 +63,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-[#666666] hidden sm:block">
-                {user?.email}
-              </span>
               <Link to="/" className="text-[#666666] hover:text-[#C62E2E]" title="Voir le site">
                 <Home className="w-5 h-5" />
               </Link>
