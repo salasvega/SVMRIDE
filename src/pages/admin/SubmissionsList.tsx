@@ -312,59 +312,54 @@ export default function SubmissionsList() {
           <p className="text-[#666666]">{filteredSubmissions.length} demande(s)</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-4">
-              <Filter className="w-5 h-5 text-[#666666]" />
-              <Select
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-                className="flex-1"
-              >
-                <option value="all">Tous les types</option>
-                <option value="contact">Contact</option>
-                <option value="financing">Financement</option>
-                <option value="trade_in">Reprise</option>
-                <option value="custom_search">Recherche personnalisée</option>
-              </Select>
-              <Select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="flex-1"
-              >
-                <option value="all">Tous les statuts</option>
-                <option value="new">Nouvelles</option>
-                <option value="in_progress">En cours</option>
-                <option value="completed">Terminées</option>
-              </Select>
-            </div>
-            <div className="flex items-center gap-4">
-              <Search className="w-5 h-5 text-[#666666]" />
-              <input
-                type="text"
-                placeholder="Rechercher par nom, email, téléphone, message..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 px-4 py-2 border border-[#E5E5E5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D10000] focus:border-transparent"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="text-sm text-[#666666] hover:text-[#D10000] transition-colors"
+        <div className="bg-white rounded-xl shadow-sm border border-[#E5E5E5] mb-6">
+          <div className="p-6 border-b border-[#E5E5E5]">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#666666] w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Rechercher par nom, email, téléphone, message..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent"
+                />
+              </div>
+
+              <div className="flex gap-4">
+                <select
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                  className="min-w-[180px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent bg-white text-[#111111]"
                 >
-                  Effacer
-                </button>
-              )}
+                  <option value="all">Tous les types</option>
+                  <option value="contact">Contact</option>
+                  <option value="financing">Financement</option>
+                  <option value="trade_in">Reprise</option>
+                  <option value="custom_search">Recherche personnalisée</option>
+                </select>
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="min-w-[150px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent bg-white text-[#111111]"
+                >
+                  <option value="all">Tous les statuts</option>
+                  <option value="new">Nouvelles</option>
+                  <option value="in_progress">En cours</option>
+                  <option value="completed">Terminées</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
 
-        {filteredSubmissions.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-            <p className="text-[#666666]">Aucune demande pour le moment</p>
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm border border-[#E5E5E5] overflow-hidden">
+          {filteredSubmissions.length === 0 ? (
+            <div className="p-12 text-center">
+              <p className="text-[#666666]">Aucune demande trouvée</p>
+            </div>
+          ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-[#F9F9F9] border-b border-[#E5E5E5]">
@@ -430,8 +425,8 @@ export default function SubmissionsList() {
                 </tbody>
               </table>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {selectedSubmission && (
           <SubmissionDetailsModal
