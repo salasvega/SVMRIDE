@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Edit, Trash2, Eye, EyeOff, Plus, Search } from 'lucide-react';
+import { Edit, Trash2, Eye, EyeOff, Plus, Search, Bike, Package, ShoppingCart, CheckCircle } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
@@ -84,6 +84,13 @@ export function VehiclesList() {
     return matchesSearch && matchesType && matchesStatus;
   });
 
+  const stats = {
+    total: vehicles.length,
+    available: vehicles.filter(v => ((v as any).status || 'available') === 'available').length,
+    reserved: vehicles.filter(v => ((v as any).status || 'available') === 'reserved').length,
+    sold: vehicles.filter(v => ((v as any).status || 'available') === 'sold').length,
+  };
+
   if (loading) {
     return (
       <AdminLayout>
@@ -100,7 +107,7 @@ export function VehiclesList() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">Véhicules</h1>
-            <p className="text-[#666666] mt-1">{filteredVehicles.length} véhicule{filteredVehicles.length > 1 ? 's' : ''}</p>
+            <p className="text-[#666666] mt-1">Gérez votre inventaire de véhicules</p>
           </div>
           <Link to="/admin/vehicles/new">
             <Button className="flex items-center space-x-2">
@@ -108,6 +115,76 @@ export function VehiclesList() {
               <span>Ajouter un véhicule</span>
             </Button>
           </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
+              statusFilter === 'all' ? 'border-[#E31837] ring-2 ring-[#E31837] ring-opacity-20' : 'border-[#D1D5DB]'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666]">Total Véhicules</p>
+                <p className="text-2xl font-bold text-[#111111]">{stats.total}</p>
+              </div>
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+                <Bike className="w-6 h-6 text-gray-600" />
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('available')}
+            className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
+              statusFilter === 'available' ? 'border-green-600 ring-2 ring-green-600 ring-opacity-20' : 'border-[#D1D5DB]'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666]">Disponibles</p>
+                <p className="text-2xl font-bold text-green-600">{stats.available}</p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <Package className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('reserved')}
+            className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
+              statusFilter === 'reserved' ? 'border-yellow-600 ring-2 ring-yellow-600 ring-opacity-20' : 'border-[#D1D5DB]'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666]">Réservés</p>
+                <p className="text-2xl font-bold text-yellow-600">{stats.reserved}</p>
+              </div>
+              <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                <ShoppingCart className="w-6 h-6 text-yellow-600" />
+              </div>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setStatusFilter('sold')}
+            className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
+              statusFilter === 'sold' ? 'border-blue-600 ring-2 ring-blue-600 ring-opacity-20' : 'border-[#D1D5DB]'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666]">Vendus</p>
+                <p className="text-2xl font-bold text-blue-600">{stats.sold}</p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </button>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E5E5] overflow-hidden">
