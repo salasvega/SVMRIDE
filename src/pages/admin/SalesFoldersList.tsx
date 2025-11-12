@@ -160,9 +160,7 @@ export function SalesFoldersList() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">Dossiers de Vente</h1>
-            <p className="text-[#666666] mt-1">
-              Gérez les dossiers clients et ventes
-            </p>
+           
           </div>
           <Link to="/admin/sales-folders/new">
             <Button className="flex items-center gap-2">
