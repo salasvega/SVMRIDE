@@ -315,24 +315,6 @@ export function VehicleForm() {
               />
 
               <Input
-                label="Prix de mise en vente (€)"
-                type="number"
-                value={formData.price}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    price: Number(
-                      e.target.value
-                    ),
-                  })
-                }
-                required
-                min="0"
-                placeholder="ex: 6490"
-                helperText="Prix affiché sur le site"
-              />
-
-              <Input
                 label="Kilométrage"
                 type="number"
                 value={formData.mileage}
@@ -468,6 +450,24 @@ export function VehicleForm() {
               min="0"
               placeholder="ex: 5000"
               helperText="Prix auquel vous avez acheté le véhicule"
+            />
+
+            <Input
+              label="Prix de mise en vente (€)"
+              type="number"
+              value={formData.price}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  price: Number(
+                    e.target.value
+                  ),
+                })
+              }
+              required
+              min="0"
+              placeholder="ex: 6490"
+              helperText="Prix affiché sur le site"
             />
 
             {formData.status === 'sold' && (
