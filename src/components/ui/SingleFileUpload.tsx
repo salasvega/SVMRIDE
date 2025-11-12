@@ -31,9 +31,10 @@ export function SingleFileUpload({
   useEffect(() => {
     const loadExistingFile = async () => {
       if (value && value.startsWith('financing-documents/')) {
+        const filePath = value.replace('financing-documents/', '');
         const { data } = supabase.storage
           .from('financing-documents')
-          .getPublicUrl(value);
+          .getPublicUrl(filePath);
 
         if (data?.publicUrl) {
           setPreviewUrl(data.publicUrl);
