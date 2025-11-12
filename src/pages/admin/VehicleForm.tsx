@@ -408,32 +408,6 @@ export function VehicleForm() {
               placeholder="ex: Garantie 12 mois pièces et main d'œuvre"
             />
 
-            <Select
-              label="Statut"
-              value={formData.status}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  status: e.target
-                    .value as
-                    | 'available'
-                    | 'reserved'
-                    | 'sold',
-                })
-              }
-              required
-            >
-              <option value="available">
-                Disponible
-              </option>
-              <option value="reserved">
-                Réservé
-              </option>
-              <option value="sold">
-                Vendu
-              </option>
-            </Select>
-
             <Input
               label="Prix d'achat (€)"
               type="number"
@@ -469,6 +443,32 @@ export function VehicleForm() {
               placeholder="ex: 6490"
               helperText="Prix affiché sur le site"
             />
+
+            <Select
+              label="Statut"
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  status: e.target
+                    .value as
+                    | 'available'
+                    | 'reserved'
+                    | 'sold',
+                })
+              }
+              required
+            >
+              <option value="available">
+                Disponible
+              </option>
+              <option value="reserved">
+                Réservé
+              </option>
+              <option value="sold">
+                Vendu
+              </option>
+            </Select>
 
             {formData.status === 'sold' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
