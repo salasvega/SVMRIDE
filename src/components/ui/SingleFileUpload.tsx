@@ -29,17 +29,52 @@ export function SingleFileUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (value && value.startsWith('financing-documents/')) {
-      const { data } = supabase.storage
-        .from('financing-documents')
-        .getPublicUrl(value);
+    const loadExistingFile = async () => {
+      if (value && value.startsWith('financing-documents/')) {
+        const { data } = supabase.storage
+          .from('financing-documents')
+          .getPublicUrl(value);
 
-      if (data?.publicUrl) {
-        setPreviewUrl(data.publicUrl);
-        const fileName = value.split('/').pop() || 'document';
-        setFileInfo({ name: fileName, size: 0, type: 'unknown' });
+        if (data?.publicUrl) {
+          setPreviewUrl(data.publicUrl);
+          const fileName = value.split('/').pop() || 'document';
+
+          const fileExt = fileName.split('.').pop()?.toLowerCase() || '';
+          let fileType = 'application/octet-stream';
+
+          if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(fileExt)) {
+            fileType = `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`;
+          } else if (fileExt === 'pdf') {
+            fileType = 'application/pdf';
+          }
+
+          try {
+            const response = await fetch(data.publicUrl, { method: 'HEAD' });
+            const contentLength = response.headers.get('content-length');
+            const size = contentLength ? parseInt(contentLength, 10) : 0;
+
+            setFileInfo({ name: fileName, size, type: fileType });
+
+            if (fileType.startsWith('image/')) {
+              const img = new Image();
+              img.onload = () => {
+                const isLowQuality = img.width < 800 && img.height < 800;
+                setLowQuality(isLowQuality);
+              };
+              img.src = data.publicUrl;
+            }
+          } catch (error) {
+            setFileInfo({ name: fileName, size: 0, type: fileType });
+          }
+        }
+      } else {
+        setPreviewUrl(null);
+        setFileInfo(null);
+        setLowQuality(false);
       }
-    }
+    };
+
+    loadExistingFile();
   }, [value]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
