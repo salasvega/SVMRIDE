@@ -242,6 +242,9 @@ export function SalesFoldersList() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-[#E5E5E5]">
+                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
+                    Statut
+                  </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
                     N° Dossier
                   </th>
@@ -256,9 +259,6 @@ export function SalesFoldersList() {
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
                     Prix
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    Statut
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
                     Actions
