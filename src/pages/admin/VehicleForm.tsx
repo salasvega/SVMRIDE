@@ -408,41 +408,45 @@ export function VehicleForm() {
               placeholder="ex: Garantie 12 mois pièces et main d'œuvre"
             />
 
-            <Input
-              label="Prix d'achat (€)"
-              type="number"
-              value={formData.purchase_price}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  purchase_price: Number(
-                    e.target.value
-                  ),
-                })
-              }
-              required
-              min="0"
-              placeholder="ex: 5000"
-              helperText="Prix auquel vous avez acheté le véhicule"
-            />
+            {formData.status !== 'sold' && (
+              <>
+                <Input
+                  label="Prix d'achat (€)"
+                  type="number"
+                  value={formData.purchase_price}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      purchase_price: Number(
+                        e.target.value
+                      ),
+                    })
+                  }
+                  required
+                  min="0"
+                  placeholder="ex: 5000"
+                  helperText="Prix auquel vous avez acheté le véhicule"
+                />
 
-            <Input
-              label="Prix de mise en vente (€)"
-              type="number"
-              value={formData.price}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  price: Number(
-                    e.target.value
-                  ),
-                })
-              }
-              required
-              min="0"
-              placeholder="ex: 6490"
-              helperText="Prix affiché sur le site"
-            />
+                <Input
+                  label="Prix de mise en vente (€)"
+                  type="number"
+                  value={formData.price}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      price: Number(
+                        e.target.value
+                      ),
+                    })
+                  }
+                  required
+                  min="0"
+                  placeholder="ex: 6490"
+                  helperText="Prix affiché sur le site"
+                />
+              </>
+            )}
 
             <Select
               label="Statut"
@@ -472,24 +476,6 @@ export function VehicleForm() {
 
             {formData.status === 'sold' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-                <Input
-                  label="Prix d'achat (€)"
-                  type="number"
-                  value={formData.purchase_price}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      purchase_price: Number(
-                        e.target.value
-                      ),
-                    })
-                  }
-                  required
-                  min="0"
-                  placeholder="ex: 5000"
-                  helperText="Prix auquel vous avez acheté le véhicule"
-                  disabled
-                />
                 <Input
                   label="Prix de vente final (€)"
                   type="number"
