@@ -69,7 +69,7 @@ export function AdminDashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
+          <Link to="/admin/vehicles" className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-[#C62E2E] hover:shadow-md transition-all cursor-pointer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666] mb-1">Total véhicules</p>
@@ -85,9 +85,9 @@ export function AdminDashboard() {
                 </svg>
               </div>
             </div>
-          </div>
+          </Link>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
+          <Link to="/admin/submissions" className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-[#C62E2E] hover:shadow-md transition-all cursor-pointer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666] mb-1">Messages reçus</p>
@@ -97,9 +97,9 @@ export function AdminDashboard() {
                 <Mail className="w-6 h-6 text-orange-600" />
               </div>
             </div>
-          </div>
+          </Link>
 
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
+          <Link to="/admin/financing-profiles" className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-[#C62E2E] hover:shadow-md transition-all cursor-pointer">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666] mb-1">Dossiers financement</p>
@@ -109,7 +109,7 @@ export function AdminDashboard() {
                 <FileText className="w-6 h-6 text-blue-600" />
               </div>
             </div>
-          </div>
+          </Link>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
