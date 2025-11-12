@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/Button';
-import { FileText, Search, Filter, Eye, Trash2, Plus } from 'lucide-react';
+import { FileText, Search, Filter, Trash2, Plus } from 'lucide-react';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 
 interface SalesFolder {
@@ -256,7 +256,8 @@ export function SalesFoldersList() {
                   filteredFolders.map((folder) => (
                     <tr
                       key={folder.id}
-                      className="border-b border-[#E5E5E5] hover:bg-gray-50"
+                      className="border-b border-[#E5E5E5] hover:bg-gray-50 cursor-pointer"
+                      onDoubleClick={() => window.location.href = `/admin/sales-folders/${folder.id}`}
                     >
                       <td className="py-3 px-4">
                         <span className="font-mono text-sm text-[#FF5C00] font-semibold">
@@ -310,16 +311,9 @@ export function SalesFoldersList() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
-                          <Link to={`/admin/sales-folders/${folder.id}`}>
-                            <button
-                              className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                              title="Voir les détails"
-                            >
-                              <Eye className="w-4 h-4 text-blue-600" />
-                            </button>
-                          </Link>
                           <button
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setFolderToDelete(folder);
                               setDeleteModalOpen(true);
                             }}
