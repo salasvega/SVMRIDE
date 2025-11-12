@@ -305,7 +305,7 @@ export function AdminDashboard() {
               </div>
               <div>
                 <h3 className="text-lg font-bold text-[#111111]">Valeur du Stock</h3>
-                <p className="text-sm text-[#666666]">Prix d'achat des véhicules disponibles</p>
+                <p className="text-sm text-[#666666]">Prix de revient des véhicules disponibles</p>
               </div>
             </div>
             <p className="text-3xl font-bold text-green-600">
