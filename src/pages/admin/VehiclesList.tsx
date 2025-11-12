@@ -154,13 +154,16 @@ export function VehiclesList() {
                     Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
-                    Prix
+                    Prix vente
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
                     Année
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
                     Statut
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Marge
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
                     Visibilité
@@ -173,7 +176,7 @@ export function VehiclesList() {
               <tbody className="divide-y divide-[#E5E5E5]">
                 {filteredVehicles.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-[#666666]">
+                    <td colSpan={9} className="px-6 py-12 text-center text-[#666666]">
                       Aucun véhicule trouvé
                     </td>
                   </tr>
@@ -235,6 +238,32 @@ export function VehiclesList() {
                             {config.label}
                           </span>
                         );
+                      })()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {(() => {
+                        const status = (vehicle as any).status;
+                        const salePrice = (vehicle as any).sale_price;
+                        const purchasePrice = (vehicle as any).purchase_price || 0;
+
+                        if (status === 'sold' && salePrice && purchasePrice) {
+                          const margin = salePrice - purchasePrice;
+                          const marginPercent = ((margin / purchasePrice) * 100).toFixed(1);
+                          const isPositive = margin >= 0;
+
+                          return (
+                            <div className="text-sm">
+                              <div className={`font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                                {margin.toLocaleString('fr-FR')} €
+                              </div>
+                              <div className="text-xs text-[#666666]">
+                                {marginPercent}%
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        return <span className="text-sm text-[#999999]">-</span>;
                       })()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

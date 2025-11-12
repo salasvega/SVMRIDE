@@ -47,6 +47,9 @@ export function VehicleForm() {
     type: 'moto' as 'moto' | 'scooter',
     displacement: 0,
     price: 0,
+    purchase_price: 0,
+    sale_price: undefined as number | undefined,
+    sale_date: undefined as string | undefined,
     mileage: 0,
     condition: 'excellent' as 'excellent' | 'bon' | 'correct' | 'a-reviser',
     description: '',
@@ -91,6 +94,9 @@ export function VehicleForm() {
         type: vehicle.type as 'moto' | 'scooter',
         displacement: vehicle.displacement,
         price: vehicle.price,
+        purchase_price: vehicle.purchase_price || 0,
+        sale_price: vehicle.sale_price,
+        sale_date: vehicle.sale_date,
         mileage: vehicle.mileage,
         condition: vehicle.condition as
           | 'excellent'
@@ -103,7 +109,7 @@ export function VehicleForm() {
         warranty:
           vehicle.warranty ||
           "Garantie 6 mois pièces et main d'œuvre",
-        status: (vehicle as any).status || 'available',
+        status: vehicle.status || 'available',
         available: vehicle.available,
       });
 
@@ -128,12 +134,18 @@ export function VehicleForm() {
     // on enregistre seulement les URL (string[])
     // car on suppose que ta colonne "images" dans Supabase est text[]
     // et pas encore un jsonb complexe
-    const vehicleData = {
+    const vehicleData: any = {
       ...formData,
       features,
       images: formData.images.map((img) => img.url),
       available: formData.status === 'available' && formData.available,
+      sale_date: formData.status === 'sold' && formData.sale_date ? formData.sale_date : null,
     };
+
+    if (formData.status !== 'sold') {
+      delete vehicleData.sale_price;
+      delete vehicleData.sale_date;
+    }
 
     try {
       if (isEditing && id) {
@@ -303,7 +315,25 @@ export function VehicleForm() {
               />
 
               <Input
-                label="Prix (€)"
+                label="Prix d'achat (€)"
+                type="number"
+                value={formData.purchase_price}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    purchase_price: Number(
+                      e.target.value
+                    ),
+                  })
+                }
+                required
+                min="0"
+                placeholder="ex: 5000"
+                helperText="Prix auquel vous avez acheté le véhicule"
+              />
+
+              <Input
+                label="Prix de mise en vente (€)"
                 type="number"
                 value={formData.price}
                 onChange={(e) =>
@@ -317,6 +347,7 @@ export function VehicleForm() {
                 required
                 min="0"
                 placeholder="ex: 6490"
+                helperText="Prix affiché sur le site"
               />
 
               <Input
@@ -438,6 +469,48 @@ export function VehicleForm() {
                 Vendu
               </option>
             </Select>
+
+            {formData.status === 'sold' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <Input
+                  label="Prix de vente final (€)"
+                  type="number"
+                  value={formData.sale_price || ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      sale_price: e.target.value ? Number(e.target.value) : undefined,
+                    })
+                  }
+                  min="0"
+                  placeholder="ex: 6200"
+                  helperText="Prix réel de la vente"
+                />
+                <Input
+                  label="Date de vente"
+                  type="date"
+                  value={formData.sale_date || ''}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      sale_date: e.target.value,
+                    })
+                  }
+                  helperText="Date de finalisation de la vente"
+                />
+                {formData.sale_price && formData.purchase_price && (
+                  <div className="col-span-2 p-3 bg-white rounded border border-green-300">
+                    <p className="text-sm text-[#666666]">Marge réalisée</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {(formData.sale_price - formData.purchase_price).toLocaleString('fr-FR')} €
+                    </p>
+                    <p className="text-xs text-[#666666] mt-1">
+                      {(((formData.sale_price - formData.purchase_price) / formData.purchase_price) * 100).toFixed(1)}% de marge
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
 
             <label className="flex items-center space-x-2">
               <input
