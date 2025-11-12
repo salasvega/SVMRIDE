@@ -157,17 +157,8 @@ export function SalesFoldersList() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-[#111111]">Dossiers de Vente</h1>
-           
-          </div>
-          <Link to="/admin/sales-folders/new">
-            <Button className="flex items-center gap-2">
-              <Plus className="w-5 h-5" />
-              Nouveau Dossier
-            </Button>
-          </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-[#111111]">Dossiers de Vente</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -369,6 +360,15 @@ export function SalesFoldersList() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Link to="/admin/sales-folders/new">
+            <Button className="flex items-center gap-2">
+              <Plus className="w-5 h-5" />
+              Nouveau Dossier
+            </Button>
+          </Link>
         </div>
       </div>
 
