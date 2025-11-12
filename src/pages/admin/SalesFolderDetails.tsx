@@ -266,9 +266,7 @@ export function SalesFolderDetails() {
                   <h3 className="text-2xl font-bold text-[#111111]">
                     {folder.vehicle.brand} {folder.vehicle.model}
                   </h3>
-                  <p className="text-2xl font-bold text-[#D10000] mt-1">
-                    {folder.vehicle.price.toLocaleString('fr-FR')} €
-                  </p>
+                 
                 </div>
 
                 <div className="bg-[#F5F5F5] rounded-lg p-4">
