@@ -257,7 +257,7 @@ export function SalesFolderDetails() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-grey-100 rounded-lg flex items-center justify-center">
                 <Bike className="w-5 h-5 text-grey-600" />
               </div>
               <h2 className="text-xl font-bold text-[#111111]">Véhicule</h2>
