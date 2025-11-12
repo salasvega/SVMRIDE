@@ -319,28 +319,23 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
               </div>
             )}
 
-            <div className="bg-[#F5F5F5] rounded-xl p-4 border-2 border-[#E0E0E0]">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-white rounded-lg">
-                  <FileEdit className="w-5 h-5 text-[#666666]" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-3">Notes administrateur</p>
-                  <Textarea
-                    value={adminNotes}
-                    onChange={(e) => setAdminNotes(e.target.value)}
-                    placeholder="Ajoutez vos notes, actions effectuées, remarques..."
-                    rows={4}
-                    className="bg-white text-[#111111] placeholder-[#999999] text-sm"
-                  />
-                  <button
-                    onClick={handleSaveAdminNotes}
-                    disabled={isSavingNotes}
-                    className="mt-3 px-4 py-2 bg-[#666666] hover:bg-[#555555] disabled:bg-[#CCCCCC] text-white font-semibold rounded-lg transition-colors"
-                  >
-                    {isSavingNotes ? 'Enregistrement...' : 'Enregistrer les notes'}
-                  </button>
-                </div>
+            <div className="border-t border-[#E5E5E5] pt-6">
+              <h3 className="text-lg font-semibold text-[#111111] mb-4">Notes administrateur</h3>
+              <textarea
+                value={adminNotes}
+                onChange={(e) => setAdminNotes(e.target.value)}
+                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent resize-none"
+                rows={4}
+                placeholder="Ajoutez des notes internes sur ce dossier..."
+              />
+              <div className="mt-3 flex justify-end">
+                <button
+                  onClick={handleSaveAdminNotes}
+                  disabled={isSavingNotes}
+                  className="px-4 py-2 bg-[#E31837] text-white rounded-lg hover:bg-[#C1132E] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSavingNotes ? 'Enregistrement...' : 'Enregistrer les notes'}
+                </button>
               </div>
             </div>
 
