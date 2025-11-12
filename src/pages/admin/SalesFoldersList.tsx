@@ -6,6 +6,13 @@ import { Button } from '../../components/ui/Button';
 import { FileText, Search, Filter, Trash2, Plus } from 'lucide-react';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 
+interface DocumentMetadata {
+  type: string;
+  filename: string;
+  path: string;
+  upload_date: string;
+}
+
 interface SalesFolder {
   id: string;
   folder_number: string;
@@ -19,6 +26,7 @@ interface SalesFolder {
   sale_price: number | null;
   deposit_amount: number | null;
   balance_amount: number | null;
+  documents: DocumentMetadata[];
   created_at: string;
   vehicle?: {
     brand: string;
@@ -101,6 +109,18 @@ export function SalesFoldersList() {
 
   async function handleDelete(folder: SalesFolder) {
     try {
+      if (folder.documents && folder.documents.length > 0) {
+        const filePaths = folder.documents.map(doc => doc.path);
+
+        const { error: storageError } = await supabase.storage
+          .from('sales-documents')
+          .remove(filePaths);
+
+        if (storageError) {
+          console.error('Error deleting files from storage:', storageError);
+        }
+      }
+
       const { error } = await supabase
         .from('sales_folders')
         .delete()
