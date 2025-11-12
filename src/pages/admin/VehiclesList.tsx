@@ -104,13 +104,12 @@ export function VehiclesList() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">Véhicules</h1>
-            
           </div>
-          <Link to="/admin/vehicles/new">
-            <Button className="flex items-center space-x-2">
+          <Link to="/admin/vehicles/new" className="w-full sm:w-auto">
+            <Button className="flex items-center justify-center space-x-2 w-full sm:w-auto">
               <Plus className="w-4 h-4" />
               <span>Ajouter un véhicule</span>
             </Button>
