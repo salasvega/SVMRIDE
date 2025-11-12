@@ -279,6 +279,15 @@ export function SalesFoldersList() {
                       className="border-b border-[#E5E5E5] hover:bg-gray-50 cursor-pointer"
                       onDoubleClick={() => window.location.href = `/admin/sales-folders/${folder.id}`}
                     >
+                       <td className="py-3 px-4">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                            statusColors[folder.status]
+                          }`}
+                        >
+                          {statusLabels[folder.status]}
+                        </span>
+                      </td>
                       <td className="py-3 px-4">
                         <span className="font-mono text-sm text-[#FF5C00] font-semibold">
                           {folder.folder_number}
@@ -320,15 +329,7 @@ export function SalesFoldersList() {
                           <span className="text-[#666666] text-sm">-</span>
                         )}
                       </td>
-                      <td className="py-3 px-4">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                            statusColors[folder.status]
-                          }`}
-                        >
-                          {statusLabels[folder.status]}
-                        </span>
-                      </td>
+                     
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-2">
                           <button
