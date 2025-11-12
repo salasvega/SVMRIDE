@@ -182,11 +182,27 @@ export function FinancingProfile() {
   const handleSingleFileUpload = async (field: keyof FinancingProfile, file: File) => {
     if (!userEmail) return;
 
+    const fileNameMapping: Record<string, string> = {
+      id_card_front: 'piece_identite_recto',
+      id_card_back: 'piece_identite_verso',
+      driver_license_front: 'permis_conduire_recto',
+      driver_license_back: 'permis_conduire_verso',
+      proof_of_residence: 'justificatif_domicile',
+      payslip_1: 'bulletin_salaire_1',
+      payslip_2: 'bulletin_salaire_2',
+      payslip_3: 'bulletin_salaire_3',
+      tax_notice: 'avis_imposition',
+      rib: 'rib',
+      hosting_certificate: 'attestation_hebergement',
+      host_id_card: 'piece_identite_hebergeur',
+    };
+
     console.log('Starting file upload:', { field, fileName: file.name, fileSize: file.size });
 
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${userEmail}/${field}_${Date.now()}.${fileExt}`;
+      const frenchFieldName = fileNameMapping[field as string] || field;
+      const fileName = `${userEmail}/${frenchFieldName}_${Date.now()}.${fileExt}`;
 
       console.log('Uploading to storage:', fileName);
 
