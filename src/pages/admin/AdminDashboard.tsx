@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, FileText, TrendingUp } from 'lucide-react';
+import { Mail, FileText } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 
@@ -111,13 +111,9 @@ export function AdminDashboard() {
             <div className="relative flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666] mb-2 font-medium">Total véhicules</p>
-                <p className="text-4xl font-bold text-[#111111] mb-2">
+                <p className="text-4xl font-bold text-[#111111]">
                   <AnimatedCounter value={stats.total} />
                 </p>
-                <div className="flex items-center text-green-600 text-sm font-medium">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  <span>Stock actif</span>
-                </div>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
                 <svg className="w-8 h-8 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -139,13 +135,9 @@ export function AdminDashboard() {
             <div className="relative flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666] mb-2 font-medium">Messages reçus</p>
-                <p className="text-4xl font-bold text-[#111111] mb-2">
+                <p className="text-4xl font-bold text-[#111111]">
                   <AnimatedCounter value={stats.submissions} />
                 </p>
-                <div className="flex items-center text-orange-600 text-sm font-medium">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  <span>Demandes clients</span>
-                </div>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
                 <Mail className="w-8 h-8 text-orange-600" />
@@ -161,13 +153,9 @@ export function AdminDashboard() {
             <div className="relative flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666] mb-2 font-medium">Dossiers financement</p>
-                <p className="text-4xl font-bold text-[#111111] mb-2">
+                <p className="text-4xl font-bold text-[#111111]">
                   <AnimatedCounter value={stats.financingProfiles} />
                 </p>
-                <div className="flex items-center text-purple-600 text-sm font-medium">
-                  <TrendingUp className="w-4 h-4 mr-1" />
-                  <span>En traitement</span>
-                </div>
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
                 <FileText className="w-8 h-8 text-purple-600" />
