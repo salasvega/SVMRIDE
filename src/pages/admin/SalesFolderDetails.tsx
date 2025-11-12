@@ -39,6 +39,7 @@ interface SalesFolder {
     model: string;
     year: number;
     type: string;
+    images?: string[];
   };
 }
 
@@ -125,6 +126,7 @@ export function SalesFolderDetails() {
   const [folder, setFolder] = useState<SalesFolder | null>(null);
   const [loading, setLoading] = useState(true);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [vehicleThumbnail, setVehicleThumbnail] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -139,7 +141,7 @@ export function SalesFolderDetails() {
         .select(
           `
           *,
-          vehicle:vehicles(brand, model, year, type)
+          vehicle:vehicles(brand, model, year, type, images)
         `
         )
         .eq('id', id)
@@ -148,6 +150,10 @@ export function SalesFolderDetails() {
       if (error) throw error;
 
       setFolder(data);
+
+      if (data?.vehicle?.images && data.vehicle.images.length > 0) {
+        setVehicleThumbnail(data.vehicle.images[0]);
+      }
     } catch (error) {
       console.error('Error fetching folder:', error);
     } finally {
@@ -257,6 +263,18 @@ export function SalesFolderDetails() {
                     {folder.vehicle.brand} {folder.vehicle.model}
                   </p>
                 </div>
+                {vehicleThumbnail && (
+                  <div>
+                    <p className="text-sm text-[#666666] mb-2">Aperçu</p>
+                    <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-[#E5E5E5]">
+                      <img
+                        src={vehicleThumbnail}
+                        alt="Véhicule"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-[#666666]">Année</p>
