@@ -11,7 +11,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/admin/login');
+    navigate('/');
   };
 
   return (
