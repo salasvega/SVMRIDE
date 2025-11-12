@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { CheckCircle, Calculator, FileText } from 'lucide-react';
+import { CheckCircle, Calculator, FileText, HelpCircle } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
@@ -448,6 +448,7 @@ export function Financing() {
                     fullWidth
                     size="lg"
                   >
+                    <HelpCircle className="w-5 h-5" />
                     {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma question'}
                   </Button>
 
