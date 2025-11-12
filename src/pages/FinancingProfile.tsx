@@ -232,6 +232,38 @@ export function FinancingProfile() {
   };
 
   const validateProfile = (): boolean => {
+    const fieldLabels: Record<string, string> = {
+      last_name: 'Nom',
+      first_name: 'Prénom',
+      birth_postal_code: 'Code postal de naissance',
+      birth_date: 'Date de naissance',
+      current_address: 'Adresse actuelle',
+      phone_number: 'Numéro de téléphone',
+      email: 'Adresse email',
+      housing_entry_date: 'Date d\'entrée dans le logement',
+      housing_status: 'Occupation dans le logement',
+      job_title: 'Emploi/poste occupé',
+      employment_start_date: 'Date d\'entrée (emploi)',
+      contract_type: 'Type de contrat',
+      monthly_net_salary: 'Salaire net mensuel',
+      marital_status: 'Situation maritale',
+      vehicle_to_finance: 'Véhicule à financer',
+      desired_duration: 'Durée souhaitée',
+    };
+
+    const documentLabels: Record<string, string> = {
+      id_card_front: 'Pièce d\'identité (recto)',
+      id_card_back: 'Pièce d\'identité (verso)',
+      driver_license_front: 'Permis de conduire (recto)',
+      driver_license_back: 'Permis de conduire (verso)',
+      proof_of_residence: 'Justificatif de domicile',
+      payslip_1: 'Bulletin de salaire 1',
+      payslip_2: 'Bulletin de salaire 2',
+      payslip_3: 'Bulletin de salaire 3',
+      tax_notice: 'Avis d\'imposition',
+      rib: 'RIB',
+    };
+
     const requiredFields = [
       'last_name', 'first_name', 'birth_postal_code', 'birth_date',
       'current_address', 'phone_number', 'email', 'housing_entry_date',
@@ -247,7 +279,8 @@ export function FinancingProfile() {
 
     for (const field of requiredFields) {
       if (!profile[field as keyof FinancingProfile]) {
-        setMessage({ type: 'error', text: `Le champ "${field}" est obligatoire` });
+        const label = fieldLabels[field] || field;
+        setMessage({ type: 'error', text: `Le champ "${label}" est obligatoire` });
         return false;
       }
     }
@@ -259,7 +292,8 @@ export function FinancingProfile() {
 
     for (const doc of requiredDocuments) {
       if (!profile[doc as keyof FinancingProfile]) {
-        setMessage({ type: 'error', text: `Le document "${doc}" est obligatoire` });
+        const label = documentLabels[doc] || doc;
+        setMessage({ type: 'error', text: `Le document "${label}" est obligatoire` });
         return false;
       }
     }
