@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, CheckCircle, Mail, FileText } from 'lucide-react';
+import { Mail, FileText } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
-import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
 
 export function AdminDashboard() {
@@ -110,85 +109,6 @@ export function AdminDashboard() {
               </div>
             </div>
           </Link>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
-          <h2 className="text-xl font-bold text-[#111111] mb-4">Actions rapides</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link
-              to="/admin/vehicles"
-              className="p-4 border-2 border-[#E5E5E5] rounded-lg hover:border-[#C62E2E] hover:bg-[#C62E2E]/5 transition-all group"
-            >
-              <div className="flex items-center space-x-3">
-                <svg className="w-6 h-6 text-[#C62E2E]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m18 14-1-3"/>
-                  <path d="m3 9 6 2a2 2 0 0 1 2-2h2a2 2 0 0 1 1.99 1.81"/>
-                  <path d="M8 17h3a1 1 0 0 0 1-1 6 6 0 0 1 6-6 1 1 0 0 0 1-1v-.75A5 5 0 0 0 17 5"/>
-                  <circle cx="19" cy="17" r="3"/>
-                  <circle cx="5" cy="17" r="3"/>
-                </svg>
-                <div>
-                  <p className="font-semibold text-[#111111] group-hover:text-[#C62E2E]">
-                    Gérer les véhicules
-                  </p>
-                  <p className="text-sm text-[#666666]">
-                    Voir, modifier ou supprimer des véhicules
-                  </p>
-                </div>
-              </div>
-            </Link>
-
-            <Link
-              to="/admin/vehicles/new"
-              className="p-4 border-2 border-[#E5E5E5] rounded-lg hover:border-[#C62E2E] hover:bg-[#C62E2E]/5 transition-all group"
-            >
-              <div className="flex items-center space-x-3">
-                <Plus className="w-6 h-6 text-[#C62E2E]" />
-                <div>
-                  <p className="font-semibold text-[#111111] group-hover:text-[#C62E2E]">
-                    Ajouter un véhicule
-                  </p>
-                  <p className="text-sm text-[#666666]">
-                    Créer une nouvelle fiche véhicule
-                  </p>
-                </div>
-              </div>
-            </Link>
-
-            <Link
-              to="/admin/submissions"
-              className="p-4 border-2 border-[#E5E5E5] rounded-lg hover:border-[#C62E2E] hover:bg-[#C62E2E]/5 transition-all group"
-            >
-              <div className="flex items-center space-x-3">
-                <Mail className="w-6 h-6 text-[#C62E2E]" />
-                <div>
-                  <p className="font-semibold text-[#111111] group-hover:text-[#C62E2E]">
-                    Consulter les messages
-                  </p>
-                  <p className="text-sm text-[#666666]">
-                    Voir tous les messages reçus
-                  </p>
-                </div>
-              </div>
-            </Link>
-
-            <Link
-              to="/admin/financing-profiles"
-              className="p-4 border-2 border-[#E5E5E5] rounded-lg hover:border-[#C62E2E] hover:bg-[#C62E2E]/5 transition-all group"
-            >
-              <div className="flex items-center space-x-3">
-                <FileText className="w-6 h-6 text-[#C62E2E]" />
-                <div>
-                  <p className="font-semibold text-[#111111] group-hover:text-[#C62E2E]">
-                    Dossiers financement
-                  </p>
-                  <p className="text-sm text-[#666666]">
-                    Consulter les dossiers complets
-                  </p>
-                </div>
-              </div>
-            </Link>
-          </div>
         </div>
       </div>
     </AdminLayout>
