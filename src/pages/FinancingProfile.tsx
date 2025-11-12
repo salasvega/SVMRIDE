@@ -549,7 +549,7 @@ export function FinancingProfile() {
         />
       )}
 
-      <Section className="py-12 bg-gray-50">
+      <Section className="py-8 bg-gray-50">
         <Container>
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-8">
