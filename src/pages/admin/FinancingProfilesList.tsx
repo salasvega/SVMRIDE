@@ -249,15 +249,15 @@ export default function FinancingProfilesList() {
           onClose={() => setMessage(null)}
         />
       )}
-      <Container className="py-8">
-        <div className="flex justify-between items-center mb-8">
+      <Container> 
+<div className="mb-8">
+
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">Dossiers de Financement</h1>
-            <p className="text-[#666666] mt-1">
-              {filteredProfiles.length} dossier{filteredProfiles.length > 1 ? 's' : ''}
-            </p>
+            <p className="text-[#666666]">{filteredProfiles.length} dossier{filteredProfiles.length > 1 ? 's' : ''}
+           </p>
           </div>
-        </div>
+
 
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E5E5] mb-6">
           <div className="p-6 border-b border-[#E5E5E5]">
