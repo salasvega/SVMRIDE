@@ -308,8 +308,8 @@ export function SalesFolderDetails() {
                         <Package className="w-4 h-4 text-[#D10000]" />
                       </div>
                       <div>
-                        <p className="text-sm text-[#666666]">Type</p>
-                        <p className="text-[#111111] font-semibold capitalize">{folder.vehicle.type}</p>
+                        <p className="text-sm text-[#666666]">Prix affiché</p>
+                        <p className="text-[#111111] font-semibold capitalize">{folder.vehicle.price}</p>
                       </div>
                     </div>
                   </div>
