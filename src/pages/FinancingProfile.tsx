@@ -553,7 +553,8 @@ export function FinancingProfile() {
         <Container>
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-8">
-         
+              <div className="flex items-center justify-between mb-8">
+                <div>
                   <h1 className="text-3xl font-bold text-gray-900">Mon Dossier Financement</h1>
                   <p className="text-gray-600 mt-2">
                     Complétez votre dossier pour soumettre votre demande de financement
@@ -566,7 +567,6 @@ export function FinancingProfile() {
                   </div>
                 )}
               </div>
-
 
               <form className="space-y-8">
                 <div>
