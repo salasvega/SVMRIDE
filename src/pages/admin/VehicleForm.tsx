@@ -411,7 +411,7 @@ export function VehicleForm() {
             {formData.status !== 'sold' && (
               <>
                 <Input
-                  label="Prix d'achat (€)"
+                  label="Prix de revient (€)"
                   type="number"
                   value={formData.purchase_price}
                   onChange={(e) =>
