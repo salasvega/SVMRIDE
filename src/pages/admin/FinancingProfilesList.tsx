@@ -88,6 +88,36 @@ export default function FinancingProfilesList() {
     if (!profileToDelete) return;
 
     try {
+      const profile = profiles.find((p) => p.id === profileToDelete);
+      if (!profile) return;
+
+      const documentFields = [
+        profile.id_card_front,
+        profile.id_card_back,
+        profile.driver_license_front,
+        profile.driver_license_back,
+        profile.proof_of_residence,
+        profile.payslip_1,
+        profile.payslip_2,
+        profile.payslip_3,
+        profile.tax_notice,
+        profile.rib,
+        profile.hosting_certificate,
+        profile.host_id_card,
+      ];
+
+      const filesToDelete = documentFields.filter((path) => path && path.trim() !== '');
+
+      if (filesToDelete.length > 0) {
+        const { error: storageError } = await supabase.storage
+          .from('financing-documents')
+          .remove(filesToDelete);
+
+        if (storageError) {
+          console.error('Error deleting files from storage:', storageError);
+        }
+      }
+
       const { error } = await supabase
         .from('user_financing_profiles')
         .delete()
