@@ -448,7 +448,7 @@ export function Financing() {
                     fullWidth
                     size="lg"
                   >
-                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer la demande'}
+                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer la question'}
                   </Button>
 
                   <Link
