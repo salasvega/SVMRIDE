@@ -314,7 +314,7 @@ export function SalesFolderDetails() {
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <DollarSign className="w-5 h-5 text-green-600" />
             </div>
-            <h2 className="text-xl font-bold text-[#111111]">Informations Financières</h2>
+            <h2 className="text-xl font-bold text-[#111111]">Informations de Vente</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
@@ -352,6 +352,13 @@ export function SalesFolderDetails() {
             </div>
           )}
         </div>
+
+        {folder.admin_notes && (
+          <div className="bg-yellow-50 rounded-lg p-6 border-2 border-yellow-200">
+            <h2 className="text-lg font-bold text-[#111111] mb-2">Notes Internes</h2>
+            <p className="text-[#666666] whitespace-pre-line">{folder.admin_notes}</p>
+          </div>
+        )}
 
         <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
           <div className="flex items-center gap-3 mb-4">
@@ -397,13 +404,6 @@ export function SalesFolderDetails() {
             <p className="text-center text-[#666666] py-8">Aucun document téléchargé</p>
           )}
         </div>
-
-        {folder.admin_notes && (
-          <div className="bg-yellow-50 rounded-lg p-6 border-2 border-yellow-200">
-            <h2 className="text-lg font-bold text-[#111111] mb-2">Notes Internes</h2>
-            <p className="text-[#666666] whitespace-pre-line">{folder.admin_notes}</p>
-          </div>
-        )}
 
         <div className="flex justify-end">
           <Link to={`/admin/sales-folders/edit/${folder.id}`}>
