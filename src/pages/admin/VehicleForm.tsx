@@ -491,7 +491,7 @@ export function VehicleForm() {
                   required
                   min="0"
                   placeholder="ex: 5000"
-                  helperText="Somme du prix d'achat du véhicule + des frais engagés pour la mise en vente"
+                  helperText="Somme des couts d'achat du véhicule + des frais engagés pour sa mise en vente"
                 />
                 <Input
                   label="Prix de vente final (€)"
