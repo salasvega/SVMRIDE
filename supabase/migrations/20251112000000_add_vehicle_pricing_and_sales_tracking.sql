@@ -43,6 +43,6 @@ END $$;
 
 -- Add helpful comment to clarify the price columns
 COMMENT ON COLUMN vehicles.price IS 'Prix de mise en vente (listing price)';
-COMMENT ON COLUMN vehicles.purchase_price IS 'Prix d''achat du véhicule';
+COMMENT ON COLUMN vehicles.purchase_price IS 'Prix de revient du véhicule';
 COMMENT ON COLUMN vehicles.sale_price IS 'Prix de vente final (uniquement si vendu)';
 COMMENT ON COLUMN vehicles.sale_date IS 'Date de vente du véhicule';
