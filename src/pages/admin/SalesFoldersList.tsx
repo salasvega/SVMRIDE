@@ -173,7 +173,12 @@ export function SalesFoldersList() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg p-4 border-2 border-[#D1D5DB]">
+          <button
+            onClick={() => setStatusFilter('all')}
+            className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
+              statusFilter === 'all' ? 'border-[#FF5C00] ring-2 ring-[#FF5C00] ring-opacity-20' : 'border-[#D1D5DB]'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666]">Total</p>
@@ -181,8 +186,13 @@ export function SalesFoldersList() {
               </div>
               <FileText className="w-8 h-8 text-[#FF5C00]" />
             </div>
-          </div>
-          <div className="bg-white rounded-lg p-4 border-2 border-[#D1D5DB]">
+          </button>
+          <button
+            onClick={() => setStatusFilter('en_cours')}
+            className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
+              statusFilter === 'en_cours' ? 'border-yellow-600 ring-2 ring-yellow-600 ring-opacity-20' : 'border-[#D1D5DB]'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666]">En cours</p>
@@ -190,8 +200,13 @@ export function SalesFoldersList() {
               </div>
               <FileText className="w-8 h-8 text-yellow-600" />
             </div>
-          </div>
-          <div className="bg-white rounded-lg p-4 border-2 border-[#D1D5DB]">
+          </button>
+          <button
+            onClick={() => setStatusFilter('complete')}
+            className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
+              statusFilter === 'complete' ? 'border-green-600 ring-2 ring-green-600 ring-opacity-20' : 'border-[#D1D5DB]'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666]">Complétés</p>
@@ -199,8 +214,13 @@ export function SalesFoldersList() {
               </div>
               <FileText className="w-8 h-8 text-green-600" />
             </div>
-          </div>
-          <div className="bg-white rounded-lg p-4 border-2 border-[#D1D5DB]">
+          </button>
+          <button
+            onClick={() => setStatusFilter('archive')}
+            className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
+              statusFilter === 'archive' ? 'border-gray-600 ring-2 ring-gray-600 ring-opacity-20' : 'border-[#D1D5DB]'
+            }`}
+          >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#666666]">Archivés</p>
@@ -208,7 +228,7 @@ export function SalesFoldersList() {
               </div>
               <FileText className="w-8 h-8 text-gray-600" />
             </div>
-          </div>
+          </button>
         </div>
 
         <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
