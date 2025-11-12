@@ -6,8 +6,9 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
+import { FileUpload, UploadedDoc } from '../../components/ui/FileUpload';
 import Toast from '../../components/ui/Toast';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, FileText, Download, Trash2, X } from 'lucide-react';
 
 interface Vehicle {
   id: string;
@@ -33,6 +34,73 @@ interface FormData {
   admin_notes: string;
 }
 
+interface DocumentMetadata {
+  type: string;
+  filename: string;
+  path: string;
+  upload_date: string;
+}
+
+const documentTypes: Record<string, string> = {
+  facture: 'Facture',
+  carte_grise: 'Carte grise',
+  piece_identite: 'Pièce d\'identité',
+  controle_technique: 'Contrôle technique',
+  contrat: 'Contrat de vente',
+  autre: 'Autre document',
+};
+
+function DocumentThumbnail({ doc, onClick }: { doc: DocumentMetadata; onClick: () => void }) {
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadThumbnail() {
+      try {
+        const { data, error } = await supabase.storage
+          .from('sales-documents')
+          .createSignedUrl(doc.path, 3600);
+
+        if (error) throw error;
+        if (data) {
+          setThumbnailUrl(data.signedUrl);
+        }
+      } catch (error) {
+        console.error('Error loading thumbnail:', error);
+      }
+    }
+
+    const isImage = doc.filename.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+    if (isImage) {
+      loadThumbnail();
+    }
+  }, [doc.path, doc.filename]);
+
+  const isImage = doc.filename.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+
+  if (isImage && thumbnailUrl) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-[#D10000]"
+        title="Aperçu"
+      >
+        <img
+          src={thumbnailUrl}
+          alt={doc.filename}
+          className="w-full h-full object-cover"
+        />
+      </button>
+    );
+  }
+
+  return (
+    <div className="w-10 h-10 bg-[#F5F5F5] text-[#666666] rounded-md flex items-center justify-center flex-shrink-0">
+      <FileText className="w-5 h-5" />
+    </div>
+  );
+}
+
 export function SalesFolderForm() {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -41,6 +109,11 @@ export function SalesFolderForm() {
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [existingDocuments, setExistingDocuments] = useState<DocumentMetadata[]>([]);
+  const [filesToUpload, setFilesToUpload] = useState<UploadedDoc[]>([]);
+  const [uploadType, setUploadType] = useState('facture');
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     vehicle_id: '',
     status: 'en_cours',
@@ -106,6 +179,7 @@ export function SalesFolderForm() {
           payment_method: data.payment_method || '',
           admin_notes: data.admin_notes || '',
         });
+        setExistingDocuments(data.documents || []);
       }
     } catch (error) {
       console.error('Error fetching folder:', error);
@@ -130,6 +204,119 @@ export function SalesFolderForm() {
   ) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+
+  async function handleUploadDocuments() {
+    if (filesToUpload.length === 0 || !id) return;
+
+    setUploading(true);
+
+    try {
+      const newDocuments: DocumentMetadata[] = [];
+
+      for (const doc of filesToUpload) {
+        const file = doc.file;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${id}/${uploadType}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('sales-documents')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        newDocuments.push({
+          type: uploadType,
+          filename: file.name,
+          path: filePath,
+          upload_date: new Date().toISOString(),
+        });
+      }
+
+      const updatedDocuments = [...existingDocuments, ...newDocuments];
+
+      const { error: updateError } = await supabase
+        .from('sales_folders')
+        .update({ documents: updatedDocuments })
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+
+      setExistingDocuments(updatedDocuments);
+      setFilesToUpload([]);
+      setToast({ type: 'success', message: 'Documents uploadés avec succès' });
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      setToast({ type: 'error', message: 'Erreur lors du téléchargement des fichiers' });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handlePreviewDocument(doc: DocumentMetadata) {
+    try {
+      const { data, error } = await supabase.storage
+        .from('sales-documents')
+        .createSignedUrl(doc.path, 3600);
+
+      if (error) throw error;
+      if (data) {
+        setPreviewUrl(data.signedUrl);
+      }
+    } catch (error) {
+      console.error('Error creating preview URL:', error);
+      setToast({ type: 'error', message: 'Erreur lors de la prévisualisation du document' });
+    }
+  }
+
+  async function handleDownload(doc: DocumentMetadata) {
+    try {
+      const { data, error } = await supabase.storage
+        .from('sales-documents')
+        .download(doc.path);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = doc.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      setToast({ type: 'error', message: 'Erreur lors du téléchargement du fichier' });
+    }
+  }
+
+  async function handleDeleteDocument(doc: DocumentMetadata) {
+    if (!confirm(`Supprimer le document "${doc.filename}" ?`)) return;
+
+    try {
+      const { error: storageError } = await supabase.storage
+        .from('sales-documents')
+        .remove([doc.path]);
+
+      if (storageError) throw storageError;
+
+      const updatedDocuments = existingDocuments.filter((d) => d.path !== doc.path);
+
+      const { error: updateError } = await supabase
+        .from('sales_folders')
+        .update({ documents: updatedDocuments })
+        .eq('id', id);
+
+      if (updateError) throw updateError;
+
+      setExistingDocuments(updatedDocuments);
+      setToast({ type: 'success', message: 'Document supprimé avec succès' });
+    } catch (error) {
+      console.error('Error deleting document:', error);
+      setToast({ type: 'error', message: 'Erreur lors de la suppression du document' });
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -347,6 +534,97 @@ export function SalesFolderForm() {
             />
           </div>
 
+          {isEditing && (
+            <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
+              <h2 className="text-xl font-bold text-[#111111] mb-4">Documents</h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[#111111] mb-2">
+                    Type de document
+                  </label>
+                  <select
+                    value={uploadType}
+                    onChange={(e) => setUploadType(e.target.value)}
+                    className="w-full px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm"
+                  >
+                    {Object.entries(documentTypes).map(([key, label]) => (
+                      <option key={key} value={key}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <FileUpload
+                  label="Ajouter des documents"
+                  maxFiles={10}
+                  maxSizeMB={10}
+                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,application/pdf,image/*"
+                  value={filesToUpload}
+                  onChange={setFilesToUpload}
+                />
+
+                {filesToUpload.length > 0 && (
+                  <Button
+                    type="button"
+                    onClick={handleUploadDocuments}
+                    disabled={uploading}
+                    className="w-full"
+                  >
+                    {uploading ? 'Upload en cours...' : `Uploader ${filesToUpload.length} document(s)`}
+                  </Button>
+                )}
+              </div>
+
+              {existingDocuments.length > 0 && (
+                <div className="mt-6 pt-6 border-t border-[#E5E5E5]">
+                  <h3 className="text-sm font-semibold text-[#111111] mb-3">Documents téléchargés</h3>
+                  <div className="space-y-2">
+                    {existingDocuments.map((doc, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1">
+                          <DocumentThumbnail
+                            doc={doc}
+                            onClick={() => handlePreviewDocument(doc)}
+                          />
+                          <div>
+                            <p className="text-sm font-medium text-[#111111]">{doc.filename}</p>
+                            <p className="text-xs text-[#666666]">
+                              {documentTypes[doc.type] || doc.type} •{' '}
+                              {new Date(doc.upload_date).toLocaleDateString('fr-FR')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleDownload(doc)}
+                            className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Télécharger"
+                          >
+                            <Download className="w-4 h-4 text-blue-600" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDocument(doc)}
+                            className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                            title="Supprimer"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           <div className="flex justify-end gap-4">
             <Button
               type="button"
@@ -368,6 +646,34 @@ export function SalesFolderForm() {
             message={toast.message}
             onClose={() => setToast(null)}
           />
+        )}
+
+        {previewUrl && (
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            role="dialog"
+            aria-modal="true"
+            onClick={() => setPreviewUrl(null)}
+          >
+            <div
+              className="relative max-w-full max-h-full flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="absolute -top-4 -right-4 bg-white text-[#111111] rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
+                onClick={() => setPreviewUrl(null)}
+                aria-label="Fermer l'aperçu"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <img
+                src={previewUrl}
+                alt="Aperçu du document"
+                className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-2xl object-contain bg-[#111111]"
+              />
+            </div>
+          </div>
         )}
       </div>
     </AdminLayout>

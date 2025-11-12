@@ -3,17 +3,16 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/Button';
-import { FileUpload, UploadedDoc } from '../../components/ui/FileUpload';
 import {
   ArrowLeft,
   Edit,
   Download,
-  Trash2,
   FileText,
   User,
   Calendar,
   DollarSign,
   Package,
+  X,
 } from 'lucide-react';
 
 interface SalesFolder {
@@ -125,9 +124,7 @@ export function SalesFolderDetails() {
   const { id } = useParams();
   const [folder, setFolder] = useState<SalesFolder | null>(null);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [uploadType, setUploadType] = useState('facture');
-  const [filesToUpload, setFilesToUpload] = useState<UploadedDoc[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -158,52 +155,6 @@ export function SalesFolderDetails() {
     }
   }
 
-  async function handleUploadDocuments() {
-    if (filesToUpload.length === 0 || !folder) return;
-
-    setUploading(true);
-
-    try {
-      const newDocuments: DocumentMetadata[] = [];
-
-      for (const doc of filesToUpload) {
-        const file = doc.file;
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `${folder.id}/${uploadType}/${fileName}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('sales-documents')
-          .upload(filePath, file);
-
-        if (uploadError) throw uploadError;
-
-        newDocuments.push({
-          type: uploadType,
-          filename: file.name,
-          path: filePath,
-          upload_date: new Date().toISOString(),
-        });
-      }
-
-      const updatedDocuments = [...(folder.documents || []), ...newDocuments];
-
-      const { error: updateError } = await supabase
-        .from('sales_folders')
-        .update({ documents: updatedDocuments })
-        .eq('id', folder.id);
-
-      if (updateError) throw updateError;
-
-      setFilesToUpload([]);
-      await fetchFolder();
-    } catch (error) {
-      console.error('Error uploading files:', error);
-      alert('Erreur lors du téléchargement des fichiers');
-    } finally {
-      setUploading(false);
-    }
-  }
 
   async function handleDownload(doc: DocumentMetadata) {
     try {
@@ -227,11 +178,7 @@ export function SalesFolderDetails() {
     }
   }
 
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [loadingPreview, setLoadingPreview] = useState(false);
-
   async function handlePreviewDocument(doc: DocumentMetadata) {
-    setLoadingPreview(true);
     try {
       const { data, error } = await supabase.storage
         .from('sales-documents')
@@ -244,41 +191,9 @@ export function SalesFolderDetails() {
     } catch (error) {
       console.error('Error creating preview URL:', error);
       alert('Erreur lors de la prévisualisation du document');
-    } finally {
-      setLoadingPreview(false);
     }
   }
 
-  function closePreview() {
-    setPreviewUrl(null);
-  }
-
-  async function handleDeleteDocument(doc: DocumentMetadata) {
-    if (!folder) return;
-    if (!confirm(`Supprimer le document "${doc.filename}" ?`)) return;
-
-    try {
-      const { error: storageError } = await supabase.storage
-        .from('sales-documents')
-        .remove([doc.path]);
-
-      if (storageError) throw storageError;
-
-      const updatedDocuments = folder.documents.filter((d) => d.path !== doc.path);
-
-      const { error: updateError } = await supabase
-        .from('sales_folders')
-        .update({ documents: updatedDocuments })
-        .eq('id', folder.id);
-
-      if (updateError) throw updateError;
-
-      await fetchFolder();
-    } catch (error) {
-      console.error('Error deleting document:', error);
-      alert('Erreur lors de la suppression du document');
-    }
-  }
 
   if (loading) {
     return (
@@ -454,48 +369,7 @@ export function SalesFolderDetails() {
             <h2 className="text-xl font-bold text-[#111111]">Documents</h2>
           </div>
 
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-[#111111] mb-2">
-                Type de document
-              </label>
-              <select
-                value={uploadType}
-                onChange={(e) => setUploadType(e.target.value)}
-                className="w-full px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm"
-              >
-                {Object.entries(documentTypes).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <FileUpload
-              label="Ajouter des documents"
-              maxFiles={10}
-              maxSizeMB={10}
-              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,application/pdf,image/*"
-              value={filesToUpload}
-              onChange={setFilesToUpload}
-            />
-
-            {filesToUpload.length > 0 && (
-              <Button
-                onClick={handleUploadDocuments}
-                disabled={uploading}
-                className="w-full"
-              >
-                {uploading ? 'Upload en cours...' : `Uploader ${filesToUpload.length} document(s)`}
-              </Button>
-            )}
-          </div>
-
-          <div className="mt-6 pt-6 border-t border-[#E5E5E5]">
-            <h3 className="text-sm font-semibold text-[#111111] mb-3">Documents téléchargés</h3>
-
-            {folder.documents && folder.documents.length > 0 ? (
+          {folder.documents && folder.documents.length > 0 ? (
               <div className="space-y-2">
                 {folder.documents.map((doc, index) => (
                   <div
@@ -523,21 +397,13 @@ export function SalesFolderDetails() {
                       >
                         <Download className="w-4 h-4 text-blue-600" />
                       </button>
-                      <button
-                        onClick={() => handleDeleteDocument(doc)}
-                        className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Supprimer"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </button>
                     </div>
                   </div>
                 ))}
               </div>
-            ) : (
-              <p className="text-center text-[#666666] py-8">Aucun document téléchargé</p>
-            )}
-          </div>
+          ) : (
+            <p className="text-center text-[#666666] py-8">Aucun document téléchargé</p>
+          )}
         </div>
 
         {folder.admin_notes && (
@@ -553,7 +419,7 @@ export function SalesFolderDetails() {
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
           role="dialog"
           aria-modal="true"
-          onClick={closePreview}
+          onClick={() => setPreviewUrl(null)}
         >
           <div
             className="relative max-w-full max-h-full flex items-center justify-center"
@@ -562,10 +428,10 @@ export function SalesFolderDetails() {
             <button
               type="button"
               className="absolute -top-4 -right-4 bg-white text-[#111111] rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
-              onClick={closePreview}
+              onClick={() => setPreviewUrl(null)}
               aria-label="Fermer l'aperçu"
             >
-              <FileText className="w-5 h-5" />
+              <X className="w-5 h-5" />
             </button>
             <img
               src={previewUrl}
