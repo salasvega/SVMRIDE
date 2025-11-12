@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Edit, Trash2, Eye, EyeOff, Plus } from 'lucide-react';
+import { Edit, Trash2, Eye, EyeOff, Plus, Search } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
@@ -14,6 +14,9 @@ export function VehiclesList() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [vehicleToDelete, setVehicleToDelete] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     fetchVehicles();
@@ -60,6 +63,19 @@ export function VehiclesList() {
     navigate(`/admin/vehicles/edit/${vehicleId}`);
   }
 
+  const filteredVehicles = vehicles.filter((vehicle) => {
+    const matchesSearch =
+      vehicle.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.model.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesType = typeFilter === 'all' || vehicle.type === typeFilter;
+
+    const vehicleStatus = (vehicle as any).status || 'available';
+    const matchesStatus = statusFilter === 'all' || vehicleStatus === statusFilter;
+
+    return matchesSearch && matchesType && matchesStatus;
+  });
+
   if (loading) {
     return (
       <AdminLayout>
@@ -76,7 +92,7 @@ export function VehiclesList() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">Véhicules</h1>
-            <p className="text-[#666666] mt-1">{vehicles.length} véhicules au total</p>
+            <p className="text-[#666666] mt-1">{filteredVehicles.length} véhicule{filteredVehicles.length > 1 ? 's' : ''}</p>
           </div>
           <Link to="/admin/vehicles/new">
             <Button className="flex items-center space-x-2">
@@ -87,6 +103,43 @@ export function VehiclesList() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E5E5] overflow-hidden">
+          <div className="p-6 border-b border-[#E5E5E5]">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#666666] w-5 h-5" />
+                <input
+                  type="text"
+                  placeholder="Rechercher par marque, modèle..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent"
+                />
+              </div>
+
+              <div className="flex gap-4">
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="min-w-[120px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent bg-white text-[#111111]"
+                >
+                  <option value="all">Tous types</option>
+                  <option value="moto">Moto</option>
+                  <option value="scooter">Scooter</option>
+                </select>
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="min-w-[150px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent bg-white text-[#111111]"
+                >
+                  <option value="all">Tous les statuts</option>
+                  <option value="available">Disponible</option>
+                  <option value="reserved">Réservé</option>
+                  <option value="sold">Vendu</option>
+                </select>
+              </div>
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-[#F9F9F9] border-b border-[#E5E5E5]">
@@ -118,7 +171,14 @@ export function VehiclesList() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#E5E5E5]">
-                {vehicles.map((vehicle) => (
+                {filteredVehicles.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-12 text-center text-[#666666]">
+                      Aucun véhicule trouvé
+                    </td>
+                  </tr>
+                ) : (
+                  filteredVehicles.map((vehicle) => (
                   <tr
                     key={vehicle.id}
                     className="hover:bg-[#F9F9F9] cursor-pointer"
@@ -212,7 +272,8 @@ export function VehiclesList() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  ))
+                )}
               </tbody>
             </table>
           </div>
