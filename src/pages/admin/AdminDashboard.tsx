@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Mail, FileText } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
+import { useUnreadCount } from '../../hooks/useUnreadCount';
 
 function AnimatedCounter({ value, duration = 1000 }: { value: number; duration?: number }) {
   const [count, setCount] = useState(0);
@@ -40,6 +41,7 @@ function AnimatedCounter({ value, duration = 1000 }: { value: number; duration?:
 }
 
 export function AdminDashboard() {
+  const { count: unreadCount } = useUnreadCount();
   const [stats, setStats] = useState({
     total: 0,
     available: 0,
@@ -139,8 +141,13 @@ export function AdminDashboard() {
                   <AnimatedCounter value={stats.submissions} />
                 </p>
               </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+              <div className="relative w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
                 <Mail className="w-8 h-8 text-orange-600" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
               </div>
             </div>
           </Link>
