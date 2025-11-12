@@ -107,7 +107,7 @@ export function VehiclesList() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-[#111111]">Véhicules</h1>
-            <p className="text-[#666666] mt-1">Gérez votre inventaire de véhicules</p>
+            
           </div>
           <Link to="/admin/vehicles/new">
             <Button className="flex items-center space-x-2">
