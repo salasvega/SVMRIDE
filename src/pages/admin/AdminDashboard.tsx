@@ -57,6 +57,7 @@ export function AdminDashboard() {
     stockValue: 0,
     totalMargin: 0,
     averageMargin: 0,
+    averageMarginPercentage: 0,
   });
 
   useEffect(() => {
@@ -99,6 +100,9 @@ export function AdminDashboard() {
         const totalMargin = soldWithMargin.reduce((sum, v) => sum + ((v.sale_price || 0) - (v.purchase_price || 0)), 0);
         const averageMargin = soldWithMargin.length > 0 ? totalMargin / soldWithMargin.length : 0;
 
+        const totalPurchasePrice = soldWithMargin.reduce((sum, v) => sum + (v.purchase_price || 0), 0);
+        const averageMarginPercentage = totalPurchasePrice > 0 ? (totalMargin / totalPurchasePrice) * 100 : 0;
+
         setStats({
           total: typedVehicles.length,
           available: availableVehicles.length,
@@ -111,6 +115,7 @@ export function AdminDashboard() {
           stockValue,
           totalMargin,
           averageMargin,
+          averageMarginPercentage,
         });
       }
     }
@@ -289,11 +294,19 @@ export function AdminDashboard() {
                   {stats.totalMargin.toLocaleString('fr-FR')} €
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-[#666666]">Marge moyenne</p>
-                <p className="text-xl font-bold text-[#111111]">
-                  {stats.averageMargin.toLocaleString('fr-FR')} €
-                </p>
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm text-[#666666]">Marge moyenne</p>
+                  <p className="text-xl font-bold text-[#111111]">
+                    {stats.averageMargin.toLocaleString('fr-FR')} €
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-[#666666]">% de marge moyenne</p>
+                  <p className="text-xl font-bold text-green-600">
+                    {stats.averageMarginPercentage.toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %
+                  </p>
+                </div>
               </div>
             </div>
           </div>
