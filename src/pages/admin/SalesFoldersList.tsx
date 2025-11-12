@@ -261,25 +261,25 @@ export function SalesFoldersList() {
               <thead>
                 <tr className="border-b border-[#E5E5E5]">
                    <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    Statut
+                    STATUT
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    N° Dossier
+                    N° DOSSIER
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    Client
+                    CLIENT
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    Véhicule
+                    VEHICULE
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    Date
+                    DATE
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    Prix
+                    PRIX
                   </th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    Actions
+                    ACTIONS
                   </th>
                 </tr>
               </thead>
