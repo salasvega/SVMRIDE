@@ -404,7 +404,8 @@ export function FinancingProfile() {
         .from('user_financing_profiles')
         .update({
           status: 'draft',
-          is_complete: false
+          is_complete: false,
+          submitted_at: null
         })
         .eq('id', profile.id);
 
@@ -413,7 +414,8 @@ export function FinancingProfile() {
       setProfile(prev => ({
         ...prev,
         status: 'draft',
-        is_complete: false
+        is_complete: false,
+        submitted_at: undefined
       }));
 
       setMessage({ type: 'success', text: 'Dossier réouvert pour modification' });
