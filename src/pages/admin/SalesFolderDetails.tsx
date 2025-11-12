@@ -218,38 +218,61 @@ export function SalesFolderDetails() {
   return (
     <AdminLayout>
       <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <button
-              onClick={() => navigate('/admin/sales-folders')}
-              className="flex items-center gap-2 text-[#666666] hover:text-[#FF5C00] mb-4"
+        <div>
+          <button
+            onClick={() => navigate('/admin/sales-folders')}
+            className="flex items-center gap-2 text-[#666666] hover:text-[#FF5C00] mb-4"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Retour aux dossiers
+          </button>
+          <div className="flex items-center gap-4">
+            <h1 className="text-3xl font-bold text-[#111111]">{folder.folder_number}</h1>
+            <span
+              className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                statusColors[folder.status]
+              }`}
             >
-              <ArrowLeft className="w-5 h-5" />
-              Retour aux dossiers
-            </button>
-            <div className="flex items-center gap-4">
-              <h1 className="text-3xl font-bold text-[#111111]">{folder.folder_number}</h1>
-              <span
-                className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                  statusColors[folder.status]
-                }`}
-              >
-                {statusLabels[folder.status]}
-              </span>
-            </div>
-            <p className="text-[#666666] mt-1">
-              Créé le {new Date(folder.created_at).toLocaleDateString('fr-FR')}
-            </p>
+              {statusLabels[folder.status]}
+            </span>
           </div>
-          <Link to={`/admin/sales-folders/edit/${folder.id}`}>
-            <Button className="flex items-center gap-2">
-              <Edit className="w-5 h-5" />
-              Modifier
-            </Button>
-          </Link>
+          <p className="text-[#666666] mt-1">
+            Créé le {new Date(folder.created_at).toLocaleDateString('fr-FR')}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
+                <Package className="w-5 h-5 text-orange-600" />
+              </div>
+              <h2 className="text-xl font-bold text-[#111111]">Véhicule</h2>
+            </div>
+            {folder.vehicle ? (
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-[#666666]">Modèle</p>
+                  <p className="text-[#111111] font-semibold text-lg">
+                    {folder.vehicle.brand} {folder.vehicle.model}
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-[#666666]">Année</p>
+                    <p className="text-[#111111]">{folder.vehicle.year}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-[#666666]">Type</p>
+                    <p className="text-[#111111] capitalize">{folder.vehicle.type}</p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-[#666666]">Aucun véhicule associé</p>
+            )}
+          </div>
+
           <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -283,37 +306,6 @@ export function SalesFolderDetails() {
                 </div>
               )}
             </div>
-          </div>
-
-          <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Package className="w-5 h-5 text-orange-600" />
-              </div>
-              <h2 className="text-xl font-bold text-[#111111]">Véhicule</h2>
-            </div>
-            {folder.vehicle ? (
-              <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-[#666666]">Modèle</p>
-                  <p className="text-[#111111] font-semibold text-lg">
-                    {folder.vehicle.brand} {folder.vehicle.model}
-                  </p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-[#666666]">Année</p>
-                    <p className="text-[#111111]">{folder.vehicle.year}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-[#666666]">Type</p>
-                    <p className="text-[#111111] capitalize">{folder.vehicle.type}</p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-[#666666]">Aucun véhicule associé</p>
-            )}
           </div>
         </div>
 
@@ -412,6 +404,15 @@ export function SalesFolderDetails() {
             <p className="text-[#666666] whitespace-pre-line">{folder.admin_notes}</p>
           </div>
         )}
+
+        <div className="flex justify-end">
+          <Link to={`/admin/sales-folders/edit/${folder.id}`}>
+            <Button className="flex items-center gap-2">
+              <Edit className="w-5 h-5" />
+              Modifier
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {previewUrl && (
