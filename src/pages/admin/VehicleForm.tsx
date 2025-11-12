@@ -96,7 +96,7 @@ export function VehicleForm() {
         price: vehicle.price,
         purchase_price: vehicle.purchase_price || 0,
         sale_price: vehicle.sale_price,
-        sale_date: vehicle.sale_date,
+        sale_date: vehicle.sale_date ? vehicle.sale_date.split('T')[0] : undefined,
         mileage: vehicle.mileage,
         condition: vehicle.condition as
           | 'excellent'
