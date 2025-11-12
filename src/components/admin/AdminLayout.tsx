@@ -66,15 +66,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <Link to="/" className="text-[#666666] hover:text-[#C62E2E]" title="Voir le site">
                 <Home className="w-5 h-5" />
               </Link>
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                size="sm"
-                className="flex items-center space-x-2"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="hidden sm:inline">Déconnexion</span>
-              </Button>
             </div>
           </div>
         </div>
