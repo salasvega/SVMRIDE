@@ -3,11 +3,11 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/Button';
+import { FileUpload, UploadedDoc } from '../../components/ui/FileUpload';
 import {
   ArrowLeft,
   Edit,
   Download,
-  Upload,
   Trash2,
   FileText,
   User,
@@ -50,6 +50,56 @@ interface DocumentMetadata {
   upload_date: string;
 }
 
+function DocumentThumbnail({ doc, onClick }: { doc: DocumentMetadata; onClick: () => void }) {
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadThumbnail() {
+      try {
+        const { data, error } = await supabase.storage
+          .from('sales-documents')
+          .createSignedUrl(doc.path, 3600);
+
+        if (error) throw error;
+        if (data) {
+          setThumbnailUrl(data.signedUrl);
+        }
+      } catch (error) {
+        console.error('Error loading thumbnail:', error);
+      }
+    }
+
+    const isImage = doc.filename.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+    if (isImage) {
+      loadThumbnail();
+    }
+  }, [doc.path, doc.filename]);
+
+  const isImage = doc.filename.match(/\.(jpg|jpeg|png|gif|webp)$/i);
+
+  if (isImage && thumbnailUrl) {
+    return (
+      <button
+        onClick={onClick}
+        className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-[#D10000]"
+        title="Aper\u00e7u"
+      >
+        <img
+          src={thumbnailUrl}
+          alt={doc.filename}
+          className="w-full h-full object-cover"
+        />
+      </button>
+    );
+  }
+
+  return (
+    <div className="w-10 h-10 bg-[#F5F5F5] text-[#666666] rounded-md flex items-center justify-center flex-shrink-0">
+      <FileText className="w-5 h-5" />
+    </div>
+  );
+}
+
 const statusLabels: Record<string, string> = {
   en_cours: 'En cours',
   complete: 'Complété',
@@ -77,6 +127,7 @@ export function SalesFolderDetails() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [uploadType, setUploadType] = useState('facture');
+  const [filesToUpload, setFilesToUpload] = useState<UploadedDoc[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -107,31 +158,35 @@ export function SalesFolderDetails() {
     }
   }
 
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    if (!e.target.files || e.target.files.length === 0 || !folder) return;
+  async function handleUploadDocuments() {
+    if (filesToUpload.length === 0 || !folder) return;
 
-    const file = e.target.files[0];
     setUploading(true);
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}.${fileExt}`;
-      const filePath = `${folder.id}/${uploadType}/${fileName}`;
+      const newDocuments: DocumentMetadata[] = [];
 
-      const { error: uploadError } = await supabase.storage
-        .from('sales-documents')
-        .upload(filePath, file);
+      for (const doc of filesToUpload) {
+        const file = doc.file;
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `${folder.id}/${uploadType}/${fileName}`;
 
-      if (uploadError) throw uploadError;
+        const { error: uploadError } = await supabase.storage
+          .from('sales-documents')
+          .upload(filePath, file);
 
-      const newDocument: DocumentMetadata = {
-        type: uploadType,
-        filename: file.name,
-        path: filePath,
-        upload_date: new Date().toISOString(),
-      };
+        if (uploadError) throw uploadError;
 
-      const updatedDocuments = [...(folder.documents || []), newDocument];
+        newDocuments.push({
+          type: uploadType,
+          filename: file.name,
+          path: filePath,
+          upload_date: new Date().toISOString(),
+        });
+      }
+
+      const updatedDocuments = [...(folder.documents || []), ...newDocuments];
 
       const { error: updateError } = await supabase
         .from('sales_folders')
@@ -140,13 +195,13 @@ export function SalesFolderDetails() {
 
       if (updateError) throw updateError;
 
+      setFilesToUpload([]);
       await fetchFolder();
     } catch (error) {
-      console.error('Error uploading file:', error);
-      alert('Erreur lors du téléchargement du fichier');
+      console.error('Error uploading files:', error);
+      alert('Erreur lors du téléchargement des fichiers');
     } finally {
       setUploading(false);
-      e.target.value = '';
     }
   }
 
@@ -170,6 +225,32 @@ export function SalesFolderDetails() {
       console.error('Error downloading file:', error);
       alert('Erreur lors du téléchargement du fichier');
     }
+  }
+
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loadingPreview, setLoadingPreview] = useState(false);
+
+  async function handlePreviewDocument(doc: DocumentMetadata) {
+    setLoadingPreview(true);
+    try {
+      const { data, error } = await supabase.storage
+        .from('sales-documents')
+        .createSignedUrl(doc.path, 3600);
+
+      if (error) throw error;
+      if (data) {
+        setPreviewUrl(data.signedUrl);
+      }
+    } catch (error) {
+      console.error('Error creating preview URL:', error);
+      alert('Erreur lors de la prévisualisation du document');
+    } finally {
+      setLoadingPreview(false);
+    }
+  }
+
+  function closePreview() {
+    setPreviewUrl(null);
   }
 
   async function handleDeleteDocument(doc: DocumentMetadata) {
@@ -366,18 +447,22 @@ export function SalesFolderDetails() {
         </div>
 
         <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-purple-600" />
-              </div>
-              <h2 className="text-xl font-bold text-[#111111]">Documents</h2>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <FileText className="w-5 h-5 text-purple-600" />
             </div>
-            <div className="flex items-center gap-2">
+            <h2 className="text-xl font-bold text-[#111111]">Documents</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-[#111111] mb-2">
+                Type de document
+              </label>
               <select
                 value={uploadType}
                 onChange={(e) => setUploadType(e.target.value)}
-                className="px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm"
+                className="w-full px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm"
               >
                 {Object.entries(documentTypes).map(([key, label]) => (
                   <option key={key} value={key}>
@@ -385,65 +470,74 @@ export function SalesFolderDetails() {
                   </option>
                 ))}
               </select>
-              <input
-                id="file-upload"
-                type="file"
-                onChange={handleFileUpload}
-                disabled={uploading}
-                className="hidden"
-                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-              />
-              <Button
-                disabled={uploading}
-                className="flex items-center gap-2"
-                onClick={() => document.getElementById('file-upload')?.click()}
-                type="button"
-              >
-                <Upload className="w-4 h-4" />
-                {uploading ? 'Upload...' : 'Ajouter'}
-              </Button>
             </div>
+
+            <FileUpload
+              label="Ajouter des documents"
+              maxFiles={10}
+              maxSizeMB={10}
+              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,application/pdf,image/*"
+              value={filesToUpload}
+              onChange={setFilesToUpload}
+            />
+
+            {filesToUpload.length > 0 && (
+              <Button
+                onClick={handleUploadDocuments}
+                disabled={uploading}
+                className="w-full"
+              >
+                {uploading ? 'Upload en cours...' : `Uploader ${filesToUpload.length} document(s)`}
+              </Button>
+            )}
           </div>
 
-          {folder.documents && folder.documents.length > 0 ? (
-            <div className="space-y-2">
-              {folder.documents.map((doc, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div className="flex items-center gap-3 flex-1">
-                    <FileText className="w-5 h-5 text-[#666666]" />
-                    <div>
-                      <p className="text-sm font-medium text-[#111111]">{doc.filename}</p>
-                      <p className="text-xs text-[#666666]">
-                        {documentTypes[doc.type] || doc.type} •{' '}
-                        {new Date(doc.upload_date).toLocaleDateString('fr-FR')}
-                      </p>
+          <div className="mt-6 pt-6 border-t border-[#E5E5E5]">
+            <h3 className="text-sm font-semibold text-[#111111] mb-3">Documents téléchargés</h3>
+
+            {folder.documents && folder.documents.length > 0 ? (
+              <div className="space-y-2">
+                {folder.documents.map((doc, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-3 flex-1">
+                      <DocumentThumbnail
+                        doc={doc}
+                        onClick={() => handlePreviewDocument(doc)}
+                      />
+                      <div>
+                        <p className="text-sm font-medium text-[#111111]">{doc.filename}</p>
+                        <p className="text-xs text-[#666666]">
+                          {documentTypes[doc.type] || doc.type} •{' '}
+                          {new Date(doc.upload_date).toLocaleDateString('fr-FR')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleDownload(doc)}
+                        className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Télécharger"
+                      >
+                        <Download className="w-4 h-4 text-blue-600" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteDocument(doc)}
+                        className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Supprimer"
+                      >
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleDownload(doc)}
-                      className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
-                      title="Télécharger"
-                    >
-                      <Download className="w-4 h-4 text-blue-600" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteDocument(doc)}
-                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Supprimer"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-600" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-[#666666] py-8">Aucun document téléchargé</p>
-          )}
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-[#666666] py-8">Aucun document téléchargé</p>
+            )}
+          </div>
         </div>
 
         {folder.admin_notes && (
@@ -453,6 +547,34 @@ export function SalesFolderDetails() {
           </div>
         )}
       </div>
+
+      {previewUrl && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={closePreview}
+        >
+          <div
+            className="relative max-w-full max-h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="absolute -top-4 -right-4 bg-white text-[#111111] rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
+              onClick={closePreview}
+              aria-label="Fermer l'aperçu"
+            >
+              <FileText className="w-5 h-5" />
+            </button>
+            <img
+              src={previewUrl}
+              alt="Aperçu du document"
+              className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-2xl object-contain bg-[#111111]"
+            />
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
