@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogOut, Home, Crown, Mail, FileText, FolderOpen } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/Button';
@@ -8,8 +8,11 @@ import { useFinancingProfilesUnreadCount } from '../../hooks/useFinancingProfile
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const { count: unreadCount } = useUnreadCount();
   const { count: unreadFinancingProfiles } = useFinancingProfilesUnreadCount();
+
+  const isActive = (path: string) => location.pathname.startsWith(path);
 
   const handleSignOut = async () => {
     await signOut();
@@ -30,7 +33,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               <div className="hidden md:flex space-x-4">
                 <Link
                   to="/admin/vehicles"
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E] transition-colors flex items-center gap-2"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                    isActive('/admin/vehicles')
+                      ? 'text-[#C62E2E] bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E]'
+                  }`}
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="m18 14-1-3"/>
@@ -43,7 +50,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 </Link>
                 <Link
                   to="/admin/submissions"
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E] transition-colors flex items-center gap-2 relative"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 relative ${
+                    isActive('/admin/submissions')
+                      ? 'text-[#C62E2E] bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E]'
+                  }`}
                 >
                   <Mail className="w-4 h-4" />
                   Messages
@@ -55,7 +66,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 </Link>
                 <Link
                   to="/admin/financing-profiles"
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E] transition-colors flex items-center gap-2 relative"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 relative ${
+                    isActive('/admin/financing-profiles')
+                      ? 'text-[#C62E2E] bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E]'
+                  }`}
                 >
                   <FileText className="w-4 h-4" />
                   Dossiers Financement
@@ -67,7 +82,11 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 </Link>
                 <Link
                   to="/admin/sales-folders"
-                  className="px-3 py-2 rounded-lg text-sm font-medium text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E] transition-colors flex items-center gap-2"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                    isActive('/admin/sales-folders')
+                      ? 'text-[#C62E2E] bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E]'
+                  }`}
                 >
                   <FolderOpen className="w-4 h-4" />
                   Dossiers Vente
