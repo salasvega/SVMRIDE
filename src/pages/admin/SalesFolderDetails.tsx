@@ -13,6 +13,8 @@ import {
   DollarSign,
   Package,
   X,
+  MapPin,
+  Gauge,
 } from 'lucide-react';
 
 interface SalesFolder {
@@ -40,6 +42,8 @@ interface SalesFolder {
     year: number;
     type: string;
     price: number;
+    mileage?: number;
+    displacement?: number;
     images?: string[];
   };
 }
@@ -142,7 +146,7 @@ export function SalesFolderDetails() {
         .select(
           `
           *,
-          vehicle:vehicles(brand, model, year, type, price, images)
+          vehicle:vehicles(brand, model, year, type, price, mileage, displacement, images)
         `
         )
         .eq('id', id)
@@ -257,37 +261,57 @@ export function SalesFolderDetails() {
               <h2 className="text-xl font-bold text-[#111111]">Véhicule</h2>
             </div>
             {folder.vehicle ? (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-[#666666]">Modèle</p>
-                  <p className="text-[#111111] font-semibold text-lg">
+                  <h3 className="text-2xl font-bold text-[#111111]">
                     {folder.vehicle.brand} {folder.vehicle.model}
+                  </h3>
+                  <p className="text-2xl font-bold text-[#D10000] mt-1">
+                    {folder.vehicle.price.toLocaleString('fr-FR')} €
                   </p>
                 </div>
-                {vehicleThumbnail && (
-                  <div>
-                    <p className="text-sm text-[#666666] mb-2">Aperçu</p>
-                    <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-[#E5E5E5]">
-                      <img
-                        src={vehicleThumbnail}
-                        alt="Véhicule"
-                        className="w-full h-full object-cover"
-                      />
+
+                <div className="bg-[#F5F5F5] rounded-lg p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Calendar className="w-4 h-4 text-[#D10000]" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#666666]">Année</p>
+                        <p className="text-[#111111] font-semibold">{folder.vehicle.year}</p>
+                      </div>
                     </div>
-                  </div>
-                )}
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-sm text-[#666666]">Année</p>
-                    <p className="text-[#111111]">{folder.vehicle.year}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-[#666666]">Type</p>
-                    <p className="text-[#111111] capitalize">{folder.vehicle.type}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-[#666666]">Prix d'origine</p>
-                    <p className="text-[#111111] font-semibold">{folder.vehicle.price.toLocaleString('fr-FR')} €</p>
+
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Gauge className="w-4 h-4 text-[#D10000]" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#666666]">Cylindrée</p>
+                        <p className="text-[#111111] font-semibold">{folder.vehicle.displacement || '-'} cc</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <MapPin className="w-4 h-4 text-[#D10000]" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#666666]">Kilométrage</p>
+                        <p className="text-[#111111] font-semibold">{folder.vehicle.mileage?.toLocaleString('fr-FR') || '-'} km</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Package className="w-4 h-4 text-[#D10000]" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-[#666666]">Type</p>
+                        <p className="text-[#111111] font-semibold capitalize">{folder.vehicle.type}</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
