@@ -16,6 +16,7 @@ interface Vehicle {
   model: string;
   year: number;
   price: number;
+  images?: string[];
 }
 
 interface FormData {
@@ -114,6 +115,7 @@ export function SalesFolderForm() {
   const [uploadType, setUploadType] = useState('facture');
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [vehicleThumbnail, setVehicleThumbnail] = useState<string | null>(null);
   const [formData, setFormData] = useState<FormData>({
     vehicle_id: '',
     status: 'en_cours',
@@ -144,7 +146,7 @@ export function SalesFolderForm() {
   async function fetchVehicles() {
     const { data } = await supabase
       .from('vehicles')
-      .select('id, brand, model, year, price')
+      .select('id, brand, model, year, price, images')
       .in('status', ['available', 'reserved'])
       .order('brand');
 
@@ -180,6 +182,25 @@ export function SalesFolderForm() {
           admin_notes: data.admin_notes || '',
         });
         setExistingDocuments(data.documents || []);
+
+        if (data.vehicle_id) {
+          const selectedVehicle = vehicles.find(v => v.id === data.vehicle_id);
+          if (selectedVehicle?.images && selectedVehicle.images.length > 0) {
+            const mainImage = selectedVehicle.images[0];
+            try {
+              const { data: signedData, error: signedError } = await supabase.storage
+                .from('vehicle-images')
+                .createSignedUrl(mainImage, 3600);
+
+              if (signedError) throw signedError;
+              if (signedData) {
+                setVehicleThumbnail(signedData.signedUrl);
+              }
+            } catch (error) {
+              console.error('Error loading vehicle thumbnail:', error);
+            }
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching folder:', error);
@@ -199,11 +220,33 @@ export function SalesFolderForm() {
     }
   }
 
-  function handleChange(
+  async function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'vehicle_id' && value) {
+      const selectedVehicle = vehicles.find(v => v.id === value);
+      if (selectedVehicle?.images && selectedVehicle.images.length > 0) {
+        const mainImage = selectedVehicle.images[0];
+        try {
+          const { data, error } = await supabase.storage
+            .from('vehicle-images')
+            .createSignedUrl(mainImage, 3600);
+
+          if (error) throw error;
+          if (data) {
+            setVehicleThumbnail(data.signedUrl);
+          }
+        } catch (error) {
+          console.error('Error loading vehicle thumbnail:', error);
+          setVehicleThumbnail(null);
+        }
+      } else {
+        setVehicleThumbnail(null);
+      }
+    }
   }
 
   async function handleUploadDocuments() {
@@ -454,6 +497,20 @@ export function SalesFolderForm() {
                   </option>
                 ))}
               </Select>
+              {vehicleThumbnail && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-[#666666] mb-2">
+                    Aperçu du véhicule
+                  </label>
+                  <div className="w-32 h-32 rounded-lg overflow-hidden border-2 border-[#E5E5E5]">
+                    <img
+                      src={vehicleThumbnail}
+                      alt="Véhicule sélectionné"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
