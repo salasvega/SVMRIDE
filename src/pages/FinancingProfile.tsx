@@ -747,7 +747,7 @@ export function FinancingProfile() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SingleFileUpload
                           label="Recto *"
-                          value={profile.id_card_front}
+                          value={profile.id_card_front ? `financing-documents/${profile.id_card_front}` : ''}
                           onChange={(file) => handleSingleFileUpload('id_card_front', file)}
                           onDelete={() => handleDeleteFile('id_card_front')}
                           disabled={isSubmitted}
@@ -756,7 +756,7 @@ export function FinancingProfile() {
                         />
                         <SingleFileUpload
                           label="Verso *"
-                          value={profile.id_card_back}
+                          value={profile.id_card_back ? `financing-documents/${profile.id_card_back}` : ''}
                           onChange={(file) => handleSingleFileUpload('id_card_back', file)}
                           onDelete={() => handleDeleteFile('id_card_back')}
                           disabled={isSubmitted}
@@ -771,7 +771,7 @@ export function FinancingProfile() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SingleFileUpload
                           label="Recto *"
-                          value={profile.driver_license_front}
+                          value={profile.driver_license_front ? `financing-documents/${profile.driver_license_front}` : ''}
                           onChange={(file) => handleSingleFileUpload('driver_license_front', file)}
                           onDelete={() => handleDeleteFile('driver_license_front')}
                           disabled={isSubmitted}
@@ -779,7 +779,7 @@ export function FinancingProfile() {
                         />
                         <SingleFileUpload
                           label="Verso *"
-                          value={profile.driver_license_back}
+                          value={profile.driver_license_back ? `financing-documents/${profile.driver_license_back}` : ''}
                           onChange={(file) => handleSingleFileUpload('driver_license_back', file)}
                           onDelete={() => handleDeleteFile('driver_license_back')}
                           disabled={isSubmitted}
@@ -790,7 +790,7 @@ export function FinancingProfile() {
 
                     <SingleFileUpload
                       label="Justificatif de domicile (moins de 3 mois) *"
-                      value={profile.proof_of_residence}
+                      value={profile.proof_of_residence ? `financing-documents/${profile.proof_of_residence}` : ''}
                       onChange={(file) => handleSingleFileUpload('proof_of_residence', file)}
                       onDelete={() => handleDeleteFile('proof_of_residence')}
                       disabled={isSubmitted}
@@ -802,7 +802,7 @@ export function FinancingProfile() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <SingleFileUpload
                           label="Bulletin 1 *"
-                          value={profile.payslip_1}
+                          value={profile.payslip_1 ? `financing-documents/${profile.payslip_1}` : ''}
                           onChange={(file) => handleSingleFileUpload('payslip_1', file)}
                           onDelete={() => handleDeleteFile('payslip_1')}
                           disabled={isSubmitted}
@@ -810,7 +810,7 @@ export function FinancingProfile() {
                         />
                         <SingleFileUpload
                           label="Bulletin 2 *"
-                          value={profile.payslip_2}
+                          value={profile.payslip_2 ? `financing-documents/${profile.payslip_2}` : ''}
                           onChange={(file) => handleSingleFileUpload('payslip_2', file)}
                           onDelete={() => handleDeleteFile('payslip_2')}
                           disabled={isSubmitted}
@@ -818,7 +818,7 @@ export function FinancingProfile() {
                         />
                         <SingleFileUpload
                           label="Bulletin 3 *"
-                          value={profile.payslip_3}
+                          value={profile.payslip_3 ? `financing-documents/${profile.payslip_3}` : ''}
                           onChange={(file) => handleSingleFileUpload('payslip_3', file)}
                           onDelete={() => handleDeleteFile('payslip_3')}
                           disabled={isSubmitted}
@@ -829,7 +829,7 @@ export function FinancingProfile() {
 
                     <SingleFileUpload
                       label="Dernier avis d'imposition *"
-                      value={profile.tax_notice}
+                      value={profile.tax_notice ? `financing-documents/${profile.tax_notice}` : ''}
                       onChange={(file) => handleSingleFileUpload('tax_notice', file)}
                       onDelete={() => handleDeleteFile('tax_notice')}
                       disabled={isSubmitted}
@@ -838,7 +838,7 @@ export function FinancingProfile() {
 
                     <SingleFileUpload
                       label="RIB *"
-                      value={profile.rib}
+                      value={profile.rib ? `financing-documents/${profile.rib}` : ''}
                       onChange={(file) => handleSingleFileUpload('rib', file)}
                       onDelete={() => handleDeleteFile('rib')}
                       disabled={isSubmitted}
@@ -851,7 +851,7 @@ export function FinancingProfile() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <SingleFileUpload
                             label="Attestation d'hébergement *"
-                            value={profile.hosting_certificate}
+                            value={profile.hosting_certificate ? `financing-documents/${profile.hosting_certificate}` : ''}
                             onChange={(file) => handleSingleFileUpload('hosting_certificate', file)}
                             onDelete={() => handleDeleteFile('hosting_certificate')}
                             disabled={isSubmitted}
@@ -859,7 +859,7 @@ export function FinancingProfile() {
                           />
                           <SingleFileUpload
                             label="Pièce d'identité hébergeur *"
-                            value={profile.host_id_card}
+                            value={profile.host_id_card ? `financing-documents/${profile.host_id_card}` : ''}
                             onChange={(file) => handleSingleFileUpload('host_id_card', file)}
                             onDelete={() => handleDeleteFile('host_id_card')}
                             disabled={isSubmitted}
