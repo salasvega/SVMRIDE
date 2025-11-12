@@ -549,12 +549,11 @@ export function FinancingProfile() {
         />
       )}
 
-      <Section className="py-4 bg-gray-50">
+      <Section className="py-8 bg-gray-50">
         <Container>
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-8">
-              <div className="flex items-center justify-between mb-8">
-                <div>
+         
                   <h1 className="text-3xl font-bold text-gray-900">Mon Dossier Financement</h1>
                   <p className="text-gray-600 mt-2">
                     Complétez votre dossier pour soumettre votre demande de financement
