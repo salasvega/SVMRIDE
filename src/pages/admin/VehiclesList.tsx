@@ -104,16 +104,8 @@ export function VehiclesList() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-[#111111]">Véhicules</h1>
-          </div>
-          <Link to="/admin/vehicles/new" className="w-full sm:w-auto">
-            <Button className="flex items-center justify-center space-x-2 w-full sm:w-auto">
-              <Plus className="w-4 h-4" />
-              <span>Ajouter un véhicule</span>
-            </Button>
-          </Link>
+        <div>
+          <h1 className="text-3xl font-bold text-[#111111]">Véhicules</h1>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -361,6 +353,15 @@ export function VehiclesList() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        <div className="flex justify-end">
+          <Link to="/admin/vehicles/new">
+            <Button className="flex items-center justify-center space-x-2">
+              <Plus className="w-4 h-4" />
+              <span>Ajouter un véhicule</span>
+            </Button>
+          </Link>
         </div>
 
         {vehicleToDelete && (
