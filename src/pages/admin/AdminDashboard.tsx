@@ -128,6 +128,54 @@ export function AdminDashboard() {
           </p>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Link
+            to="/admin/submissions"
+            className="group relative bg-gradient-to-br from-white to-orange-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-orange-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:to-orange-600/10 transition-all duration-300" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666] mb-2 font-medium">Messages reçus</p>
+                <p className="text-4xl font-bold text-[#111111]">
+                  <AnimatedCounter value={stats.submissions} />
+                </p>
+              </div>
+              <div className="relative w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                <Mail className="w-8 h-8 text-orange-600" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </span>
+                )}
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/financing-profiles"
+            className="group relative bg-gradient-to-br from-white to-purple-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-purple-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:to-purple-600/10 transition-all duration-300" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666] mb-2 font-medium">Dossiers financement</p>
+                <p className="text-4xl font-bold text-[#111111]">
+                  <AnimatedCounter value={stats.financingProfiles} />
+                </p>
+              </div>
+              <div className="relative w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                <FileText className="w-8 h-8 text-purple-600" />
+                {unreadFinancingProfiles > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
+                    {unreadFinancingProfiles > 99 ? '99+' : unreadFinancingProfiles}
+                  </span>
+                )}
+              </div>
+            </div>
+          </Link>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Link
             to="/admin/vehicles?status=available"
@@ -249,55 +297,6 @@ export function AdminDashboard() {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-
-          <Link
-            to="/admin/submissions"
-            className="group relative bg-gradient-to-br from-white to-orange-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-orange-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-500/0 to-orange-500/0 group-hover:from-orange-500/5 group-hover:to-orange-600/10 transition-all duration-300" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[#666666] mb-2 font-medium">Messages reçus</p>
-                <p className="text-4xl font-bold text-[#111111]">
-                  <AnimatedCounter value={stats.submissions} />
-                </p>
-              </div>
-              <div className="relative w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-                <Mail className="w-8 h-8 text-orange-600" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
-                    {unreadCount > 99 ? '99+' : unreadCount}
-                  </span>
-                )}
-              </div>
-            </div>
-          </Link>
-
-          <Link
-            to="/admin/financing-profiles"
-            className="group relative bg-gradient-to-br from-white to-purple-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-purple-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:to-purple-600/10 transition-all duration-300" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[#666666] mb-2 font-medium">Dossiers financement</p>
-                <p className="text-4xl font-bold text-[#111111]">
-                  <AnimatedCounter value={stats.financingProfiles} />
-                </p>
-              </div>
-              <div className="relative w-16 h-16 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-                <FileText className="w-8 h-8 text-purple-600" />
-                {unreadFinancingProfiles > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
-                    {unreadFinancingProfiles > 99 ? '99+' : unreadFinancingProfiles}
-                  </span>
-                )}
-              </div>
-            </div>
-          </Link>
         </div>
       </div>
     </AdminLayout>
