@@ -242,7 +242,7 @@ export function SalesFoldersList() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-[#666666]" />
+             
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
