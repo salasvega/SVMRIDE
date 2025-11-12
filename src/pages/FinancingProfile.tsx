@@ -930,7 +930,7 @@ export function FinancingProfile() {
                         variant="secondary"
                       >
                         <Save className="w-4 h-4 mr-2" />
-                        {saving ? 'Sauvegarde...' : 'Sauvegarder le brouillon'}
+                        {saving ? 'Enregistrement...' : 'Enregistrer le brouillon'}
                       </Button>
                       <Button
                         type="button"
