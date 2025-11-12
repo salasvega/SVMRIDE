@@ -477,6 +477,23 @@ export function VehicleForm() {
             {formData.status === 'sold' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <Input
+                  label="Prix d'achat (€)"
+                  type="number"
+                  value={formData.purchase_price}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      purchase_price: Number(
+                        e.target.value
+                      ),
+                    })
+                  }
+                  required
+                  min="0"
+                  placeholder="ex: 5000"
+                  helperText="Prix auquel vous avez acheté le véhicule"
+                />
+                <Input
                   label="Prix de vente final (€)"
                   type="number"
                   value={formData.sale_price || ''}
