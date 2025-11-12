@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Textarea } from '../../components/ui/Textarea';
 import { Select } from '../../components/ui/Select';
+import Toast from '../../components/ui/Toast';
 import { ArrowLeft, Save } from 'lucide-react';
 
 interface Vehicle {
@@ -39,6 +40,7 @@ export function SalesFolderForm() {
 
   const [loading, setLoading] = useState(false);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [formData, setFormData] = useState<FormData>({
     vehicle_id: '',
     status: 'en_cours',
@@ -178,10 +180,20 @@ export function SalesFolderForm() {
         }
       }
 
-      navigate('/admin/sales-folders');
+      setToast({
+        type: 'success',
+        message: isEditing ? 'Dossier modifié avec succès' : 'Dossier créé avec succès',
+      });
+
+      setTimeout(() => {
+        navigate('/admin/sales-folders');
+      }, 1500);
     } catch (error) {
       console.error('Error saving folder:', error);
-      alert('Erreur lors de la sauvegarde du dossier');
+      setToast({
+        type: 'error',
+        message: 'Erreur lors de la sauvegarde du dossier',
+      });
     } finally {
       setLoading(false);
     }
@@ -349,6 +361,14 @@ export function SalesFolderForm() {
             </Button>
           </div>
         </form>
+
+        {toast && (
+          <Toast
+            type={toast.type}
+            message={toast.message}
+            onClose={() => setToast(null)}
+          />
+        )}
       </div>
     </AdminLayout>
   );
