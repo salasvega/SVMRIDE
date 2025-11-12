@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
 import { Textarea } from '../ui/Textarea';
 import { supabase } from '../../lib/supabase';
+import Toast from '../ui/Toast';
 
 type Attachment = {
   filename: string;
@@ -37,6 +38,7 @@ interface SubmissionDetailsModalProps {
 export function SubmissionDetailsModal({ submission, onClose, onStatusChange, onAdminNotesChange }: SubmissionDetailsModalProps) {
   const [adminNotes, setAdminNotes] = useState(submission.admin_notes || '');
   const [isSavingNotes, setIsSavingNotes] = useState(false);
+  const [toast, setToast] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
   useEffect(() => {
     setAdminNotes(submission.admin_notes || '');
@@ -97,8 +99,11 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
       if (onAdminNotesChange) {
         onAdminNotesChange(submission.id, adminNotes);
       }
+
+      setToast({ type: 'success', message: 'Notes enregistrées avec succès' });
     } catch (error) {
       console.error('Error saving admin notes:', error);
+      setToast({ type: 'error', message: 'Erreur lors de l\'enregistrement des notes' });
     } finally {
       setIsSavingNotes(false);
     }
@@ -135,7 +140,15 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <>
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
         <div className="sticky top-0 bg-gradient-to-r from-[#C62E2E] to-[#D10000] text-white px-6 py-5 relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/fond_carbonne_nid_abeilles.png')] bg-center bg-cover opacity-80"></div>
@@ -345,5 +358,6 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
         </div>
       </div>
     </div>
+    </>
   );
 }
