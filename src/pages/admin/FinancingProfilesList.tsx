@@ -257,7 +257,7 @@ export default function FinancingProfilesList() {
             <p className="text-[#666666]">{filteredProfiles.length} dossier{filteredProfiles.length > 1 ? 's' : ''}
            </p>
           </div>
-
+ </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-[#E5E5E5] mb-6">
           <div className="p-6 border-b border-[#E5E5E5]">
