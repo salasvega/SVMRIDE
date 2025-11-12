@@ -358,7 +358,7 @@ export function SalesFolderDetails() {
         <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-5 h-5 text-green-600" />
+              <Euro className="w-5 h-5 text-green-600" />
             </div>
             <h2 className="text-xl font-bold text-[#111111]">Informations de Vente</h2>
           </div>
