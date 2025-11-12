@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, FileText, Package, ShoppingCart, CheckCircle, TrendingUp } from 'lucide-react';
+import { Mail, FileText, Package, ShoppingCart, CheckCircle, TrendingUp, FolderOpen } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
@@ -58,6 +58,8 @@ export function AdminDashboard() {
     totalMargin: 0,
     averageMargin: 0,
     averageMarginPercentage: 0,
+    salesFolders: 0,
+    salesFoldersEnCours: 0,
   });
 
   useEffect(() => {
@@ -85,6 +87,15 @@ export function AdminDashboard() {
       const { count: financingProfilesCount } = await supabase
         .from('user_financing_profiles')
         .select('*', { count: 'exact', head: true });
+
+      const { count: salesFoldersCount } = await supabase
+        .from('sales_folders')
+        .select('*', { count: 'exact', head: true });
+
+      const { count: salesFoldersEnCoursCount } = await supabase
+        .from('sales_folders')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'en_cours');
 
       const totalSubmissions = (contactCount || 0) + (tradeInCount || 0) + (customSearchCount || 0) + (financingCount || 0);
 
@@ -116,6 +127,8 @@ export function AdminDashboard() {
           totalMargin,
           averageMargin,
           averageMarginPercentage,
+          salesFolders: salesFoldersCount || 0,
+          salesFoldersEnCours: salesFoldersEnCoursCount || 0,
         });
       }
     }
@@ -176,6 +189,29 @@ export function AdminDashboard() {
                     {unreadFinancingProfiles > 99 ? '99+' : unreadFinancingProfiles}
                   </span>
                 )}
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/sales-folders"
+            className="group relative bg-gradient-to-br from-white to-teal-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB] hover:border-teal-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-500/0 to-teal-500/0 group-hover:from-teal-500/5 group-hover:to-teal-600/10 transition-all duration-300" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666] mb-2 font-medium">Dossiers de vente</p>
+                <p className="text-4xl font-bold text-[#111111]">
+                  <AnimatedCounter value={stats.salesFolders} />
+                </p>
+                {stats.salesFoldersEnCours > 0 && (
+                  <p className="text-xs text-teal-600 mt-1 font-medium">
+                    {stats.salesFoldersEnCours} en cours
+                  </p>
+                )}
+              </div>
+              <div className="relative w-16 h-16 bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                <FolderOpen className="w-8 h-8 text-teal-600" />
               </div>
             </div>
           </Link>

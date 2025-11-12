@@ -24,6 +24,9 @@ import { VehiclesList } from './pages/admin/VehiclesList';
 import { VehicleForm } from './pages/admin/VehicleForm';
 import SubmissionsList from './pages/admin/SubmissionsList';
 import FinancingProfilesList from './pages/admin/FinancingProfilesList';
+import { SalesFoldersList } from './pages/admin/SalesFoldersList';
+import { SalesFolderForm } from './pages/admin/SalesFolderForm';
+import { SalesFolderDetails } from './pages/admin/SalesFolderDetails';
 
 function App() {
   return (
@@ -78,6 +81,38 @@ function App() {
             element={
               <ProtectedRoute>
                 <FinancingProfilesList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/sales-folders"
+            element={
+              <ProtectedRoute>
+                <SalesFoldersList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/sales-folders/new"
+            element={
+              <ProtectedRoute>
+                <SalesFolderForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/sales-folders/edit/:id"
+            element={
+              <ProtectedRoute>
+                <SalesFolderForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/sales-folders/:id"
+            element={
+              <ProtectedRoute>
+                <SalesFolderDetails />
               </ProtectedRoute>
             }
           />
