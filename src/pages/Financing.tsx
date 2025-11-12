@@ -449,7 +449,7 @@ export function Financing() {
                     size="lg"
                   >
                     <HelpCircle className="w-5 h-5" />
-                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma question'}
+                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma demande'}
                   </Button>
 
                   <Link
