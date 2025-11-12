@@ -142,7 +142,7 @@ export function AdminDashboard() {
         <div>
           <h1 className="text-3xl font-bold text-[#111111]">Dashboard</h1>
           <p className="text-[#666666] mt-1">
-            Bienvenue dans l'interface d'administration
+            Bienvenue dans l'interface d'administration de SVM Ride
           </p>
         </div>
 
