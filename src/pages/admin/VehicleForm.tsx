@@ -12,6 +12,7 @@ import {
 } from '../../components/admin/ImageUpload';
 import { supabase } from '../../lib/supabase';
 import { Vehicle } from '../../types/vehicle';
+import Toast from '../../components/ui/Toast';
 
 export function VehicleForm() {
   const { id } = useParams();
@@ -20,6 +21,7 @@ export function VehicleForm() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState<{ type: 'success' | 'error' | 'info'; message: string } | null>(null);
 
   // Helper: on normalise les images qui viennent de la base
   // - si c'est déjà {url, path}, on garde
@@ -141,18 +143,25 @@ export function VehicleForm() {
           .eq('id', id);
 
         if (updateError) throw updateError;
+
+        setToast({ type: 'success', message: 'Véhicule modifié avec succès' });
       } else {
         const { error: insertError } = await supabase
           .from('vehicles')
           .insert([vehicleData]);
 
         if (insertError) throw insertError;
+
+        setToast({ type: 'success', message: 'Véhicule ajouté avec succès' });
       }
 
-      navigate('/admin/vehicles');
+      setTimeout(() => {
+        navigate('/admin/vehicles');
+      }, 1500);
     } catch (err) {
       console.error('Error saving vehicle:', err);
       setError("Erreur lors de l'enregistrement du véhicule");
+      setToast({ type: 'error', message: "Erreur lors de l'enregistrement du véhicule" });
       setLoading(false);
     }
   };
@@ -169,7 +178,15 @@ export function VehicleForm() {
   };
 
   return (
-    <AdminLayout>
+    <>
+      {toast && (
+        <Toast
+          type={toast.type}
+          message={toast.message}
+          onClose={() => setToast(null)}
+        />
+      )}
+      <AdminLayout>
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center space-x-4">
@@ -486,5 +503,6 @@ export function VehicleForm() {
         </form>
       </div>
     </AdminLayout>
+    </>
   );
 }
