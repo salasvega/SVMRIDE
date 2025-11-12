@@ -348,11 +348,46 @@ export function SalesFolderForm() {
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data: newFolder, error } = await supabase
           .from('sales_folders')
-          .insert([dataToSave]);
+          .insert([dataToSave])
+          .select()
+          .single();
 
         if (error) throw error;
+
+        if (newFolder && filesToUpload.length > 0) {
+          const newDocuments: DocumentMetadata[] = [];
+
+          for (const doc of filesToUpload) {
+            const file = doc.file;
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+            const filePath = `${newFolder.id}/${uploadType}/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+              .from('sales-documents')
+              .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            newDocuments.push({
+              type: uploadType,
+              filename: file.name,
+              path: filePath,
+              upload_date: new Date().toISOString(),
+            });
+          }
+
+          if (newDocuments.length > 0) {
+            const { error: updateError } = await supabase
+              .from('sales_folders')
+              .update({ documents: newDocuments })
+              .eq('id', newFolder.id);
+
+            if (updateError) throw updateError;
+          }
+        }
 
         if (formData.vehicle_id && formData.status === 'complete') {
           await supabase
@@ -534,50 +569,55 @@ export function SalesFolderForm() {
             />
           </div>
 
-          {isEditing && (
-            <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
-              <h2 className="text-xl font-bold text-[#111111] mb-4">Documents</h2>
+          <div className="bg-white rounded-lg p-6 border-2 border-[#D1D5DB]">
+            <h2 className="text-xl font-bold text-[#111111] mb-4">Documents</h2>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#111111] mb-2">
-                    Type de document
-                  </label>
-                  <select
-                    value={uploadType}
-                    onChange={(e) => setUploadType(e.target.value)}
-                    className="w-full px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm"
-                  >
-                    {Object.entries(documentTypes).map(([key, label]) => (
-                      <option key={key} value={key}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <FileUpload
-                  label="Ajouter des documents"
-                  maxFiles={10}
-                  maxSizeMB={10}
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,application/pdf,image/*"
-                  value={filesToUpload}
-                  onChange={setFilesToUpload}
-                />
-
-                {filesToUpload.length > 0 && (
-                  <Button
-                    type="button"
-                    onClick={handleUploadDocuments}
-                    disabled={uploading}
-                    className="w-full"
-                  >
-                    {uploading ? 'Upload en cours...' : `Uploader ${filesToUpload.length} document(s)`}
-                  </Button>
-                )}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-[#111111] mb-2">
+                  Type de document
+                </label>
+                <select
+                  value={uploadType}
+                  onChange={(e) => setUploadType(e.target.value)}
+                  className="w-full px-3 py-2 border border-[#D1D5DB] rounded-lg text-sm"
+                >
+                  {Object.entries(documentTypes).map(([key, label]) => (
+                    <option key={key} value={key}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {existingDocuments.length > 0 && (
+              <FileUpload
+                label="Ajouter des documents"
+                maxFiles={10}
+                maxSizeMB={10}
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,application/pdf,image/*"
+                value={filesToUpload}
+                onChange={setFilesToUpload}
+              />
+
+              {!isEditing && filesToUpload.length > 0 && (
+                <p className="text-sm text-[#666666] italic">
+                  {filesToUpload.length} document(s) sera uploadé lors de la création du dossier
+                </p>
+              )}
+
+              {isEditing && filesToUpload.length > 0 && (
+                <Button
+                  type="button"
+                  onClick={handleUploadDocuments}
+                  disabled={uploading}
+                  className="w-full"
+                >
+                  {uploading ? 'Upload en cours...' : `Uploader ${filesToUpload.length} document(s)`}
+                </Button>
+              )}
+            </div>
+
+            {isEditing && existingDocuments.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-[#E5E5E5]">
                   <h3 className="text-sm font-semibold text-[#111111] mb-3">Documents téléchargés</h3>
                   <div className="space-y-2">
@@ -622,8 +662,7 @@ export function SalesFolderForm() {
                   </div>
                 </div>
               )}
-            </div>
-          )}
+          </div>
 
           <div className="flex justify-end gap-4">
             <Button
