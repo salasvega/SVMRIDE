@@ -130,7 +130,7 @@ export function AdminDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Link
-            to="/admin/vehicles"
+            to="/admin/vehicles?status=available"
             className="group relative bg-gradient-to-br from-white to-green-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-green-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-green-500/0 to-green-500/0 group-hover:from-green-500/5 group-hover:to-green-600/10 transition-all duration-300" />
@@ -148,7 +148,7 @@ export function AdminDashboard() {
           </Link>
 
           <Link
-            to="/admin/vehicles"
+            to="/admin/vehicles?status=reserved"
             className="group relative bg-gradient-to-br from-white to-yellow-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-yellow-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/5 group-hover:to-yellow-600/10 transition-all duration-300" />
@@ -166,7 +166,7 @@ export function AdminDashboard() {
           </Link>
 
           <Link
-            to="/admin/vehicles"
+            to="/admin/vehicles?status=sold"
             className="group relative bg-gradient-to-br from-white to-blue-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-blue-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-blue-500/0 group-hover:from-blue-500/5 group-hover:to-blue-600/10 transition-all duration-300" />
