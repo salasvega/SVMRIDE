@@ -178,6 +178,30 @@ export function AdminDashboard() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Link
+            to="/admin/vehicles"
+            className="group relative bg-gradient-to-br from-white to-gray-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-gray-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-500/0 to-gray-500/0 group-hover:from-gray-500/5 group-hover:to-gray-600/10 transition-all duration-300" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666] mb-2 font-medium">Total Véhicules</p>
+                <p className="text-4xl font-bold text-[#111111]">
+                  <AnimatedCounter value={stats.total} />
+                </p>
+              </div>
+              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                <svg className="w-8 h-8 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m18 14-1-3"/>
+                  <path d="m3 9 6 2a2 2 0 0 1 2-2h2a2 2 0 0 1 1.99 1.81"/>
+                  <path d="M8 17h3a1 1 0 0 0 1-1 6 6 0 0 1 6-6 1 1 0 0 0 1-1v-.75A5 5 0 0 0 17 5"/>
+                  <circle cx="19" cy="17" r="3"/>
+                  <circle cx="5" cy="17" r="3"/>
+                </svg>
+              </div>
+            </div>
+          </Link>
+
+          <Link
             to="/admin/vehicles?status=available"
             className="group relative bg-gradient-to-br from-white to-green-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-green-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
           >
@@ -227,30 +251,6 @@ export function AdminDashboard() {
               </div>
               <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
                 <CheckCircle className="w-8 h-8 text-blue-600" />
-              </div>
-            </div>
-          </Link>
-
-          <Link
-            to="/admin/vehicles"
-            className="group relative bg-gradient-to-br from-white to-gray-50/30 rounded-xl p-6 shadow-sm border border-[#E5E5E5] hover:border-gray-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-gray-500/0 to-gray-500/0 group-hover:from-gray-500/5 group-hover:to-gray-600/10 transition-all duration-300" />
-            <div className="relative flex items-center justify-between">
-              <div>
-                <p className="text-sm text-[#666666] mb-2 font-medium">Total Véhicules</p>
-                <p className="text-4xl font-bold text-[#111111]">
-                  <AnimatedCounter value={stats.total} />
-                </p>
-              </div>
-              <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
-                <svg className="w-8 h-8 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m18 14-1-3"/>
-                  <path d="m3 9 6 2a2 2 0 0 1 2-2h2a2 2 0 0 1 1.99 1.81"/>
-                  <path d="M8 17h3a1 1 0 0 0 1-1 6 6 0 0 1 6-6 1 1 0 0 0 1-1v-.75A5 5 0 0 0 17 5"/>
-                  <circle cx="19" cy="17" r="3"/>
-                  <circle cx="5" cy="17" r="3"/>
-                </svg>
               </div>
             </div>
           </Link>
