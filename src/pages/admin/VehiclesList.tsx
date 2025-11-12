@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Edit, Trash2, Eye, EyeOff, Plus, Search, Bike, Package, ShoppingCart, CheckCircle } from 'lucide-react';
+import { Trash2, Eye, EyeOff, Plus, Search, Bike, Package, ShoppingCart, CheckCircle } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
@@ -333,12 +333,6 @@ export function VehiclesList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end space-x-2">
-                        <Link
-                          to={`/admin/vehicles/edit/${vehicle.id}`}
-                          className="text-[#C62E2E] hover:text-[#A02525] transition-colors"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Link>
                         <button
                           onClick={() => setVehicleToDelete(vehicle.id)}
                           className="text-red-600 hover:text-red-800 transition-colors"
