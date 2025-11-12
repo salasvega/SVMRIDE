@@ -385,19 +385,23 @@ export function SalesFolderDetails() {
                   </option>
                 ))}
               </select>
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  onChange={handleFileUpload}
-                  disabled={uploading}
-                  className="hidden"
-                  accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                />
-                <Button disabled={uploading} className="flex items-center gap-2">
-                  <Upload className="w-4 h-4" />
-                  {uploading ? 'Upload...' : 'Ajouter'}
-                </Button>
-              </label>
+              <input
+                id="file-upload"
+                type="file"
+                onChange={handleFileUpload}
+                disabled={uploading}
+                className="hidden"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              />
+              <Button
+                disabled={uploading}
+                className="flex items-center gap-2"
+                onClick={() => document.getElementById('file-upload')?.click()}
+                type="button"
+              >
+                <Upload className="w-4 h-4" />
+                {uploading ? 'Upload...' : 'Ajouter'}
+              </Button>
             </div>
           </div>
 
