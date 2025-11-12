@@ -887,6 +887,7 @@ export function FinancingProfile() {
                         type="button"
                         onClick={handleSubmit}
                         disabled={submitting}
+                        className="bg-green-600 hover:bg-green-700 text-white border-2 border-green-600 font-semibold"
                       >
                         <Send className="w-4 h-4 mr-2" />
                         {submitting ? 'Envoi...' : 'Soumettre la demande'}
