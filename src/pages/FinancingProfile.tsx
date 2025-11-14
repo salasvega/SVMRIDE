@@ -534,6 +534,41 @@ export function FinancingProfile() {
 
   const isSubmitted = profile.status === 'submitted';
 
+  const isFormValid = (): boolean => {
+    const requiredFields = [
+      'last_name', 'first_name', 'birth_postal_code', 'birth_date',
+      'current_address', 'phone_number', 'email', 'housing_entry_date',
+      'housing_status', 'job_title',
+      'employment_start_date', 'contract_type', 'monthly_net_salary',
+      'marital_status', 'vehicle_to_finance', 'desired_duration'
+    ];
+
+    const requiredDocuments = [
+      'id_card_front', 'id_card_back', 'driver_license_front', 'driver_license_back',
+      'proof_of_residence', 'payslip_1', 'payslip_2', 'payslip_3', 'tax_notice', 'rib'
+    ];
+
+    for (const field of requiredFields) {
+      if (!profile[field as keyof FinancingProfile]) {
+        return false;
+      }
+    }
+
+    for (const doc of requiredDocuments) {
+      if (!profile[doc as keyof FinancingProfile]) {
+        return false;
+      }
+    }
+
+    if (profile.housing_status === 'hébergé') {
+      if (!profile.hosting_certificate || !profile.host_id_card) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   return (
     <>
       <SEOHead
@@ -938,8 +973,12 @@ export function FinancingProfile() {
                       <Button
                         type="button"
                         onClick={handleSubmit}
-                        disabled={submitting}
-                        className="bg-green-600 hover:bg-green-700 text-white border-2 border-green-600 font-semibold"
+                        disabled={submitting || !isFormValid()}
+                        className={`border-2 font-semibold ${
+                          !isFormValid()
+                            ? 'bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed opacity-50'
+                            : 'bg-green-600 hover:bg-green-700 text-white border-green-600'
+                        }`}
                       >
                         <Send className="w-4 h-4 mr-2" />
                         {submitting ? 'Envoi...' : 'Soumettre la demande'}
