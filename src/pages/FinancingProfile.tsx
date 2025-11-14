@@ -557,10 +557,10 @@ export function FinancingProfile() {
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900">Mon Dossier Financement</h1>
                   <p className="text-gray-600 mt-2">
-                    Complétez votre dossier pour soumettre votre demande de financement
+                    Complétez votre dossier pour nous soumettre votre demande de financement
                   </p>
                   <p className="text-gray-600 mt-2">
-                    Une fois qu'il nous sera soumis, vous serez contactés par notre équipe dans les plus brefs délais.
+                    Une fois reçu par notre équipe, nous vous contacterons dans les plus brefs délais.
                   </p>
                 </div>
                 {isSubmitted && (
