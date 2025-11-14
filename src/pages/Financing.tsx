@@ -365,6 +365,7 @@ export function Financing() {
                 <form
                   onSubmit={handleSubmit}
                   className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
+                  style={{ display: 'none' }}
                 >
                   <h2 className="text-2xl font-bold text-[#111111] mb-4">
                     Demande de financement
