@@ -201,23 +201,14 @@ export function VehicleDetail() {
                 <p className="text-[#444444]">{vehicle.warranty}</p>
               </div>
 {/* CTA contact + CTA financement */}
-<div
-  className="
-    w-full
-    flex
-    flex-col
-    gap-4
-    sm:flex-row
-    sm:gap-6
-  "
->
+<div className="w-full flex flex-col gap-4">
   {/* Bouton primaire : rouge plein */}
   <Link
     to="/contact"
     state={{
       vehicle: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
     }}
-    className="w-full sm:flex-1"
+    className="w-full"
   >
     <Button
       size="lg"
@@ -247,16 +238,14 @@ export function VehicleDetail() {
       "
     >
       <MessageCircle className="w-6 h-6" />
-      <span className="whitespace-nowrap">
-        Demander des informations
-      </span>
+      <span>Demander des informations</span>
     </Button>
   </Link>
 
   {/* Bouton secondaire : contour rouge, fond blanc */}
   <Link
     to={financingLink}
-    className="w-full sm:flex-1"
+    className="w-full"
   >
     <Button
       size="lg"
@@ -286,9 +275,7 @@ export function VehicleDetail() {
       "
     >
       <Euro className="w-6 h-6" />
-      <span className="whitespace-nowrap">
-        Demander un financement
-      </span>
+      <span>Demander un financement</span>
     </Button>
   </Link>
 </div>
