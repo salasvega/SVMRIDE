@@ -559,6 +559,9 @@ export function FinancingProfile() {
                   <p className="text-gray-600 mt-2">
                     Complétez votre dossier pour soumettre votre demande de financement
                   </p>
+                  <p className="text-gray-600 mt-2">
+                    Une fois qu'il nous sera soumis, vous serez contactés par notre équipe dans les plus brefs délais.
+                  </p>
                 </div>
                 {isSubmitted && (
                   <div className="flex items-center text-green-600">
