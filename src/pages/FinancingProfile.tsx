@@ -486,9 +486,9 @@ export function FinancingProfile() {
           <Container>
             <div className="max-w-md mx-auto">
               <div className="bg-white rounded-lg shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Accès au Dossier</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">Dossier de financement</h2>
                 <p className="text-gray-600 mb-6">
-                  Veuillez entrer votre adresse email pour accéder à votre dossier de financement.
+                  Veuillez entrer votre adresse email pour créer ou accéder à votre dossier.
                 </p>
                 <form onSubmit={handleEmailSubmit} className="space-y-4">
                   <Input
