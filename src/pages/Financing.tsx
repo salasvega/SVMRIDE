@@ -362,106 +362,117 @@ export function Financing() {
                   </p>
                 </div>
               ) : (
-                <form
-                  onSubmit={handleSubmit}
-                  className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
-                  style={{ display: 'none' }}
-                >
-                  <h2 className="text-2xl font-bold text-[#111111] mb-4">
-                    Demande de financement
-                  </h2>
-
-                  <Input
-                    label="Nom complet"
-                    name="name"
-                    type="text"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                  />
-
-                  <Input
-                    label="Email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-
-                  <Input
-                    label="Téléphone"
-                    name="phone"
-                    type="tel"
-                    required
-                    value={formData.phone}
-                    onChange={handleChange}
-                  />
-
-                  <Input
-                    label="Montant souhaité (€)"
-                    name="amount"
-                    type="number"
-                    required
-                    min="1000"
-                    value={formData.amount}
-                    onChange={handleChange}
-                  />
-
-                  <Input
-                    label="Durée souhaitée (mois)"
-                    name="duration"
-                    type="number"
-                    required
-                    min="12"
-                    max="60"
-                    value={formData.duration}
-                    onChange={handleChange}
-                  />
-
-                  <Textarea
-                    label="Commentaires"
-                    name="comments"
-                    rows={4}
-                    placeholder="Posez vos questions ou ajoutez des informations complémentaires..."
-                    value={formData.comments}
-                    onChange={handleChange}
-                  />
-
-                  {/* Champ caché côté UI, mais envoyé quand même */}
-                  {/* Tu peux le rendre visible si tu veux debugger / l'exposer au client */}
-                  <input
-                    type="hidden"
-                    name="vehicleSlug"
-                    value={formData.vehicleSlug}
-                    readOnly
-                  />
-
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
-                      {error}
-                    </div>
-                  )}
-
-                  <Button
-                    type="submit"
-                    disabled={isSubmitting}
-                    fullWidth
-                    size="lg"
+                <>
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
+                    style={{ display: 'none' }}
                   >
-                    <HelpCircle className="w-5 h-5" />
-                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma demande'}
-                  </Button>
+                    <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                      Demande de financement
+                    </h2>
 
-                  <Link
-                    to={`/financement/dossier?vehicle=${encodeURIComponent(vehicleFromURL)}&price=${priceFromURL || ''}&duration=${formData.duration}`}
-                    className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-[#2C2C2C] hover:bg-[#1A1A1A] text-white font-semibold rounded-lg transition-colors"
-                  >
-                    <FileText className="w-5 h-5" />
-                    Mon Dossier de Financement
-                  </Link>
+                    <Input
+                      label="Nom complet"
+                      name="name"
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={handleChange}
+                    />
 
-                </form>
+                    <Input
+                      label="Email"
+                      name="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                    />
+
+                    <Input
+                      label="Téléphone"
+                      name="phone"
+                      type="tel"
+                      required
+                      value={formData.phone}
+                      onChange={handleChange}
+                    />
+
+                    <Input
+                      label="Montant souhaité (€)"
+                      name="amount"
+                      type="number"
+                      required
+                      min="1000"
+                      value={formData.amount}
+                      onChange={handleChange}
+                    />
+
+                    <Input
+                      label="Durée souhaitée (mois)"
+                      name="duration"
+                      type="number"
+                      required
+                      min="12"
+                      max="60"
+                      value={formData.duration}
+                      onChange={handleChange}
+                    />
+
+                    <Textarea
+                      label="Commentaires"
+                      name="comments"
+                      rows={4}
+                      placeholder="Posez vos questions ou ajoutez des informations complémentaires..."
+                      value={formData.comments}
+                      onChange={handleChange}
+                    />
+
+                    {/* Champ caché côté UI, mais envoyé quand même */}
+                    {/* Tu peux le rendre visible si tu veux debugger / l'exposer au client */}
+                    <input
+                      type="hidden"
+                      name="vehicleSlug"
+                      value={formData.vehicleSlug}
+                      readOnly
+                    />
+
+                    {error && (
+                      <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                        {error}
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      fullWidth
+                      size="lg"
+                    >
+                      <HelpCircle className="w-5 h-5" />
+                      {isSubmitting ? 'Envoi en cours...' : 'Envoyer ma demande'}
+                    </Button>
+                  </form>
+
+                  <div className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl">
+                    <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                      Demande de financement
+                    </h2>
+
+                    <p className="text-[#444444] leading-relaxed">
+                      Pour soumettre une demande de financement via nos partenaires, remplissez le dossier en cliquant sur le bouton ci-dessous :
+                    </p>
+
+                    <Link
+                      to={`/financement/dossier?vehicle=${encodeURIComponent(vehicleFromURL)}&price=${priceFromURL || ''}&duration=${formData.duration}`}
+                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-[#2C2C2C] hover:bg-[#1A1A1A] text-white font-semibold rounded-lg transition-colors"
+                    >
+                      <FileText className="w-5 h-5" />
+                      Mon Dossier de Financement
+                    </Link>
+                  </div>
+                </>
               )}
             </div>
           </div>
