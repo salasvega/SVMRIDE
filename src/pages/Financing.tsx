@@ -466,7 +466,7 @@ export function Financing() {
 
                     <Link
                       to={`/financement/dossier?vehicle=${encodeURIComponent(vehicleFromURL)}&price=${priceFromURL || ''}&duration=${formData.duration}`}
-                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-[#2C2C2C] hover:bg-[#1A1A1A] text-white font-semibold rounded-lg transition-colors"
+                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-[#D10000] hover:bg-[#B00000] text-white font-semibold rounded-lg transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       Mon Dossier de Financement
