@@ -44,7 +44,7 @@ export function AdminLogin() {
             Administration
           </h1>
           <p className="text-center text-[#666666] mb-8">
-            Connectez-vous pour gérer le catalogue
+            Connectez-vous pour gérer votre espace de vente
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
