@@ -249,28 +249,28 @@ export function SalesFoldersList() {
 
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
-                <tr className="border-b border-[#E5E5E5]">
-                   <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    STATUT
+              <thead className="bg-[#F9F9F9]">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Statut
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    N° DOSSIER
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    N° Dossier
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    CLIENT
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Client
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    VEHICULE
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Véhicule
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    DATE
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Date
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    PRIX
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Prix
                   </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-[#111111]">
-                    ACTIONS
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#666666] uppercase tracking-wider">
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -288,7 +288,7 @@ export function SalesFoldersList() {
                       className="border-b border-[#E5E5E5] hover:bg-gray-50 cursor-pointer"
                       onDoubleClick={() => window.location.href = `/admin/sales-folders/${folder.id}`}
                     >
-                       <td className="py-3 px-4">
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                             statusColors[folder.status]
@@ -297,12 +297,12 @@ export function SalesFoldersList() {
                           {statusLabels[folder.status]}
                         </span>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="px-6 py-4">
                         <span className="font-mono text-sm text-[#FF5C00] font-semibold">
                           {folder.folder_number}
                         </span>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="px-6 py-4">
                         <div className="text-sm">
                           <div className="font-medium text-[#111111]">
                             {folder.client_first_name} {folder.client_last_name}
@@ -314,7 +314,7 @@ export function SalesFoldersList() {
                           )}
                         </div>
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="px-6 py-4">
                         {folder.vehicle ? (
                           <div className="text-sm text-[#111111]">
                             {folder.vehicle.brand} {folder.vehicle.model}
@@ -326,10 +326,10 @@ export function SalesFoldersList() {
                           <span className="text-[#666666] text-sm">-</span>
                         )}
                       </td>
-                      <td className="py-3 px-4 text-sm text-[#666666]">
+                      <td className="px-6 py-4 text-sm text-[#666666]">
                         {new Date(folder.sale_date).toLocaleDateString('fr-FR')}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="px-6 py-4">
                         {folder.sale_price ? (
                           <span className="text-sm font-semibold text-[#111111]">
                             {folder.sale_price.toLocaleString('fr-FR')} €
@@ -338,8 +338,8 @@ export function SalesFoldersList() {
                           <span className="text-[#666666] text-sm">-</span>
                         )}
                       </td>
-                     
-                      <td className="py-3 px-4">
+
+                      <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <button
                             onClick={(e) => {
