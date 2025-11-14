@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock } from 'lucide-react';
+import { Lock, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Section } from '../../components/ui/Section';
 import { Container } from '../../components/ui/Container';
@@ -33,7 +33,15 @@ export function AdminLogin() {
   return (
     <Section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#111111] to-[#1a1a1a]">
       <Container className="max-w-md">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 relative">
+          <button
+            onClick={() => navigate('/')}
+            className="absolute top-4 right-4 text-[#666666] hover:text-[#111111] transition-colors"
+            aria-label="Fermer"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
           <div className="flex justify-center mb-6">
             <div className="w-16 h-16 bg-[#C62E2E] rounded-full flex items-center justify-center">
               <Lock className="w-8 h-8 text-white" />
