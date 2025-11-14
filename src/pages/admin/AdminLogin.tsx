@@ -60,7 +60,7 @@ export function AdminLogin() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              placeholder="admin@svmride.com"
+              placeholder="Admin mail"
             />
 
             <Input
