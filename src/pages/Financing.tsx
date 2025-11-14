@@ -461,7 +461,7 @@ export function Financing() {
                     </h2>
 
                     <p className="text-[#444444] leading-relaxed">
-                      Pour soumettre une demande de financement via nos partenaires, remplissez le dossier en cliquant sur le bouton ci-dessous :
+                    Effectuez votre demande de financement via nos partenaires en cliquant sur le bouton ci-dessous :
                     </p>
 
                     <Link
