@@ -84,15 +84,22 @@ export function Header() {
           `}
         >
           <div className="flex flex-col gap-4">
-            {navLinks.map((link) => (
+            {navLinks.map((link, index) => (
               <Link
                 key={link.href}
                 to={link.href}
-                className={`px-4 py-2 text-base font-medium rounded-lg transition-colors ${
+                className={`px-4 py-2 text-base font-medium rounded-lg transition-all duration-300 ease-out ${
                   isActive(link.href)
                     ? 'bg-[#F9F9F9] text-[#D10000]'
                     : 'text-[#444444] hover:bg-[#F9F9F9]'
+                } ${
+                  mobileMenuOpen
+                    ? 'opacity-100 translate-x-0'
+                    : 'opacity-0 -translate-x-4'
                 }`}
+                style={{
+                  transitionDelay: mobileMenuOpen ? `${index * 50}ms` : '0ms'
+                }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}
@@ -102,7 +109,14 @@ export function Header() {
             <Link
               to="/contact"
               onClick={() => setMobileMenuOpen(false)}
-              className="px-4"
+              className={`px-4 transition-all duration-300 ease-out ${
+                mobileMenuOpen
+                  ? 'opacity-100 translate-x-0'
+                  : 'opacity-0 -translate-x-4'
+              }`}
+              style={{
+                transitionDelay: mobileMenuOpen ? `${navLinks.length * 50}ms` : '0ms'
+              }}
             >
               <Button fullWidth size="sm">Contactez-nous</Button>
             </Link>
