@@ -251,7 +251,6 @@ export function Contact() {
                     </span>
                   </div>
                   
-                  </div>
                 </div>
               </div>
             </div>
