@@ -219,11 +219,9 @@ export function Contact() {
                     Adresse
                   </h3>
                 </div>
-                <p className="text-[#444444]">
-                  Île-de-France
-                  <br />
-                
-                </p>
+                 <p className="text-[#444444]">
+                      {siteConfig.contact.instagram}
+                    </p>
               </div>
 
               <div className="bg-[#F9F9F9] p-6 rounded-xl">
