@@ -218,10 +218,12 @@ export function Contact() {
                   <h3 className="font-semibold text-[#111111]">
                     Adresse
                   </h3>
-               
-                 <p className="text-[#444444]">
-                      {siteConfig.contact.instagram}
-                    </p>
+                </div>
+                <p className="text-[#444444]">
+                  Île-de-France
+                  <br />
+                  
+                </p>
               </div>
 
               <div className="bg-[#F9F9F9] p-6 rounded-xl">
