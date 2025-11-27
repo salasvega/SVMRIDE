@@ -222,7 +222,7 @@ export function Contact() {
                 <p className="text-[#444444]">
                   Île-de-France
                   <br />
-                  Sur rendez-vous uniquement
+                
                 </p>
               </div>
 
