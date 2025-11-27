@@ -250,11 +250,7 @@ export function Contact() {
                       10h00 - 18h00
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Dimanche:</span>
-                    <span className="font-medium">
-                      Sur rendez-vous
-                    </span>
+                  
                   </div>
                 </div>
               </div>
