@@ -3,7 +3,7 @@ export const siteConfig = {
   description: 'Spécialiste du deux-roues en Île-de-France',
   contact: {
     email: 'contact@svmride.com',
-    phone: '06 99 35 28 90',
+    phone: '01 84 19 01 74',
     instagram: '@svm_ride',
     instagramUrl: 'https://instagram.com/svm_ride',
   },
