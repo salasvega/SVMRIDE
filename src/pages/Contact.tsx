@@ -218,13 +218,14 @@ export function Contact() {
                   <h3 className="font-semibold text-[#111111]">
                     Adresse
                   </h3>
-                </div>
-                <p className="text-[#444444]">
-                  Île-de-France
-                  <br />
-                  
-                </p>
-              </div>
+                 <div>
+                    <h3 className="font-semibold text-[#111111] mb-1">
+                      Téléphone
+                    </h3>
+                    <p className="text-[#444444]">
+                      {siteConfig.contact.phone}
+                    </p>
+                  </div>
 
               <div className="bg-[#F9F9F9] p-6 rounded-xl">
                 <div className="flex items-center gap-3 mb-4">
