@@ -1,6 +1,8 @@
 export const siteConfig = {
   name: 'SVM Ride',
   description: 'Spécialiste du deux-roues en Île-de-France',
+  adresse:
+    "77 Rue d'Argenteuil - Asnières sur Seine: Sans rendez-vous.\nPoints de vente en Ile de France : Sur rendez-vous\nHoraires: Mardi - Samedi : 9h-18h,  Lundi : Sur rendez-vous",
   contact: {
     email: 'contact@svmride.com',
     phone: '01 84 19 01 74',
