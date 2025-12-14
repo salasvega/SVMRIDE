@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Mail, Phone, Instagram } from 'lucide-react';
+import { Mail, Phone, Instagram, MapPin } from 'lucide-react';
 import { siteConfig } from '../../config/site';
 
 export function Footer() {
@@ -20,9 +20,13 @@ export function Footer() {
               </svg>
               <span className="text-2xl font-bold">{siteConfig.name}</span>
             </Link>
-            <p className="text-[#AAAAAA] text-sm leading-relaxed">
-              Votre spécialiste du deux-roues en Île-de-France. Vente, reprise, financement et personnalisation.
+            <p className="text-[#AAAAAA] text-sm leading-relaxed mb-4">
+              {siteConfig.description}
             </p>
+            <div className="flex items-start gap-2 text-[#AAAAAA] text-sm">
+              <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
+              <span className="whitespace-pre-line">{siteConfig.adresse}</span>
+            </div>
           </div>
 
           <div>
