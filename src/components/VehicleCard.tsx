@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Gauge, MapPin } from 'lucide-react';
+import { Calendar, Gauge, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Vehicle } from '../types/vehicle';
 import { formatPrice, formatMileage } from '../utils/vehicle-filters';
 import { Button } from './ui/Button';
@@ -13,10 +14,11 @@ interface VehicleCardProps {
 }
 
 // Récupère la première image (string[] ou {url,path}[])
-function getMainImage(vehicle: any): string | undefined {
-  if (!vehicle.images || vehicle.images.length === 0) return undefined;
-  const first = vehicle.images[0];
-  return typeof first === 'string' ? first : first?.url;
+function getAllImages(vehicle: any): string[] {
+  if (!vehicle.images || vehicle.images.length === 0) return [];
+  return vehicle.images.map((img: any) =>
+    typeof img === 'string' ? img : img?.url
+  ).filter(Boolean);
 }
 
 // Donne le label et la couleur selon le statut
@@ -34,30 +36,86 @@ function getStatusBadge(status?: string) {
 }
 
 export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) {
-  const mainImage = getMainImage(vehicle) || '/placeholder.jpg';
+  const images = getAllImages(vehicle);
+  const displayImages = images.length > 0 ? images : ['/placeholder.jpg'];
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const statusInfo = getStatusBadge(vehicle.status);
+  const hasMultipleImages = displayImages.length > 1;
+
+  const handlePrevImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? displayImages.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentImageIndex((prev) =>
+      prev === displayImages.length - 1 ? 0 : prev + 1
+    );
+  };
 
   const content = (
     <article className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group relative">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#F9F9F9]">
         <img
-          src={mainImage}
-          alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
+          src={displayImages[currentImageIndex]}
+          alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year} - Image ${currentImageIndex + 1}`}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
 
-        {/* Badge statut */}
+        {hasMultipleImages && (
+          <>
+            <button
+              onClick={handlePrevImage}
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+              aria-label="Image précédente"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            <button
+              onClick={handleNextImage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+              aria-label="Image suivante"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+              {displayImages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setCurrentImageIndex(index);
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentImageIndex
+                      ? 'bg-white w-6'
+                      : 'bg-white/50 hover:bg-white/75'
+                  }`}
+                  aria-label={`Aller à l'image ${index + 1}`}
+                />
+              ))}
+            </div>
+          </>
+        )}
+
         {statusInfo.label && (
           <div
-            className={`absolute top-4 left-4 ${statusInfo.color} text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md`}
+            className={`absolute top-4 left-4 ${statusInfo.color} text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md z-10`}
           >
             {statusInfo.label}
           </div>
         )}
 
-        {/* Prix */}
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-[#D10000] shadow-md">
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-[#D10000] shadow-md z-10">
           {formatPrice(vehicle.price)}
         </div>
       </div>
