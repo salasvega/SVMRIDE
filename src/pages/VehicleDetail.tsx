@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, Gauge, MapPin, Shield, ArrowLeft, MessageCircle, Euro } from 'lucide-react';
+import { Calendar, Gauge, MapPin, Shield, ArrowLeft, MessageCircle, Euro, ChevronLeft, ChevronRight } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
@@ -13,6 +13,20 @@ export function VehicleDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { vehicle, loading, error } = useVehicle(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handlePrevImage = () => {
+    if (!vehicle) return;
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? vehicle.images.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    if (!vehicle) return;
+    setCurrentImageIndex((prev) =>
+      prev === vehicle.images.length - 1 ? 0 : prev + 1
+    );
+  };
 
   if (loading) {
     return (
@@ -92,24 +106,59 @@ export function VehicleDetail() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* --- Colonne gauche : galerie photos --- */}
             <div>
-              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-[#F9F9F9] mb-4">
+              <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F9F9F9] mb-4 group">
                 <img
                   src={vehicle.images[currentImageIndex]}
                   alt={`${vehicle.brand} ${vehicle.model} - Image ${currentImageIndex + 1}`}
                   className="w-full h-full object-cover"
                 />
+
+                {vehicle.images.length > 1 && (
+                  <>
+                    <button
+                      onClick={handlePrevImage}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+                      aria-label="Image précédente"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+
+                    <button
+                      onClick={handleNextImage}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+                      aria-label="Image suivante"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+
+                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                      {vehicle.images.map((_, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setCurrentImageIndex(index)}
+                          className={`h-2 rounded-full transition-all ${
+                            index === currentImageIndex
+                              ? 'bg-white w-8'
+                              : 'bg-white/50 hover:bg-white/75 w-2'
+                          }`}
+                          aria-label={`Aller à l'image ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
 
               {vehicle.images.length > 1 && (
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
                   {vehicle.images.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all ${
+                      className={`aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
                         currentImageIndex === index
-                          ? 'border-[#D10000]'
-                          : 'border-transparent'
+                          ? 'border-[#D10000] scale-105'
+                          : 'border-gray-200'
                       }`}
                     >
                       <img
