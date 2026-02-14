@@ -10,6 +10,7 @@ import {
   ImageUpload,
   type UploadedImage,
 } from '../../components/admin/ImageUpload';
+import { VehicleSalesSheet } from '../../components/admin/VehicleSalesSheet';
 import { supabase } from '../../lib/supabase';
 import { Vehicle } from '../../types/vehicle';
 import Toast from '../../components/ui/Toast';
@@ -553,6 +554,34 @@ export function VehicleForm() {
               </span>
             </label>
           </div>
+
+          {/* Fiche de vente */}
+          {isEditing && formData.images.length > 0 && (
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
+              <h2 className="text-xl font-bold text-[#111111] mb-4">
+                Fiche de vente
+              </h2>
+              <p className="text-[#666666] mb-4">
+                Générez et imprimez une fiche de vente professionnelle pour afficher ce véhicule en vitrine.
+              </p>
+              <VehicleSalesSheet
+                vehicle={{
+                  brand: formData.brand,
+                  model: formData.model,
+                  year: formData.year,
+                  type: formData.type,
+                  displacement: formData.displacement,
+                  price: formData.price,
+                  mileage: formData.mileage,
+                  condition: formData.condition,
+                  description: formData.description,
+                  images: formData.images,
+                  features: formData.features,
+                  warranty: formData.warranty,
+                }}
+              />
+            </div>
+          )}
 
           {/* Bloc images */}
           <div className="bg-white rounded-xl p-6 shadow-sm border border-[#E5E5E5]">
