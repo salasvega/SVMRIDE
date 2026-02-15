@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Printer, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { formatPrice, formatMileage } from '../../utils/vehicle-filters';
@@ -216,26 +217,28 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
       {showModal && (
         <>
           <style>{`
-            @media print {
-              .print-hide-modal {
-                display: none !important;
-              }
-
+            @media screen {
               .sales-sheet-printable {
-                display: block !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                background: white !important;
-                z-index: 9999 !important;
+                display: none !important;
               }
             }
 
-            @media screen {
+            @media print {
+              body * {
+                visibility: hidden !important;
+              }
+
+              .sales-sheet-printable,
+              .sales-sheet-printable * {
+                visibility: visible !important;
+              }
+
               .sales-sheet-printable {
-                display: none;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                background: white !important;
               }
             }
 
@@ -245,7 +248,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
             }
           `}</style>
 
-          <div className="print-hide-modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl">
               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
                 <h2 className="text-xl font-bold text-gray-900">
@@ -278,11 +281,14 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
             </div>
           </div>
 
-          <div className="sales-sheet-printable">
-            <div style={{ border: '4px solid #D10000', borderRadius: '16px', overflow: 'hidden', background: 'white' }}>
-              <SheetContent />
-            </div>
-          </div>
+          {createPortal(
+            <div className="sales-sheet-printable">
+              <div style={{ border: '4px solid #D10000', borderRadius: '16px', overflow: 'hidden', background: 'white' }}>
+                <SheetContent />
+              </div>
+            </div>,
+            document.body
+          )}
         </>
       )}
     </>
