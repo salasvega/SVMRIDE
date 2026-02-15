@@ -41,14 +41,19 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
       <div style={{
         background: 'linear-gradient(135deg, #D10000 0%, #A00000 100%)',
         color: 'white',
-        padding: '30px',
+        padding: '12px 20px',
         textAlign: 'center',
         borderTopLeftRadius: '16px',
-        borderTopRightRadius: '16px'
+        borderTopRightRadius: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '12px'
       }}>
-        <div style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '8px', letterSpacing: '2px' }}>
+        <div style={{ fontSize: '22px', fontWeight: 'bold', letterSpacing: '1px' }}>
           {siteConfig.name}
         </div>
+        <div style={{ fontSize: '20px', opacity: 0.7 }}>•</div>
         <div style={{ fontSize: '14px', opacity: 0.9 }}>
           Votre spécialiste moto & scooter
         </div>
@@ -58,25 +63,25 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
         <img
           src={vehicle.images[0].url}
           alt={`${vehicle.brand} ${vehicle.model}`}
-          style={{ width: '100%', height: '350px', objectFit: 'cover', borderBottom: '3px solid #D10000' }}
+          style={{ width: '100%', height: '250px', objectFit: 'cover', borderBottom: '3px solid #D10000' }}
         />
       )}
 
-      <div style={{ padding: '30px' }}>
-        <h1 style={{ fontSize: '36px', fontWeight: 'bold', color: '#111111', marginBottom: '8px', lineHeight: 1.2 }}>
+      <div style={{ padding: '20px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#111111', marginBottom: '4px', lineHeight: 1.2 }}>
           {vehicle.brand} {vehicle.model}
         </h1>
-        <div style={{ fontSize: '24px', color: '#666666', marginBottom: '20px' }}>
+        <div style={{ fontSize: '20px', color: '#666666', marginBottom: '12px' }}>
           {vehicle.year}
         </div>
 
         <div style={{
-          fontSize: '56px',
+          fontSize: '40px',
           fontWeight: 'bold',
           color: '#D10000',
-          margin: '20px 0',
+          margin: '12px 0',
           textAlign: 'center',
-          padding: '20px',
+          padding: '12px',
           background: '#FFF5F5',
           borderRadius: '12px',
           border: '2px dashed #D10000'
@@ -84,60 +89,60 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
           {formatPrice(vehicle.price)}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', margin: '30px 0' }}>
-          <div style={{ padding: '16px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
-            <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '4px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', margin: '15px 0' }}>
+          <div style={{ padding: '12px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '2px' }}>
               Kilométrage
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111111' }}>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111111' }}>
               {formatMileage(vehicle.mileage)}
             </div>
           </div>
 
-          <div style={{ padding: '16px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
-            <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '4px' }}>
+          <div style={{ padding: '12px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '2px' }}>
               Cylindrée
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111111' }}>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111111' }}>
               {vehicle.displacement} cc
             </div>
           </div>
 
-          <div style={{ padding: '16px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
-            <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '4px' }}>
+          <div style={{ padding: '12px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '2px' }}>
               Type
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111111', textTransform: 'capitalize' }}>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111111', textTransform: 'capitalize' }}>
               {vehicle.type}
             </div>
           </div>
 
-          <div style={{ padding: '16px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
-            <div style={{ fontSize: '12px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '4px' }}>
+          <div style={{ padding: '12px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
+            <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '2px' }}>
               État
             </div>
-            <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111111' }}>
+            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#111111' }}>
               {conditionLabels[vehicle.condition] || vehicle.condition}
             </div>
           </div>
         </div>
 
         {vehicle.features.length > 0 && (
-          <div style={{ margin: '30px 0' }}>
+          <div style={{ margin: '15px 0' }}>
             <h2 style={{
-              fontSize: '20px',
+              fontSize: '18px',
               fontWeight: 'bold',
               color: '#111111',
-              marginBottom: '16px',
-              paddingBottom: '8px',
+              marginBottom: '10px',
+              paddingBottom: '6px',
               borderBottom: '2px solid #D10000'
             }}>
               Équipements
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '6px' }}>
               {vehicle.features.slice(0, 8).map((feature, index) => (
-                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: '#444444' }}>
-                  <span style={{ width: '8px', height: '8px', background: '#D10000', borderRadius: '50%' }}></span>
+                <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#444444' }}>
+                  <span style={{ width: '6px', height: '6px', background: '#D10000', borderRadius: '50%' }}></span>
                   {feature}
                 </div>
               ))}
@@ -146,18 +151,18 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
         )}
 
         {vehicle.description && (
-          <div style={{ margin: '30px 0' }}>
+          <div style={{ margin: '15px 0' }}>
             <h2 style={{
-              fontSize: '20px',
+              fontSize: '18px',
               fontWeight: 'bold',
               color: '#111111',
-              marginBottom: '16px',
-              paddingBottom: '8px',
+              marginBottom: '10px',
+              paddingBottom: '6px',
               borderBottom: '2px solid #D10000'
             }}>
               Description
             </h2>
-            <div style={{ padding: '20px', background: '#F9F9F9', borderRadius: '8px', color: '#444444', fontSize: '14px', lineHeight: 1.6 }}>
+            <div style={{ padding: '12px', background: '#F9F9F9', borderRadius: '8px', color: '#444444', fontSize: '13px', lineHeight: 1.5 }}>
               {vehicle.description}
             </div>
           </div>
@@ -165,17 +170,17 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
 
         {vehicle.warranty && (
           <div style={{
-            margin: '20px 0',
-            padding: '16px',
+            margin: '12px 0',
+            padding: '10px',
             background: '#FFF5F5',
             border: '2px solid #D10000',
             borderRadius: '8px',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#D10000', marginBottom: '8px' }}>
+            <div style={{ fontSize: '15px', fontWeight: 'bold', color: '#D10000', marginBottom: '4px' }}>
               🛡️ GARANTIE
             </div>
-            <div style={{ fontSize: '16px', color: '#111111', fontWeight: 600 }}>
+            <div style={{ fontSize: '14px', color: '#111111', fontWeight: 600 }}>
               {vehicle.warranty}
             </div>
           </div>
@@ -185,17 +190,17 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
       <div style={{
         background: '#111111',
         color: 'white',
-        padding: '24px 30px',
+        padding: '15px 20px',
         textAlign: 'center',
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px'
       }}>
-        <div style={{ fontSize: '16px', lineHeight: 1.6 }}>
+        <div style={{ fontSize: '14px', lineHeight: 1.5 }}>
           77 Rue d'Argenteuil - Asnières sur Seine
           <br />
           Tél: {siteConfig.contact.phone} | Email: {siteConfig.contact.email}
         </div>
-        <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#D10000', marginTop: '8px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#D10000', marginTop: '6px' }}>
           Visitez-nous ou contactez-nous !
         </div>
       </div>
@@ -244,7 +249,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
 
             @page {
               size: A4;
-              margin: 10mm;
+              margin: 8mm;
             }
           `}</style>
 
