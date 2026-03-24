@@ -169,20 +169,50 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
       <div style={{
         background: '#111111',
         color: 'white',
-        padding: '12px 16px',
-        textAlign: 'center',
+        padding: '16px',
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px'
       }}>
-        <div style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '6px' }}>
-          <div><strong>Chaville:</strong> 310 Avenue Roger Salengro, 92370</div>
-          <div><strong>Asnières-sur-Seine:</strong> 77 Rue d'Argenteuil, 92600</div>
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-around',
+          gap: '16px',
+          marginBottom: '12px',
+          flexWrap: 'wrap'
+        }}>
+          {siteConfig.showrooms.map((showroom, idx) => (
+            <div key={idx} style={{
+              flex: '1 1 200px',
+              minWidth: '200px',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: 'bold',
+                color: '#D10000',
+                marginBottom: '4px'
+              }}>
+                📍 {showroom.name}
+              </div>
+              <div style={{ fontSize: '12px', opacity: 0.9, lineHeight: 1.4 }}>
+                {showroom.fullAddress}
+              </div>
+              {showroom.note && (
+                <div style={{ fontSize: '11px', fontStyle: 'italic', opacity: 0.75, marginTop: '2px' }}>
+                  ({showroom.note})
+                </div>
+              )}
+            </div>
+          ))}
         </div>
-        <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>
-          Tél: {siteConfig.contact.phone} | Email: {siteConfig.contact.email}
-        </div>
-        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#D10000' }}>
-          Visitez-nous ou contactez-nous !
+        <div style={{
+          fontSize: '12px',
+          opacity: 0.9,
+          textAlign: 'center',
+          paddingTop: '8px',
+          borderTop: '1px solid rgba(255,255,255,0.2)'
+        }}>
+          📞 {siteConfig.contact.phone} | ✉️ {siteConfig.contact.email}
         </div>
       </div>
     </div>

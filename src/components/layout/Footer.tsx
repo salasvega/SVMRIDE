@@ -23,9 +23,31 @@ export function Footer() {
             <p className="text-[#AAAAAA] text-sm leading-relaxed mb-4">
               {siteConfig.description}
             </p>
-            <div className="flex items-start gap-2 text-[#AAAAAA] text-sm">
-              <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" aria-hidden="true" />
-              <span className="whitespace-pre-line">{siteConfig.adresse}</span>
+
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-white mb-2">Nos showrooms</h3>
+              {siteConfig.showrooms.map((showroom, index) => (
+                <a
+                  key={index}
+                  href={showroom.mapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2 text-[#AAAAAA] hover:text-white transition-colors group"
+                >
+                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-[#D10000] group-hover:text-white transition-colors" aria-hidden="true" />
+                  <div className="text-sm">
+                    <div className="font-medium">{showroom.name}</div>
+                    <div className="text-xs">{showroom.fullAddress}</div>
+                    {showroom.note && (
+                      <div className="text-xs italic text-[#888888]">({showroom.note})</div>
+                    )}
+                  </div>
+                </a>
+              ))}
+              <div className="text-xs text-[#888888] mt-3 pl-6">
+                <div>Mardi - Samedi : 9h-18h</div>
+                <div>Lundi : Sur rendez-vous</div>
+              </div>
             </div>
           </div>
 

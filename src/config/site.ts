@@ -8,6 +8,7 @@ export const siteConfig = {
       postalCode: '92370',
       city: 'Chaville',
       fullAddress: '310 Avenue Roger Salengro, 92370 Chaville',
+      mapsUrl: 'https://www.google.com/maps/search/?api=1&query=310+Avenue+Roger+Salengro+92370+Chaville',
     },
     {
       name: 'Asnières-sur-Seine',
@@ -16,6 +17,7 @@ export const siteConfig = {
       city: 'Asnières-sur-Seine',
       fullAddress: "77 Rue d'Argenteuil, 92600 Asnières-sur-Seine",
       note: 'sans rendez-vous',
+      mapsUrl: 'https://www.google.com/maps/search/?api=1&query=77+Rue+d%27Argenteuil+92600+Asnieres-sur-Seine',
     },
   ],
   adresse:

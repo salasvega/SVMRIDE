@@ -210,18 +210,68 @@ export function Contact() {
               </div>
 
               <div className="bg-[#F9F9F9] p-6 rounded-xl">
-                <div className="flex items-start gap-3 mb-4">
+                <div className="flex items-start gap-3 mb-6">
                   <MapPin
                     className="w-6 h-6 text-[#D10000] flex-shrink-0"
                     aria-hidden="true"
                   />
-                  <h3 className="font-semibold text-[#111111]">
-                    Adresse & Horaires
+                  <h3 className="font-semibold text-[#111111] text-xl">
+                    Nos showrooms
                   </h3>
                 </div>
-                <p className="text-[#444444] whitespace-pre-line">
-                  {siteConfig.adresse}
-                </p>
+
+                <div className="space-y-4 mb-6">
+                  {siteConfig.showrooms.map((showroom, index) => (
+                    <a
+                      key={index}
+                      href={showroom.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-start gap-3 p-4 bg-white rounded-lg hover:shadow-md transition-all border border-[#E5E5E5] hover:border-[#D10000] group"
+                    >
+                      <MapPin
+                        className="w-5 h-5 text-[#D10000] flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform"
+                        aria-hidden="true"
+                      />
+                      <div className="flex-1">
+                        <div className="font-semibold text-[#111111] mb-1 group-hover:text-[#D10000] transition-colors">
+                          {showroom.name}
+                        </div>
+                        <div className="text-sm text-[#444444] mb-1">
+                          {showroom.fullAddress}
+                        </div>
+                        {showroom.note && (
+                          <div className="text-xs text-[#666666] italic">
+                            ({showroom.note})
+                          </div>
+                        )}
+                        <div className="text-xs text-[#D10000] font-medium mt-2 flex items-center gap-1">
+                          <span>Voir sur Google Maps</span>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+
+                <div className="bg-white p-4 rounded-lg border border-[#E5E5E5]">
+                  <div className="flex items-start gap-3 mb-2">
+                    <Clock
+                      className="w-5 h-5 text-[#D10000] flex-shrink-0 mt-0.5"
+                      aria-hidden="true"
+                    />
+                    <h4 className="font-semibold text-[#111111]">Horaires</h4>
+                  </div>
+                  <div className="pl-8 text-sm text-[#444444] space-y-1">
+                    <div>Mardi - Samedi : 9h-18h</div>
+                    <div>Lundi : Sur rendez-vous</div>
+                  </div>
+                  <div className="pl-8 text-xs text-[#666666] mt-3 italic">
+                    Sur rendez-vous sur nos points de vente en Ile de France
+                  </div>
+                </div>
               </div>
             </div>
 
