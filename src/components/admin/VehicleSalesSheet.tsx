@@ -167,11 +167,12 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
       </div>
 
       <div style={{
-        background: '#111111',
-        color: 'white',
+        background: 'white',
+        color: '#333333',
         padding: '16px',
         borderBottomLeftRadius: '16px',
-        borderBottomRightRadius: '16px'
+        borderBottomRightRadius: '16px',
+        borderTop: '3px solid #D10000'
       }}>
         <div style={{
           display: 'flex',
@@ -194,11 +195,11 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
               }}>
                 📍 {showroom.name}
               </div>
-              <div style={{ fontSize: '12px', opacity: 0.9, lineHeight: 1.4 }}>
+              <div style={{ fontSize: '12px', color: '#333333', lineHeight: 1.4 }}>
                 {showroom.fullAddress}
               </div>
               {showroom.note && (
-                <div style={{ fontSize: '11px', fontStyle: 'italic', opacity: 0.75, marginTop: '2px' }}>
+                <div style={{ fontSize: '11px', fontStyle: 'italic', color: '#666666', marginTop: '2px' }}>
                   ({showroom.note})
                 </div>
               )}
@@ -207,10 +208,10 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
         </div>
         <div style={{
           fontSize: '12px',
-          opacity: 0.9,
+          color: '#333333',
           textAlign: 'center',
           paddingTop: '8px',
-          borderTop: '1px solid rgba(255,255,255,0.2)'
+          borderTop: '2px solid #EEEEEE'
         }}>
           📞 {siteConfig.contact.phone} | ✉️ {siteConfig.contact.email}
         </div>
