@@ -16,7 +16,6 @@ export const siteConfig = {
       postalCode: '92600',
       city: 'Asnières-sur-Seine',
       fullAddress: "77 Rue d'Argenteuil, 92600 Asnières-sur-Seine",
-      note: 'sans rendez-vous',
       mapsUrl: 'https://www.google.com/maps/search/?api=1&query=77+Rue+d%27Argenteuil+92600+Asnieres-sur-Seine',
     },
   ],
