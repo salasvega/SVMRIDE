@@ -1,8 +1,25 @@
 export const siteConfig = {
   name: 'SVM Ride',
   description: 'Spécialiste du deux-roues en Île-de-France',
+  showrooms: [
+    {
+      name: 'Chaville',
+      address: '310 Avenue Roger Salengro',
+      postalCode: '92370',
+      city: 'Chaville',
+      fullAddress: '310 Avenue Roger Salengro, 92370 Chaville',
+    },
+    {
+      name: 'Asnières-sur-Seine',
+      address: "77 Rue d'Argenteuil",
+      postalCode: '92600',
+      city: 'Asnières-sur-Seine',
+      fullAddress: "77 Rue d'Argenteuil, 92600 Asnières-sur-Seine",
+      note: 'sans rendez-vous',
+    },
+  ],
   adresse:
-    "77 Rue d'Argenteuil - Asnières sur Seine (sans rendez-vous).\nSur rendez-vous sur nos points de vente en Ile de France. \nHoraires: \nMardi - Samedi : 9h-18h \nLundi : Sur rendez-vous",
+    "310 Avenue Roger Salengro, 92370 Chaville\n77 Rue d'Argenteuil, 92600 Asnières-sur-Seine (sans rendez-vous)\nSur rendez-vous sur nos points de vente en Ile de France.\nHoraires:\nMardi - Samedi : 9h-18h\nLundi : Sur rendez-vous",
   contact: {
     email: 'contact@svmride.com',
     phone: '01 84 19 01 74',

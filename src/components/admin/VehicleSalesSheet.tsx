@@ -174,10 +174,14 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px'
       }}>
-        <div style={{ fontSize: '13px', lineHeight: 1.4 }}>
-          77 Rue d'Argenteuil - Asnières sur Seine | Tél: {siteConfig.contact.phone} | Email: {siteConfig.contact.email}
+        <div style={{ fontSize: '13px', lineHeight: 1.5, marginBottom: '6px' }}>
+          <div><strong>Chaville:</strong> 310 Avenue Roger Salengro, 92370</div>
+          <div><strong>Asnières-sur-Seine:</strong> 77 Rue d'Argenteuil, 92600</div>
         </div>
-        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#D10000', marginTop: '4px' }}>
+        <div style={{ fontSize: '12px', opacity: 0.9, marginBottom: '4px' }}>
+          Tél: {siteConfig.contact.phone} | Email: {siteConfig.contact.email}
+        </div>
+        <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#D10000' }}>
           Visitez-nous ou contactez-nous !
         </div>
       </div>
