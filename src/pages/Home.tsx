@@ -48,7 +48,7 @@ export function Home() {
               Votre spécialiste du deux-roues basé en Île-de-France.
             </p>
             <Link to="/vehicules">
-              <Button size="lg">Voir nos véhicules</Button>
+              <Button size="lg" variant="light">Voir nos véhicules</Button>
             </Link>
           </div>
         </Container>
@@ -90,7 +90,7 @@ export function Home() {
             ].map((feature, index) => (
               <div key={index} className="text-center">
                 <div className="inline-flex items-center justify-center w-16 h-16 bg-[#F9F9F9] rounded-xl mb-4">
-                  <feature.icon className="w-8 h-8 text-[#D10000]" aria-hidden="true" />
+                  <feature.icon className="w-8 h-8 text-brand" aria-hidden="true" />
                 </div>
                 <h3 className="text-lg font-semibold text-[#111111] mb-2">{feature.title}</h3>
                 <p className="text-sm text-[#444444] leading-relaxed">{feature.description}</p>
@@ -116,22 +116,22 @@ export function Home() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-white p-6 rounded-xl shadow-sm">
-                <Clock className="w-8 h-8 text-[#D10000] mb-3" aria-hidden="true" />
+                <Clock className="w-8 h-8 text-brand mb-3" aria-hidden="true" />
                 <h3 className="font-semibold text-[#111111] mb-2">Expertise rapide</h3>
                 <p className="text-sm text-[#444444]">Évaluation en moins de 24h</p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm">
-                <Award className="w-8 h-8 text-[#D10000] mb-3" aria-hidden="true" />
+                <Award className="w-8 h-8 text-brand mb-3" aria-hidden="true" />
                 <h3 className="font-semibold text-[#111111] mb-2">Offre attractive</h3>
                 <p className="text-sm text-[#444444]">Prix juste et compétitif</p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm">
-                <CheckCircle className="w-8 h-8 text-[#D10000] mb-3" aria-hidden="true" />
+                <CheckCircle className="w-8 h-8 text-brand mb-3" aria-hidden="true" />
                 <h3 className="font-semibold text-[#111111] mb-2">Virement immédiat</h3>
                 <p className="text-sm text-[#444444]">Paiement sécurisé rapide</p>
               </div>
               <div className="bg-white p-6 rounded-xl shadow-sm">
-                <Shield className="w-8 h-8 text-[#D10000] mb-3" aria-hidden="true" />
+                <Shield className="w-8 h-8 text-brand mb-3" aria-hidden="true" />
                 <h3 className="font-semibold text-[#111111] mb-2">Sans contrainte</h3>
                 <p className="text-sm text-[#444444]">Démarches simplifiées</p>
               </div>
@@ -148,7 +148,7 @@ export function Home() {
               <p className="text-[#444444] mb-6 leading-relaxed">
                 Transformez votre deux-roues selon vos envies. Échappements, kits esthétiques, selles confort et bien plus encore.
               </p>
-              <Link to="/contact" className="text-[#D10000] font-semibold hover:underline">
+              <Link to="/contact" className="text-brand font-semibold hover:underline">
                 En savoir plus →
               </Link>
             </div>
@@ -158,7 +158,7 @@ export function Home() {
               <p className="text-[#444444] mb-6 leading-relaxed">
                 Large gamme d'accessoires et d'équipements pour votre sécurité et votre confort. Casques, gants, bagagerie et plus.
               </p>
-              <Link to="/contact" className="text-[#D10000] font-semibold hover:underline">
+              <Link to="/contact" className="text-brand font-semibold hover:underline">
                 En savoir plus →
               </Link>
             </div>
@@ -168,7 +168,7 @@ export function Home() {
               <p className="text-[#444444] mb-6 leading-relaxed">
                 Service d'entretien et de réparation pour tous types de deux-roues. Prenez rendez-vous en ligne facilement.
               </p>
-              <Link to="/contact" className="text-[#D10000] font-semibold hover:underline">
+              <Link to="/contact" className="text-brand font-semibold hover:underline">
                 Prendre rendez-vous →
               </Link>
             </div>
@@ -187,7 +187,7 @@ export function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6 shadow-md">
-                <Star className="w-10 h-10 text-[#D10000]" aria-hidden="true" />
+                <Star className="w-10 h-10 text-brand" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Expertise & Passion</h3>
               <p className="text-[#444444] leading-relaxed">
@@ -197,7 +197,7 @@ export function Home() {
 
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6 shadow-md">
-                <Shield className="w-10 h-10 text-[#D10000]" aria-hidden="true" />
+                <Shield className="w-10 h-10 text-brand" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Qualité & Fiabilité</h3>
               <p className="text-[#444444] leading-relaxed">
@@ -207,7 +207,7 @@ export function Home() {
 
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-20 h-20 bg-white rounded-full mb-6 shadow-md">
-                <Users className="w-10 h-10 text-[#D10000]" aria-hidden="true" />
+                <Users className="w-10 h-10 text-brand" aria-hidden="true" />
               </div>
               <h3 className="text-xl font-bold text-[#111111] mb-3">Satisfaction Client</h3>
               <p className="text-[#444444] leading-relaxed">
@@ -225,7 +225,7 @@ export function Home() {
             Contactez-nous dès maintenant pour discuter de votre projet ou visiter notre showroom.
           </p>
           <Link to="/contact">
-            <Button size="lg">Nous contacter</Button>
+            <Button size="lg" variant="light">Nous contacter</Button>
           </Link>
         </Container>
       </Section>

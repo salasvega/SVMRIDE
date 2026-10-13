@@ -16,16 +16,16 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label htmlFor={textareaId} className="block text-sm font-medium text-[#111111] mb-2">
             {label}
-            {props.required && <span className="text-[#D10000] ml-1">*</span>}
+            {props.required && <span className="text-brand ml-1">*</span>}
           </label>
         )}
         <textarea
           ref={ref}
           id={textareaId}
-          className={`${widthClass} px-4 py-3 border border-[#AAAAAA] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D10000] focus:border-transparent transition-all resize-vertical ${error ? 'border-[#D10000]' : ''} ${className}`}
+          className={`${widthClass} px-4 py-3 border border-[#AAAAAA] rounded-lg focus:outline-none focus:ring-2 focus:ring-brand focus:border-transparent transition-all resize-vertical ${error ? 'border-brand' : ''} ${className}`}
           {...props}
         />
-        {error && <p className="mt-1 text-sm text-[#D10000]">{error}</p>}
+        {error && <p className="mt-1 text-sm text-brand">{error}</p>}
       </div>
     );
   }

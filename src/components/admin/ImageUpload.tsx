@@ -331,7 +331,7 @@ export function ImageUpload({
 
                 {/* badge Principale */}
                 {index === 0 && (
-                  <div className="absolute top-2 left-2 bg-[#C62E2E] text-white text-[10px] font-semibold px-2 py-1 rounded flex items-center gap-1">
+                  <div className="absolute top-2 left-2 bg-brand text-white text-[10px] font-semibold px-2 py-1 rounded flex items-center gap-1">
                     <Star className="w-3 h-3 fill-white text-white" />
                     <span>Principale</span>
                   </div>
@@ -377,8 +377,8 @@ export function ImageUpload({
               className={[
                 'border-2 border-dashed rounded-lg h-32 flex flex-col items-center justify-center cursor-pointer transition-all text-center px-2',
                 isDropTarget
-                  ? 'border-[#C62E2E] bg-[#C62E2E]/10'
-                  : 'border-[#CCCCCC] hover:border-[#C62E2E] hover:bg-[#C62E2E]/5',
+                  ? 'border-brand bg-brand/10'
+                  : 'border-[#CCCCCC] hover:border-brand hover:bg-brand/5',
               ].join(' ')}
               onDragOver={handleDropZoneDragOver}
               onDragLeave={handleDropZoneDragLeave}
@@ -395,7 +395,7 @@ export function ImageUpload({
 
               {uploading ? (
                 <div className="text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#C62E2E] mx-auto mb-2"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto mb-2"></div>
                   <p className="text-xs text-[#666666]">
                     Upload & compression...
                   </p>
@@ -454,7 +454,7 @@ export function ImageUpload({
             <button
               type="button"
               onClick={() => setAsPrimary(previewImage)}
-              className="absolute top-3 left-3 bg-[#C62E2E] hover:bg-[#a92222] text-white text-xs font-semibold rounded-full px-3 py-2 flex items-center gap-1 shadow-lg"
+              className="absolute top-3 left-3 bg-brand hover:bg-[#a92222] text-white text-xs font-semibold rounded-full px-3 py-2 flex items-center gap-1 shadow-lg"
             >
               <Star className="w-4 h-4 fill-white text-white" />
               <span>Définir comme photo principale</span>

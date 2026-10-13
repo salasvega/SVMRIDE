@@ -235,7 +235,7 @@ export function FileUpload({
         <button
           type="button"
           onClick={() => openLightbox(doc.previewUrl)}
-          className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-[#D10000]"
+          className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-brand"
           title="Aperçu"
         >
           <img
@@ -271,8 +271,8 @@ export function FileUpload({
         <div
           className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
             dragOver
-              ? 'border-[#D10000] bg-[#D10000]/5'
-              : 'border-[#CCCCCC] bg-white hover:border-[#D10000] hover:bg-[#D10000]/5'
+              ? 'border-brand bg-brand/5'
+              : 'border-[#CCCCCC] bg-white hover:border-brand hover:bg-brand/5'
           }`}
           onClick={handleClickBrowse}
           onDragOver={handleDragOver}
@@ -351,7 +351,7 @@ export function FileUpload({
                 {/* bouton supprimer */}
                 <button
                   type="button"
-                  className="text-[#999999] hover:text-[#D10000] ml-4"
+                  className="text-[#999999] hover:text-brand ml-4"
                   onClick={() => removeFile(index)}
                   aria-label={`Supprimer ${doc.file.name}`}
                 >

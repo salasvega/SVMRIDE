@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===== Couleur de marque =====
+   Pour changer le thème du site, modifier uniquement ces trois valeurs (R G B).
+   --brand       : couleur principale (boutons, liens, icônes)
+   --brand-dark  : survol des boutons
+   --brand-light : version claire, lisible sur fond sombre (pied de page) */
+:root {
+  --brand: 4 60 105;        /* #043C69 */
+  --brand-dark: 3 42 74;    /* #032A4A */
+  --brand-light: 79 143 199; /* #4F8FC7 */
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -58,7 +69,7 @@ input[type="range"].range-slider::-webkit-slider-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #D10000;
+  background: rgb(var(--brand));
   cursor: pointer;
   border: 2px solid white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -66,7 +77,7 @@ input[type="range"].range-slider::-webkit-slider-thumb {
 }
 
 input[type="range"].range-slider::-webkit-slider-thumb:hover {
-  background: #C00000;
+  background: rgb(var(--brand-dark));
   transform: scale(1.1);
 }
 
@@ -75,7 +86,7 @@ input[type="range"].range-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #D10000;
+  background: rgb(var(--brand));
   cursor: pointer;
   border: 2px solid white;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -83,6 +94,6 @@ input[type="range"].range-slider::-moz-range-thumb {
 }
 
 input[type="range"].range-slider::-moz-range-thumb:hover {
-  background: #C00000;
+  background: rgb(var(--brand-dark));
   transform: scale(1.1);
 }

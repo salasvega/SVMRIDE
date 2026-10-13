@@ -157,7 +157,7 @@ export function SingleFileUpload({
         <button
           type="button"
           onClick={() => setPreviewImageUrl(previewUrl)}
-          className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-[#D10000]"
+          className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-brand"
           title="Aperçu"
         >
           <img
@@ -223,7 +223,7 @@ export function SingleFileUpload({
               <button
                 type="button"
                 onClick={handleDelete}
-                className="text-[#999999] hover:text-[#D10000] ml-4"
+                className="text-[#999999] hover:text-brand ml-4"
                 title="Supprimer"
               >
                 <X className="w-4 h-4" />
@@ -245,7 +245,7 @@ export function SingleFileUpload({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[#CCCCCC] rounded-lg hover:border-[#D10000] hover:bg-[#D10000]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[#CCCCCC] rounded-lg hover:border-brand hover:bg-brand/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Upload className="w-5 h-5 text-[#999999]" />
               <span className="text-sm text-[#444444]">

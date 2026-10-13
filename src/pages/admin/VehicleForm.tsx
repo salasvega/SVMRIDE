@@ -205,7 +205,7 @@ export function VehicleForm() {
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate('/admin/vehicles')}
-            className="text-[#666666] hover:text-[#C62E2E]"
+            className="text-[#666666] hover:text-brand"
           >
             <ArrowLeft className="w-6 h-6" />
           </button>
@@ -547,7 +547,7 @@ export function VehicleForm() {
                       e.target.checked,
                   })
                 }
-                className="w-4 h-4 text-[#C62E2E] border-gray-300 rounded focus:ring-[#C62E2E]"
+                className="w-4 h-4 text-brand border-gray-300 rounded focus:ring-brand"
               />
               <span className="text-sm font-medium text-[#111111]">
                 Visible sur le site

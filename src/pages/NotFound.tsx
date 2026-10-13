@@ -16,7 +16,7 @@ export function NotFound() {
 
       <Section background="white" className="py-24">
         <Container className="text-center">
-          <AlertCircle className="w-20 h-20 text-[#D10000] mx-auto mb-6" aria-hidden="true" />
+          <AlertCircle className="w-20 h-20 text-brand mx-auto mb-6" aria-hidden="true" />
           <h1 className="text-6xl font-bold text-[#111111] mb-4">404</h1>
           <h2 className="text-2xl md:text-3xl font-bold text-[#111111] mb-4">
             Page non trouvée

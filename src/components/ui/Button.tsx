@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'light';
   size?: 'sm' | 'md' | 'lg';
   children: ReactNode;
   fullWidth?: boolean;
@@ -18,9 +18,11 @@ export function Button({
   const baseClasses = 'font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
-    primary: 'bg-[#D10000] text-white hover:bg-[#A00000] focus:ring-[#D10000]',
+    primary: 'bg-brand text-white hover:bg-brand-dark focus:ring-brand',
     secondary: 'bg-[#111111] text-white hover:bg-[#444444] focus:ring-[#111111]',
-    outline: 'border-2 border-[#D10000] text-[#D10000] hover:bg-[#D10000] hover:text-white focus:ring-[#D10000]',
+    outline: 'border-2 border-brand text-brand hover:bg-brand hover:text-white focus:ring-brand',
+    // Pour les fonds sombres : bouton blanc, texte couleur de marque
+    light: 'bg-white text-brand hover:bg-white/90 focus:ring-white',
   };
 
   const sizeClasses = {

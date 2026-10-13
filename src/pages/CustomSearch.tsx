@@ -131,7 +131,7 @@ export function CustomSearch() {
         <Container>
           <div className="flex items-center gap-3">
             <Search
-              className="w-8 h-8 text-[#D10000]"
+              className="w-8 h-8 text-brand"
               aria-hidden="true"
             />
             <h1 className="text-3xl md:text-4xl font-bold text-[#111111]">
@@ -164,7 +164,7 @@ export function CustomSearch() {
               <div className="space-y-4">
                 <div className="bg-[#F9F9F9] p-6 rounded-xl">
                   <h3 className="font-semibold text-[#111111] mb-2 flex items-center gap-2">
-                    <span className="w-8 h-8 bg-[#D10000] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    <span className="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center text-sm font-bold">
                       1
                     </span>
                     Définissez vos critères
@@ -177,7 +177,7 @@ export function CustomSearch() {
 
                 <div className="bg-[#F9F9F9] p-6 rounded-xl">
                   <h3 className="font-semibold text-[#111111] mb-2 flex items-center gap-2">
-                    <span className="w-8 h-8 bg-[#D10000] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    <span className="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center text-sm font-bold">
                       2
                     </span>
                     Nous cherchons pour vous
@@ -190,7 +190,7 @@ export function CustomSearch() {
 
                 <div className="bg-[#F9F9F9] p-6 rounded-xl">
                   <h3 className="font-semibold text-[#111111] mb-2 flex items-center gap-2">
-                    <span className="w-8 h-8 bg-[#D10000] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    <span className="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center text-sm font-bold">
                       3
                     </span>
                     Vous recevez des propositions
@@ -203,7 +203,7 @@ export function CustomSearch() {
 
                 <div className="bg-[#F9F9F9] p-6 rounded-xl">
                   <h3 className="font-semibold text-[#111111] mb-2 flex items-center gap-2">
-                    <span className="w-8 h-8 bg-[#D10000] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    <span className="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center text-sm font-bold">
                       4
                     </span>
                     Vous choisissez
@@ -384,7 +384,7 @@ export function CustomSearch() {
                       required
                       checked={formData.consent}
                       onChange={handleChange}
-                      className="mt-1 w-4 h-4 text-[#D10000] focus:ring-[#D10000] rounded"
+                      className="mt-1 w-4 h-4 text-brand focus:ring-brand rounded"
                     />
                     <label
                       htmlFor="consent"
@@ -395,12 +395,12 @@ export function CustomSearch() {
                       la{' '}
                       <a
                         href="/politique-confidentialite"
-                        className="text-[#D10000] hover:underline"
+                        className="text-brand hover:underline"
                       >
                         politique de confidentialité
                       </a>
                       .{' '}
-                      <span className="text-[#D10000]">
+                      <span className="text-brand">
                         *
                       </span>
                     </label>
