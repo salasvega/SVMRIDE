@@ -167,8 +167,10 @@ Deno.serve(async (req: Request) => {
         "Authorization": `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: "contact@svmride.com",
-        to: ["contact@svmride.com"],
+        // Même expéditeur que les autres formulaires tant que svmride.com
+        // n'est pas vérifié dans Resend (resend.com/domains).
+        from: "noreply@resend.dev",
+        to: Deno.env.get("RECIPIENT_EMAIL") ?? "contact@svmride.com",
         subject: `Nouveau contact: ${subject}`,
         html: emailHtml,
         reply_to: email,
