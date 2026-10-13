@@ -129,7 +129,7 @@ export function Vehicles() {
                 placeholder="Rechercher une marque ou un modèle..."
                 value={searchQuery}
                 onChange={(e) => updateSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white border-2 border-[#E5E5E5] rounded-xl text-[#111111] placeholder-[#AAAAAA] focus:border-[#D10000] focus:outline-none transition-colors"
+                className="w-full pl-12 pr-4 py-4 bg-white border-2 border-[#E5E5E5] rounded-xl text-[#111111] placeholder-[#AAAAAA] focus:border-brand focus:outline-none transition-colors"
               />
             </div>
 
@@ -139,12 +139,12 @@ export function Vehicles() {
                 className="w-full px-6 py-4 flex items-center justify-between hover:bg-[#F9F9F9] transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <SlidersHorizontal className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
+                  <SlidersHorizontal className="w-5 h-5 text-brand" aria-hidden="true" />
                   <span className="font-semibold text-[#111111]">
                     Filtres avancés
                   </span>
                   {activeFiltersCount > 0 && (
-                    <span className="px-2 py-1 bg-[#D10000] text-white text-xs font-semibold rounded-full">
+                    <span className="px-2 py-1 bg-brand text-white text-xs font-semibold rounded-full">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -228,7 +228,7 @@ export function Vehicles() {
                         </span>
                         <button
                           onClick={clearAllFilters}
-                          className="text-sm text-[#D10000] hover:underline font-medium"
+                          className="text-sm text-brand hover:underline font-medium"
                         >
                           Tout effacer
                         </button>
@@ -243,7 +243,7 @@ export function Vehicles() {
                               className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#F9F9F9] hover:bg-[#EEEEEE] border border-[#E5E5E5] rounded-lg text-sm text-[#111111] transition-colors group"
                             >
                               <span>{getFilterLabel(key as keyof VehicleFilters, value)}</span>
-                              <X className="w-3.5 h-3.5 text-[#AAAAAA] group-hover:text-[#D10000]" aria-hidden="true" />
+                              <X className="w-3.5 h-3.5 text-[#AAAAAA] group-hover:text-brand" aria-hidden="true" />
                             </button>
                           );
                         })}

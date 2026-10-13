@@ -26,7 +26,7 @@ export function Header() {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img
-              src="/image copy.png"
+              src="/logo-bleu.png"
               alt="SVM Ride Logo"
               className="w-12 h-12 object-contain"
             />
@@ -41,9 +41,9 @@ export function Header() {
               <Link
                 key={link.href}
                 to={link.href}
-                className={`text-sm font-medium transition-colors hover:text-[#D10000] ${
+                className={`text-sm font-medium transition-colors hover:text-brand ${
                   isActive(link.href)
-                    ? 'text-[#D10000]'
+                    ? 'text-brand'
                     : 'text-[#444444]'
                 }`}
               >
@@ -90,7 +90,7 @@ export function Header() {
                 to={link.href}
                 className={`px-4 py-2 text-base font-medium rounded-lg transition-all duration-300 ease-out ${
                   isActive(link.href)
-                    ? 'bg-[#F9F9F9] text-[#D10000]'
+                    ? 'bg-[#F9F9F9] text-brand'
                     : 'text-[#444444] hover:bg-[#F9F9F9]'
                 } ${
                   mobileMenuOpen

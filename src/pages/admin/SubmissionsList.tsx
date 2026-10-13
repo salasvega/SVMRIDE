@@ -413,7 +413,7 @@ export default function SubmissionsList() {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => setSubmissionToDelete(submission.id)}
-                            className="p-2 text-[#D10000] hover:bg-[#F9F9F9] rounded transition-colors"
+                            className="p-2 text-brand hover:bg-[#F9F9F9] rounded transition-colors"
                             title="Supprimer"
                           >
                             <Trash2 className="w-4 h-4" />

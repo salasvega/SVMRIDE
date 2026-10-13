@@ -147,7 +147,7 @@ export function TradeIn() {
 
               <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-[#D10000] text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center font-bold">
                     1
                   </div>
                   <div>
@@ -163,7 +163,7 @@ export function TradeIn() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-[#D10000] text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center font-bold">
                     2
                   </div>
                   <div>
@@ -178,7 +178,7 @@ export function TradeIn() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-[#D10000] text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center font-bold">
                     3
                   </div>
                   <div>
@@ -193,7 +193,7 @@ export function TradeIn() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-[#D10000] text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center font-bold">
                     4
                   </div>
                   <div>
@@ -337,7 +337,7 @@ export function TradeIn() {
                       required
                       checked={formData.consent}
                       onChange={handleChange}
-                      className="mt-1 w-4 h-4 text-[#D10000] focus:ring-[#D10000] rounded"
+                      className="mt-1 w-4 h-4 text-brand focus:ring-brand rounded"
                     />
                     <label
                       htmlFor="consent"
@@ -348,12 +348,12 @@ export function TradeIn() {
                       reprise conformément à la{' '}
                       <a
                         href="/politique-confidentialite"
-                        className="text-[#D10000] hover:underline"
+                        className="text-brand hover:underline"
                       >
                         politique de confidentialité
                       </a>
                       .{' '}
-                      <span className="text-[#D10000]">
+                      <span className="text-brand">
                         *
                       </span>
                     </label>

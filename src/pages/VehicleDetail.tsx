@@ -93,7 +93,7 @@ export function VehicleDetail() {
         <Container>
           <Link
             to="/vehicules"
-            className="inline-flex items-center gap-2 text-[#D10000] hover:underline"
+            className="inline-flex items-center gap-2 text-brand hover:underline"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour aux véhicules
@@ -157,7 +157,7 @@ export function VehicleDetail() {
                       onClick={() => setCurrentImageIndex(index)}
                       className={`aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
                         currentImageIndex === index
-                          ? 'border-[#D10000] scale-105'
+                          ? 'border-brand scale-105'
                           : 'border-gray-200'
                       }`}
                     >
@@ -178,13 +178,13 @@ export function VehicleDetail() {
                 {vehicle.brand} {vehicle.model}
               </h1>
 
-              <p className="text-3xl font-bold text-[#D10000] mb-6">
+              <p className="text-3xl font-bold text-brand mb-6">
                 {formatPrice(vehicle.price)}
               </p>
 
               <div className="grid grid-cols-2 gap-4 mb-8 p-6 bg-[#F9F9F9] rounded-xl">
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
+                  <Calendar className="w-5 h-5 text-brand" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Année</p>
                     <p className="font-semibold text-[#111111]">{vehicle.year}</p>
@@ -192,7 +192,7 @@ export function VehicleDetail() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Gauge className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
+                  <Gauge className="w-5 h-5 text-brand" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Cylindrée</p>
                     <p className="font-semibold text-[#111111]">
@@ -202,7 +202,7 @@ export function VehicleDetail() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
+                  <MapPin className="w-5 h-5 text-brand" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Kilométrage</p>
                     <p className="font-semibold text-[#111111]">
@@ -212,7 +212,7 @@ export function VehicleDetail() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-[#D10000]" aria-hidden="true" />
+                  <Shield className="w-5 h-5 text-brand" aria-hidden="true" />
                   <div>
                     <p className="text-sm text-[#444444]">Type</p>
                     <p className="font-semibold text-[#111111] capitalize">
@@ -234,7 +234,7 @@ export function VehicleDetail() {
                 <ul className="grid grid-cols-2 gap-2">
                   {vehicle.features.map((feature, index) => (
                     <li key={index} className="flex items-center gap-2 text-[#444444]">
-                      <span className="w-2 h-2 bg-[#D10000] rounded-full"></span>
+                      <span className="w-2 h-2 bg-brand rounded-full"></span>
                       {feature}
                     </li>
                   ))}
@@ -243,7 +243,7 @@ export function VehicleDetail() {
 
               {/* Garantie */}
               <div className="p-4 bg-[#F9F9F9] rounded-xl mb-8">
-                <div className="flex items-center gap-2 text-[#D10000] mb-1">
+                <div className="flex items-center gap-2 text-brand mb-1">
                   <Shield className="w-5 h-5" aria-hidden="true" />
                   <span className="font-semibold">Garantie</span>
                 </div>
@@ -264,7 +264,7 @@ export function VehicleDetail() {
       fullWidth
       className="
         w-full
-        bg-[#D10000]
+        bg-brand
         text-white
         font-semibold
         tracking-wide

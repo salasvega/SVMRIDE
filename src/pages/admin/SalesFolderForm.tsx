@@ -83,7 +83,7 @@ function DocumentThumbnail({ doc, onClick }: { doc: DocumentMetadata; onClick: (
       <button
         type="button"
         onClick={onClick}
-        className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-[#D10000]"
+        className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-brand"
         title="Aperçu"
       >
         <img

@@ -11,7 +11,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <Link to="/" className="flex items-center gap-2 mb-4">
-              <svg className="w-8 h-8 text-[#D10000]" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg className="w-8 h-8 text-brand-light" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="m18 14-1-3"/>
                 <path d="m3 9 6 2a2 2 0 0 1 2-2h2a2 2 0 0 1 1.99 1.81"/>
                 <path d="M8 17h3a1 1 0 0 0 1-1 6 6 0 0 1 6-6 1 1 0 0 0 1-1v-.75A5 5 0 0 0 17 5"/>
@@ -34,7 +34,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="flex items-start gap-2 text-[#AAAAAA] hover:text-white transition-colors group"
                 >
-                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-[#D10000] group-hover:text-white transition-colors" aria-hidden="true" />
+                  <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-brand-light group-hover:text-white transition-colors" aria-hidden="true" />
                   <div className="text-sm">
                     <div className="font-medium">{showroom.name}</div>
                     <div className="text-xs">{showroom.fullAddress}</div>

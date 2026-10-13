@@ -88,7 +88,7 @@ function DocumentThumbnail({ doc, onClick }: { doc: DocumentMetadata; onClick: (
     return (
       <button
         onClick={onClick}
-        className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-[#D10000]"
+        className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-brand"
         title="Aper\u00e7u"
       >
         <img
@@ -284,7 +284,7 @@ export function SalesFolderDetails() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Calendar className="w-4 h-4 text-[#D10000]" />
+                        <Calendar className="w-4 h-4 text-brand" />
                       </div>
                       <div>
                         <p className="text-sm text-[#666666]">Année</p>
@@ -294,7 +294,7 @@ export function SalesFolderDetails() {
 
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Gauge className="w-4 h-4 text-[#D10000]" />
+                        <Gauge className="w-4 h-4 text-brand" />
                       </div>
                       <div>
                         <p className="text-sm text-[#666666]">Cylindrée</p>
@@ -304,7 +304,7 @@ export function SalesFolderDetails() {
 
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <MapPin className="w-4 h-4 text-[#D10000]" />
+                        <MapPin className="w-4 h-4 text-brand" />
                       </div>
                       <div>
                         <p className="text-sm text-[#666666]">Kilométrage</p>
@@ -314,7 +314,7 @@ export function SalesFolderDetails() {
 
                     <div className="flex items-start gap-3">
                       <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Euro className="w-4 h-4 text-[#D10000]" />
+                        <Euro className="w-4 h-4 text-brand" />
                       </div>
                       <div>
                         <p className="text-sm text-[#666666]">Prix affiché</p>

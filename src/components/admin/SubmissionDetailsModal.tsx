@@ -150,7 +150,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
       )}
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-        <div className="sticky top-0 bg-gradient-to-r from-[#C62E2E] to-[#D10000] text-white px-6 py-5 relative overflow-hidden">
+        <div className="sticky top-0 bg-gradient-to-r from-brand to-brand text-white px-6 py-5 relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/fond_carbonne_nid_abeilles.png')] bg-center bg-cover opacity-80"></div>
           <div className="relative z-10 flex items-center justify-between gap-4">
             <div className="flex-1">
@@ -178,7 +178,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <div className="flex items-center gap-3 bg-[#F9F9F9] rounded-xl p-4 flex-1">
-                <User className="w-6 h-6 text-[#C62E2E]" />
+                <User className="w-6 h-6 text-brand" />
                 <span className="text-lg font-semibold text-[#111111]">
                   {submission.name}
                 </span>
@@ -201,13 +201,13 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
               <div className="bg-[#F9F9F9] rounded-xl p-4 space-y-3">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-white rounded-lg">
-                    <Mail className="w-5 h-5 text-[#C62E2E]" />
+                    <Mail className="w-5 h-5 text-brand" />
                   </div>
                   <div className="flex-1">
                     <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-1">Email</p>
                     <a
                       href={`mailto:${submission.email}`}
-                      className="text-[#C62E2E] hover:underline break-all"
+                      className="text-brand hover:underline break-all"
                     >
                       {submission.email}
                     </a>
@@ -218,13 +218,13 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
               <div className="bg-[#F9F9F9] rounded-xl p-4 space-y-3">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-white rounded-lg">
-                    <Phone className="w-5 h-5 text-[#C62E2E]" />
+                    <Phone className="w-5 h-5 text-brand" />
                   </div>
                   <div className="flex-1">
                     <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-1">Téléphone</p>
                     <a
                       href={`tel:${submission.phone}`}
-                      className="text-[#C62E2E] hover:underline"
+                      className="text-brand hover:underline"
                     >
                       {submission.phone}
                     </a>
@@ -237,7 +237,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
               <div className="bg-[#F9F9F9] rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-white rounded-lg">
-                    <Tag className="w-5 h-5 text-[#C62E2E]" />
+                    <Tag className="w-5 h-5 text-brand" />
                   </div>
                   <div className="flex-1">
                     <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-1">Sujet</p>
@@ -251,7 +251,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
               <div className="bg-[#F9F9F9] rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-white rounded-lg">
-                    <MessageSquare className="w-5 h-5 text-[#C62E2E]" />
+                    <MessageSquare className="w-5 h-5 text-brand" />
                   </div>
                   <div className="flex-1">
                     <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-2">Message</p>
@@ -281,7 +281,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
               <div className="bg-[#F9F9F9] rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-white rounded-lg">
-                    <Paperclip className="w-5 h-5 text-[#C62E2E]" />
+                    <Paperclip className="w-5 h-5 text-brand" />
                   </div>
                   <div className="flex-1">
                     <p className="text-xs text-[#666666] font-medium uppercase tracking-wide mb-3">
@@ -306,10 +306,10 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
                           </div>
                           <button
                             onClick={() => handleDownloadAttachment(attachment)}
-                            className="ml-3 p-2 hover:bg-[#C62E2E]/10 rounded-lg transition-colors flex-shrink-0 group"
+                            className="ml-3 p-2 hover:bg-brand/10 rounded-lg transition-colors flex-shrink-0 group"
                             title="Télécharger"
                           >
-                            <Download className="w-5 h-5 text-[#C62E2E] group-hover:text-[#A02525]" />
+                            <Download className="w-5 h-5 text-brand group-hover:text-[#A02525]" />
                           </button>
                         </div>
                       ))}
@@ -346,7 +346,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
         <div className="sticky bottom-0 bg-white border-t border-[#E5E5E5] px-6 py-4">
           <Button
             onClick={onClose}
-            className="w-full bg-[#C62E2E] hover:bg-[#A02525] text-white font-semibold py-3 rounded-xl transition-colors"
+            className="w-full bg-brand hover:bg-[#A02525] text-white font-semibold py-3 rounded-xl transition-colors"
           >
             Fermer
           </Button>

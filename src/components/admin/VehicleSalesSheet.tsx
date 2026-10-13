@@ -42,7 +42,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
         <img
           src={vehicle.images[0].url}
           alt={`${vehicle.brand} ${vehicle.model}`}
-          style={{ width: '100%', height: '220px', objectFit: 'cover', borderBottom: '3px solid #D10000', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
+          style={{ width: '100%', height: '220px', objectFit: 'cover', borderBottom: '3px solid rgb(var(--brand))', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
         />
       )}
 
@@ -57,19 +57,19 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
         <div style={{
           fontSize: '38px',
           fontWeight: 'bold',
-          color: '#D10000',
+          color: 'rgb(var(--brand))',
           margin: '10px 0',
           textAlign: 'center',
           padding: '10px',
           background: '#FFF5F5',
           borderRadius: '12px',
-          border: '2px dashed #D10000'
+          border: '2px dashed rgb(var(--brand))'
         }}>
           {formatPrice(vehicle.price)}
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', margin: '12px 0' }}>
-          <div style={{ padding: '10px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
+          <div style={{ padding: '10px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid rgb(var(--brand))' }}>
             <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '2px' }}>
               Kilométrage
             </div>
@@ -78,7 +78,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
             </div>
           </div>
 
-          <div style={{ padding: '10px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
+          <div style={{ padding: '10px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid rgb(var(--brand))' }}>
             <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '2px' }}>
               Cylindrée
             </div>
@@ -87,7 +87,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
             </div>
           </div>
 
-          <div style={{ padding: '10px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
+          <div style={{ padding: '10px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid rgb(var(--brand))' }}>
             <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '2px' }}>
               Type
             </div>
@@ -96,7 +96,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
             </div>
           </div>
 
-          <div style={{ padding: '10px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid #D10000' }}>
+          <div style={{ padding: '10px', background: '#F9F9F9', borderRadius: '8px', borderLeft: '4px solid rgb(var(--brand))' }}>
             <div style={{ fontSize: '10px', textTransform: 'uppercase', color: '#666666', fontWeight: 600, marginBottom: '2px' }}>
               État
             </div>
@@ -114,14 +114,14 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
               color: '#111111',
               marginBottom: '8px',
               paddingBottom: '5px',
-              borderBottom: '2px solid #D10000'
+              borderBottom: '2px solid rgb(var(--brand))'
             }}>
               Équipements
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '5px' }}>
               {vehicle.features.slice(0, 8).map((feature, index) => (
                 <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#444444' }}>
-                  <span style={{ width: '5px', height: '5px', background: '#D10000', borderRadius: '50%' }}></span>
+                  <span style={{ width: '5px', height: '5px', background: 'rgb(var(--brand))', borderRadius: '50%' }}></span>
                   {feature}
                 </div>
               ))}
@@ -137,7 +137,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
               color: '#111111',
               marginBottom: '8px',
               paddingBottom: '5px',
-              borderBottom: '2px solid #D10000'
+              borderBottom: '2px solid rgb(var(--brand))'
             }}>
               Description
             </h2>
@@ -152,11 +152,11 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
             margin: '10px 0',
             padding: '8px',
             background: '#FFF5F5',
-            border: '2px solid #D10000',
+            border: '2px solid rgb(var(--brand))',
             borderRadius: '8px',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#D10000', marginBottom: '3px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 'bold', color: 'rgb(var(--brand))', marginBottom: '3px' }}>
               🛡️ GARANTIE
             </div>
             <div style={{ fontSize: '13px', color: '#111111', fontWeight: 600 }}>
@@ -172,7 +172,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
         padding: '16px',
         borderBottomLeftRadius: '16px',
         borderBottomRightRadius: '16px',
-        borderTop: '3px solid #D10000'
+        borderTop: '3px solid rgb(var(--brand))'
       }}>
         <div style={{
           display: 'flex',
@@ -190,7 +190,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
               <div style={{
                 fontSize: '14px',
                 fontWeight: 'bold',
-                color: '#D10000',
+                color: 'rgb(var(--brand))',
                 marginBottom: '4px'
               }}>
                 📍 {showroom.name}
@@ -291,7 +291,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
               </div>
 
               <div className="p-6">
-                <div className="mx-auto bg-white border-4 border-[#D10000] rounded-2xl overflow-hidden">
+                <div className="mx-auto bg-white border-4 border-brand rounded-2xl overflow-hidden">
                   <SheetContent />
                 </div>
               </div>
@@ -300,7 +300,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
 
           {createPortal(
             <div className="sales-sheet-printable">
-              <div style={{ border: '4px solid #D10000', borderRadius: '16px', overflow: 'hidden', background: 'white' }}>
+              <div style={{ border: '4px solid rgb(var(--brand))', borderRadius: '16px', overflow: 'hidden', background: 'white' }}>
                 <SheetContent />
               </div>
             </div>,

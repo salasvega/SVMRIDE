@@ -26,7 +26,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
               <Link to="/admin/dashboard" className="flex items-center space-x-2">
-                <Crown className="w-6 h-6 text-[#C62E2E]" />
+                <Crown className="w-6 h-6 text-brand" />
                 <span className="text-xl font-bold text-[#111111]">Admin</span>
               </Link>
 
@@ -35,8 +35,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   to="/admin/vehicles"
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                     isActive('/admin/vehicles')
-                      ? 'text-[#C62E2E] bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E]'
+                      ? 'text-brand bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
                   }`}
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -52,14 +52,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   to="/admin/submissions"
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 relative ${
                     isActive('/admin/submissions')
-                      ? 'text-[#C62E2E] bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E]'
+                      ? 'text-brand bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
                   }`}
                 >
                   <Mail className="w-4 h-4" />
                   Messages
                   {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[#C62E2E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-brand text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
@@ -68,14 +68,14 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   to="/admin/financing-profiles"
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 relative ${
                     isActive('/admin/financing-profiles')
-                      ? 'text-[#C62E2E] bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E]'
+                      ? 'text-brand bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
                   }`}
                 >
                   <FileText className="w-4 h-4" />
                   Dossiers Financement
                   {unreadFinancingProfiles > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[#C62E2E] text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-brand text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                       {unreadFinancingProfiles > 99 ? '99+' : unreadFinancingProfiles}
                     </span>
                   )}
@@ -84,8 +84,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   to="/admin/sales-folders"
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
                     isActive('/admin/sales-folders')
-                      ? 'text-[#C62E2E] bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-[#C62E2E]'
+                      ? 'text-brand bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
                   }`}
                 >
                   <FolderOpen className="w-4 h-4" />
@@ -95,7 +95,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div className="flex items-center space-x-4">
-              <Link to="/" className="text-[#666666] hover:text-[#C62E2E]" title="Voir le site">
+              <Link to="/" className="text-[#666666] hover:text-brand" title="Voir le site">
                 <Home className="w-5 h-5" />
               </Link>
             </div>

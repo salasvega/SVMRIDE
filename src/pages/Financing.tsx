@@ -261,7 +261,7 @@ export function Financing() {
 
   <div className="space-y-4">
     <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+      <CheckCircle className="w-6 h-6 text-brand flex-shrink-0" aria-hidden="true" />
       <div>
         <h3 className="font-semibold text-[#111111] mb-1">Réponse rapide</h3>
         <p className="text-sm text-[#444444]">
@@ -271,7 +271,7 @@ export function Financing() {
     </div>
 
     <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+      <CheckCircle className="w-6 h-6 text-brand flex-shrink-0" aria-hidden="true" />
       <div>
         <h3 className="font-semibold text-[#111111] mb-1">Taux compétitifs</h3>
         <p className="text-sm text-[#444444]">
@@ -283,7 +283,7 @@ export function Financing() {
     {/* Paiement en plusieurs fois via Alma */}
 <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
   <CheckCircle
-    className="w-6 h-6 text-[#D10000] flex-shrink-0"
+    className="w-6 h-6 text-brand flex-shrink-0"
     aria-hidden="true"
   />
   <div>
@@ -297,7 +297,7 @@ export function Financing() {
         href="https://almapay.com/fr-FR"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-[#D10000] font-medium hover:underline"
+        className="text-brand font-medium hover:underline"
       >
         Alma
       </a>
@@ -326,7 +326,7 @@ export function Financing() {
 
 
     <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+      <CheckCircle className="w-6 h-6 text-brand flex-shrink-0" aria-hidden="true" />
       <div>
         <h3 className="font-semibold text-[#111111] mb-1">Sans frais de dossier</h3>
         <p className="text-sm text-[#444444]">
@@ -336,7 +336,7 @@ export function Financing() {
     </div>
 
     <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-[#D10000] flex-shrink-0" aria-hidden="true" />
+      <CheckCircle className="w-6 h-6 text-brand flex-shrink-0" aria-hidden="true" />
       <div>
         <h3 className="font-semibold text-[#111111] mb-1">Accompagnement personnalisé</h3>
         <p className="text-sm text-[#444444]">
@@ -466,7 +466,7 @@ export function Financing() {
 
                     <Link
                       to={`/financement/dossier?vehicle=${encodeURIComponent(vehicleFromURL)}&price=${priceFromURL || ''}&duration=${formData.duration}`}
-                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-[#D10000] hover:bg-[#B00000] text-white font-semibold rounded-lg transition-colors"
+                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand hover:bg-[#B00000] text-white font-semibold rounded-lg transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       Mon Dossier de Financement

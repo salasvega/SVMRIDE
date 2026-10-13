@@ -115,7 +115,7 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
           </div>
         )}
 
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-[#D10000] shadow-md z-10">
+        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-brand shadow-md z-10">
           {formatPrice(vehicle.price)}
         </div>
       </div>

@@ -43,7 +43,7 @@ export function AdminLogin() {
           </button>
 
           <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 bg-[#C62E2E] rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-brand rounded-full flex items-center justify-center">
               <Lock className="w-8 h-8 text-white" />
             </div>
           </div>
