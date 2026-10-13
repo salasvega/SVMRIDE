@@ -41,7 +41,7 @@ BEGIN
     url := 'https://fthoybkgbnxzlrjbprrh.supabase.co/functions/v1/trade-in-notification',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aG95YmtnYm54emxyamJwcnJoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTA1MDUxMywiZXhwIjoyMDc2NjI2NTEzfQ.4n8H5nNj940jvJWZBecryN-DdlWX98E7HgZs_SuvGDk'
+      'Authorization', 'Bearer <CLE_RETIREE>'
     ),
     body := payload
   ) INTO request_id;
@@ -77,7 +77,7 @@ BEGIN
     url := 'https://fthoybkgbnxzlrjbprrh.supabase.co/functions/v1/custom-search-notification',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aG95YmtnYm54emxyamJwcnJoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTA1MDUxMywiZXhwIjoyMDc2NjI2NTEzfQ.4n8H5nNj940jvJWZBecryN-DdlWX98E7HgZs_SuvGDk'
+      'Authorization', 'Bearer <CLE_RETIREE>'
     ),
     body := payload
   ) INTO request_id;
@@ -113,7 +113,7 @@ BEGIN
     url := 'https://fthoybkgbnxzlrjbprrh.supabase.co/functions/v1/financing-notification',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aG95YmtnYm54emxyamJwcnJoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTA1MDUxMywiZXhwIjoyMDc2NjI2NTEzfQ.4n8H5nNj940jvJWZBecryN-DdlWX98E7HgZs_SuvGDk'
+      'Authorization', 'Bearer <CLE_RETIREE>'
     ),
     body := payload
   ) INTO request_id;

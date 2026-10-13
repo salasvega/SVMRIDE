@@ -23,8 +23,12 @@ export function useFormSubmit(options: UseFormSubmitOptions = {}) {
       if (endpoint.includes('/functions/v1/')) {
         const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
         if (anonKey) {
-          headers['Authorization'] = `Bearer ${anonKey}`;
           headers['apikey'] = anonKey;
+          // Les anciennes clés (JWT « eyJ… ») vont aussi dans Authorization.
+          // Les nouvelles clés publishable (sb_publishable_…) seraient refusées dans cet en-tête.
+          if (anonKey.startsWith('eyJ')) {
+            headers['Authorization'] = `Bearer ${anonKey}`;
+          }
         }
       }
 
