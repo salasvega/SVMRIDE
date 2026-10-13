@@ -30,11 +30,43 @@ interface WebhookPayload {
   };
 }
 
+
+// Clé secrète Supabase (sb_secret_…) fournie automatiquement par la plateforme.
+// Repli sur l'ancienne clé tant que les clés legacy sont actives.
+function getSecretKey(): string {
+  try {
+    const keys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}");
+    if (keys.default) return keys.default;
+  } catch (_) { /* ignore */ }
+  return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+}
+
+// Seuls les déclencheurs de la base (qui envoient la clé secrète dans l'en-tête apikey)
+// peuvent appeler cette fonction.
+function isAuthorizedCaller(req: Request): boolean {
+  const apikey = req.headers.get("apikey") ?? "";
+  if (!apikey) return false;
+  try {
+    const keys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}");
+    return Object.values(keys).includes(apikey);
+  } catch (_) {
+    return false;
+  }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
       status: 200,
       headers: corsHeaders,
+    });
+  }
+
+
+  if (!isAuthorizedCaller(req)) {
+    return new Response(JSON.stringify({ success: false, error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
@@ -46,7 +78,7 @@ Deno.serve(async (req: Request) => {
     const record = payload.record;
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseKey = getSecretKey();
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const resendAttachments = [];

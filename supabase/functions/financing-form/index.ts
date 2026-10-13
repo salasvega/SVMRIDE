@@ -25,6 +25,17 @@ interface FinancingFormData {
   attachments?: Attachment[];
 }
 
+
+// Clé secrète Supabase (sb_secret_…) fournie automatiquement par la plateforme.
+// Repli sur l'ancienne clé tant que les clés legacy sont actives.
+function getSecretKey(): string {
+  try {
+    const keys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") ?? "{}");
+    if (keys.default) return keys.default;
+  } catch (_) { /* ignore */ }
+  return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, {
@@ -35,7 +46,7 @@ Deno.serve(async (req: Request) => {
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseKey = getSecretKey();
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const formData: FinancingFormData = await req.json();

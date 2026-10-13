@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
 const OLD_SUPABASE_URL = 'https://qvwmztoqpltyvoowziok.supabase.co';
-const OLD_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF2d216dG9xcGx0eXZvb3d6aW9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjA4NzI5MzksImV4cCI6MjA3NjQ0ODkzOX0.v_5aJK-YXg1FKU7vH9rMKINCL_Y5w8wUZrFuFHSIiRg';
+const OLD_SUPABASE_KEY = '<CLE_RETIREE>';
 
 const NEW_SUPABASE_URL = 'https://fthoybkgbnxzlrjbprrh.supabase.co';
-const NEW_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aG95YmtnYm54emxyamJwcnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNTA1MTMsImV4cCI6MjA3NjYyNjUxM30.rVGAQqw8aOyFRwqMpx52xi2-Vr7LzImObjS71qkI3xk';
+const NEW_SUPABASE_KEY = '<CLE_RETIREE>';
 
 const oldSupabase = createClient(OLD_SUPABASE_URL, OLD_SUPABASE_KEY);
 const newSupabase = createClient(NEW_SUPABASE_URL, NEW_SUPABASE_KEY);

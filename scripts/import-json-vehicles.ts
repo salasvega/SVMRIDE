@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import vehiclesData from '../src/data/vehicles.json' assert { type: 'json' };
 
 const SUPABASE_URL = 'https://fthoybkgbnxzlrjbprrh.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aG95YmtnYm54emxyamJwcnJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNTA1MTMsImV4cCI6MjA3NjYyNjUxM30.rVGAQqw8aOyFRwqMpx52xi2-Vr7LzImObjS71qkI3xk';
+const SUPABASE_KEY = '<CLE_RETIREE>';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 

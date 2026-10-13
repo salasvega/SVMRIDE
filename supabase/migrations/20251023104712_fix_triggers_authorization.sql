@@ -23,7 +23,7 @@ CREATE TRIGGER "SendMailOnCustomSearchForm"
   EXECUTE FUNCTION supabase_functions.http_request(
     'https://fthoybkgbnxzlrjbprrh.supabase.co/functions/v1/custom-search-form',
     'POST',
-    '{"Content-type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aG95YmtnYm54emxyamJwcnJoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTA1MDUxMywiZXhwIjoyMDc2NjI2NTEzfQ.4n8H5nNj940jvJWZBecryN-DdlWX98E7HgZs_SuvGDk"}',
+    '{"Content-type":"application/json","Authorization":"Bearer <CLE_RETIREE>"}',
     '{}',
     '5000'
   );
@@ -35,7 +35,7 @@ CREATE TRIGGER "SendMailOnFinancingForm"
   EXECUTE FUNCTION supabase_functions.http_request(
     'https://fthoybkgbnxzlrjbprrh.supabase.co/functions/v1/financing-form',
     'POST',
-    '{"Content-type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aG95YmtnYm54emxyamJwcnJoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTA1MDUxMywiZXhwIjoyMDc2NjI2NTEzfQ.4n8H5nNj940jvJWZBecryN-DdlWX98E7HgZs_SuvGDk"}',
+    '{"Content-type":"application/json","Authorization":"Bearer <CLE_RETIREE>"}',
     '{}',
     '5000'
   );
@@ -47,7 +47,7 @@ CREATE TRIGGER "SendMailOnTradeInForm"
   EXECUTE FUNCTION supabase_functions.http_request(
     'https://fthoybkgbnxzlrjbprrh.supabase.co/functions/v1/trade-in-form',
     'POST',
-    '{"Content-type":"application/json","Authorization":"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ0aG95YmtnYm54emxyamJwcnJoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTA1MDUxMywiZXhwIjoyMDc2NjI2NTEzfQ.4n8H5nNj940jvJWZBecryN-DdlWX98E7HgZs_SuvGDk"}',
+    '{"Content-type":"application/json","Authorization":"Bearer <CLE_RETIREE>"}',
     '{}',
     '5000'
   );
