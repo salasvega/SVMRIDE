@@ -1,9 +1,9 @@
 export const theme = {
   colors: {
     // Valeurs de référence : la couleur réelle se règle dans src/index.css
-    primary: '#043C69',
-    primaryDark: '#032A4A',
-    primaryLight: '#4F8FC7',
+    primary: '#0A4FD6',
+    primaryDark: '#083EA7',
+    primaryLight: '#6395F8',
     neutral: {
       900: '#111111',
       700: '#444444',

@@ -26,7 +26,7 @@ export function Header() {
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img
-              src="/logo-bleu.png"
+              src="/logo-header.webp"
               alt="SVM Ride Logo"
               className="w-12 h-12 object-contain"
             />

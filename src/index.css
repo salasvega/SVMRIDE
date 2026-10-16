@@ -8,9 +8,9 @@
    --brand-dark  : survol des boutons
    --brand-light : version claire, lisible sur fond sombre (pied de page) */
 :root {
-  --brand: 4 60 105;        /* #043C69 */
-  --brand-dark: 3 42 74;    /* #032A4A */
-  --brand-light: 79 143 199; /* #4F8FC7 */
+  --brand: 10 79 214;       /* #0A4FD6 */
+  --brand-dark: 8 62 167;   /* #083EA7 */
+  --brand-light: 99 149 248; /* #6395F8 */
 }
 
 @layer base {
