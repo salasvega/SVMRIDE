@@ -7,8 +7,8 @@ import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Select } from '../components/ui/Select';
 import { VehicleCard } from '../components/VehicleCard';
-import { getUniqueBrands } from '../utils/vehicle-filters';
-import { VehicleFilters } from '../types/vehicle';
+import { getUniqueBrands, STATUTS, statutDe, trierParStatut } from '../utils/vehicle-filters';
+import { VehicleFilters, VehicleStatus } from '../types/vehicle';
 import { useVehicles } from '../hooks/useVehicles';
 
 export function Vehicles() {
@@ -17,6 +17,9 @@ export function Vehicles() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<VehicleFilters>({
     brand: searchParams.get('brand') || undefined,
+    status: STATUTS.some((st) => st.valeur === searchParams.get('status'))
+      ? (searchParams.get('status') as VehicleStatus)
+      : undefined,
     type: (searchParams.get('type') as 'moto' | 'scooter') || undefined,
     displacementMin: searchParams.get('displacementMin') ? Number(searchParams.get('displacementMin')) : undefined,
     displacementMax: searchParams.get('displacementMax') ? Number(searchParams.get('displacementMax')) : undefined,
@@ -27,16 +30,43 @@ export function Vehicles() {
   const { vehicles: allVehicles, loading, error } = useVehicles(filters);
   const brands = useMemo(() => getUniqueBrands(allVehicles), [allVehicles]);
 
-  const vehicles = useMemo(() => {
-    if (!searchQuery.trim()) return allVehicles;
-
-    const query = searchQuery.toLowerCase();
-    return allVehicles.filter(vehicle =>
-      vehicle.brand.toLowerCase().includes(query) ||
-      vehicle.model.toLowerCase().includes(query) ||
-      `${vehicle.brand} ${vehicle.model}`.toLowerCase().includes(query)
-    );
+  // Recherche texte, puis tri : disponibles, réservés, vendus (les plus récents d'abord)
+  const trouves = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    const liste = !query
+      ? allVehicles
+      : allVehicles.filter(vehicle =>
+          vehicle.brand.toLowerCase().includes(query) ||
+          vehicle.model.toLowerCase().includes(query) ||
+          `${vehicle.brand} ${vehicle.model}`.toLowerCase().includes(query)
+        );
+    return trierParStatut(liste);
   }, [allVehicles, searchQuery]);
+
+  // Nombre de véhicules par statut (avant le filtre de statut), pour le compteur et le filtre
+  const parStatut = useMemo(() => {
+    const n: Record<VehicleStatus, number> = { available: 0, reserved: 0, sold: 0 };
+    trouves.forEach((v) => { n[statutDe(v)] += 1; });
+    return n;
+  }, [trouves]);
+
+  const vehicles = useMemo(
+    () => (filters.status ? trouves.filter((v) => statutDe(v) === filters.status) : trouves),
+    [trouves, filters.status]
+  );
+
+  const compteur = (() => {
+    const total = vehicles.length;
+    const vehicule = `${total} véhicule${total > 1 ? 's' : ''}`;
+    if (filters.status) {
+      const st = STATUTS.find((x) => x.valeur === filters.status)!;
+      return `${vehicule} ${total > 1 ? st.pluriel : st.libelle.toLowerCase()}`;
+    }
+    const details = STATUTS.filter((st) => parStatut[st.valeur] > 0).map((st) =>
+      `${parStatut[st.valeur]} ${parStatut[st.valeur] > 1 ? st.pluriel : st.libelle.toLowerCase()}`
+    );
+    return details.length > 1 ? `${vehicule} : ${details.join(', ')}` : details[0] ?? vehicule;
+  })();
 
   const updateFilter = (key: keyof VehicleFilters, value: string) => {
     const newFilters = { ...filters };
@@ -44,7 +74,7 @@ export function Vehicles() {
     if (value === '') {
       delete newFilters[key];
     } else {
-      if (key === 'brand' || key === 'type') {
+      if (key === 'brand' || key === 'type' || key === 'status') {
         newFilters[key] = value as any;
       } else {
         newFilters[key] = Number(value) as any;
@@ -95,6 +125,7 @@ export function Vehicles() {
   const getFilterLabel = (key: keyof VehicleFilters, value: string | number) => {
     const labels: Record<string, string> = {
       brand: value as string,
+      status: STATUTS.find((st) => st.valeur === value)?.libelle ?? String(value),
       type: value === 'moto' ? 'Moto' : 'Scooter',
       displacementMin: `≥ ${value} cc`,
       displacementMax: `≤ ${value} cc`,
@@ -113,8 +144,8 @@ export function Vehicles() {
           <h1 className="filet-apres mb-4">
             Nos Véhicules d'Occasion
           </h1>
-          <p className="text-base md:text-lg text-gris mb-6">
-            {loading ? 'Chargement...' : `${vehicles.length} véhicule${vehicles.length > 1 ? 's' : ''} disponible${vehicles.length > 1 ? 's' : ''}`}
+          <p className="text-base md:text-lg text-gris mb-6" aria-live="polite">
+            {loading ? 'Chargement...' : compteur}
           </p>
 
           <div className="space-y-4 mb-8">
@@ -166,6 +197,19 @@ export function Vehicles() {
                       {brands.map((brand) => (
                         <option key={brand} value={brand}>
                           {brand}
+                        </option>
+                      ))}
+                    </Select>
+
+                    <Select
+                      label="Disponibilité"
+                      value={filters.status || ''}
+                      onChange={(e) => updateFilter('status', e.target.value)}
+                    >
+                      <option value="">Tous les statuts</option>
+                      {STATUTS.map((st) => (
+                        <option key={st.valeur} value={st.valeur}>
+                          {st.libelle} ({parStatut[st.valeur]})
                         </option>
                       ))}
                     </Select>

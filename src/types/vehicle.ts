@@ -28,6 +28,7 @@ export interface Vehicle {
 
 export interface VehicleFilters {
   brand?: string;
+  status?: VehicleStatus;
   type?: VehicleType;
   displacementMin?: number;
   displacementMax?: number;

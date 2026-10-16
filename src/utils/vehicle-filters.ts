@@ -1,8 +1,31 @@
-import { Vehicle, VehicleFilters } from '../types/vehicle';
+import { Vehicle, VehicleFilters, VehicleStatus } from '../types/vehicle';
+
+/** Ordre d'affichage : disponibles, puis réservés, puis vendus. */
+export const STATUTS: { valeur: VehicleStatus; libelle: string; pluriel: string }[] = [
+  { valeur: 'available', libelle: 'Disponible', pluriel: 'disponibles' },
+  { valeur: 'reserved', libelle: 'Réservé', pluriel: 'réservés' },
+  { valeur: 'sold', libelle: 'Vendu', pluriel: 'vendus' },
+];
+
+/** Statut d'un véhicule ; sans statut renseigné, il est considéré disponible. */
+export function statutDe(vehicle: Pick<Vehicle, 'status'>): VehicleStatus {
+  return vehicle.status === 'reserved' || vehicle.status === 'sold' ? vehicle.status : 'available';
+}
+
+const RANG: Record<VehicleStatus, number> = { available: 0, reserved: 1, sold: 2 };
+
+/** Trie par statut (disponible → réservé → vendu) en gardant l'ordre d'origine à statut égal. */
+export function trierParStatut<T extends Pick<Vehicle, 'status'>>(vehicles: T[]): T[] {
+  return vehicles
+    .map((v, i) => ({ v, i }))
+    .sort((a, b) => RANG[statutDe(a.v)] - RANG[statutDe(b.v)] || a.i - b.i)
+    .map(({ v }) => v);
+}
 
 export function filterVehicles(vehicles: Vehicle[], filters: VehicleFilters): Vehicle[] {
   return vehicles.filter(vehicle => {
     if (filters.brand && vehicle.brand !== filters.brand) return false;
+    if (filters.status && statutDe(vehicle) !== filters.status) return false;
     if (filters.type && vehicle.type !== filters.type) return false;
     if (filters.displacementMin && vehicle.displacement < filters.displacementMin) return false;
     if (filters.displacementMax && vehicle.displacement > filters.displacementMax) return false;
