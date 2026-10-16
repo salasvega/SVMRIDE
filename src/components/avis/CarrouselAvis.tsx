@@ -248,7 +248,7 @@ export function CarrouselAvis({ avis, demo = false }: { avis: Avis[]; demo?: boo
               <div>
                 <p id="avis-lecture-titre" className="font-semibold text-noir">{enLecture.auteur}</p>
                 <p className="text-xs text-gris">
-                  <time dateTime={enLecture.publieLe}>{formatDate(enLecture.publieLe)}</time>
+                  {enLecture.dateLibelle ?? <time dateTime={enLecture.publieLe}>{formatDate(enLecture.publieLe)}</time>}
                 </p>
               </div>
               <button type="button" onClick={() => setEnLecture(null)} className={bouton} aria-label="Fermer l'avis">

@@ -2,8 +2,17 @@
 
 Section d'accueil « Votre confiance, notre plus belle récompense ».
 État au 16/10/2026 : **phase A terminée** (affichage, données, synchronisation prêts).
-Sur svmride.com la section est **masquée** : pas de lien vérifié, pas de connexion Google.
-En local et dans les aperçus Netlify, des avis **fictifs** marqués « démo » la remplissent.
+Sur svmride.com : boutons Google + sélection de 5 vrais avis (voir ci-dessous).
+
+## En attendant l'API : sélection manuelle (depuis le 17/10/2026)
+
+`src/config/avisSelection.ts` contient les **5 avis les plus récents** de la fiche (tri « Avis les plus
+récents » de Google Maps), recopiés **mot pour mot** le 17/10/2026 : nom abrégé (prénom + initiale),
+note, texte intégral, période de publication (Google n'affiche qu'une date relative).
+Sur le site : ces 5 cartes, sans note moyenne ni nombre d'avis (ils deviendraient faux), avec la mention
+« Derniers avis publiés sur Google, recopiés sans modification le … ».
+Pour actualiser : refaire le relevé de la même façon (les plus récents, sans trier selon la note).
+Dès que `actif: true`, la sélection est ignorée au profit des avis synchronisés.
 
 ## Architecture
 
@@ -12,7 +21,8 @@ En local et dans les aperçus Netlify, des avis **fictifs** marqués « démo »
 | Affichage (section, carrousel, carte, étoiles, logo) | `src/components/avis/*` |
 | Format commun des avis | `src/lib/avis/types.ts` |
 | Choix de la source, fraîcheur, ordre | `src/lib/avis/source.ts` |
-| Avis de démonstration (exclus de la version production) | `src/lib/avis/demo.ts` |
+| Sélection manuelle d'avis réels (en attendant l'API) | `src/config/avisSelection.ts` |
+| Avis de démonstration (aperçu seulement, si la sélection est vide) | `src/lib/avis/demo.ts` |
 | Réglages du site (activation, Place ID, liens) | `src/config/avisGoogle.ts` |
 | Service Google (OAuth, pagination, conversion) | `netlify/lib/avis-google.ts` |
 | Synchronisation quotidienne (5 h 17 UTC) | `netlify/functions/avis-google-sync.mts` |

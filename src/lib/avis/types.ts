@@ -17,14 +17,17 @@ export interface Avis {
   publieLe: string;
   /** Date de dernière modification (ISO 8601) */
   modifieLe?: string;
+  /** Date affichée telle quelle quand la date exacte est inconnue (sélection manuelle) */
+  dateLibelle?: string;
 }
 
 export interface ResumeAvis {
-  source: 'google' | 'demo';
-  /** Note moyenne de l'établissement (sur 5) */
-  noteMoyenne: number;
-  /** Nombre total d'avis de l'établissement */
-  nombreAvis: number;
+  /** google : synchronisé ; selection : avis réels recopiés à la main ; demo : fictifs (aperçu) */
+  source: 'google' | 'selection' | 'demo';
+  /** Note moyenne de l'établissement (sur 5) — absente pour une sélection manuelle */
+  noteMoyenne?: number;
+  /** Nombre total d'avis de l'établissement — absent pour une sélection manuelle */
+  nombreAvis?: number;
   /** Avis à afficher, du plus récent au plus ancien */
   avis: Avis[];
   /** Date de la dernière synchronisation réussie (ISO 8601) */

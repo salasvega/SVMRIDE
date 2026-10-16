@@ -11,7 +11,8 @@
 import { useEffect, useState } from 'react';
 import { ExternalLink, PenLine } from 'lucide-react';
 import { AVIS_GOOGLE, liensGoogle } from '../../config/avisGoogle';
-import { chargerAvis, modeDemo } from '../../lib/avis/source';
+import { chargerAvis, modeDemo, modeSelection } from '../../lib/avis/source';
+import { formatDate } from '../../lib/avis/format';
 import type { ResumeAvis } from '../../lib/avis/types';
 import { Section } from '../ui/Section';
 import { Container } from '../ui/Container';
@@ -21,7 +22,10 @@ import { LogoGoogle } from './LogoGoogle';
 
 export function SectionAvisGoogle() {
   const demo = modeDemo();
-  const sourceAttendue = demo || AVIS_GOOGLE.actif;
+  const selection = modeSelection();
+  const sourceAttendue = demo || selection || AVIS_GOOGLE.actif;
+  // La note globale n'existe qu'avec Google (ou la démo) : jamais pour une sélection manuelle
+  const noteAttendue = demo || AVIS_GOOGLE.actif;
   const [resume, setResume] = useState<ResumeAvis | null>(null);
   const [charge, setCharge] = useState(!sourceAttendue);
 
@@ -39,6 +43,7 @@ export function SectionAvisGoogle() {
   const liens = liensGoogle();
   const liensAffiches = !!liens && (AVIS_GOOGLE.liensVerifies || demo);
   const avecAvis = !!resume && resume.avis.length > 0;
+  const avecNote = avecAvis && resume!.noteMoyenne !== undefined && resume!.nombreAvis !== undefined;
   // Pas encore d'avis Google à afficher : titre et boutons centrés, section plus compacte
   const compact = !sourceAttendue && !avecAvis;
 
@@ -73,22 +78,22 @@ export function SectionAvisGoogle() {
           </div>
 
           {/* Note globale : place réservée pendant le chargement (pas de saut de mise en page) */}
-          {(sourceAttendue || avecAvis) && (
+          {(noteAttendue || avecNote) && (
             <div
-              className={`carte inline-flex min-h-[92px] items-center gap-4 self-start px-5 py-4 lg:self-auto ${avecAvis ? '' : 'invisible'}`}
-              aria-hidden={!avecAvis || undefined}
+              className={`carte inline-flex min-h-[92px] items-center gap-4 self-start px-5 py-4 lg:self-auto ${avecNote ? '' : 'invisible'}`}
+              aria-hidden={!avecNote || undefined}
             >
               <LogoGoogle taille={30} />
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.14em] text-gris">Avis Google</p>
-                {avecAvis && (
+                {avecNote && (
                   <div className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
                     <span className="titre-display text-[30px] leading-none">
-                      {resume!.noteMoyenne.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
+                      {resume!.noteMoyenne!.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                     </span>
-                    <Etoiles note={resume!.noteMoyenne} taille={18} />
+                    <Etoiles note={resume!.noteMoyenne!} taille={18} />
                     <span className="text-sm text-gris">
-                      sur 5 · {resume!.nombreAvis.toLocaleString('fr-FR')} avis
+                      sur 5 · {resume!.nombreAvis!.toLocaleString('fr-FR')} avis
                     </span>
                   </div>
                 )}
@@ -98,7 +103,14 @@ export function SectionAvisGoogle() {
         </div>
 
         {avecAvis ? (
-          <CarrouselAvis avis={resume!.avis} demo={resume!.source === 'demo'} />
+          <>
+            <CarrouselAvis avis={resume!.avis} demo={resume!.source === 'demo'} />
+            {resume!.source === 'selection' && (
+              <p className="mt-6 text-center text-xs text-gris">
+                Derniers avis publiés sur Google, recopiés sans modification le {formatDate(resume!.synchroniseLe)}.
+              </p>
+            )}
+          </>
         ) : (
           sourceAttendue && !charge && <div className="h-[300px]" aria-hidden="true" />
         )}

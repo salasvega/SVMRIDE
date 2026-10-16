@@ -41,7 +41,7 @@ export function CarteAvis({ avis, onLireLaSuite, demo }: { avis: Avis; onLireLaS
         <div className="min-w-0">
           <p className="truncate font-semibold text-noir">{avis.auteur}</p>
           <p className="text-xs text-gris">
-            <time dateTime={avis.publieLe}>{formatDate(avis.publieLe)}</time>
+            {avis.dateLibelle ? <span>{avis.dateLibelle}</span> : <time dateTime={avis.publieLe}>{formatDate(avis.publieLe)}</time>}
           </p>
         </div>
       </header>
@@ -50,7 +50,7 @@ export function CarteAvis({ avis, onLireLaSuite, demo }: { avis: Avis; onLireLaS
 
       {avis.texte ? (
         <>
-          <p ref={texteRef} className="mt-3 line-clamp-5 text-[15px] leading-relaxed text-gris">
+          <p ref={texteRef} className="mt-3 line-clamp-5 whitespace-pre-line text-[15px] leading-relaxed text-gris">
             {avis.texte}
           </p>
           {coupe && (
