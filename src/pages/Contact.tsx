@@ -278,7 +278,7 @@ export function Contact() {
                     <div>Lundi : Sur rendez-vous</div>
                   </div>
                   <div className="pl-8 text-xs text-[#666666] mt-3 italic">
-                    Sur rendez-vous sur nos points de vente en Ile de France
+                    Sur rendez-vous à notre showroom de Chaville
                   </div>
                 </div>
               </div>
