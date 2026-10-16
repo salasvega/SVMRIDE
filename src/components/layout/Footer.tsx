@@ -20,7 +20,7 @@ export function Footer() {
             </p>
 
             <div className="space-y-3">
-              <h3 className="titre-display text-sm tracking-[1px] mb-2">Nos showrooms</h3>
+              <h3 className="titre-display text-sm tracking-[1px] mb-2">Notre showroom</h3>
               {siteConfig.showrooms.map((showroom, index) => (
                 <a
                   key={index}

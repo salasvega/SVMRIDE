@@ -198,45 +198,6 @@ export function Contact() {
 
               <div className="space-y-6 mb-8">
                 <a
-                  href={`mailto:${siteConfig.contact.email}`}
-                  className="flex items-start gap-4 p-4 bg-fond rounded-xl hover:bg-bordure transition-colors"
-                >
-                  <Mail
-                    className="w-6 h-6 text-or-texte flex-shrink-0 mt-1"
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-noir mb-1">
-                      Email
-                    </h3>
-                    <p className="text-gris">
-                      {siteConfig.contact.email}
-                    </p>
-                  </div>
-                </a>
-
-                <a
-                  href={`tel:${siteConfig.contact.phone.replace(
-                    /\s/g,
-                    ''
-                  )}`}
-                  className="flex items-start gap-4 p-4 bg-fond rounded-xl hover:bg-bordure transition-colors"
-                >
-                  <Phone
-                    className="w-6 h-6 text-or-texte flex-shrink-0 mt-1"
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-noir mb-1">
-                      Téléphone
-                    </h3>
-                    <p className="text-gris">
-                      {siteConfig.contact.phone}
-                    </p>
-                  </div>
-                </a>
-
-                <a
                   href={siteConfig.contact.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -264,7 +225,7 @@ export function Contact() {
                     aria-hidden="true"
                   />
                   <h3 className="font-semibold text-noir text-xl">
-                    Nos showrooms
+                    Notre showroom
                   </h3>
                 </div>
 
