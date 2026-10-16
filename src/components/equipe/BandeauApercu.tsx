@@ -8,8 +8,9 @@ export function BandeauApercu({ className = '' }: { className?: string }) {
     >
       <Eye className="mt-0.5 h-4 w-4 shrink-0 text-or-texte" aria-hidden="true" />
       <span>
-        <strong className="font-semibold">Aperçu :</strong> collaborateurs fictifs et textes provisoires, en attente des
-        vraies photos et de la validation de Mattia. Cette partie n'est pas visible sur svmride.com.
+        <strong className="font-semibold">Aperçu :</strong> collaborateurs fictifs (photos d'illustration) et textes
+        provisoires, en attente des vraies informations et de la validation de Mattia. Cette partie n'est pas visible
+        sur svmride.com.
       </span>
     </p>
   );

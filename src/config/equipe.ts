@@ -14,6 +14,8 @@
  *   est toujours mis en avant à part). Supprimer l'entrée retire la fiche partout.
  * - Photo : portrait carré d'au moins 600 px, déposé dans public/equipe/ en WebP
  *   (et AVIF si possible) ; sans photo, des initiales s'affichent à la place.
+ *   Les portraits d'Inès, Thomas et Hugo (16/10) sont des images d'illustration
+ *   fournies pour les tests, recadrées en 480 px : à remplacer par les vraies photos.
  */
 
 /** Change à true pour publier sur svmride.com. */
@@ -66,6 +68,7 @@ export const MEMBRES: Membre[] = [
     id: 'ines',
     prenom: 'Inès',
     fonction: 'Conseillère vente et financement',
+    photo: { webp: '/equipe/ines.webp', avif: '/equipe/ines.avif', jpg: '/equipe/ines.jpg' },
     citation: "Trouver la moto qui colle à votre budget, c'est mon puzzle préféré.",
     ordre: 1,
     exemple: true,
@@ -74,6 +77,7 @@ export const MEMBRES: Membre[] = [
     id: 'thomas',
     prenom: 'Thomas',
     fonction: 'Technicien atelier',
+    photo: { webp: '/equipe/thomas.webp', avif: '/equipe/thomas.avif', jpg: '/equipe/thomas.jpg' },
     citation: "Une moto bien préparée, c'est une moto qu'on oublie pour ne penser qu'à la route.",
     ordre: 2,
     exemple: true,
@@ -82,6 +86,7 @@ export const MEMBRES: Membre[] = [
     id: 'hugo',
     prenom: 'Hugo',
     fonction: 'Expert reprises et dépôt-vente',
+    photo: { webp: '/equipe/hugo.webp', avif: '/equipe/hugo.avif', jpg: '/equipe/hugo.jpg' },
     citation: "J'estime chaque moto avec honnêteté, comme si c'était la mienne.",
     ordre: 3,
     exemple: true,
