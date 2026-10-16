@@ -148,6 +148,54 @@ export function Contact() {
                 Nos coordonnées
               </h2>
 
+              {/* Carte de visite du responsable commercial */}
+              <div className="sur-sombre relative overflow-hidden rounded-2xl bg-noir-profond text-white shadow-vehicule mb-6">
+                <div className="liseret-or" aria-hidden="true" />
+                <div className="flex flex-col sm:flex-row sm:items-center gap-5 p-5 md:p-6">
+                  <div className="flex items-center gap-4 sm:block flex-shrink-0">
+                    <img
+                      src="/equipe-mattia.webp"
+                      alt="Mattia, responsable commercial de SVM Ride"
+                      width={96}
+                      height={96}
+                      loading="lazy"
+                      className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover ring-2 ring-or ring-offset-2 ring-offset-noir-profond"
+                    />
+                    <div className="sm:hidden">
+                      <p className="titre-display text-2xl leading-none">Mattia</p>
+                      <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-or-clair">
+                        Responsable commercial
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 min-w-0 sm:border-l sm:border-white/15 sm:pl-5">
+                    <div className="hidden sm:block mb-3">
+                      <p className="titre-display text-[26px] leading-none">Mattia</p>
+                      <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-or-clair">
+                        Responsable commercial
+                      </p>
+                    </div>
+                    <div className="space-y-1">
+                      <a
+                        href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
+                        className="flex items-center gap-2.5 rounded-lg py-1.5 text-[#E8E8E8] hover:text-white transition-colors duration-180"
+                      >
+                        <Phone className="w-[18px] h-[18px] text-or-clair flex-shrink-0" strokeWidth={1.8} aria-hidden="true" />
+                        <span className="font-medium">{siteConfig.contact.phone}</span>
+                      </a>
+                      <a
+                        href={`mailto:${siteConfig.contact.email}`}
+                        className="flex items-center gap-2.5 rounded-lg py-1.5 text-[#E8E8E8] hover:text-white transition-colors duration-180 break-all"
+                      >
+                        <Mail className="w-[18px] h-[18px] text-or-clair flex-shrink-0" strokeWidth={1.8} aria-hidden="true" />
+                        <span>{siteConfig.contact.email}</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-6 mb-8">
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
