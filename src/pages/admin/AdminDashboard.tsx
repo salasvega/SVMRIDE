@@ -6,6 +6,7 @@ import { supabase } from '../../lib/supabase';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
 import { useFinancingProfilesUnreadCount } from '../../hooks/useFinancingProfilesUnreadCount';
 import { Vehicle } from '../../types/vehicle';
+import { StockageCard } from '../../components/admin/StockageCard';
 
 function AnimatedCounter({ value, duration = 1000 }: { value: number; duration?: number }) {
   const [count, setCount] = useState(0);
@@ -347,6 +348,8 @@ export function AdminDashboard() {
             </div>
           </div>
         </div>
+
+        <StockageCard />
       </div>
     </AdminLayout>
   );

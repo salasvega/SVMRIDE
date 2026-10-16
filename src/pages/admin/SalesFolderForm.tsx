@@ -9,6 +9,7 @@ import { Select } from '../../components/ui/Select';
 import { FileUpload, UploadedDoc } from '../../components/ui/FileUpload';
 import Toast from '../../components/ui/Toast';
 import { ArrowLeft, Save, FileText, Download, Trash2, X } from 'lucide-react';
+import { compresserImage, extensionDe } from '../../lib/compressionImage';
 
 interface Vehicle {
   id: string;
@@ -233,8 +234,8 @@ export function SalesFolderForm() {
       const newDocuments: DocumentMetadata[] = [];
 
       for (const doc of filesToUpload) {
-        const file = doc.file;
-        const fileExt = file.name.split('.').pop();
+        const file = await compresserImage(doc.file, { cote: 2400, qualite: 0.85 });
+        const fileExt = extensionDe(file);
         const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
         const filePath = `${id}/${uploadType}/${fileName}`;
 
@@ -378,8 +379,8 @@ export function SalesFolderForm() {
           const newDocuments: DocumentMetadata[] = [];
 
           for (const doc of filesToUpload) {
-            const file = doc.file;
-            const fileExt = file.name.split('.').pop();
+            const file = await compresserImage(doc.file, { cote: 2400, qualite: 0.85 });
+            const fileExt = extensionDe(file);
             const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
             const filePath = `${newFolder.id}/${uploadType}/${fileName}`;
 

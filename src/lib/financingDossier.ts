@@ -7,6 +7,7 @@
  * puis un jeton de session.
  */
 import { supabase } from './supabase';
+import { compresserImage } from './compressionImage';
 
 const URL_FONCTION = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/financing-dossier`;
 const CLE = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
@@ -44,7 +45,9 @@ export async function appelDossier<T = Record<string, unknown>>(
 }
 
 /** Envoie une pièce : lien d'envoi à usage unique, puis rattachement au dossier */
-export async function envoyerPiece<P>(session: string, field: string, fichier: File): Promise<P> {
+export async function envoyerPiece<P>(session: string, field: string, original: File): Promise<P> {
+  // Photos allégées, mais assez définies pour rester lisibles (pièces d'identité, RIB…)
+  const fichier = await compresserImage(original, { cote: 2400, qualite: 0.85 });
   const ext = (fichier.name.split('.').pop() || '').toLowerCase();
   const { path, token } = await appelDossier<{ path: string; token: string }>('upload-url', { session, field, ext });
   const { error } = await supabase.storage.from(BUCKET_FINANCEMENT).uploadToSignedUrl(path, token, fichier, {

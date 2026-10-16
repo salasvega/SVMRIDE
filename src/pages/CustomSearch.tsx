@@ -11,6 +11,7 @@ import { Button } from '../components/ui/Button';
 import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
+import { compresserImage, extensionDe } from '../lib/compressionImage';
 
 export function CustomSearch() {
   // Données du formulaire "je cherche un véhicule précis"
@@ -70,8 +71,8 @@ export function CustomSearch() {
     }> = [];
 
     for (const doc of files) {
-      const file = doc.file;
-      const fileExt = file.name.split('.').pop();
+      const file = await compresserImage(doc.file);
+      const fileExt = extensionDe(file);
       const fileName = `${Date.now()}-${Math.random()
         .toString(36)
         .substring(7)}.${fileExt}`;

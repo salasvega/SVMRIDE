@@ -19,6 +19,7 @@ import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { siteConfig } from '../config/site';
 import { supabase } from '../lib/supabase';
+import { compresserImage, extensionDe } from '../lib/compressionImage';
 
 export function Contact() {
   // Si on arrive depuis une fiche véhicule, on a passé `state={{ vehicle: "Yamaha MT-07 2021" }}`
@@ -73,8 +74,8 @@ export function Contact() {
     }> = [];
 
     for (const doc of files) {
-      const file = doc.file;
-      const fileExt = file.name.split('.').pop();
+      const file = await compresserImage(doc.file);
+      const fileExt = extensionDe(file);
       const fileName = `${Date.now()}-${Math.random()
         .toString(36)
         .substring(7)}.${fileExt}`;
