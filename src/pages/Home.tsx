@@ -35,9 +35,9 @@ export function Home() {
 
       <Section background="dark" className="relative !py-0 overflow-hidden">
         {/* Mobile et tablette : cadrage sur les motos. Ordinateur : photo large
-            avec le panneau SVM RIDE, calée en haut à gauche au-dessus du titre. */}
+            avec le panneau SVM RIDE, rognée sous les roues et calée en bas à gauche. */}
         <div
-          className="absolute inset-0 bg-cover bg-[url('/accueil-showroom.webp')] bg-[position:50%_40%] lg:bg-[url('/accueil-showroom-logo.webp')] lg:bg-[position:0%_0%]"
+          className="absolute inset-0 bg-cover bg-[url('/accueil-showroom.webp')] bg-[position:50%_40%] lg:bg-[url('/accueil-showroom-logo.webp')] lg:bg-[position:0%_100%]"
           aria-hidden="true"
         />
         {/* Voile sombre pour la lisibilité du titre ; sur ordinateur, allégé en
@@ -46,7 +46,7 @@ export function Home() {
           className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,14,16,.35),rgba(14,14,16,.88))] lg:bg-[linear-gradient(180deg,rgba(14,14,16,.08)_0%,rgba(14,14,16,.30)_38%,rgba(14,14,16,.88)_100%)]"
           aria-hidden="true"
         />
-        <Container className="relative z-10 flex flex-col justify-end min-h-[440px] md:min-h-[520px] lg:min-h-[560px] py-14 md:py-20">
+        <Container className="relative z-10 flex flex-col justify-end min-h-[440px] md:min-h-[520px] lg:min-h-[clamp(420px,26vw,540px)] py-14 md:py-20 lg:py-12">
           <div className="max-w-3xl">
             <span className="filet-or mb-5" aria-hidden="true" />
             <h1 className="titre-hero mb-4 md:mb-5 drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
