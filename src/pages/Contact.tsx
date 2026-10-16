@@ -128,12 +128,12 @@ export function Contact() {
         path="/contact"
       />
 
-      <Section background="gray" className="!py-8">
+      <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#111111] mb-2">
+          <h1 className="filet-apres mb-4">
             Contactez-nous
           </h1>
-          <p className="text-lg text-[#444444]">
+          <p className="text-base md:text-lg text-gris">
             Nous sommes à votre écoute
           </p>
         </Container>
@@ -144,24 +144,24 @@ export function Contact() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Colonne gauche : infos de contact */}
             <div>
-              <h2 className="text-2xl font-bold text-[#111111] mb-6">
+              <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
                 Nos coordonnées
               </h2>
 
               <div className="space-y-6 mb-8">
                 <a
                   href={`mailto:${siteConfig.contact.email}`}
-                  className="flex items-start gap-4 p-4 bg-[#F9F9F9] rounded-xl hover:bg-[#EEEEEE] transition-colors"
+                  className="flex items-start gap-4 p-4 bg-fond rounded-xl hover:bg-bordure transition-colors"
                 >
                   <Mail
-                    className="w-6 h-6 text-brand flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-or-texte flex-shrink-0 mt-1"
                     aria-hidden="true"
                   />
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">
+                    <h3 className="font-semibold text-noir mb-1">
                       Email
                     </h3>
-                    <p className="text-[#444444]">
+                    <p className="text-gris">
                       {siteConfig.contact.email}
                     </p>
                   </div>
@@ -172,17 +172,17 @@ export function Contact() {
                     /\s/g,
                     ''
                   )}`}
-                  className="flex items-start gap-4 p-4 bg-[#F9F9F9] rounded-xl hover:bg-[#EEEEEE] transition-colors"
+                  className="flex items-start gap-4 p-4 bg-fond rounded-xl hover:bg-bordure transition-colors"
                 >
                   <Phone
-                    className="w-6 h-6 text-brand flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-or-texte flex-shrink-0 mt-1"
                     aria-hidden="true"
                   />
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">
+                    <h3 className="font-semibold text-noir mb-1">
                       Téléphone
                     </h3>
-                    <p className="text-[#444444]">
+                    <p className="text-gris">
                       {siteConfig.contact.phone}
                     </p>
                   </div>
@@ -192,30 +192,30 @@ export function Contact() {
                   href={siteConfig.contact.instagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-4 p-4 bg-[#F9F9F9] rounded-xl hover:bg-[#EEEEEE] transition-colors"
+                  className="flex items-start gap-4 p-4 bg-fond rounded-xl hover:bg-bordure transition-colors"
                 >
                   <Instagram
-                    className="w-6 h-6 text-brand flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-or-texte flex-shrink-0 mt-1"
                     aria-hidden="true"
                   />
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-1">
+                    <h3 className="font-semibold text-noir mb-1">
                       Instagram
                     </h3>
-                    <p className="text-[#444444]">
+                    <p className="text-gris">
                       {siteConfig.contact.instagram}
                     </p>
                   </div>
                 </a>
               </div>
 
-              <div className="bg-[#F9F9F9] p-6 rounded-xl">
+              <div className="bg-fond p-6 rounded-xl">
                 <div className="flex items-start gap-3 mb-6">
                   <MapPin
-                    className="w-6 h-6 text-brand flex-shrink-0"
+                    className="w-6 h-6 text-or-texte flex-shrink-0"
                     aria-hidden="true"
                   />
-                  <h3 className="font-semibold text-[#111111] text-xl">
+                  <h3 className="font-semibold text-noir text-xl">
                     Nos showrooms
                   </h3>
                 </div>
@@ -227,17 +227,17 @@ export function Contact() {
                       href={showroom.mapsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-start gap-3 p-4 bg-white rounded-lg hover:shadow-md transition-all border border-[#E5E5E5] hover:border-brand group"
+                      className="flex items-start gap-3 p-4 bg-white rounded-lg hover:shadow-md transition-all border border-bordure hover:border-brand group"
                     >
                       <MapPin
-                        className="w-5 h-5 text-brand flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform"
+                        className="w-5 h-5 text-or-texte flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform"
                         aria-hidden="true"
                       />
                       <div className="flex-1">
-                        <div className="font-semibold text-[#111111] mb-1 group-hover:text-brand transition-colors">
+                        <div className="font-semibold text-noir mb-1 group-hover:text-bleu transition-colors duration-180">
                           {showroom.name}
                         </div>
-                        <div className="text-sm text-[#444444] mb-1">
+                        <div className="text-sm text-gris mb-1">
                           {showroom.fullAddress}
                         </div>
                         {showroom.note && (
@@ -256,15 +256,15 @@ export function Contact() {
                   ))}
                 </div>
 
-                <div className="bg-white p-4 rounded-lg border border-[#E5E5E5]">
+                <div className="bg-white p-4 rounded-lg border border-bordure">
                   <div className="flex items-start gap-3 mb-2">
                     <Clock
-                      className="w-5 h-5 text-brand flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 text-or-texte flex-shrink-0 mt-0.5"
                       aria-hidden="true"
                     />
-                    <h4 className="font-semibold text-[#111111]">Horaires</h4>
+                    <h4 className="font-semibold text-noir">Horaires</h4>
                   </div>
-                  <div className="pl-8 text-sm text-[#444444] space-y-1">
+                  <div className="pl-8 text-sm text-gris space-y-1">
                     <div>Mardi - Samedi : 9h-18h</div>
                     <div>Lundi : Sur rendez-vous</div>
                   </div>
@@ -292,9 +292,9 @@ export function Contact() {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
+                  className="space-y-6 bg-fond p-8 rounded-xl"
                 >
-                  <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                  <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
                     Envoyez-nous un message
                   </h2>
 
@@ -351,18 +351,18 @@ export function Contact() {
                       required
                       checked={formData.consent}
                       onChange={handleChange}
-                      className="mt-1 w-4 h-4 text-brand focus:ring-brand rounded"
+                      className="mt-1 w-4 h-4 text-brand focus:ring-bleu/30 rounded"
                     />
                     <label
                       htmlFor="consent"
-                      className="text-sm text-[#444444]"
+                      className="text-sm text-gris"
                     >
                       J'accepte que mes données soient
                       utilisées pour traiter ma demande
                       conformément à la{' '}
                       <a
                         href="/politique-confidentialite"
-                        className="text-brand hover:underline"
+                        className="text-bleu underline underline-offset-2 hover:decoration-2"
                       >
                         politique de confidentialité
                       </a>
@@ -381,7 +381,7 @@ export function Contact() {
 
                   {/* Indicateur visuel pendant l'envoi des pièces jointes */}
                   {uploadingFiles && (
-                    <div className="text-sm text-[#444444] bg-white/70 border border-[#E5E5E5] rounded-lg px-3 py-2 flex items-center justify-center">
+                    <div className="text-sm text-gris bg-white/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
                       Téléversement des documents...
                     </div>
                   )}

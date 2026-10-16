@@ -5,6 +5,7 @@ import { ScrollToTop } from './components/ScrollToTop';
 import { Header } from './components/layout/Header';
 import { Footer } from './components/layout/Footer';
 import { CookieBanner } from './components/CookieBanner';
+import { DegradeOrDefs } from './components/ui/DegradeOrDefs';
 import { Home } from './pages/Home';
 import { Vehicles } from './pages/Vehicles';
 import { VehicleDetail } from './pages/VehicleDetail';
@@ -120,7 +121,8 @@ function App() {
           <Route
             path="*"
             element={
-              <div className="min-h-screen flex flex-col">
+              <div className="site min-h-screen flex flex-col">
+                <DegradeOrDefs />
                 <Header />
                 <main className="flex-1">
                   <Routes>

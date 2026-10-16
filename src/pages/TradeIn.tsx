@@ -125,12 +125,12 @@ export function TradeIn() {
         path="/reprises"
       />
 
-      <Section background="gray" className="!py-8">
+      <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#111111] mb-2">
+          <h1 className="filet-apres mb-4">
             Reprise de votre véhicule
           </h1>
-          <p className="text-lg text-[#444444]">
+          <p className="text-base md:text-lg text-gris">
             Obtenez une estimation rapide et au meilleur prix
           </p>
         </Container>
@@ -141,20 +141,20 @@ export function TradeIn() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Colonne gauche : explication du process */}
             <div>
-              <h2 className="text-2xl font-bold text-[#111111] mb-6">
+              <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
                 Comment ça marche ?
               </h2>
 
               <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
                     1
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-2">
+                    <h3 className="font-semibold text-noir mb-2">
                       Remplissez le formulaire
                     </h3>
-                    <p className="text-[#444444] leading-relaxed">
+                    <p className="text-gris leading-relaxed">
                       Décrivez votre véhicule et son état en quelques
                       clics. Plus vous êtes précis, plus notre
                       estimation sera juste.
@@ -163,14 +163,14 @@ export function TradeIn() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
                     2
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-2">
+                    <h3 className="font-semibold text-noir mb-2">
                       Recevez une estimation
                     </h3>
-                    <p className="text-[#444444] leading-relaxed">
+                    <p className="text-gris leading-relaxed">
                       Notre équipe étudie votre demande et vous
                       contacte sous 24h avec une première estimation.
                     </p>
@@ -178,14 +178,14 @@ export function TradeIn() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
                     3
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-2">
+                    <h3 className="font-semibold text-noir mb-2">
                       Expertise sur place
                     </h3>
-                    <p className="text-[#444444] leading-relaxed">
+                    <p className="text-gris leading-relaxed">
                       Un rendez-vous est organisé pour examiner le
                       véhicule et finaliser l'offre.
                     </p>
@@ -193,14 +193,14 @@ export function TradeIn() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 bg-brand text-white rounded-full flex items-center justify-center font-bold">
+                  <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
                     4
                   </div>
                   <div>
-                    <h3 className="font-semibold text-[#111111] mb-2">
+                    <h3 className="font-semibold text-noir mb-2">
                       Virement immédiat
                     </h3>
-                    <p className="text-[#444444] leading-relaxed">
+                    <p className="text-gris leading-relaxed">
                       Si vous acceptez l'offre, le paiement est
                       effectué immédiatement et nous gérons toutes les
                       démarches.
@@ -226,9 +226,9 @@ export function TradeIn() {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
+                  className="space-y-6 bg-fond p-8 rounded-xl"
                 >
-                  <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                  <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
                     Demande de reprise
                   </h2>
 
@@ -337,18 +337,18 @@ export function TradeIn() {
                       required
                       checked={formData.consent}
                       onChange={handleChange}
-                      className="mt-1 w-4 h-4 text-brand focus:ring-brand rounded"
+                      className="mt-1 w-4 h-4 text-brand focus:ring-bleu/30 rounded"
                     />
                     <label
                       htmlFor="consent"
-                      className="text-sm text-[#444444]"
+                      className="text-sm text-gris"
                     >
                       J'accepte que mes données soient
                       utilisées pour traiter ma demande de
                       reprise conformément à la{' '}
                       <a
                         href="/politique-confidentialite"
-                        className="text-brand hover:underline"
+                        className="text-bleu underline underline-offset-2 hover:decoration-2"
                       >
                         politique de confidentialité
                       </a>
@@ -367,7 +367,7 @@ export function TradeIn() {
 
                   {/* Indicateur visuel pendant upload */}
                   {uploadingFiles && (
-                    <div className="text-sm text-[#444444] bg-white/70 border border-[#E5E5E5] rounded-lg px-3 py-2 flex items-center justify-center">
+                    <div className="text-sm text-gris bg-white/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
                       Téléversement des documents...
                     </div>
                   )}

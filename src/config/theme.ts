@@ -1,17 +1,23 @@
 export const theme = {
   colors: {
-    // Valeurs de référence : la couleur réelle se règle dans src/index.css
-    primary: '#043C69',
-    primaryDark: '#032A4A',
-    primaryLight: '#4F8FC7',
-    neutral: {
-      900: '#111111',
-      700: '#444444',
-      500: '#777777',
-      300: '#AAAAAA',
-      100: '#EEEEEE',
-      50: '#F9F9F9',
-    },
+    // Valeurs de référence : les couleurs réelles se règlent dans src/index.css (:root)
+    noir: '#111111',
+    noirProfond: '#0E0E10',
+    grisTexte: '#4A4A4A',
+    bleu: '#0A4FD6',
+    bleuVif: '#1A8CFF',
+    bleuHover: '#1372EE',
+    or: '#B8902F',
+    orTexte: '#8A6A1F',
+    orClair: '#D9B965',
+    fond: '#F6F5F2',
+    bordure: '#ECE9E0',
+    champ: '#E3E0D6',
+    degradeOr: 'linear-gradient(90deg, #2A2112, #B8902F 55%, #D9B965)',
+    // Anciens noms conservés pour compatibilité
+    primary: '#0A4FD6',
+    primaryDark: '#1372EE',
+    primaryLight: '#6395F8',
     white: '#FFFFFF',
     black: '#000000',
   },

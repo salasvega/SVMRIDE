@@ -157,7 +157,7 @@ export function SingleFileUpload({
         <button
           type="button"
           onClick={() => setPreviewImageUrl(previewUrl)}
-          className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-brand"
+          className="w-10 h-10 rounded-md overflow-hidden border border-bordure flex-shrink-0 focus:ring-2 focus:ring-bleu/30"
           title="Aperçu"
         >
           <img
@@ -170,7 +170,7 @@ export function SingleFileUpload({
     }
 
     return (
-      <div className="bg-[#F5F5F5] text-[#666666] rounded-md p-2 flex items-center justify-center w-10 h-10 flex-shrink-0">
+      <div className="bg-fond text-[#666666] rounded-md p-2 flex items-center justify-center w-10 h-10 flex-shrink-0">
         <FileText className="w-5 h-5" />
       </div>
     );
@@ -180,19 +180,19 @@ export function SingleFileUpload({
     <>
       <div className="space-y-2">
         {label && (
-          <label className="block text-sm font-medium text-[#111111]">
+          <label className="block text-sm font-medium text-noir">
             {label}
             {required && <span className="text-red-600 ml-1">*</span>}
           </label>
         )}
 
         {value || previewUrl ? (
-          <div className="flex items-start justify-between bg-white border border-[#E5E5E5] rounded-lg p-3 text-sm">
+          <div className="flex items-start justify-between bg-white border border-bordure rounded-lg p-3 text-sm">
             <div className="flex items-start gap-3">
               {renderPreviewThumb()}
 
               <div className="min-w-0">
-                <div className="font-medium text-[#111111] truncate max-w-[220px]">
+                <div className="font-medium text-noir truncate max-w-[220px]">
                   {getFileName()}
                 </div>
 
@@ -203,7 +203,7 @@ export function SingleFileUpload({
                 )}
 
                 {fileInfo && (
-                  <div className="text-[11px] text-[#999999] uppercase">
+                  <div className="text-[11px] text-[#6B6B6B] uppercase">
                     {getShortType()}
                   </div>
                 )}
@@ -223,7 +223,7 @@ export function SingleFileUpload({
               <button
                 type="button"
                 onClick={handleDelete}
-                className="text-[#999999] hover:text-brand ml-4"
+                className="text-[#6B6B6B] hover:text-brand ml-4"
                 title="Supprimer"
               >
                 <X className="w-4 h-4" />
@@ -245,10 +245,10 @@ export function SingleFileUpload({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[#CCCCCC] rounded-lg hover:border-brand hover:bg-brand/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-champ rounded-lg hover:border-brand hover:bg-brand/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Upload className="w-5 h-5 text-[#999999]" />
-              <span className="text-sm text-[#444444]">
+              <Upload className="w-5 h-5 text-[#6B6B6B]" />
+              <span className="text-sm text-gris">
                 Cliquer pour choisir un fichier
               </span>
             </button>
@@ -273,7 +273,7 @@ export function SingleFileUpload({
           >
             <button
               type="button"
-              className="absolute -top-4 -right-4 bg-white text-[#111111] rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
+              className="absolute -top-4 -right-4 bg-white text-noir rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
               onClick={() => setPreviewImageUrl(null)}
               aria-label="Fermer l'aperçu"
             >

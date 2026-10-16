@@ -482,12 +482,12 @@ export function FinancingProfile() {
           title="Mon Dossier Financement - SVM-RIDE"
           description="Gérez votre dossier de financement automobile en ligne"
         />
-        <Section className="py-12 bg-gray-50">
+        <Section className="py-12 bg-fond">
           <Container>
             <div className="max-w-md mx-auto">
               <div className="bg-white rounded-lg shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Dossier de financement</h2>
-                <p className="text-gray-600 mb-6">
+                <h2 className="text-2xl font-bold text-noir mb-4">Dossier de financement</h2>
+                <p className="text-gris mb-6">
                   Veuillez entrer votre adresse email pour créer ou accéder à votre dossier de financement.
                 </p>
                 <form onSubmit={handleEmailSubmit} className="space-y-4">
@@ -523,10 +523,10 @@ export function FinancingProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-fond flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bleu mx-auto"></div>
+          <p className="mt-4 text-gris">Chargement...</p>
         </div>
       </div>
     );
@@ -584,17 +584,17 @@ export function FinancingProfile() {
         />
       )}
 
-      <Section className="py-8 bg-gray-50">
+      <Section className="py-8 bg-fond">
         <Container>
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Mon Dossier Financement</h1>
-                  <p className="text-gray-600 mt-2">
+                  <h1 className="text-3xl font-bold text-noir">Mon Dossier Financement</h1>
+                  <p className="text-gris mt-2">
                     Complétez votre dossier pour nous soumettre votre demande de financement
                   </p>
-                  <p className="text-gray-600 mt-2">
+                  <p className="text-gris mt-2">
                     Une fois reçu par notre équipe, nous vous contacterons dans les plus brefs délais.
                   </p>
                 </div>
@@ -608,7 +608,7 @@ export function FinancingProfile() {
 
               <form className="space-y-8">
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Informations Personnelles</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">Informations Personnelles</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       label="Nom *"
@@ -668,7 +668,7 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Informations Logement</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">Informations Logement</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       type="date"
@@ -702,7 +702,7 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Informations Professionnelles</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">Informations Professionnelles</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       label="Emploi/poste occupé *"
@@ -739,7 +739,7 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Informations Financières</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">Informations Financières</h2>
                   <div className="space-y-4">
                     <Textarea
                       label="Autres charges ou crédits"
@@ -761,7 +761,7 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Situation Personnelle</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">Situation Personnelle</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Select
                       label="Situation maritale *"
@@ -788,7 +788,7 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Détails du Financement</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">Détails du Financement</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       label="Véhicule à financer *"
@@ -827,10 +827,10 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Documents Obligatoires</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">Documents Obligatoires</h2>
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-3">Pièce d'identité</h3>
+                      <h3 className="text-lg font-medium text-noir mb-3">Pièce d'identité</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SingleFileUpload
                           label="Recto *"
@@ -854,7 +854,7 @@ export function FinancingProfile() {
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-3">Permis de conduire</h3>
+                      <h3 className="text-lg font-medium text-noir mb-3">Permis de conduire</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SingleFileUpload
                           label="Recto *"
@@ -885,7 +885,7 @@ export function FinancingProfile() {
                     />
 
                     <div>
-                      <h3 className="text-lg font-medium text-gray-900 mb-3">Bulletins de salaire</h3>
+                      <h3 className="text-lg font-medium text-noir mb-3">Bulletins de salaire</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <SingleFileUpload
                           label="Bulletin 1 *"
@@ -934,7 +934,7 @@ export function FinancingProfile() {
 
                     {profile.housing_status === 'hébergé' && (
                       <div className="border-t pt-6 mt-6">
-                        <h3 className="text-lg font-medium text-gray-900 mb-3">Documents si hébergé</h3>
+                        <h3 className="text-lg font-medium text-noir mb-3">Documents si hébergé</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <SingleFileUpload
                             label="Attestation d'hébergement *"
@@ -976,7 +976,7 @@ export function FinancingProfile() {
                         disabled={submitting || !isFormValid()}
                         className={`border-2 font-semibold ${
                           !isFormValid()
-                            ? 'bg-gray-300 border-gray-300 text-gray-500 cursor-not-allowed opacity-50'
+                            ? 'bg-gray-300 border-champ text-[#6B6B6B] cursor-not-allowed opacity-50'
                             : 'bg-green-600 hover:bg-green-700 text-white border-green-600'
                         }`}
                       >
@@ -990,7 +990,7 @@ export function FinancingProfile() {
                       type="button"
                       onClick={handleReopen}
                       variant="secondary"
-                      className="bg-blue-600 text-white hover:bg-blue-700 border-2 border-blue-600 font-semibold"
+                      className="bg-bleu text-white hover:bg-bleu-hover border-2 border-bleu font-semibold"
                     >
                       <Edit className="w-4 h-4 mr-2" />
                       Modifier le dossier

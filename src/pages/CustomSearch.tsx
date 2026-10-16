@@ -127,18 +127,18 @@ export function CustomSearch() {
         path="/recherche-personnalisee"
       />
 
-      <Section background="gray" className="!py-8">
+      <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>
           <div className="flex items-center gap-3">
             <Search
-              className="w-8 h-8 text-brand"
+              className="w-8 h-8 text-or-texte"
               aria-hidden="true"
             />
-            <h1 className="text-3xl md:text-4xl font-bold text-[#111111]">
+            <h1 className="filet-apres">
               Recherche Personnalisée
             </h1>
           </div>
-          <p className="text-lg text-[#444444] mt-2">
+          <p className="text-base md:text-lg text-gris mt-2">
             Nous trouvons le deux-roues de vos rêves
           </p>
         </Container>
@@ -149,11 +149,11 @@ export function CustomSearch() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Colonne gauche : explication du service */}
             <div>
-              <h2 className="text-2xl font-bold text-[#111111] mb-6">
+              <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
                 Un service sur-mesure
               </h2>
 
-              <p className="text-[#444444] leading-relaxed mb-6">
+              <p className="text-gris leading-relaxed mb-6">
                 Vous cherchez un modèle précis, une configuration
                 particulière ou un véhicule rare ? Notre service de
                 recherche personnalisée met notre expertise et notre
@@ -162,61 +162,61 @@ export function CustomSearch() {
               </p>
 
               <div className="space-y-4">
-                <div className="bg-[#F9F9F9] p-6 rounded-xl">
-                  <h3 className="font-semibold text-[#111111] mb-2 flex items-center gap-2">
-                    <span className="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="bg-fond p-6 rounded-xl">
+                  <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
+                    <span className="pastille-etape w-8 h-8 text-sm">
                       1
                     </span>
                     Définissez vos critères
                   </h3>
-                  <p className="text-sm text-[#444444] ml-10">
+                  <p className="text-sm text-gris ml-10">
                     Remplissez le formulaire avec vos souhaits : marque,
                     modèle, budget, délai...
                   </p>
                 </div>
 
-                <div className="bg-[#F9F9F9] p-6 rounded-xl">
-                  <h3 className="font-semibold text-[#111111] mb-2 flex items-center gap-2">
-                    <span className="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="bg-fond p-6 rounded-xl">
+                  <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
+                    <span className="pastille-etape w-8 h-8 text-sm">
                       2
                     </span>
                     Nous cherchons pour vous
                   </h3>
-                  <p className="text-sm text-[#444444] ml-10">
+                  <p className="text-sm text-gris ml-10">
                     Notre équipe active son réseau et recherche
                     activement le véhicule correspondant.
                   </p>
                 </div>
 
-                <div className="bg-[#F9F9F9] p-6 rounded-xl">
-                  <h3 className="font-semibold text-[#111111] mb-2 flex items-center gap-2">
-                    <span className="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="bg-fond p-6 rounded-xl">
+                  <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
+                    <span className="pastille-etape w-8 h-8 text-sm">
                       3
                     </span>
                     Vous recevez des propositions
                   </h3>
-                  <p className="text-sm text-[#444444] ml-10">
+                  <p className="text-sm text-gris ml-10">
                     Nous vous présentons les véhicules trouvés avec
                     photos, historique et prix.
                   </p>
                 </div>
 
-                <div className="bg-[#F9F9F9] p-6 rounded-xl">
-                  <h3 className="font-semibold text-[#111111] mb-2 flex items-center gap-2">
-                    <span className="w-8 h-8 bg-brand text-white rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="bg-fond p-6 rounded-xl">
+                  <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
+                    <span className="pastille-etape w-8 h-8 text-sm">
                       4
                     </span>
                     Vous choisissez
                   </h3>
-                  <p className="text-sm text-[#444444] ml-10">
+                  <p className="text-sm text-gris ml-10">
                     Pas de pression, vous décidez librement si une
                     proposition vous convient.
                   </p>
                 </div>
               </div>
 
-              <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-xl">
-                <p className="text-sm text-blue-900">
+              <div className="mt-8 p-5 md:p-6 bg-white border border-bordure border-l-[3px] border-l-or rounded-xl">
+                <p className="text-sm text-gris">
                   <strong>
                     Service gratuit et sans engagement.
                   </strong>{' '}
@@ -242,9 +242,9 @@ export function CustomSearch() {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl sticky top-24"
+                  className="space-y-6 bg-fond p-8 rounded-xl sticky top-24"
                 >
-                  <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                  <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
                     Votre recherche
                   </h2>
 
@@ -384,18 +384,18 @@ export function CustomSearch() {
                       required
                       checked={formData.consent}
                       onChange={handleChange}
-                      className="mt-1 w-4 h-4 text-brand focus:ring-brand rounded"
+                      className="mt-1 w-4 h-4 text-brand focus:ring-bleu/30 rounded"
                     />
                     <label
                       htmlFor="consent"
-                      className="text-sm text-[#444444]"
+                      className="text-sm text-gris"
                     >
                       J'accepte que mes données soient utilisées
                       pour traiter ma recherche conformément à
                       la{' '}
                       <a
                         href="/politique-confidentialite"
-                        className="text-brand hover:underline"
+                        className="text-bleu underline underline-offset-2 hover:decoration-2"
                       >
                         politique de confidentialité
                       </a>
@@ -414,7 +414,7 @@ export function CustomSearch() {
 
                   {/* Indicateur visuel pendant upload */}
                   {uploadingFiles && (
-                    <div className="text-sm text-[#444444] bg-white/70 border border-[#E5E5E5] rounded-lg px-3 py-2 flex items-center justify-center">
+                    <div className="text-sm text-gris bg-white/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
                       Téléversement des documents...
                     </div>
                   )}

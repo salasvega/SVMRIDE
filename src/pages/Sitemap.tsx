@@ -35,9 +35,9 @@ export function Sitemap() {
         path="/plan-du-site"
       />
 
-      <Section background="gray" className="py-8">
+      <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#111111]">
+          <h1 className="filet-apres">
             Plan du Site
           </h1>
         </Container>
@@ -48,7 +48,7 @@ export function Sitemap() {
           <div className="space-y-12">
             {siteStructure.map((section, index) => (
               <div key={index}>
-                <h2 className="text-2xl font-bold text-[#111111] mb-6">{section.title}</h2>
+                <h2 className="text-[22px] md:text-2xl mb-6">{section.title}</h2>
                 <ul className="space-y-3">
                   {section.links.map((link, linkIndex) => (
                     <li key={linkIndex}>
@@ -56,7 +56,7 @@ export function Sitemap() {
                         to={link.href}
                         className="text-lg text-brand hover:underline flex items-center gap-2"
                       >
-                        <span className="w-2 h-2 bg-brand rounded-full"></span>
+                        <span className="w-1.5 h-1.5 bg-or rounded-full" aria-hidden="true"></span>
                         {link.label}
                       </Link>
                     </li>
