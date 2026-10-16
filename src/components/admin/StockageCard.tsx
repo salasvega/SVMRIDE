@@ -1,6 +1,6 @@
 /**
- * Tableau de bord : place utilisée dans le stockage Supabase (offre gratuite,
- * 1 Go) et outil de compression des anciennes photos envoyées par les
+ * Tableau de bord : place utilisée dans le stockage Supabase (offre Pro,
+ * 100 Go inclus) et outil de compression des anciennes photos envoyées par les
  * formulaires. La compression se fait dans le navigateur de l'admin : chaque
  * photo est téléchargée, allégée, puis remplacée au même emplacement (les
  * liens et les demandes restent inchangés).
@@ -10,7 +10,7 @@ import { HardDrive, Minimize2 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { compresserImage } from '../../lib/compressionImage';
 
-const QUOTA = 1024 ** 3; // 1 Go (offre gratuite)
+const QUOTA = 100 * 1024 ** 3; // 100 Go inclus dans l'offre Pro
 const BUCKET = 'form-attachments';
 const PARALLELE = 3;
 
@@ -119,7 +119,7 @@ export function StockageCard() {
         </div>
         <div>
           <h3 id="stockage-titre" className="text-lg font-bold text-[#111111]">Stockage des fichiers</h3>
-          <p className="text-sm text-[#666666]">Offre gratuite Supabase : 1 Go</p>
+          <p className="text-sm text-[#666666]">Offre Supabase Pro : 100 Go inclus</p>
         </div>
       </div>
 
@@ -129,7 +129,7 @@ export function StockageCard() {
         <>
           <div className="flex items-baseline justify-between mb-2">
             <p className="text-2xl font-bold text-[#111111]">{mo(utilise)}</p>
-            <p className="text-sm text-[#666666]">{pourcent.toLocaleString('fr-FR', { maximumFractionDigits: 0 })} % utilisés</p>
+            <p className="text-sm text-[#666666]">{pourcent.toLocaleString('fr-FR', { maximumFractionDigits: pourcent < 10 ? 1 : 0 })} % utilisés</p>
           </div>
           <div
             className="h-3 rounded-full bg-gray-100 overflow-hidden"
