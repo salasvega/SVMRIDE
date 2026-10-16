@@ -5,9 +5,11 @@
  * base (qui, quand, avant / après).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Camera, ExternalLink, Mail, Phone, Search, Trash2, X } from 'lucide-react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Camera, ExternalLink, FolderPlus, FolderOpen, Mail, Phone, Search, Trash2, X } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
+import { DepotOnglets } from '../../components/admin/DepotOnglets';
+import { appelAdmin, messageErreur } from '../../lib/depot';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 import { supabase } from '../../lib/supabase';
 
@@ -143,6 +145,8 @@ export function DepotDemandesList() {
           <p className="text-[#666666] mt-1">Demandes d'estimation reçues par la page « Vendre ma moto ». Réponse annoncée : 48 h ouvrées.</p>
         </div>
 
+        <DepotOnglets demandes={compte.nouvelle} />
+
         <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
           <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="group" aria-label="Filtrer par statut">
             {filtres.map((f) => (
@@ -243,6 +247,27 @@ function FicheDemande({
   const [enregistrement, setEnregistrement] = useState(false);
   const [message, setMessage] = useState('');
   const [suppression, setSuppression] = useState(false);
+  const [dossier, setDossier] = useState<{ id: string; reference: string } | null>(null);
+  const [conversion, setConversion] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setDossier(null);
+    supabase.from('depot_dossiers').select('id, reference').eq('demande_id', d.id).maybeSingle()
+      .then(({ data }: { data: { id: string; reference: string } | null }) => setDossier(data));
+  }, [d.id]);
+
+  const creerDossier = async () => {
+    setConversion(true);
+    setMessage('');
+    try {
+      const r = await appelAdmin<{ dossier: { id: string } }>('convertir', { demande_id: d.id });
+      navigate(`/admin/depot-vente/dossiers/${r.dossier.id}`);
+    } catch (e) {
+      setMessage(messageErreur(e));
+      setConversion(false);
+    }
+  };
 
   const chargerHistorique = useCallback(async () => {
     const { data } = await supabase
@@ -358,6 +383,28 @@ function FicheDemande({
             >
               <Mail className="w-4 h-4" aria-hidden="true" /> Écrire
             </a>
+          </div>
+
+          <div className="rounded-xl border-2 border-bleu/30 bg-blue-50/50 p-4">
+            {dossier ? (
+              <Link to={`/admin/depot-vente/dossiers/${dossier.id}`} className="inline-flex items-center gap-2 font-semibold text-bleu hover:underline">
+                <FolderOpen className="w-4 h-4" aria-hidden="true" /> Ouvrir le dossier {dossier.reference}
+              </Link>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={creerDossier}
+                  disabled={conversion}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-bleu text-white text-sm font-semibold disabled:opacity-50"
+                >
+                  <FolderPlus className="w-4 h-4" aria-hidden="true" /> {conversion ? 'Création…' : 'Créer le dossier de dépôt-vente'}
+                </button>
+                <p className="text-xs text-[#555555] mt-2">
+                  Quand la moto est confiée : le dossier reprend le propriétaire, la moto et les photos, et la demande passe en « Acceptée ».
+                </p>
+              </>
+            )}
           </div>
 
           <section aria-labelledby="t-proprio">

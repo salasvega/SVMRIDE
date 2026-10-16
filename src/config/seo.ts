@@ -108,7 +108,7 @@ export const pageSeo = {
   '/vendre-ma-moto': {
     title: 'Vendre ma moto en dépôt-vente | SVM Ride',
     description:
-      "Confiez votre moto à SVM Ride : estimation gratuite et sans engagement, réponse sous 48 h ouvrées, nous gérons l'annonce, les visites et la vente. Chaville (92).",
+      "Confiez votre moto à SVM Ride : réponse sous 48 h ouvrées, nous gérons l'annonce, les visites et la vente, vous êtes payé sous 48 h. Chaville (92).",
     path: '/vendre-ma-moto',
   },
   '/financement': {
@@ -121,6 +121,12 @@ export const pageSeo = {
     title: 'Mon dossier de financement | SVM Ride',
     description: 'Accédez à votre dossier de financement SVM Ride et déposez vos justificatifs en ligne.',
     path: '/financement/dossier',
+    noindex: true,
+  },
+  '/suivre-ma-vente': {
+    title: 'Suivre ma vente en dépôt-vente | SVM Ride',
+    description: "Suivez en ligne la vente de votre moto confiée en dépôt-vente à SVM Ride : étapes, visites, offres et documents.",
+    path: '/suivre-ma-vente',
     noindex: true,
   },
   '/recherche-personnalisee': {
@@ -165,6 +171,14 @@ export const pageSeo = {
 } satisfies Record<string, SeoMeta>;
 
 export type PagePath = keyof typeof pageSeo;
+
+/** Page de signature d'un contrat (lien personnel : jamais indexée ni référencée) */
+export const signatureSeo: SeoMeta = {
+  title: 'Signature de votre contrat | SVM Ride',
+  description: 'Signature électronique de votre contrat de dépôt-vente SVM Ride.',
+  path: '/signature',
+  noindex: true,
+};
 
 export const notFoundSeo: SeoMeta = {
   title: 'Page introuvable | SVM Ride',

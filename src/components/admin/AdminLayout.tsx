@@ -15,14 +15,12 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   const [depotNonLues, setDepotNonLues] = useState(0);
 
-  // Demandes de dépôt-vente pas encore ouvertes
+  // Dépôt-vente : demandes d'estimation pas encore ouvertes + demandes des déposants à traiter
   useEffect(() => {
-    supabase
-      .from('depot_demandes')
-      .select('id', { count: 'exact', head: true })
-      .eq('envoi_termine', true)
-      .is('lu_le', null)
-      .then(({ count }: { count: number | null }) => setDepotNonLues(count ?? 0));
+    Promise.all([
+      supabase.from('depot_demandes').select('id', { count: 'exact', head: true }).eq('envoi_termine', true).is('lu_le', null),
+      supabase.from('depot_demandes_proprietaire').select('id', { count: 'exact', head: true }).eq('statut', 'nouvelle'),
+    ]).then(([a, b]: { count: number | null }[]) => setDepotNonLues((a.count ?? 0) + (b.count ?? 0)));
   }, [location.pathname]);
 
   const isActive = (path: string) => location.pathname.startsWith(path);

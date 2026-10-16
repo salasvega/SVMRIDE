@@ -16,6 +16,7 @@ import {
   injectSeo,
   notFoundSeo,
   pageSeo,
+  signatureSeo,
   SEO_VEHICLE_COLUMNS,
   SITE_URL,
   sitemapPages,
@@ -105,6 +106,8 @@ export default async function seo(request: Request, context: Context) {
     meta = notFoundSeo; // page en préparation : invisible sur svmride.com
   } else if (path in pageSeo) {
     meta = pageSeo[path as keyof typeof pageSeo];
+  } else if (/^\/signature\/[A-Za-z0-9_-]{20,80}$/.test(path)) {
+    meta = signatureSeo;
   } else if (vehicule) {
     meta = await metaVehicule(decodeURIComponent(vehicule[1]), path);
   } else if (path === '/admin' || path.startsWith('/admin/')) {
@@ -121,6 +124,8 @@ export default async function seo(request: Request, context: Context) {
   headers.delete('content-length');
   headers.delete('etag');
   if (meta.noindex) headers.set('x-robots-tag', 'noindex');
+  // Lien de signature personnel : jamais transmis à un autre site
+  if (meta === signatureSeo) headers.set('referrer-policy', 'no-referrer');
   return new Response(injectSeo(html, meta), { status: meta.status ?? res.status, headers });
 }
 

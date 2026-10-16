@@ -35,6 +35,10 @@ const FinancingProfilesList = lazy(() => import('./pages/admin/FinancingProfiles
 const SalesFoldersList = nomme(() => import('./pages/admin/SalesFoldersList'), 'SalesFoldersList');
 const SalesFolderForm = nomme(() => import('./pages/admin/SalesFolderForm'), 'SalesFolderForm');
 const DepotDemandesList = nomme(() => import('./pages/admin/DepotDemandesList'), 'DepotDemandesList');
+const DepotDossiersList = nomme(() => import('./pages/admin/DepotDossiersList'), 'DepotDossiersList');
+const DepotDossierDetail = nomme(() => import('./pages/admin/DepotDossierDetail'), 'DepotDossierDetail');
+const Signature = nomme(() => import('./pages/Signature'), 'Signature');
+const SuivreMaVente = nomme(() => import('./pages/SuivreMaVente'), 'SuivreMaVente');
 const SalesFolderDetails = nomme(() => import('./pages/admin/SalesFolderDetails'), 'SalesFolderDetails');
 
 function App() {
@@ -103,6 +107,22 @@ function App() {
             }
           />
           <Route
+            path="/admin/depot-vente/dossiers"
+            element={
+              <ProtectedRoute>
+                <DepotDossiersList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/depot-vente/dossiers/:id"
+            element={
+              <ProtectedRoute>
+                <DepotDossierDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/sales-folders"
             element={
               <ProtectedRoute>
@@ -150,6 +170,8 @@ function App() {
                     <Route path="/vendre-ma-moto" element={<VendreMaMoto />} />
                     <Route path="/financement" element={<Financing />} />
                     <Route path="/financement/dossier" element={<FinancingProfile />} />
+                    <Route path="/signature/:jeton" element={<Signature />} />
+                    <Route path="/suivre-ma-vente" element={<SuivreMaVente />} />
                     <Route path="/recherche-personnalisee" element={<CustomSearch />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/equipe" element={<Equipe />} />

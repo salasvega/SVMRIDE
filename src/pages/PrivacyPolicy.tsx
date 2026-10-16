@@ -39,6 +39,11 @@ export function PrivacyPolicy() {
               <li>Numéro de téléphone</li>
               <li>Informations et photos de votre véhicule (dans le cadre d'une reprise, d'un dépôt-vente ou d'une recherche)</li>
               <li>Messages et commentaires que vous nous envoyez</li>
+              <li>
+                Si vous nous confiez votre moto en dépôt-vente : adresse postale, type et numéro de pièce d'identité, documents
+                du véhicule, état des lieux, et les éléments de preuve de la signature électronique du contrat (date et heure,
+                adresse IP, navigateur, empreinte du document)
+              </li>
             </ul>
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Utilisation des données</h2>
@@ -49,6 +54,7 @@ export function PrivacyPolicy() {
               <li>Répondre à vos demandes d'information</li>
               <li>Traiter vos demandes de reprise de véhicule</li>
               <li>Étudier vos demandes de dépôt-vente et vous recontacter pour une estimation</li>
+              <li>Exécuter le mandat de dépôt-vente (contrat, vente, paiement, démarches de carte grise, suivi en ligne de la vente) et tenir le registre légal des objets mobiliers</li>
               <li>Vous proposer des solutions de financement</li>
               <li>Effectuer des recherches personnalisées de véhicules</li>
               <li>Améliorer nos services</li>
@@ -56,7 +62,7 @@ export function PrivacyPolicy() {
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Base légale du traitement</h2>
             <p className="text-gris mb-6 leading-relaxed">
-              Le traitement de vos données repose sur votre consentement explicite que vous nous accordez lors de la soumission de nos formulaires. Vous pouvez retirer votre consentement à tout moment.
+              Le traitement de vos données repose sur votre consentement explicite que vous nous accordez lors de la soumission de nos formulaires. Vous pouvez retirer votre consentement à tout moment. Lorsque vous nous confiez votre moto en dépôt-vente, le traitement repose sur l'exécution du contrat et sur nos obligations légales (registre des objets mobiliers, comptabilité).
             </p>
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Conservation des données</h2>
@@ -65,7 +71,8 @@ export function PrivacyPolicy() {
             </p>
             <ul className="list-disc list-inside text-gris mb-6 space-y-2 ml-4">
               <li>les photos et pièces jointes sont supprimées 12 mois après votre demande ;</li>
-              <li>la demande elle-même est supprimée 3 ans après son envoi, sauf si elle a donné lieu à un contrat (dépôt-vente, achat), qui suit alors ses propres durées légales.</li>
+              <li>la demande elle-même est supprimée 3 ans après son envoi, sauf si elle a donné lieu à un contrat (dépôt-vente, achat), qui suit alors ses propres durées légales ;</li>
+              <li>un dossier de dépôt-vente (contrat signé, documents, preuves de signature) est conservé 5 ans après la fin du mandat, puis supprimé.</li>
             </ul>
             <p className="text-gris mb-6 leading-relaxed">
               Ces suppressions sont automatiques. Vos données sont hébergées dans l'Union européenne.

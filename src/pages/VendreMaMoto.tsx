@@ -38,18 +38,18 @@ const ETAPES_PARCOURS = [
   },
   {
     icon: FileSignature,
-    titre: 'Le mandat',
-    texte: 'Durée, prix et commission sont fixés ensemble et écrits noir sur blanc, avant toute signature.',
+    titre: 'Le dépôt et le mandat',
+    texte: 'Au showroom, nous faisons ensemble l’état des lieux. Vous signez le mandat sur votre téléphone : prix et net vendeur y sont écrits.',
   },
   {
     icon: Store,
     titre: 'La mise en vente',
-    texte: 'Nous publions l’annonce et nous occupons des appels, des visites et des essais.',
+    texte: 'Annonce, appels, visites : nous nous occupons de tout. Aucun essai sans votre accord. Vous suivez chaque étape en ligne.',
   },
   {
     icon: Handshake,
-    titre: 'La vente',
-    texte: 'Nous gérons les démarches avec l’acheteur et vous êtes réglé selon les conditions du mandat.',
+    titre: 'La vente et le paiement',
+    texte: 'Nous gérons l’acheteur et la carte grise. Vous recevez votre net vendeur par virement sous 48 h.',
   },
 ];
 
@@ -62,24 +62,36 @@ const AVANTAGES = [
   {
     icon: CalendarCheck,
     titre: 'Zéro contrainte',
-    texte: 'Plus d’appels, de rendez-vous ni d’essais à organiser : nous nous en chargeons.',
+    texte: 'Annonce sur svmride.com, appels, visites, démarches : nous nous en chargeons, votre moto reste au showroom.',
   },
   {
     icon: ShieldCheck,
-    titre: 'Des acheteurs rassurés',
-    texte: 'Votre moto est présentée par un professionnel, avec des solutions de financement pour l’acheteur.',
+    titre: 'Aucun risque après la vente',
+    texte: 'SVM Ride achète votre moto au moment de la vente : la garantie et le service après-vente de l’acheteur sont à notre charge.',
   },
   {
     icon: Eye,
-    titre: 'Plus de visibilité',
-    texte: 'Votre annonce sur svmride.com et le suivi de nos conseillers au showroom de Chaville.',
+    titre: 'Une vente transparente',
+    texte: 'Visites, offres, réservation, paiement : suivez chaque étape dans votre espace « Suivre ma vente ».',
   },
 ];
 
 const FAQ = [
   {
     q: 'Combien coûte le dépôt-vente ?',
-    r: 'L’estimation est gratuite et sans engagement. Notre commission vous est annoncée avant toute signature, lors de notre échange : aucune surprise.',
+    r: 'L’estimation est gratuite. Notre rémunération est la différence entre le prix de vente et votre net vendeur : ces deux montants sont fixés ensemble et écrits dans le mandat avant toute signature. Aucun autre frais, sauf un entretien que vous auriez accepté sur devis.',
+  },
+  {
+    q: 'Combien de temps dure le mandat ?',
+    r: 'Deux mois, en exclusivité : pendant cette période, la moto n’est pas proposée ailleurs. Il peut être prolongé par un avenant que vous signez en ligne. Les conditions d’une reprise anticipée de la moto sont précisées dans le mandat.',
+  },
+  {
+    q: 'Quand et comment suis-je payé ?',
+    r: 'SVM Ride encaisse le paiement de l’acheteur et vous verse votre net vendeur par virement sous 48 h. Si un acheteur renonce après avoir versé un acompte, cela n’a aucune conséquence pour vous.',
+  },
+  {
+    q: 'Où est ma moto pendant la vente ?',
+    r: 'Au showroom de Chaville, couverte par l’assurance du garage. Aucun essai n’est réalisé sans votre accord, et le prix n’est jamais modifié sans votre accord écrit.',
   },
   {
     q: 'Vais-je recevoir une estimation automatique ?',
@@ -87,11 +99,11 @@ const FAQ = [
   },
   {
     q: 'Quels documents prévoir ?',
-    r: 'La carte grise, le carnet d’entretien et les factures si vous les avez, le double des clés, et le contrôle technique si votre moto y est soumise. Rien n’est demandé à cette étape : nous en parlerons ensemble.',
+    r: 'Pour le dépôt : la carte grise, une pièce d’identité, un certificat de non-gage de moins de 15 jours, le double des clés, et le carnet d’entretien et les factures si vous les avez. Votre RIB vous sera demandé au moment de la vente. Rien n’est demandé pour l’estimation.',
   },
   {
     q: 'Que deviennent mes informations ?',
-    r: 'Elles servent uniquement à traiter votre demande. Elles sont conservées au plus 3 ans si votre moto ne nous est pas confiée, et vos photos 12 mois au plus. Vous pouvez demander à les consulter ou à les supprimer à tout moment.',
+    r: 'Elles servent uniquement à traiter votre demande. Sans dépôt, elles sont conservées au plus 3 ans et vos photos 12 mois au plus. Si vous nous confiez votre moto, le dossier est conservé 5 ans après la fin du mandat (obligations légales). Vous pouvez demander à consulter ou corriger vos données à tout moment.',
   },
 ];
 
@@ -200,7 +212,7 @@ export function VendreMaMoto() {
             <h1 className="filet-apres mb-4">Vendre ma moto en dépôt-vente</h1>
             <p className="text-base md:text-lg text-gris mb-6 leading-relaxed">
               Confiez-nous votre moto : nous la vendons pour vous, au juste prix, sans les appels, les visites ni les
-              démarches. Estimation gratuite et sans engagement.
+              démarches. Estimation gratuite, paiement sous 48 h après la vente.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a href="#formulaire" tabIndex={-1}>
@@ -213,6 +225,10 @@ export function VendreMaMoto() {
                 </Button>
               </a>
             </div>
+            <p className="mt-5 text-sm text-gris">
+              Votre moto est déjà chez nous ?{' '}
+              <Link to="/suivre-ma-vente" className="lien">Suivez votre vente en ligne</Link>.
+            </p>
           </div>
         </Container>
       </Section>
@@ -251,10 +267,10 @@ export function VendreMaMoto() {
           <div className="mt-6 rounded-2xl border border-or/40 bg-white/[0.04] p-5 md:p-6 flex gap-4 items-start">
             <IconeOr icon={BadgeEuro} className="w-7 h-7 flex-shrink-0" />
             <div>
-              <h3 className="font-semibold text-white mb-1">Une commission transparente</h3>
+              <h3 className="font-semibold text-white mb-1">Un net vendeur écrit noir sur blanc</h3>
               <p className="text-sm text-[#D6D6D6] leading-relaxed">
-                Estimation gratuite et sans engagement. Notre commission vous est annoncée avant toute signature,
-                sans surprise.
+                Vous savez dès la signature ce que vous recevrez : le net vendeur est écrit dans le mandat, et vous êtes payé
+                par virement sous 48 h après la vente. Pas de frais cachés.
               </p>
             </div>
           </div>

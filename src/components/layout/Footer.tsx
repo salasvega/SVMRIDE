@@ -89,6 +89,12 @@ export function Footer() {
                 </Link>
               )}
               <Link
+                to="/suivre-ma-vente"
+                className="block text-sm text-[#AAAAAA] hover:text-white transition-colors duration-180"
+              >
+                Suivre ma vente (dépôt-vente)
+              </Link>
+              <Link
                 to="/mentions-legales"
                 className="block text-sm text-[#AAAAAA] hover:text-white transition-colors duration-180"
               >
