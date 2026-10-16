@@ -153,7 +153,7 @@ export function Contact() {
                   <div className="flex items-center gap-4 sm:block flex-shrink-0">
                     <img
                       src="/equipe-mattia.webp"
-                      alt="Mattia, responsable commercial de SVM Ride"
+                      alt="Mattia, directeur et responsable commercial de SVM Ride"
                       width={96}
                       height={96}
                       loading="lazy"
@@ -162,7 +162,7 @@ export function Contact() {
                     <div className="sm:hidden">
                       <p className="titre-display text-2xl leading-none">Mattia</p>
                       <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-or-clair">
-                        Responsable commercial
+                        Directeur · Responsable commercial
                       </p>
                     </div>
                   </div>
@@ -171,7 +171,7 @@ export function Contact() {
                     <div className="hidden sm:block mb-3">
                       <p className="titre-display text-[26px] leading-none">Mattia</p>
                       <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-or-clair">
-                        Responsable commercial
+                        Directeur · Responsable commercial
                       </p>
                     </div>
                     <div className="space-y-1">

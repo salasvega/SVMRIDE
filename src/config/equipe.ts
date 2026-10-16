@@ -15,11 +15,10 @@
  * - Photo : portrait carré d'au moins 600 px, déposé dans public/equipe/ en WebP
  *   (et AVIF si possible) ; sans photo, des initiales s'affichent à la place.
  *   Portraits d'Amanda, Pedro et Valentin fournis le 16/10, recadrés en 480 px.
- * - textesProvisoires : phrases rédigées en attendant les leurs, à faire valider.
  */
 
 /** Change à true pour publier sur svmride.com. */
-export const EQUIPE_EN_LIGNE = false;
+export const EQUIPE_EN_LIGNE = true; // publié le 16/10/2026 (textes validés)
 
 export interface PhotoMembre {
   /** Chemin du fichier WebP (obligatoire), ex. /equipe/ines.webp */
@@ -53,7 +52,7 @@ export const MEMBRES: Membre[] = [
   {
     id: 'mattia',
     prenom: 'Mattia',
-    fonction: 'Responsable commercial',
+    fonction: 'Directeur · Responsable commercial',
     photo: { webp: '/equipe-mattia.webp', avif: '/equipe/mattia.avif', jpg: '/equipe/mattia.jpg' },
     presentation: [
       "Chez SVM Ride, chaque moto est choisie, contrôlée et présentée comme si elle devait rejoindre mon propre garage.",
@@ -62,7 +61,6 @@ export const MEMBRES: Membre[] = [
     citation: "Une bonne affaire, c'est une moto dont on est encore content un an après.",
     ordre: 0,
     responsable: true,
-    textesProvisoires: true,
   },
   {
     id: 'amanda',
@@ -71,7 +69,6 @@ export const MEMBRES: Membre[] = [
     photo: { webp: '/equipe/amanda.webp', avif: '/equipe/amanda.avif', jpg: '/equipe/amanda.jpg' },
     citation: "Trouver le financement qui colle à votre budget, c'est mon puzzle préféré.",
     ordre: 1,
-    textesProvisoires: true,
   },
   {
     id: 'pedro',
@@ -80,7 +77,6 @@ export const MEMBRES: Membre[] = [
     photo: { webp: '/equipe/pedro.webp', avif: '/equipe/pedro.avif', jpg: '/equipe/pedro.jpg' },
     citation: "Une moto bien préparée, c'est une moto qu'on oublie pour ne penser qu'à la route.",
     ordre: 2,
-    textesProvisoires: true,
   },
   {
     id: 'valentin',
@@ -89,7 +85,6 @@ export const MEMBRES: Membre[] = [
     photo: { webp: '/equipe/valentin.webp', avif: '/equipe/valentin.avif', jpg: '/equipe/valentin.jpg' },
     citation: "J'estime chaque moto avec honnêteté, comme si c'était la mienne.",
     ordre: 3,
-    textesProvisoires: true,
   },
 ];
 
