@@ -40,9 +40,10 @@ export function Home() {
           className="absolute inset-0 bg-cover bg-[url('/accueil-showroom.webp')] bg-[position:50%_40%] lg:bg-[url('/accueil-showroom-logo.webp')] lg:bg-[position:0%_0%]"
           aria-hidden="true"
         />
+        {/* Voile sombre pour la lisibilité du titre ; sur ordinateur, allégé en
+            haut pour laisser ressortir le panneau SVM RIDE (bas inchangé). */}
         <div
-          className="absolute inset-0"
-          style={{ background: 'linear-gradient(180deg, rgba(14,14,16,.35), rgba(14,14,16,.88))' }}
+          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,14,16,.35),rgba(14,14,16,.88))] lg:bg-[linear-gradient(180deg,rgba(14,14,16,.08)_0%,rgba(14,14,16,.30)_38%,rgba(14,14,16,.88)_100%)]"
           aria-hidden="true"
         />
         <Container className="relative z-10 flex flex-col justify-end min-h-[440px] md:min-h-[520px] lg:min-h-[560px] py-14 md:py-20">
