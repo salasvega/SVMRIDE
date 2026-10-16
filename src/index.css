@@ -10,10 +10,9 @@
   --noir: #111111;          /* titres */
   --noir-profond: #0E0E10;  /* sections sombres, pied de page */
   --gris-texte: #4A4A4A;    /* paragraphes */
-  --bleu: #0A4FD6;          /* couleur d'action principale */
+  --bleu: #254893;          /* bleu saphir : couleur d'action principale */
   --bleu-vif: #1A8CFF;      /* petits accents, focus, liens sur fond sombre */
-  --bleu-hover: #1372EE;    /* survol des boutons : le bleu le plus vif qui garde
-                               un contraste AA (4,5:1) avec le texte blanc */
+  --bleu-hover: #2F5BB3;    /* survol des boutons : un cran plus clair (6,4:1 avec le texte blanc) */
   --or: #B8902F;
   --or-texte: #8A6A1F;      /* or foncé, seul or autorisé en texte sur fond clair */
   --or-clair: #D9B965;
@@ -25,9 +24,9 @@
   --noir-rgb: 17 17 17;
   --noir-profond-rgb: 14 14 16;
   --gris-texte-rgb: 74 74 74;
-  --bleu-rgb: 10 79 214;
+  --bleu-rgb: 37 72 147;
   --bleu-vif-rgb: 26 140 255;
-  --bleu-hover-rgb: 19 114 238;
+  --bleu-hover-rgb: 47 91 179;
   --bleu-clair-rgb: 99 149 248;
   --or-rgb: 184 144 47;
   --or-texte-rgb: 138 106 31;

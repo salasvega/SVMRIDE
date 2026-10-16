@@ -22,8 +22,8 @@ export default {
         display: ['Oswald', 'Impact', 'Arial Narrow', 'sans-serif'],
       },
       boxShadow: {
-        bleu: '0 6px 16px rgba(10, 79, 214, 0.35)',
-        'bleu-fort': '0 8px 22px rgba(10, 79, 214, 0.42)',
+        bleu: '0 6px 16px rgba(37, 72, 147, 0.32)',
+        'bleu-fort': '0 8px 22px rgba(37, 72, 147, 0.4)',
         carte: '0 1px 2px rgba(17, 17, 17, 0.04), 0 4px 14px rgba(17, 17, 17, 0.04)',
         vehicule: '0 8px 24px rgba(0, 0, 0, 0.08)',
         'vehicule-fort': '0 14px 32px rgba(0, 0, 0, 0.12)',
