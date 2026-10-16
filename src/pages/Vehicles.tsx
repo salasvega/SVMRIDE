@@ -112,52 +112,54 @@ export function Vehicles() {
         path="/vehicules"
       />
 
-      <Section background="gray" className="!py-8">
+      <Section background="gray" className="!pt-8 md:!pt-12">
         <Container>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#111111] mb-2">
+          <h1 className="filet-apres mb-4">
             Nos Véhicules d'Occasion
           </h1>
-          <p className="text-lg text-[#444444] mb-6">
+          <p className="text-base md:text-lg text-gris mb-6">
             {loading ? 'Chargement...' : `${vehicles.length} véhicule${vehicles.length > 1 ? 's' : ''} disponible${vehicles.length > 1 ? 's' : ''}`}
           </p>
 
           <div className="space-y-4 mb-8">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#444444]" aria-hidden="true" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gris pointer-events-none" aria-hidden="true" />
               <input
                 type="text"
                 placeholder="Rechercher une marque ou un modèle..."
+                aria-label="Rechercher une marque ou un modèle"
                 value={searchQuery}
                 onChange={(e) => updateSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-4 bg-white border-2 border-[#E5E5E5] rounded-xl text-[#111111] placeholder-[#AAAAAA] focus:border-brand focus:outline-none transition-colors"
+                className="w-full pl-12 pr-4 py-[15px] bg-white border-[1.5px] border-champ rounded-xl text-noir placeholder:text-[#767676] focus:border-bleu focus:outline-none focus:ring-4 focus:ring-bleu/15 transition-[border-color,box-shadow] duration-150"
               />
             </div>
 
-            <div className="bg-white border-2 border-[#E5E5E5] rounded-xl overflow-hidden">
+            <div className="bg-white border-[1.5px] border-champ rounded-xl overflow-hidden">
               <button
                 onClick={() => setFiltersOpen(!filtersOpen)}
-                className="w-full px-6 py-4 flex items-center justify-between hover:bg-[#F9F9F9] transition-colors"
+                aria-expanded={filtersOpen}
+                className="w-full px-5 md:px-6 py-4 flex items-center justify-between rounded-xl hover:bg-fond transition-colors duration-180 focus-visible:outline-offset-[-2px]"
               >
                 <div className="flex items-center gap-3">
-                  <SlidersHorizontal className="w-5 h-5 text-brand" aria-hidden="true" />
-                  <span className="font-semibold text-[#111111]">
+                  <SlidersHorizontal className="w-5 h-5 text-bleu" aria-hidden="true" />
+                  <span className="font-semibold text-noir">
                     Filtres avancés
                   </span>
                   {activeFiltersCount > 0 && (
-                    <span className="px-2 py-1 bg-brand text-white text-xs font-semibold rounded-full">
+                    <span className="min-w-[22px] px-2 py-0.5 bg-bleu text-white text-xs font-semibold rounded-full text-center">
                       {activeFiltersCount}
                     </span>
                   )}
                 </div>
                 {filtersOpen ? (
-                  <ChevronUp className="w-5 h-5 text-[#444444]" aria-hidden="true" />
+                  <ChevronUp className="w-5 h-5 text-gris" aria-hidden="true" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-[#444444]" aria-hidden="true" />
+                  <ChevronDown className="w-5 h-5 text-gris" aria-hidden="true" />
                 )}
               </button>
 
               {filtersOpen && (
-                <div className="px-6 pb-6 border-t border-[#E5E5E5]">
+                <div className="px-5 md:px-6 pb-6 border-t border-bordure">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                     <Select
                       label="Marque"
@@ -221,14 +223,14 @@ export function Vehicles() {
                   </div>
 
                   {activeFiltersCount > 0 && (
-                    <div className="mt-6 pt-6 border-t border-[#E5E5E5]">
+                    <div className="mt-6 pt-6 border-t border-bordure">
                       <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-semibold text-[#111111]">
+                        <span className="text-sm font-semibold text-noir">
                           Filtres actifs
                         </span>
                         <button
                           onClick={clearAllFilters}
-                          className="text-sm text-brand hover:underline font-medium"
+                          className="lien text-sm"
                         >
                           Tout effacer
                         </button>
@@ -240,10 +242,10 @@ export function Vehicles() {
                             <button
                               key={key}
                               onClick={() => removeFilter(key as keyof VehicleFilters)}
-                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#F9F9F9] hover:bg-[#EEEEEE] border border-[#E5E5E5] rounded-lg text-sm text-[#111111] transition-colors group"
+                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-fond hover:bg-bordure border border-champ rounded-full text-sm text-noir transition-colors duration-180 group"
                             >
                               <span>{getFilterLabel(key as keyof VehicleFilters, value)}</span>
-                              <X className="w-3.5 h-3.5 text-[#AAAAAA] group-hover:text-brand" aria-hidden="true" />
+                              <X className="w-3.5 h-3.5 text-gris group-hover:text-bleu" aria-hidden="true" />
                             </button>
                           );
                         })}
@@ -257,7 +259,7 @@ export function Vehicles() {
 
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-lg text-[#444444]">Chargement des véhicules...</p>
+              <p className="text-base md:text-lg text-gris">Chargement des véhicules...</p>
             </div>
           ) : error ? (
             <div className="text-center py-12">
@@ -265,12 +267,12 @@ export function Vehicles() {
             </div>
           ) : vehicles.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-lg text-[#444444]">
+              <p className="text-base md:text-lg text-gris">
                 Aucun véhicule ne correspond à vos critères. Essayez de modifier les filtres.
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
               {vehicles.map((vehicle) => (
                 <VehicleCard key={vehicle.id} vehicle={vehicle} />
               ))}

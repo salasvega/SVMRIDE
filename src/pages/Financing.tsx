@@ -7,6 +7,7 @@ import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
+import { IconeOr } from '../components/ui/IconeOr';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 
@@ -130,13 +131,13 @@ export function Financing() {
       />
 
       {/* Bandeau titre */}
-      <Section background="gray" className="!py-8">
+      <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-[#111111] mb-2">
+            <h1 className="filet-apres mb-4">
               Solutions de Financement
             </h1>
-            <p className="text-lg text-[#444444]">
+            <p className="text-base md:text-lg text-gris">
               Financez votre deux-roues en toute simplicité
             </p>
           </div>
@@ -147,7 +148,7 @@ export function Financing() {
       <Section background="white" className="!py-8">
         <Container size="md">
           {/* Bloc simulateur */}
-          <div className="relative bg-gradient-to-br from-[#2C2C2C] to-[#1A1A1A] text-white p-8 md:p-12 rounded-xl mb-12 overflow-hidden">
+          <div className="sur-sombre relative bg-noir-profond text-white p-6 md:p-12 rounded-2xl mb-12 overflow-hidden border border-or/30 shadow-vehicule">
             <div className="absolute inset-0 opacity-20">
               <img
                 src="/image copy copy.png"
@@ -159,8 +160,8 @@ export function Financing() {
 
             <div className="relative z-10">
               <div className="flex items-center gap-3 mb-6">
-                <Calculator className="w-8 h-8" aria-hidden="true" />
-                <h2 className="text-2xl md:text-3xl font-bold">
+                <Calculator className="w-8 h-8 text-or-clair" strokeWidth={1.6} aria-hidden="true" />
+                <h2 className="text-[26px] md:text-[30px]">
                   Simulateur de crédit
                 </h2>
               </div>
@@ -174,6 +175,7 @@ export function Financing() {
                   </label>
                   <input
                     type="range"
+                    aria-label="Montant du financement"
                     min="1000"
                     max="20000"
                     step="500"
@@ -192,6 +194,7 @@ export function Financing() {
                   </label>
                   <input
                     type="range"
+                    aria-label="Durée du financement"
                     min="12"
                     max="72"
                     step="6"
@@ -214,6 +217,7 @@ export function Financing() {
                   </label>
                   <input
                     type="range"
+                    aria-label="Taux (TAEG)"
                     min="2"
                     max="10"
                     step="0.5"
@@ -229,9 +233,9 @@ export function Financing() {
                 </div>*/}
 
                 {/* Estimation */}
-                <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg mt-8 border border-white/20">
+                <div className="bg-white/[0.06] backdrop-blur-sm p-6 rounded-xl mt-8 border border-white/15">
                   <p className="text-sm mb-2">Mensualité estimée</p>
-                  <p className="text-4xl font-bold">{calculateMonthlyPayment()} €</p>
+                  <p className="font-display font-semibold text-[40px] leading-tight">{calculateMonthlyPayment()} €</p>
                   <p className="text-sm mt-2 opacity-90">
                     par mois sur {simulatorData.duration} mois
                   </p>
@@ -255,49 +259,49 @@ export function Financing() {
           <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
             {/* Avantages commerciaux */}
           <div>
-  <h2 className="text-2xl font-bold text-[#111111] mb-6">
+  <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
     Pourquoi financer avec nous ?
   </h2>
 
   <div className="space-y-4">
-    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-brand flex-shrink-0" aria-hidden="true" />
+    <div className="flex gap-4 p-4 bg-fond rounded-lg">
+      <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
       <div>
-        <h3 className="font-semibold text-[#111111] mb-1">Réponse rapide</h3>
-        <p className="text-sm text-[#444444]">
+        <h3 className="font-semibold text-noir mb-1">Réponse rapide</h3>
+        <p className="text-sm text-gris">
           Obtenez une réponse de principe en quelques heures
         </p>
       </div>
     </div>
 
-    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-brand flex-shrink-0" aria-hidden="true" />
+    <div className="flex gap-4 p-4 bg-fond rounded-lg">
+      <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
       <div>
-        <h3 className="font-semibold text-[#111111] mb-1">Taux compétitifs</h3>
-        <p className="text-sm text-[#444444]">
+        <h3 className="font-semibold text-noir mb-1">Taux compétitifs</h3>
+        <p className="text-sm text-gris">
           Nous négocions les meilleurs taux pour vous
         </p>
       </div>
     </div>
 
     {/* Paiement en plusieurs fois via Alma */}
-<div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
+<div className="flex gap-4 p-4 bg-fond rounded-lg">
   <CheckCircle
     className="w-6 h-6 text-brand flex-shrink-0"
     aria-hidden="true"
   />
   <div>
-    <h3 className="font-semibold text-[#111111] mb-1">
+    <h3 className="font-semibold text-noir mb-1">
       Paiement en 3x, 4x ou 10x par carte
     </h3>
-    <p className="text-sm text-[#444444] leading-snug">
+    <p className="text-sm text-gris leading-snug">
       Réglez votre moto ou scooter en plusieurs fois par carte bancaire
       grâce à notre partenaire&nbsp;
       <a
         href="https://almapay.com/fr-FR"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-brand font-medium hover:underline"
+        className="text-bleu font-medium underline underline-offset-2 hover:decoration-2"
       >
         Alma
       </a>
@@ -318,28 +322,28 @@ export function Financing() {
       />
     </a>
 
-    <p className="text-[11px] text-[#777777] mt-2">
+    <p className="text-[11px] text-[#5E5E5E] mt-2">
       Offre de financement soumise à conditions, proposée par Alma.
     </p>
   </div>
 </div>
 
 
-    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-brand flex-shrink-0" aria-hidden="true" />
+    <div className="flex gap-4 p-4 bg-fond rounded-lg">
+      <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
       <div>
-        <h3 className="font-semibold text-[#111111] mb-1">Sans frais de dossier</h3>
-        <p className="text-sm text-[#444444]">
+        <h3 className="font-semibold text-noir mb-1">Sans frais de dossier</h3>
+        <p className="text-sm text-gris">
           Aucun frais caché, tout est transparent
         </p>
       </div>
     </div>
 
-    <div className="flex gap-4 p-4 bg-[#F9F9F9] rounded-lg">
-      <CheckCircle className="w-6 h-6 text-brand flex-shrink-0" aria-hidden="true" />
+    <div className="flex gap-4 p-4 bg-fond rounded-lg">
+      <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
       <div>
-        <h3 className="font-semibold text-[#111111] mb-1">Accompagnement personnalisé</h3>
-        <p className="text-sm text-[#444444]">
+        <h3 className="font-semibold text-noir mb-1">Accompagnement personnalisé</h3>
+        <p className="text-sm text-gris">
           Un conseiller dédié pour vous guider
         </p>
       </div>
@@ -365,10 +369,10 @@ export function Financing() {
                 <>
                   <form
                     onSubmit={handleSubmit}
-                    className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl"
+                    className="space-y-6 bg-fond p-8 rounded-xl"
                     style={{ display: 'none' }}
                   >
-                    <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                    <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
                       Demande de financement
                     </h2>
 
@@ -455,18 +459,18 @@ export function Financing() {
                     </Button>
                   </form>
 
-                  <div className="space-y-6 bg-[#F9F9F9] p-8 rounded-xl">
-                    <h2 className="text-2xl font-bold text-[#111111] mb-4">
+                  <div className="space-y-6 bg-fond p-8 rounded-xl">
+                    <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
                       Demande de financement
                     </h2>
 
-                    <p className="text-[#444444] leading-relaxed">
+                    <p className="text-gris leading-relaxed">
                     Effectuez votre demande de financement via nos partenaires en cliquant sur le bouton ci-dessous :
                     </p>
 
                     <Link
                       to={`/financement/dossier?vehicle=${encodeURIComponent(vehicleFromURL)}&price=${priceFromURL || ''}&duration=${formData.duration}`}
-                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand hover:bg-[#B00000] text-white font-semibold rounded-lg transition-colors"
+                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand hover:bg-bleu-hover text-white font-semibold rounded-lg transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       Mon Dossier de Financement

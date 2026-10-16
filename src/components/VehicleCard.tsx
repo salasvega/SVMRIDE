@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, Gauge, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Gauge, Route, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Vehicle } from '../types/vehicle';
 import { formatPrice, formatMileage } from '../utils/vehicle-filters';
 import { Button } from './ui/Button';
@@ -21,17 +21,17 @@ function getAllImages(vehicle: any): string[] {
   ).filter(Boolean);
 }
 
-// Donne le label et la couleur selon le statut
+// Badge de statut : fond noir profond, liseré or, pastille ronde de couleur
 function getStatusBadge(status?: string) {
   switch (status) {
     case 'available':
-      return { label: 'Disponible', color: 'bg-green-600' };
+      return { label: 'Disponible', dot: 'bg-or-clair' };
     case 'reserved':
-      return { label: 'Réservé', color: 'bg-yellow-500' };
+      return { label: 'Réservé', dot: 'bg-[#F0A93B]' };
     case 'sold':
-      return { label: 'Vendu', color: 'bg-gray-600' };
+      return { label: 'Vendu', dot: 'bg-[#9A9A9A]' };
     default:
-      return { label: '', color: '' };
+      return { label: '', dot: '' };
   }
 }
 
@@ -59,12 +59,12 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
   };
 
   const content = (
-    <article className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group relative">
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#F9F9F9]">
+    <article className="bg-white rounded-[18px] overflow-hidden shadow-vehicule transition-[box-shadow,transform] duration-200 ease-out hover:shadow-vehicule-fort hover:-translate-y-1 group relative h-full flex flex-col">
+      <div className="relative aspect-[4/3] overflow-hidden bg-fond">
         <img
           src={displayImages[currentImageIndex]}
           alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year} - Image ${currentImageIndex + 1}`}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
           loading="lazy"
         />
 
@@ -72,7 +72,7 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
           <>
             <button
               onClick={handlePrevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-white p-2 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
               aria-label="Image précédente"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -80,7 +80,7 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
 
             <button
               onClick={handleNextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-white p-2 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
               aria-label="Image suivante"
             >
               <ChevronRight className="w-5 h-5" />
@@ -108,41 +108,40 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
         )}
 
         {statusInfo.label && (
-          <div
-            className={`absolute top-4 left-4 ${statusInfo.color} text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md z-10`}
-          >
+          <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-noir-profond text-white border border-or px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-[0_2px_8px_rgba(0,0,0,0.25)] z-10">
+            <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} aria-hidden="true" />
             {statusInfo.label}
           </div>
         )}
 
-        <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-semibold text-brand shadow-md z-10">
+        <div className="absolute top-3 right-3 bg-white border-[1.5px] border-or px-3 py-1 rounded-full text-sm font-bold text-noir shadow-[0_2px_8px_rgba(0,0,0,0.15)] z-10">
           {formatPrice(vehicle.price)}
         </div>
       </div>
 
-      <div className="p-6">
-        <h3 className="text-xl font-bold text-[#111111] mb-2">
+      <div className="p-5 md:p-6 flex flex-col flex-1">
+        <h3 className="titre-display text-[21px] md:text-[22px] mb-3">
           {vehicle.brand} {vehicle.model}
         </h3>
 
-        <div className="flex flex-wrap gap-4 text-sm text-[#444444] mb-4">
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-gris mb-5 pb-5 border-b border-bordure">
           <div className="flex items-center gap-1">
-            <Calendar className="w-4 h-4" aria-hidden="true" />
+            <Calendar className="w-4 h-4 text-or-texte" aria-hidden="true" />
             <span>{vehicle.year}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Gauge className="w-4 h-4" aria-hidden="true" />
+            <Gauge className="w-4 h-4 text-or-texte" aria-hidden="true" />
             <span>{vehicle.displacement} cc</span>
           </div>
           <div className="flex items-center gap-1">
-            <MapPin className="w-4 h-4" aria-hidden="true" />
+            <Route className="w-4 h-4 text-or-texte" aria-hidden="true" />
             <span>{formatMileage(vehicle.mileage)}</span>
           </div>
         </div>
 
         {!disableLink && (
-          <Link to={`/vehicules/${vehicle.slug}`}>
-            <Button variant="outline" fullWidth>
+          <Link to={`/vehicules/${vehicle.slug}`} className="mt-auto" tabIndex={-1}>
+            <Button fullWidth>
               Voir le véhicule
             </Button>
           </Link>
@@ -154,7 +153,7 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
   if (disableLink) return content;
 
   return (
-    <Link to={`/vehicules/${vehicle.slug}`} className="block">
+    <Link to={`/vehicules/${vehicle.slug}`} className="block h-full rounded-[18px]">
       {content}
     </Link>
   );

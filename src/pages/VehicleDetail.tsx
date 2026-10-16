@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Calendar, Gauge, MapPin, Shield, ArrowLeft, MessageCircle, Euro, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, Gauge, Route, Shield, ArrowLeft, MessageCircle, Euro, ChevronLeft, ChevronRight } from 'lucide-react';
+import { IconeOr } from '../components/ui/IconeOr';
 import { SEOHead } from '../components/layout/SEOHead';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
@@ -32,7 +33,7 @@ export function VehicleDetail() {
     return (
       <Section>
         <Container className="text-center py-12">
-          <p className="text-lg text-[#444444]">Chargement...</p>
+          <p className="text-lg text-gris">Chargement...</p>
         </Container>
       </Section>
     );
@@ -42,7 +43,7 @@ export function VehicleDetail() {
     return (
       <Section>
         <Container className="text-center py-12">
-          <h1 className="text-3xl font-bold text-[#111111] mb-4">Véhicule non trouvé</h1>
+          <h1 className="filet-apres text-center mb-8">Véhicule non trouvé</h1>
           <Link to="/vehicules">
             <Button>Retour aux véhicules</Button>
           </Link>
@@ -89,11 +90,11 @@ export function VehicleDetail() {
         schema={schema}
       />
 
-      <Section background="gray" className="!py-6">
+      <Section background="gray" className="!py-5">
         <Container>
           <Link
             to="/vehicules"
-            className="inline-flex items-center gap-2 text-brand hover:underline"
+            className="lien inline-flex items-center gap-2 text-sm md:text-base"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour aux véhicules
@@ -101,12 +102,12 @@ export function VehicleDetail() {
         </Container>
       </Section>
 
-      <Section background="white" className="!py-8">
+      <Section background="white" className="!pt-2 !pb-12 md:!py-10">
         <Container>
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             {/* --- Colonne gauche : galerie photos --- */}
             <div>
-              <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#F9F9F9] mb-4 group">
+              <div className="relative aspect-[4/3] rounded-[18px] overflow-hidden bg-fond mb-3 md:mb-4 group shadow-vehicule">
                 <img
                   src={vehicle.images[currentImageIndex]}
                   alt={`${vehicle.brand} ${vehicle.model} - Image ${currentImageIndex + 1}`}
@@ -117,7 +118,7 @@ export function VehicleDetail() {
                   <>
                     <button
                       onClick={handlePrevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+                      className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-white p-2.5 md:p-3 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
                       aria-label="Image précédente"
                     >
                       <ChevronLeft className="w-6 h-6" />
@@ -125,7 +126,7 @@ export function VehicleDetail() {
 
                     <button
                       onClick={handleNextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all opacity-0 group-hover:opacity-100 z-10"
+                      className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-white p-2.5 md:p-3 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
                       aria-label="Image suivante"
                     >
                       <ChevronRight className="w-6 h-6" />
@@ -150,15 +151,17 @@ export function VehicleDetail() {
               </div>
 
               {vehicle.images.length > 1 && (
-                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-3">
+                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 md:gap-3">
                   {vehicle.images.map((image, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                      aria-label={`Afficher l'image ${index + 1}`}
+                      aria-current={currentImageIndex === index ? 'true' : undefined}
+                      className={`aspect-[4/3] rounded-xl overflow-hidden border-2 transition-[border-color,opacity] duration-180 ${
                         currentImageIndex === index
-                          ? 'border-brand scale-105'
-                          : 'border-gray-200'
+                          ? 'border-bleu'
+                          : 'border-transparent opacity-75 hover:opacity-100 hover:border-or'
                       }`}
                     >
                       <img
@@ -174,48 +177,48 @@ export function VehicleDetail() {
 
             {/* --- Colonne droite : infos véhicule + actions --- */}
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-[#111111] mb-2">
+              <h1 className="!text-[32px] md:!text-[40px] mb-4">
                 {vehicle.brand} {vehicle.model}
               </h1>
 
-              <p className="text-3xl font-bold text-brand mb-6">
+              <p className="inline-flex items-center bg-white border-[1.5px] border-or rounded-full px-5 py-1.5 font-display font-semibold text-[26px] md:text-[28px] leading-tight text-noir mb-6">
                 {formatPrice(vehicle.price)}
               </p>
 
-              <div className="grid grid-cols-2 gap-4 mb-8 p-6 bg-[#F9F9F9] rounded-xl">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-brand" aria-hidden="true" />
+              <div className="grid grid-cols-2 gap-x-4 gap-y-5 mb-8 p-5 md:p-6 bg-fond border border-bordure rounded-2xl">
+                <div className="flex items-center gap-3">
+                  <IconeOr icon={Calendar} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-[#444444]">Année</p>
-                    <p className="font-semibold text-[#111111]">{vehicle.year}</p>
+                    <p className="text-xs uppercase tracking-wide text-[#5E5E5E]">Année</p>
+                    <p className="font-semibold text-noir">{vehicle.year}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Gauge className="w-5 h-5 text-brand" aria-hidden="true" />
+                <div className="flex items-center gap-3">
+                  <IconeOr icon={Gauge} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-[#444444]">Cylindrée</p>
-                    <p className="font-semibold text-[#111111]">
+                    <p className="text-xs uppercase tracking-wide text-[#5E5E5E]">Cylindrée</p>
+                    <p className="font-semibold text-noir">
                       {vehicle.displacement} cc
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-brand" aria-hidden="true" />
+                <div className="flex items-center gap-3">
+                  <IconeOr icon={Route} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-[#444444]">Kilométrage</p>
-                    <p className="font-semibold text-[#111111]">
+                    <p className="text-xs uppercase tracking-wide text-[#5E5E5E]">Kilométrage</p>
+                    <p className="font-semibold text-noir">
                       {formatMileage(vehicle.mileage)}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-brand" aria-hidden="true" />
+                <div className="flex items-center gap-3">
+                  <IconeOr icon={Shield} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-sm text-[#444444]">Type</p>
-                    <p className="font-semibold text-[#111111] capitalize">
+                    <p className="text-xs uppercase tracking-wide text-[#5E5E5E]">Type</p>
+                    <p className="font-semibold text-noir capitalize">
                       {vehicle.type}
                     </p>
                   </div>
@@ -224,17 +227,17 @@ export function VehicleDetail() {
 
               {/* Description */}
               <div className="mb-8">
-                <h2 className="text-xl font-bold text-[#111111] mb-3">Description</h2>
-                <p className="text-[#444444] leading-relaxed">{vehicle.description}</p>
+                <h2 className="text-xl md:text-[22px] filet-apres mb-4">Description</h2>
+                <p className="text-gris leading-relaxed">{vehicle.description}</p>
               </div>
 
               {/* Équipements */}
               <div className="mb-8">
-                <h2 className="text-xl font-bold text-[#111111] mb-3">Équipements</h2>
-                <ul className="grid grid-cols-2 gap-2">
+                <h2 className="text-xl md:text-[22px] filet-apres mb-4">Équipements</h2>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                   {vehicle.features.map((feature, index) => (
-                    <li key={index} className="flex items-center gap-2 text-[#444444]">
-                      <span className="w-2 h-2 bg-brand rounded-full"></span>
+                    <li key={index} className="flex items-start gap-2.5 text-gris">
+                      <span className="mt-[9px] w-1.5 h-1.5 flex-shrink-0 bg-or rounded-full" aria-hidden="true"></span>
                       {feature}
                     </li>
                   ))}
@@ -242,92 +245,36 @@ export function VehicleDetail() {
               </div>
 
               {/* Garantie */}
-              <div className="p-4 bg-[#F9F9F9] rounded-xl mb-8">
-                <div className="flex items-center gap-2 text-brand mb-1">
-                  <Shield className="w-5 h-5" aria-hidden="true" />
+              <div className="p-4 md:p-5 bg-white border border-bordure border-l-[3px] border-l-or rounded-xl mb-8">
+                <div className="flex items-center gap-2 text-noir mb-1">
+                  <IconeOr icon={Shield} className="w-5 h-5" />
                   <span className="font-semibold">Garantie</span>
                 </div>
-                <p className="text-[#444444]">{vehicle.warranty}</p>
+                <p className="text-gris">{vehicle.warranty}</p>
               </div>
-{/* CTA contact + CTA financement */}
-<div className="w-full flex flex-col gap-4">
-  {/* Bouton primaire : rouge plein */}
-  <Link
-    to="/contact"
-    state={{
-      vehicle: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
-    }}
-    className="w-full"
-  >
-    <Button
-      size="lg"
-      fullWidth
-      className="
-        w-full
-        bg-brand
-        text-white
-        font-semibold
-        tracking-wide
-        rounded-xl
-        shadow-md
-        hover:bg-[#b30000]
-        hover:shadow-xl
-        hover:scale-105
-        active:scale-100
-        transition
-        duration-200
-        border-0
-        py-4
-        text-base
-        flex
-        items-center
-        justify-center
-        gap-3
-        transform
-      "
-    >
-      <MessageCircle className="w-6 h-6" />
-      <span>Demander des informations</span>
-    </Button>
-  </Link>
+{/* CTA contact (principal) + CTA financement (secondaire) */}
+              <div className="w-full flex flex-col gap-3">
+                <Link
+                  to="/contact"
+                  state={{
+                    vehicle: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
+                  }}
+                  className="w-full"
+                  tabIndex={-1}
+                >
+                  <Button size="lg" fullWidth>
+                    <MessageCircle className="w-5 h-5" aria-hidden="true" />
+                    <span>Demander des informations</span>
+                  </Button>
+                </Link>
 
-  {/* Bouton secondaire : contour rouge, fond blanc */}
-  <Link
-    to={financingLink}
-    className="w-full"
-  >
-    <Button
-      size="lg"
-      fullWidth
-      className="
-        w-full
-        bg-[#383131]
-        text-white
-        font-semibold
-        tracking-wide
-        rounded-xl
-        shadow-md
-        hover:bg-[#b30000]
-        hover:shadow-xl
-        hover:scale-105
-        active:scale-100
-        transition
-        duration-200
-        border-0
-        py-4
-        text-base
-        flex
-        items-center
-        justify-center
-        gap-3
-        transform
-      "
-    >
-      <Euro className="w-6 h-6" />
-      <span>Demander un financement</span>
-    </Button>
-  </Link>
-</div>
+                <Link to={financingLink} className="w-full" tabIndex={-1}>
+                  <Button size="lg" variant="secondary" fullWidth>
+                    <Euro className="w-5 h-5" aria-hidden="true" />
+                    <span>Demander un financement</span>
+                  </Button>
+                </Link>
+              </div>
 
 
               

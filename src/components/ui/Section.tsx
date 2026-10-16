@@ -9,8 +9,8 @@ interface SectionProps {
 export function Section({ children, className = '', background = 'white' }: SectionProps) {
   const bgClasses = {
     white: 'bg-white',
-    gray: 'bg-[#F9F9F9]',
-    dark: 'bg-[#111111] text-white',
+    gray: 'bg-fond',
+    dark: 'sur-sombre bg-noir-profond text-white',
   };
 
   return (

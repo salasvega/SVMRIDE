@@ -235,7 +235,7 @@ export function FileUpload({
         <button
           type="button"
           onClick={() => openLightbox(doc.previewUrl)}
-          className="w-10 h-10 rounded-md overflow-hidden border border-[#E5E5E5] flex-shrink-0 focus:ring-2 focus:ring-brand"
+          className="w-10 h-10 rounded-md overflow-hidden border border-bordure flex-shrink-0 focus:ring-2 focus:ring-bleu/30"
           title="Aperçu"
         >
           <img
@@ -248,7 +248,7 @@ export function FileUpload({
     }
 
     return (
-      <div className="bg-[#F5F5F5] text-[#666666] rounded-md p-2 flex items-center justify-center w-10 h-10 flex-shrink-0">
+      <div className="bg-fond text-[#666666] rounded-md p-2 flex items-center justify-center w-10 h-10 flex-shrink-0">
         <FileText className="w-5 h-5" />
       </div>
     );
@@ -262,7 +262,7 @@ export function FileUpload({
     <>
       <div className="space-y-3">
         {label && (
-          <label className="block text-sm font-medium text-[#111111]">
+          <label className="block text-sm font-medium text-noir">
             {label}
           </label>
         )}
@@ -272,7 +272,7 @@ export function FileUpload({
           className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
             dragOver
               ? 'border-brand bg-brand/5'
-              : 'border-[#CCCCCC] bg-white hover:border-brand hover:bg-brand/5'
+              : 'border-champ bg-white hover:border-brand hover:bg-brand/5'
           }`}
           onClick={handleClickBrowse}
           onDragOver={handleDragOver}
@@ -289,8 +289,8 @@ export function FileUpload({
             onChange={handleFileInputChange}
           />
 
-          <div className="flex flex-col items-center justify-center text-[#444444]">
-            <UploadIcon className="w-8 h-8 text-[#999999] mb-2 pointer-events-none" />
+          <div className="flex flex-col items-center justify-center text-gris">
+            <UploadIcon className="w-8 h-8 text-[#6B6B6B] mb-2 pointer-events-none" />
 
             <p className="text-sm leading-snug text-center">
               Glissez-déposez vos documents
@@ -300,7 +300,7 @@ export function FileUpload({
               </span>
             </p>
 
-            <p className="text-[11px] text-[#999999] mt-2 leading-snug">
+            <p className="text-[11px] text-[#6B6B6B] mt-2 leading-snug">
               {value.length}/{maxFiles} fichier(s) ajouté(s)
               <br />
               Max {maxSizeMB} Mo / fichier
@@ -314,7 +314,7 @@ export function FileUpload({
             {value.map((doc, index) => (
               <li
                 key={index}
-                className="flex items-start justify-between bg-white border border-[#E5E5E5] rounded-lg p-3 text-sm"
+                className="flex items-start justify-between bg-white border border-bordure rounded-lg p-3 text-sm"
               >
                 <div className="flex items-start gap-3">
                   {/* vignette (image cliquable pour aperçu / icône sinon) */}
@@ -322,7 +322,7 @@ export function FileUpload({
 
                   <div className="min-w-0">
                     {/* nom du fichier */}
-                    <div className="font-medium text-[#111111] truncate max-w-[220px]">
+                    <div className="font-medium text-noir truncate max-w-[220px]">
                       {doc.file.name}
                     </div>
 
@@ -332,7 +332,7 @@ export function FileUpload({
                     </div>
 
                     {/* type court */}
-                    <div className="text-[11px] text-[#999999] uppercase">
+                    <div className="text-[11px] text-[#6B6B6B] uppercase">
                       {getShortType(doc.file)}
                     </div>
 
@@ -351,7 +351,7 @@ export function FileUpload({
                 {/* bouton supprimer */}
                 <button
                   type="button"
-                  className="text-[#999999] hover:text-brand ml-4"
+                  className="text-[#6B6B6B] hover:text-brand ml-4"
                   onClick={() => removeFile(index)}
                   aria-label={`Supprimer ${doc.file.name}`}
                 >
@@ -369,7 +369,7 @@ export function FileUpload({
           </div>
         )}
 
-        <p className="text-[11px] text-[#999999] leading-snug">
+        <p className="text-[11px] text-[#6B6B6B] leading-snug">
           Exemples : pièce d'identité, justificatif de domicile,
           bulletin de salaire.
         </p>
@@ -390,7 +390,7 @@ export function FileUpload({
             {/* bouton fermer */}
             <button
               type="button"
-              className="absolute -top-4 -right-4 bg-white text-[#111111] rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
+              className="absolute -top-4 -right-4 bg-white text-noir rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
               onClick={closeLightbox}
               aria-label="Fermer l’aperçu"
             >

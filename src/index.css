@@ -2,15 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Couleur de marque =====
-   Pour changer le thème du site, modifier uniquement ces trois valeurs (R G B).
-   --brand       : couleur principale (boutons, liens, icônes)
-   --brand-dark  : survol des boutons
-   --brand-light : version claire, lisible sur fond sombre (pied de page) */
+/* ===== Direction artistique « premium sobre » — design tokens =====
+   Toutes les couleurs du site se règlent ici. Chaque couleur existe en
+   hexadécimal (pour le CSS) et en canaux R G B (pour Tailwind : text-noir,
+   bg-fond, border-or, bg-bleu/15…). Voir tailwind.config.js. */
 :root {
-  --brand: 10 79 214;       /* #0A4FD6 */
-  --brand-dark: 8 62 167;   /* #083EA7 */
-  --brand-light: 99 149 248; /* #6395F8 */
+  --noir: #111111;          /* titres */
+  --noir-profond: #0E0E10;  /* sections sombres, pied de page */
+  --gris-texte: #4A4A4A;    /* paragraphes */
+  --bleu: #0A4FD6;          /* couleur d'action principale */
+  --bleu-vif: #1A8CFF;      /* petits accents, focus, liens sur fond sombre */
+  --bleu-hover: #1372EE;    /* survol des boutons : le bleu le plus vif qui garde
+                               un contraste AA (4,5:1) avec le texte blanc */
+  --or: #B8902F;
+  --or-texte: #8A6A1F;      /* or foncé, seul or autorisé en texte sur fond clair */
+  --or-clair: #D9B965;
+  --fond: #F6F5F2;          /* gris chaud des sections alternées */
+  --bordure: #ECE9E0;
+  --champ: #E3E0D6;         /* bordure des champs de saisie */
+  --degrade-or: linear-gradient(90deg, #2A2112, #B8902F 55%, #D9B965); /* repris du logo */
+
+  --noir-rgb: 17 17 17;
+  --noir-profond-rgb: 14 14 16;
+  --gris-texte-rgb: 74 74 74;
+  --bleu-rgb: 10 79 214;
+  --bleu-vif-rgb: 26 140 255;
+  --bleu-hover-rgb: 19 114 238;
+  --bleu-clair-rgb: 99 149 248;
+  --or-rgb: 184 144 47;
+  --or-texte-rgb: 138 106 31;
+  --or-clair-rgb: 217 185 101;
+  --fond-rgb: 246 245 242;
+  --bordure-rgb: 236 233 224;
+  --champ-rgb: 227 224 214;
 }
 
 @layer base {
@@ -19,7 +43,7 @@
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    @apply font-sans;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -29,7 +53,108 @@
   }
 
   p {
-    line-height: 1.5;
+    line-height: 1.55;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--bleu-vif);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ===== Site public (.site, posé dans App.tsx) — l'admin n'est pas concerné ===== */
+.site {
+  background: var(--fond);
+  color: var(--gris-texte);
+  font-size: 15px;
+}
+
+@media (min-width: 768px) {
+  .site { font-size: 16px; }
+}
+
+/* Titres : Oswald en majuscules, comme le logo */
+.site h1,
+.site h2,
+.titre-display {
+  font-family: 'Oswald', 'Impact', 'Arial Narrow', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  color: var(--noir);
+}
+
+.site h1 { font-size: 38px; }
+@media (min-width: 768px) { .site h1 { font-size: 46px; } }
+@media (min-width: 1024px) { .site h1 { font-size: 52px; } }
+
+/* Titre principal du hero (photo plein cadre) */
+.site h1.titre-hero { font-size: 40px; color: #fff; }
+@media (min-width: 768px) { .site h1.titre-hero { font-size: 56px; } }
+@media (min-width: 1024px) { .site h1.titre-hero { font-size: 66px; } }
+
+/* Titres de section */
+.site h2.titre-section { font-size: 28px; }
+@media (min-width: 768px) { .site h2.titre-section { font-size: 36px; } }
+
+/* Sur fond sombre, les titres passent en blanc */
+.site .sur-sombre h1,
+.site .sur-sombre h2,
+.site .sur-sombre .titre-display {
+  color: #fff;
+}
+
+@layer components {
+  /* Filet or de 64 × 3 px sous le titre (centré si le titre l'est) */
+  .filet-apres::after,
+  .filet-avant::before,
+  .filet-or {
+    content: '';
+    display: block;
+    width: 64px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--degrade-or);
+  }
+  .filet-apres::after { margin-top: 14px; }
+  .filet-avant::before { margin-bottom: 16px; }
+  .text-center .filet-apres::after,
+  .text-center.filet-apres::after,
+  .text-center .filet-avant::before,
+  .text-center.filet-avant::before,
+  .text-center > .filet-or {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Liseré or de 2 px (header, haut du pied de page) */
+  .liseret-or {
+    height: 2px;
+    background: var(--degrade-or);
+  }
+
+  /* Carte claire standard */
+  .carte {
+    @apply bg-white rounded-2xl border border-bordure shadow-carte;
+  }
+
+  /* Pastille numérotée des étapes (noir et or) */
+  .pastille-etape {
+    @apply flex-shrink-0 rounded-full bg-noir-profond text-white border border-or flex items-center justify-center font-display font-semibold;
+  }
+
+  /* Lien texte bleu */
+  .lien {
+    @apply text-bleu font-semibold underline-offset-4 decoration-2 hover:underline transition-colors duration-150;
   }
 }
 
@@ -63,37 +188,69 @@
   }
 }
 
-/* Styles pour les curseurs du simulateur */
+/* Curseurs du simulateur de financement */
+input[type="range"].range-slider {
+  accent-color: var(--bleu);
+}
+
 input[type="range"].range-slider::-webkit-slider-thumb {
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: rgb(var(--brand));
+  background: var(--bleu);
   cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px var(--or), 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: background 0.18s ease, transform 0.18s ease;
 }
 
 input[type="range"].range-slider::-webkit-slider-thumb:hover {
-  background: rgb(var(--brand-dark));
+  background: var(--bleu-hover);
   transform: scale(1.1);
 }
 
 input[type="range"].range-slider::-moz-range-thumb {
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: rgb(var(--brand));
+  background: var(--bleu);
   cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 1px var(--or), 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: background 0.18s ease, transform 0.18s ease;
 }
 
 input[type="range"].range-slider::-moz-range-thumb:hover {
-  background: rgb(var(--brand-dark));
+  background: var(--bleu-hover);
   transform: scale(1.1);
+}
+
+/* Flèche des listes déroulantes (le style natif est masqué) */
+.champ-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A4A4A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px;
+  padding-right: 2.75rem;
+}
+
+/* Cases à cocher et boutons radio aux couleurs du site */
+.site input[type="checkbox"],
+.site input[type="radio"] {
+  accent-color: var(--bleu);
+}
+
+/* Titres équilibrés sur plusieurs lignes (pas de mot isolé) */
+.site h1,
+.site h2 {
+  text-wrap: balance;
+}
+
+/* Sur fond sombre, le dégradé or démarre plus clair pour rester visible */
+.sur-sombre .filet-apres::after,
+.sur-sombre .filet-avant::before,
+.sur-sombre .filet-or {
+  background: linear-gradient(90deg, #6E5418, #B8902F 55%, #D9B965);
 }
