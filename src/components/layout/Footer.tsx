@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { equipeAffichee } from '../../config/equipe';
+import { CONTEXTE_SITE } from '../../lib/contexte';
 import { Mail, Phone, Instagram, MapPin } from 'lucide-react';
 import { siteConfig } from '../../config/site';
 
@@ -78,6 +80,14 @@ export function Footer() {
           <div>
             <h3 className="titre-display text-lg tracking-[1px] mb-4">Liens utiles</h3>
             <div className="space-y-2">
+              {equipeAffichee(CONTEXTE_SITE) && (
+                <Link
+                  to="/equipe"
+                  className="block text-sm text-[#AAAAAA] hover:text-white transition-colors duration-180"
+                >
+                  Notre équipe
+                </Link>
+              )}
               <Link
                 to="/mentions-legales"
                 className="block text-sm text-[#AAAAAA] hover:text-white transition-colors duration-180"

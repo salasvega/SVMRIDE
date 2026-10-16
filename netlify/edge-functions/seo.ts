@@ -24,7 +24,8 @@ import {
   type SeoMeta,
   type SeoVehicle,
 } from '../../src/config/seo.ts';
-import { SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
+import { equipeAffichee, EQUIPE_EN_LIGNE } from '../../src/config/equipe.ts';
+import { CONTEXTE, SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
 
 const TIMEOUT_MS = 2500;
 
@@ -55,7 +56,7 @@ const xml = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 async function sitemap(): Promise<Response> {
-  const urls = sitemapPages.map(
+  const urls = sitemapPages.filter((p) => p.path !== '/equipe' || EQUIPE_EN_LIGNE).map(
     (p) =>
       `  <url>\n    <loc>${SITE_URL}${p.path === '/' ? '/' : p.path}</loc>\n` +
       `    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`,
@@ -100,7 +101,9 @@ export default async function seo(request: Request, context: Context) {
 
   let meta: SeoMeta;
   const vehicule = path.match(/^\/vehicules\/([^/]+)$/);
-  if (path in pageSeo) {
+  if (path === '/equipe' && !equipeAffichee(CONTEXTE)) {
+    meta = notFoundSeo; // page en préparation : invisible sur svmride.com
+  } else if (path in pageSeo) {
     meta = pageSeo[path as keyof typeof pageSeo];
   } else if (vehicule) {
     meta = await metaVehicule(decodeURIComponent(vehicule[1]), path);

@@ -13,7 +13,8 @@ writeFileSync(
   fichier,
   `// Fichier généré par scripts/config-edge.mjs — ne pas modifier.\n` +
     `export const SUPABASE_URL = ${JSON.stringify(url)};\n` +
-    `export const SUPABASE_KEY = ${JSON.stringify(key)};\n`,
+    `export const SUPABASE_KEY = ${JSON.stringify(key)};\n` +
+    `export const CONTEXTE = ${JSON.stringify(process.env.CONTEXT ?? 'local')};\n`,
 );
 
 console.log(`config-edge : Supabase ${url ? 'configuré' : 'NON configuré (balises par défaut)'}`);

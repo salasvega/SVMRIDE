@@ -151,6 +151,12 @@ export const pageSeo = {
     description: 'Les cookies utilisés sur le site SVM Ride et la façon de gérer vos préférences.',
     path: '/politique-cookies',
   },
+  '/equipe': {
+    title: "Notre équipe : des passionnés de moto à Chaville | SVM Ride",
+    description:
+      "Rencontrez l'équipe SVM Ride : Mattia et des passionnés de deux-roues pour vous conseiller dans l'achat, la reprise ou le dépôt-vente de votre moto.",
+    path: '/equipe',
+  },
   '/plan-du-site': {
     title: 'Plan du site | SVM Ride',
     description: 'Toutes les pages du site SVM Ride : véhicules, reprise, financement, recherche personnalisée et contact.',
@@ -177,6 +183,7 @@ export const sitemapPages: { path: PagePath; priority: string; changefreq: strin
   { path: '/financement', priority: '0.8', changefreq: 'monthly' },
   { path: '/recherche-personnalisee', priority: '0.7', changefreq: 'monthly' },
   { path: '/contact', priority: '0.7', changefreq: 'monthly' },
+  { path: '/equipe', priority: '0.6', changefreq: 'monthly' }, // seulement si EQUIPE_EN_LIGNE
   { path: '/mentions-legales', priority: '0.2', changefreq: 'yearly' },
   { path: '/politique-confidentialite', priority: '0.2', changefreq: 'yearly' },
   { path: '/politique-cookies', priority: '0.2', changefreq: 'yearly' },

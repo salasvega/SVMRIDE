@@ -25,6 +25,7 @@ import { NotFound } from './pages/NotFound';
 const nomme = <K extends string>(charger: () => Promise<Record<K, React.ComponentType>>, nom: K) =>
   lazy(() => charger().then((m) => ({ default: m[nom] })));
 const FinancingProfile = nomme(() => import('./pages/FinancingProfile'), 'FinancingProfile');
+const Equipe = nomme(() => import('./pages/Equipe'), 'Equipe');
 const AdminLogin = nomme(() => import('./pages/admin/AdminLogin'), 'AdminLogin');
 const AdminDashboard = nomme(() => import('./pages/admin/AdminDashboard'), 'AdminDashboard');
 const VehiclesList = nomme(() => import('./pages/admin/VehiclesList'), 'VehiclesList');
@@ -151,6 +152,7 @@ function App() {
                     <Route path="/financement/dossier" element={<FinancingProfile />} />
                     <Route path="/recherche-personnalisee" element={<CustomSearch />} />
                     <Route path="/contact" element={<Contact />} />
+                    <Route path="/equipe" element={<Equipe />} />
                     <Route path="/mentions-legales" element={<LegalNotice />} />
                     <Route path="/politique-confidentialite" element={<PrivacyPolicy />} />
                     <Route path="/politique-cookies" element={<CookiePolicy />} />

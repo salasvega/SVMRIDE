@@ -5,6 +5,11 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  // Contexte Netlify ('production', 'deploy-preview', 'branch-deploy') ; 'local' hors Netlify.
+  // Sert à n'afficher certains contenus (équipe en préparation) qu'en aperçu.
+  define: {
+    __CONTEXTE_NETLIFY__: JSON.stringify(process.env.CONTEXT ?? 'local'),
+  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
