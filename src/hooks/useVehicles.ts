@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Vehicle, VehicleFilters } from '../types/vehicle';
+import { cleMarque } from '../config/marques';
 
 /**
  * Colonnes lisibles par les visiteurs. Ne jamais remettre select('*') ici :
@@ -25,9 +26,6 @@ export function useVehicles(filters?: VehicleFilters) {
           .eq('available', true)
           .order('created_at', { ascending: false });
 
-        if (filters?.brand) {
-          query = query.eq('brand', filters.brand);
-        }
         if (filters?.type) {
           query = query.eq('type', filters.type);
         }
@@ -57,7 +55,14 @@ export function useVehicles(filters?: VehicleFilters) {
 
         if (fetchError) throw fetchError;
 
-        setVehicles(data as unknown as Vehicle[]);
+        // Marque filtrée ici et non dans la requête : « YAMAHA », « Yamaha » et
+        // « yamaha » désignent la même marque (voir src/config/marques.ts).
+        let liste = data as unknown as Vehicle[];
+        if (filters?.brand) {
+          const cle = cleMarque(filters.brand);
+          liste = liste.filter((v) => cleMarque(v.brand) === cle);
+        }
+        setVehicles(liste);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An error occurred'));
       } finally {

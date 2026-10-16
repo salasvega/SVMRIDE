@@ -1,4 +1,5 @@
 import { Vehicle, VehicleFilters, VehicleStatus } from '../types/vehicle';
+import { cleMarque } from '../config/marques';
 
 /** Ordre d'affichage : disponibles, puis réservés, puis vendus. */
 export const STATUTS: { valeur: VehicleStatus; libelle: string; pluriel: string }[] = [
@@ -24,7 +25,7 @@ export function trierParStatut<T extends Pick<Vehicle, 'status'>>(vehicles: T[])
 
 export function filterVehicles(vehicles: Vehicle[], filters: VehicleFilters): Vehicle[] {
   return vehicles.filter(vehicle => {
-    if (filters.brand && vehicle.brand !== filters.brand) return false;
+    if (filters.brand && cleMarque(vehicle.brand) !== cleMarque(filters.brand)) return false;
     if (filters.status && statutDe(vehicle) !== filters.status) return false;
     if (filters.type && vehicle.type !== filters.type) return false;
     if (filters.displacementMin && vehicle.displacement < filters.displacementMin) return false;

@@ -7,6 +7,7 @@ import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
 import { DerniersArrivages } from '../components/DerniersArrivages';
+import { ExplorezLesMarques } from '../components/ExplorezLesMarques';
 
 export function Home() {
   return (
@@ -99,6 +100,8 @@ export function Home() {
       </Section>
 
       <DerniersArrivages />
+
+      <ExplorezLesMarques />
 
       <Section background="dark">
         <Container>

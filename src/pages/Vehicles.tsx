@@ -7,7 +7,9 @@ import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Select } from '../components/ui/Select';
 import { VehicleCard } from '../components/VehicleCard';
-import { getUniqueBrands, STATUTS, statutDe, trierParStatut } from '../utils/vehicle-filters';
+import { STATUTS, statutDe, trierParStatut } from '../utils/vehicle-filters';
+import { cleMarque, nomMarque } from '../config/marques';
+import { Button } from '../components/ui/Button';
 import { VehicleFilters, VehicleStatus } from '../types/vehicle';
 import { useVehicles } from '../hooks/useVehicles';
 
@@ -27,8 +29,27 @@ export function Vehicles() {
     priceMax: searchParams.get('priceMax') ? Number(searchParams.get('priceMax')) : undefined,
   });
 
-  const { vehicles: allVehicles, loading, error } = useVehicles(filters);
-  const brands = useMemo(() => getUniqueBrands(allVehicles), [allVehicles]);
+  // La marque est filtrée ici (et non dans la requête) pour garder la liste
+  // complète des marques dans le menu déroulant.
+  const { vehicles: tousVehicules, loading, error } = useVehicles({ ...filters, brand: undefined, status: undefined });
+  const cleActive = filters.brand ? cleMarque(filters.brand) : '';
+  const nomActif = filters.brand ? nomMarque(filters.brand) : '';
+
+  // Menu « Marque » : une entrée par marque, quelle que soit l'écriture dans le catalogue
+  const brands = useMemo(() => {
+    const parCle = new Map<string, string>();
+    tousVehicules.forEach((v) => {
+      const cle = cleMarque(v.brand);
+      if (cle && !parCle.has(cle)) parCle.set(cle, nomMarque(v.brand));
+    });
+    if (cleActive && !parCle.has(cleActive)) parCle.set(cleActive, nomActif);
+    return [...parCle].map(([cle, nom]) => ({ cle, nom })).sort((a, b) => a.nom.localeCompare(b.nom, 'fr'));
+  }, [tousVehicules, cleActive, nomActif]);
+
+  const allVehicles = useMemo(
+    () => (cleActive ? tousVehicules.filter((v) => cleMarque(v.brand) === cleActive) : tousVehicules),
+    [tousVehicules, cleActive]
+  );
 
   // Recherche texte, puis tri : disponibles, réservés, vendus (les plus récents d'abord)
   const trouves = useMemo(() => {
@@ -57,16 +78,21 @@ export function Vehicles() {
 
   const compteur = (() => {
     const total = vehicles.length;
-    const vehicule = `${total} véhicule${total > 1 ? 's' : ''}`;
+    const vehicule = `${total} véhicule${total > 1 ? 's' : ''}${nomActif ? ` ${nomActif}` : ''}`;
+    const mot = (st: (typeof STATUTS)[number], n: number) => (n > 1 ? st.pluriel : st.libelle.toLowerCase());
+    if (total === 0) return `Aucun véhicule${nomActif ? ` ${nomActif}` : ''} pour le moment`;
     if (filters.status) {
       const st = STATUTS.find((x) => x.valeur === filters.status)!;
-      return `${vehicule} ${total > 1 ? st.pluriel : st.libelle.toLowerCase()}`;
+      return `${vehicule} ${mot(st, total)}`;
     }
-    const details = STATUTS.filter((st) => parStatut[st.valeur] > 0).map((st) =>
-      `${parStatut[st.valeur]} ${parStatut[st.valeur] > 1 ? st.pluriel : st.libelle.toLowerCase()}`
-    );
-    return details.length > 1 ? `${vehicule} : ${details.join(', ')}` : details[0] ?? vehicule;
+    const presents = STATUTS.filter((st) => parStatut[st.valeur] > 0);
+    if (presents.length === 1) return `${vehicule} ${mot(presents[0], total)}`;
+    if (presents.length === 0) return vehicule;
+    return `${vehicule} : ${presents.map((st) => `${parStatut[st.valeur]} ${mot(st, parStatut[st.valeur])}`).join(', ')}`;
   })();
+
+  // Marque choisie (depuis l'accueil par exemple) sans aucune moto en vente
+  const marqueSansStock = !!cleActive && !loading && !error && parStatut.available === 0;
 
   const updateFilter = (key: keyof VehicleFilters, value: string) => {
     const newFilters = { ...filters };
@@ -124,7 +150,7 @@ export function Vehicles() {
 
   const getFilterLabel = (key: keyof VehicleFilters, value: string | number) => {
     const labels: Record<string, string> = {
-      brand: value as string,
+      brand: nomMarque(String(value)),
       status: STATUTS.find((st) => st.valeur === value)?.libelle ?? String(value),
       type: value === 'moto' ? 'Moto' : 'Scooter',
       displacementMin: `≥ ${value} cc`,
@@ -190,13 +216,13 @@ export function Vehicles() {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                     <Select
                       label="Marque"
-                      value={filters.brand || ''}
+                      value={cleActive}
                       onChange={(e) => updateFilter('brand', e.target.value)}
                     >
                       <option value="">Toutes les marques</option>
-                      {brands.map((brand) => (
-                        <option key={brand} value={brand}>
-                          {brand}
+                      {brands.map(({ cle, nom }) => (
+                        <option key={cle} value={cle}>
+                          {nom}
                         </option>
                       ))}
                     </Select>
@@ -262,39 +288,39 @@ export function Vehicles() {
                     </Select>
                   </div>
 
-                  {activeFiltersCount > 0 && (
-                    <div className="mt-6 pt-6 border-t border-bordure">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-semibold text-noir">
-                          Filtres actifs
-                        </span>
-                        <button
-                          onClick={clearAllFilters}
-                          className="lien text-sm"
-                        >
-                          Tout effacer
-                        </button>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(filters).map(([key, value]) => {
-                          if (value === undefined) return null;
-                          return (
-                            <button
-                              key={key}
-                              onClick={() => removeFilter(key as keyof VehicleFilters)}
-                              className="inline-flex items-center gap-2 px-3 py-1.5 bg-fond hover:bg-bordure border border-champ rounded-full text-sm text-noir transition-colors duration-180 group"
-                            >
-                              <span>{getFilterLabel(key as keyof VehicleFilters, value)}</span>
-                              <X className="w-3.5 h-3.5 text-gris group-hover:text-bleu" aria-hidden="true" />
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
+
+            {/* Filtres actifs, toujours visibles (même panneau replié) */}
+            {activeFiltersCount > 0 && (
+              <div className="flex flex-wrap items-center gap-2" aria-label="Filtres actifs" role="group">
+                <span className="text-sm font-semibold text-noir mr-1">Filtres actifs :</span>
+                {Object.entries(filters).map(([key, value]) => {
+                  if (value === undefined) return null;
+                  const libelle = getFilterLabel(key as keyof VehicleFilters, value);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => removeFilter(key as keyof VehicleFilters)}
+                      aria-label={`Retirer le filtre ${libelle}`}
+                      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-colors duration-180 group ${
+                        key === 'brand'
+                          ? 'bg-noir-profond text-white border border-or hover:bg-noir font-semibold'
+                          : 'bg-white hover:bg-bordure border border-champ text-noir'
+                      }`}
+                    >
+                      <span>{libelle}</span>
+                      <X className={`w-3.5 h-3.5 ${key === 'brand' ? 'text-or-clair' : 'text-gris group-hover:text-bleu'}`} aria-hidden="true" />
+                    </button>
+                  );
+                })}
+                <button type="button" onClick={clearAllFilters} className="lien text-sm ml-1">
+                  Tout effacer
+                </button>
+              </div>
+            )}
           </div>
 
           {loading ? (
@@ -305,6 +331,26 @@ export function Vehicles() {
             <div className="text-center py-12">
               <p className="text-lg text-red-600">Erreur lors du chargement des véhicules.</p>
             </div>
+          ) : marqueSansStock ? (
+            <>
+              <div className="carte text-center px-6 py-10 md:py-12 mb-8">
+                <p className="titre-display text-[22px] md:text-2xl mb-2">{nomActif}</p>
+                <p className="text-base md:text-lg text-gris mb-6">
+                  Aucune moto disponible actuellement pour cette marque.
+                </p>
+                <Button type="button" onClick={clearAllFilters}>Voir toutes les motos</Button>
+              </div>
+              {vehicles.length > 0 && (
+                <>
+                  <h2 className="text-base font-semibold text-noir mb-4">Déjà réservées ou vendues</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
+                    {vehicles.map((vehicle) => (
+                      <VehicleCard key={vehicle.id} vehicle={vehicle} />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
           ) : vehicles.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-base md:text-lg text-gris">
