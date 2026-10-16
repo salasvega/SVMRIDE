@@ -52,7 +52,7 @@ export const MEMBRES: Membre[] = [
   {
     id: 'mattia',
     prenom: 'Mattia',
-    fonction: 'Directeur · Responsable commercial',
+    fonction: 'Responsable commercial',
     photo: { webp: '/equipe-mattia.webp', avif: '/equipe/mattia.avif', jpg: '/equipe/mattia.jpg' },
     presentation: [
       "Chez SVM Ride, chaque moto est choisie, contrôlée et présentée comme si elle devait rejoindre mon propre garage.",
