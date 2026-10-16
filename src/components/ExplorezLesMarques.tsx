@@ -23,6 +23,7 @@ import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { MARQUES, marqueParId, nomMarque } from '../config/marques';
 import { useStockMarques } from '../hooks/useStockMarques';
+import { usePrefereMoinsDAnimations } from '../hooks/usePrefereMoinsDAnimations';
 import { Section } from './ui/Section';
 import { Container } from './ui/Container';
 
@@ -39,20 +40,6 @@ interface Element {
 }
 
 const triFr = (a: Element, b: Element) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' });
-
-function usePrefereMoinsDAnimations() {
-  const [reduit, setReduit] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  );
-  useEffect(() => {
-    const mq = window.matchMedia?.('(prefers-reduced-motion: reduce)');
-    if (!mq) return;
-    const maj = () => setReduit(mq.matches);
-    mq.addEventListener?.('change', maj);
-    return () => mq.removeEventListener?.('change', maj);
-  }, []);
-  return reduit;
-}
 
 export function ExplorezLesMarques() {
   const { pret, enStock, nomsCatalogue } = useStockMarques();

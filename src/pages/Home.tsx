@@ -9,6 +9,7 @@ import { IconeOr } from '../components/ui/IconeOr';
 import { DerniersArrivages } from '../components/DerniersArrivages';
 import { ExplorezLesMarques } from '../components/ExplorezLesMarques';
 import { SectionEquipe } from '../components/equipe/SectionEquipe';
+import { SectionAvisGoogle } from '../components/avis/SectionAvisGoogle';
 
 export function Home() {
   return (
@@ -227,6 +228,8 @@ export function Home() {
           </div>
         </Container>
       </Section>
+
+      <SectionAvisGoogle />
 
       <SectionEquipe />
 
