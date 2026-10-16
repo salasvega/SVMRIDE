@@ -1,6 +1,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.4";
 
+// Adresses des notifications (domaine svmride.com vérifié chez Resend le 16/10/2026).
+// COPIE_DEV : copie cachée au développeur pendant les tests ; vider la liste pour l'arrêter.
+const EXPEDITEUR = "SVM Ride <contact@svmride.com>";
+const DESTINATAIRE = "contact@svmride.com";
+const COPIE_DEV: string[] = ["salasvega@gmail.com"];
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -167,10 +173,9 @@ Deno.serve(async (req: Request) => {
         "Authorization": `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        // Même expéditeur que les autres formulaires tant que svmride.com
-        // n'est pas vérifié dans Resend (resend.com/domains).
-        from: "noreply@resend.dev",
-        to: Deno.env.get("RECIPIENT_EMAIL") ?? "contact@svmride.com",
+        from: EXPEDITEUR,
+        to: DESTINATAIRE,
+        ...(COPIE_DEV.length ? { bcc: COPIE_DEV } : {}),
         subject: `Nouveau contact: ${subject}`,
         html: emailHtml,
         reply_to: email,

@@ -1,6 +1,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.4";
 
+// Adresses des notifications (domaine svmride.com vérifié chez Resend le 16/10/2026).
+// COPIE_DEV : copie cachée au développeur pendant les tests ; vider la liste pour l'arrêter.
+const EXPEDITEUR = "SVM Ride <contact@svmride.com>";
+const DESTINATAIRE = "contact@svmride.com";
+const COPIE_DEV: string[] = ["salasvega@gmail.com"];
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -72,7 +78,6 @@ Deno.serve(async (req: Request) => {
 
   try {
     const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
-    const recipientEmail = Deno.env.get("RECIPIENT_EMAIL")!;
 
     const payload: WebhookPayload = await req.json();
     const record = payload.record;
@@ -138,8 +143,9 @@ Deno.serve(async (req: Request) => {
         "Authorization": `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: "noreply@resend.dev",
-        to: recipientEmail,
+        from: EXPEDITEUR,
+        to: DESTINATAIRE,
+        ...(COPIE_DEV.length ? { bcc: COPIE_DEV } : {}),
         subject: `Nouvelle demande de financement - ${record.amount}€`,
         html: emailHtml,
         attachments: resendAttachments,
