@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Trash2, Filter, Search, Circle, Clock, CheckCircle2, Download, FileText } from 'lucide-react';
+import { Trash2, Filter, Search, Circle, Clock, CheckCircle2, Download, FileText, KeyRound } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
@@ -61,6 +61,8 @@ export default function FinancingProfilesList() {
   const [adminNotes, setAdminNotes] = useState<string>('');
   const [savingNotes, setSavingNotes] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
+  const [codeGenere, setCodeGenere] = useState<{ profileId: string; code: string } | null>(null);
+  const [generationCode, setGenerationCode] = useState(false);
 
   useEffect(() => {
     loadProfiles();
@@ -154,6 +156,31 @@ export default function FinancingProfilesList() {
     } catch (error) {
       console.error('Error updating status:', error);
       setMessage({ type: 'error', text: 'Erreur lors de la mise à jour du statut' });
+    }
+  };
+
+  // Nouveau code d'accès client (remplace l'ancien et ferme les sessions en cours)
+  const handleGenererCode = async () => {
+    if (!selectedProfile) return;
+    setGenerationCode(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const reponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/financing-dossier`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${session?.access_token ?? ''}`,
+        },
+        body: JSON.stringify({ action: 'admin-reset-code', profileId: selectedProfile.id }),
+      });
+      const corps = await reponse.json();
+      if (!reponse.ok) throw new Error(corps.message);
+      setCodeGenere({ profileId: selectedProfile.id, code: corps.code });
+    } catch (error) {
+      setMessage({ type: 'error', text: error instanceof Error && error.message ? error.message : 'Impossible de générer le code' });
+    } finally {
+      setGenerationCode(false);
     }
   };
 
@@ -586,6 +613,31 @@ export default function FinancingProfilesList() {
                     </div>
                   </div>
                 )}
+
+                <div className="border-t border-[#E5E5E5] pt-6">
+                  <h3 className="text-lg font-semibold text-[#111111] mb-2">Code d'accès du client</h3>
+                  <p className="text-sm text-[#666666] mb-3">
+                    Le client se connecte à son dossier avec son e-mail et ce code. Générer un nouveau code remplace l'ancien.
+                    Transmettez-le par téléphone ou SMS après avoir vérifié l'identité de la personne.
+                  </p>
+                  {codeGenere?.profileId === selectedProfile.id ? (
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="font-mono text-xl font-bold tracking-[0.2em] text-[#111111] bg-[#F6F5F2] border border-[#E5E5E5] rounded-lg px-4 py-2 select-all">
+                        {codeGenere.code}
+                      </span>
+                      <span className="text-sm text-[#666666]">Ce code ne sera plus affiché après fermeture.</span>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleGenererCode}
+                      disabled={generationCode}
+                      className="inline-flex items-center gap-2 px-4 py-2 border-2 border-[#111111] text-[#111111] rounded-lg hover:bg-[#F6F5F2] disabled:opacity-50"
+                    >
+                      <KeyRound className="w-4 h-4" aria-hidden="true" />
+                      {generationCode ? 'Génération…' : 'Générer un nouveau code d\'accès'}
+                    </button>
+                  )}
+                </div>
 
                 <div className="border-t border-[#E5E5E5] pt-6">
                   <h3 className="text-lg font-semibold text-[#111111] mb-4">Notes administrateur</h3>

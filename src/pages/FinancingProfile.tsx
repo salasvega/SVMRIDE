@@ -8,11 +8,11 @@ import { Select } from '../components/ui/Select';
 import { Textarea } from '../components/ui/Textarea';
 import { SingleFileUpload } from '../components/ui/SingleFileUpload';
 import Toast from '../components/ui/Toast';
-import { supabase } from '../lib/supabase';
+import { appelDossier, envoyerPiece, ErreurDossier } from '../lib/financingDossier';
 import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
 import { DeleteConfirmModal } from '../components/admin/DeleteConfirmModal';
-import { Save, Send, Trash2, CheckCircle, Edit } from 'lucide-react';
+import { Save, Send, Trash2, CheckCircle, Edit, KeyRound, Copy } from 'lucide-react';
 
 interface FinancingProfile {
   id?: string;
@@ -71,9 +71,16 @@ export function FinancingProfile() {
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
-  const [userEmail, setUserEmail] = useState('');
+  // Accès sécurisé : e-mail + code personnel, puis jeton de session (2 h)
+  const [session, setSession] = useState('');
   const [showEmailModal, setShowEmailModal] = useState(true);
+  const [modeAcces, setModeAcces] = useState<'code' | 'creation'>('code');
   const [emailInput, setEmailInput] = useState('');
+  const [codeInput, setCodeInput] = useState('');
+  const [erreurAcces, setErreurAcces] = useState('');
+  const [codeCree, setCodeCree] = useState('');
+  const [codeCopie, setCodeCopie] = useState(false);
+  const [fileUrls, setFileUrls] = useState<Record<string, string>>({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [profile, setProfile] = useState<FinancingProfile>({
     user_email: '',
@@ -115,65 +122,107 @@ export function FinancingProfile() {
     is_complete: false,
   });
 
-  const loadProfile = useCallback(async () => {
-    if (!userEmail) {
-      console.log('No userEmail, skipping load');
-      return;
-    }
+  // Données reçues du serveur → état du formulaire
+  const appliquerDossier = useCallback((data: Record<string, unknown>) => {
+    setProfile(prev => ({
+      ...prev,
+      ...(data as Partial<FinancingProfile>),
+      birth_date: (data.birth_date as string) || '',
+      housing_entry_date: (data.housing_entry_date as string) || '',
+      employment_start_date: (data.employment_start_date as string) || '',
+      rent_or_credit_amount: Number(data.rent_or_credit_amount) || 0,
+      monthly_net_salary: Number(data.monthly_net_salary) || 0,
+    }));
+  }, []);
 
-    console.log('Loading profile for:', userEmail);
-    setLoading(true);
-
+  // Liens temporaires d'aperçu de toutes les pièces, en un seul appel
+  const chargerLiens = useCallback(async (jeton: string) => {
     try {
-      const { data, error } = await supabase
-        .from('user_financing_profiles')
-        .select('*')
-        .eq('user_email', userEmail)
-        .maybeSingle();
-
-      console.log('Query result:', { data, error });
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Query error:', error);
-        throw error;
-      }
-
-      if (data) {
-        console.log('Profile data loaded:', data);
-        setProfile({
-          ...data,
-          birth_date: data.birth_date || '',
-          housing_entry_date: data.housing_entry_date || '',
-          employment_start_date: data.employment_start_date || '',
-          rent_or_credit_amount: Number(data.rent_or_credit_amount) || 0,
-          monthly_net_salary: Number(data.monthly_net_salary) || 0,
-        });
-      } else {
-        console.log('No profile found, creating new');
-        setProfile(prev => ({ ...prev, user_email: userEmail, email: userEmail }));
-      }
-    } catch (error) {
-      console.error('Error loading profile:', error);
-      setMessage({ type: 'error', text: 'Erreur lors du chargement du profil' });
-    } finally {
-      console.log('Loading complete');
-      setLoading(false);
+      const { urls } = await appelDossier<{ urls: Record<string, string> }>('file-urls', { session: jeton });
+      setFileUrls(urls);
+    } catch {
+      setFileUrls({});
     }
-  }, [userEmail]);
+  }, []);
 
   useEffect(() => {
-    if (userEmail) {
-      loadProfile();
+    if (session) chargerLiens(session);
+  }, [session, chargerLiens]);
+
+  // Session expirée ou erreur : message clair, retour à l'écran d'accès si besoin
+  const gererErreur = (error: unknown, texteParDefaut: string) => {
+    if (error instanceof ErreurDossier && error.code === 'session') {
+      setSession('');
+      setCodeCree('');
+      setShowEmailModal(true);
+      setModeAcces('code');
+      setErreurAcces(error.message);
+      return;
     }
-  }, [userEmail, loadProfile]);
+    const texte = error instanceof ErreurDossier ? error.message : texteParDefaut;
+    setMessage({ type: 'error', text: texte });
+  };
+
+  // Champs envoyés au serveur (les pièces et le statut sont gérés à part ;
+  // le serveur n'accepte de toute façon que les champs saisissables)
+  const CHAMPS_EXCLUS = new Set([
+    'id', 'user_email', 'status', 'is_complete', 'submitted_at',
+    'id_card_front', 'id_card_back', 'driver_license_front', 'driver_license_back',
+    'proof_of_residence', 'payslip_1', 'payslip_2', 'payslip_3', 'tax_notice', 'rib',
+    'hosting_certificate', 'host_id_card',
+  ]);
+  const champsSaisis = () =>
+    Object.fromEntries(Object.entries(profile).filter(([cle]) => !CHAMPS_EXCLUS.has(cle)));
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!emailInput.trim()) return;
+    const email = emailInput.trim();
+    if (!email) return;
+    setErreurAcces('');
+    setLoading(true);
 
-    console.log('Email submitted:', emailInput.trim());
-    setUserEmail(emailInput.trim());
-    setShowEmailModal(false);
+    try {
+      if (modeAcces === 'creation') {
+        const r = await appelDossier<{ code: string; session: string; profile: Record<string, unknown> }>('create', {
+          email,
+          profile: {
+            vehicle_to_finance: vehicleFromURL || '',
+            financing_amount: parsedPrice || 0,
+            desired_duration: parsedDuration || 0,
+          },
+        });
+        appliquerDossier(r.profile);
+        setSession(r.session);
+        setCodeCree(r.code);
+      } else {
+        const r = await appelDossier<{ session: string; profile: Record<string, unknown> }>('open', {
+          email,
+          code: codeInput,
+        });
+        appliquerDossier(r.profile);
+        setSession(r.session);
+        setCodeCree('');
+      }
+      setShowEmailModal(false);
+      setCodeInput('');
+    } catch (error) {
+      if (error instanceof ErreurDossier && error.code === 'existe') {
+        setModeAcces('code');
+      }
+      setErreurAcces(error instanceof ErreurDossier ? error.message : 'Une erreur est survenue. Réessayez dans un instant.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copierCode = async () => {
+    try {
+      await navigator.clipboard.writeText(codeCree);
+      setCodeCopie(true);
+      setTimeout(() => setCodeCopie(false), 2500);
+    } catch {
+      setCodeCopie(false);
+    }
   };
 
   const handleInputChange = (field: keyof FinancingProfile, value: any) => {
@@ -181,70 +230,30 @@ export function FinancingProfile() {
   };
 
   const handleSingleFileUpload = async (field: keyof FinancingProfile, file: File) => {
-    if (!userEmail) return;
-
-    const fileNameMapping: Record<string, string> = {
-      id_card_front: 'piece_identite_recto',
-      id_card_back: 'piece_identite_verso',
-      driver_license_front: 'permis_conduire_recto',
-      driver_license_back: 'permis_conduire_verso',
-      proof_of_residence: 'justificatif_domicile',
-      payslip_1: 'bulletin_salaire_1',
-      payslip_2: 'bulletin_salaire_2',
-      payslip_3: 'bulletin_salaire_3',
-      tax_notice: 'avis_imposition',
-      rib: 'rib',
-      hosting_certificate: 'attestation_hebergement',
-      host_id_card: 'piece_identite_hebergeur',
-    };
-
-    console.log('Starting file upload:', { field, fileName: file.name, fileSize: file.size });
-
+    if (!session) return;
     try {
-      const fileExt = file.name.split('.').pop();
-      const frenchFieldName = fileNameMapping[field as string] || field;
-      const fileName = `${userEmail}/${frenchFieldName}_${Date.now()}.${fileExt}`;
-
-      console.log('Uploading to storage:', fileName);
-
-      const { data, error: uploadError } = await supabase.storage
-        .from('financing-documents')
-        .upload(fileName, file);
-
-      console.log('Upload result:', { data, error: uploadError });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('financing-documents')
-        .getPublicUrl(fileName);
-
-      console.log('File uploaded successfully:', { fileName, publicUrl });
-
-      handleInputChange(field, fileName);
-      setMessage({ type: 'success', text: 'Document téléchargé avec succès' });
+      const data = await envoyerPiece<Record<string, unknown>>(session, field as string, file);
+      setProfile(prev => ({ ...prev, [field]: data[field as string] as string }));
+      await chargerLiens(session);
+      setMessage({ type: 'success', text: 'Document envoyé avec succès' });
     } catch (error) {
-      console.error('Error uploading file:', error);
-      setMessage({ type: 'error', text: 'Erreur lors du téléchargement du document' });
+      gererErreur(error, "Erreur lors de l'envoi du document");
     }
   };
 
   const handleDeleteFile = async (field: keyof FinancingProfile) => {
-    const fileName = profile[field] as string;
-    if (!fileName) return;
-
+    if (!profile[field]) return;
     try {
-      const { error } = await supabase.storage
-        .from('financing-documents')
-        .remove([fileName]);
-
-      if (error) throw error;
-
+      await appelDossier('delete-file', { session, field });
       handleInputChange(field, '');
+      setFileUrls(prev => {
+        const copie = { ...prev };
+        delete copie[field as string];
+        return copie;
+      });
       setMessage({ type: 'success', text: 'Document supprimé avec succès' });
     } catch (error) {
-      console.error('Error deleting file:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de la suppression du document' });
+      gererErreur(error, 'Erreur lors de la suppression du document');
     }
   };
 
@@ -328,25 +337,15 @@ export function FinancingProfile() {
   const handleSave = async () => {
     setSaving(true);
     setMessage(null);
-
     try {
-      const cleanedProfile = {
-        ...profile,
-        birth_date: profile.birth_date || null,
-        housing_entry_date: profile.housing_entry_date || null,
-        employment_start_date: profile.employment_start_date || null,
-      };
-
-      const { error } = await supabase
-        .from('user_financing_profiles')
-        .upsert(cleanedProfile, { onConflict: 'user_email' });
-
-      if (error) throw error;
-
+      const { profile: data } = await appelDossier<{ profile: Record<string, unknown> }>('save', {
+        session,
+        profile: champsSaisis(),
+      });
+      appliquerDossier(data);
       setMessage({ type: 'success', text: 'Dossier enregistré avec succès' });
     } catch (error) {
-      console.error('Error saving profile:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de l enregistrement du dossier' });
+      gererErreur(error, "Erreur lors de l'enregistrement du dossier");
     } finally {
       setSaving(false);
     }
@@ -354,32 +353,18 @@ export function FinancingProfile() {
 
   const handleSubmit = async () => {
     if (!validateProfile()) return;
-
     setSubmitting(true);
     setMessage(null);
-
     try {
-      const cleanedProfile = {
-        ...profile,
-        birth_date: profile.birth_date || null,
-        housing_entry_date: profile.housing_entry_date || null,
-        employment_start_date: profile.employment_start_date || null,
-        status: 'submitted',
-        is_complete: true,
-        submitted_at: new Date().toISOString(),
-      };
-
-      const { error } = await supabase
-        .from('user_financing_profiles')
-        .upsert(cleanedProfile, { onConflict: 'user_email' });
-
-      if (error) throw error;
-
+      const { profile: data } = await appelDossier<{ profile: Record<string, unknown> }>('submit', {
+        session,
+        profile: champsSaisis(),
+      });
+      appliquerDossier(data);
       setMessage({ type: 'success', text: 'Demande de financement soumise avec succès ! Vous recevrez une réponse par email.' });
       setTimeout(() => navigate('/financement'), 3000);
     } catch (error) {
-      console.error('Error submitting profile:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de la soumission de la demande' });
+      gererErreur(error, 'Erreur lors de la soumission de la demande');
     } finally {
       setSubmitting(false);
     }
@@ -391,126 +376,116 @@ export function FinancingProfile() {
 
   const handleDeleteConfirm = async () => {
     try {
-      if (!profile.id) {
-        setMessage({ type: 'error', text: 'Aucun dossier à supprimer' });
-        setShowDeleteModal(false);
-        return;
-      }
-
-      console.log('Deleting profile:', profile.id);
-
-      const { error } = await supabase
-        .from('user_financing_profiles')
-        .delete()
-        .eq('id', profile.id);
-
-      if (error) throw error;
-
-      const documentFields = [
-        'id_card_front', 'id_card_back', 'driver_license_front', 'driver_license_back',
-        'proof_of_residence', 'payslip_1', 'payslip_2', 'payslip_3',
-        'tax_notice', 'rib', 'hosting_certificate', 'host_id_card'
-      ];
-
-      const filesToDelete: string[] = [];
-      for (const field of documentFields) {
-        const filePath = profile[field as keyof FinancingProfile] as string;
-        if (filePath) {
-          filesToDelete.push(filePath);
-        }
-      }
-
-      if (filesToDelete.length > 0) {
-        console.log('Attempting to delete', filesToDelete.length, 'files from storage');
-        const { error: storageError } = await supabase.storage
-          .from('financing-documents')
-          .remove(filesToDelete);
-
-        if (storageError) {
-          console.error('Error deleting files from storage (non-blocking):', storageError);
-        } else {
-          console.log('Successfully deleted', filesToDelete.length, 'files from storage');
-        }
-      }
-
-      console.log('Profile deleted successfully');
+      await appelDossier('delete', { session });
       setShowDeleteModal(false);
+      setSession('');
       setMessage({ type: 'success', text: 'Dossier supprimé avec succès' });
       setTimeout(() => navigate('/financement'), 2000);
     } catch (error) {
-      console.error('Error deleting profile:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de la suppression du dossier' });
       setShowDeleteModal(false);
+      gererErreur(error, 'Erreur lors de la suppression du dossier');
     }
   };
 
   const handleReopen = async () => {
     try {
-      if (!profile.id) {
-        setMessage({ type: 'error', text: 'Aucun dossier à modifier' });
-        return;
-      }
-
-      const { error } = await supabase
-        .from('user_financing_profiles')
-        .update({
-          status: 'draft',
-          is_complete: false,
-          submitted_at: null
-        })
-        .eq('id', profile.id);
-
-      if (error) throw error;
-
-      setProfile(prev => ({
-        ...prev,
-        status: 'draft',
-        is_complete: false,
-        submitted_at: undefined
-      }));
-
+      const { profile: data } = await appelDossier<{ profile: Record<string, unknown> }>('reopen', { session });
+      appliquerDossier(data);
       setMessage({ type: 'success', text: 'Dossier réouvert pour modification' });
     } catch (error) {
-      console.error('Error reopening profile:', error);
-      setMessage({ type: 'error', text: 'Erreur lors de la réouverture du dossier' });
+      gererErreur(error, 'Erreur lors de la réouverture du dossier');
     }
   };
 
   if (showEmailModal) {
+    const creation = modeAcces === 'creation';
     return (
       <>
         <SEOHead meta={pageSeo['/financement/dossier']} />
         <Section className="py-12 bg-fond">
           <Container>
             <div className="max-w-md mx-auto">
-              <div className="bg-white rounded-lg shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-noir mb-4">Dossier de financement</h2>
-                <p className="text-gris mb-6">
-                  Veuillez entrer votre adresse email pour créer ou accéder à votre dossier de financement.
+              <div className="carte p-6 md:p-8">
+                <h1 className="!text-[28px] md:!text-[32px] filet-apres mb-5">Dossier de financement</h1>
+
+                <div className="grid grid-cols-2 gap-1 p-1 mb-6 bg-fond rounded-xl" role="tablist" aria-label="Accès au dossier">
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={!creation}
+                    onClick={() => { setModeAcces('code'); setErreurAcces(''); }}
+                    className={`py-2.5 rounded-lg text-sm font-semibold transition-colors duration-180 ${!creation ? 'bg-white text-noir shadow-carte' : 'text-gris hover:text-noir'}`}
+                  >
+                    J'ai déjà un dossier
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={creation}
+                    onClick={() => { setModeAcces('creation'); setErreurAcces(''); }}
+                    className={`py-2.5 rounded-lg text-sm font-semibold transition-colors duration-180 ${creation ? 'bg-white text-noir shadow-carte' : 'text-gris hover:text-noir'}`}
+                  >
+                    Nouveau dossier
+                  </button>
+                </div>
+
+                <p className="text-gris mb-6 text-[15px]">
+                  {creation
+                    ? "Indiquez votre adresse e-mail. Un code d'accès personnel vous sera donné : il protège votre dossier et vos documents."
+                    : "Saisissez l'adresse e-mail de votre dossier et le code d'accès qui vous a été donné à sa création."}
                 </p>
-                <form onSubmit={handleEmailSubmit} className="space-y-4">
+
+                <form onSubmit={handleEmailSubmit} className="space-y-4" noValidate>
                   <Input
-                    label="Adresse email"
+                    label="Adresse e-mail"
                     type="email"
+                    autoComplete="email"
                     required
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="exemple@email.com"
                   />
-                  <div className="flex gap-3">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      onClick={() => navigate('/financement')}
-                      className="flex-1"
-                    >
+                  {!creation && (
+                    <Input
+                      label="Code d'accès"
+                      autoComplete="one-time-code"
+                      autoCapitalize="characters"
+                      spellCheck={false}
+                      required
+                      value={codeInput}
+                      onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
+                      placeholder="XXXX-XXXX"
+                      className="font-mono tracking-[0.15em]"
+                    />
+                  )}
+
+                  {erreurAcces && (
+                    <p role="alert" className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                      {erreurAcces}
+                    </p>
+                  )}
+
+                  <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
+                    <Button type="button" variant="secondary" onClick={() => navigate('/financement')} className="sm:flex-1">
                       Annuler
                     </Button>
-                    <Button type="submit" className="flex-1">
-                      Accéder
+                    <Button
+                      type="submit"
+                      className="sm:flex-1"
+                      disabled={loading || !emailInput.trim() || (!creation && codeInput.replace(/[^A-Z0-9]/gi, '').length !== 8)}
+                    >
+                      {loading ? 'Patientez…' : creation ? 'Créer mon dossier' : 'Accéder à mon dossier'}
                     </Button>
                   </div>
                 </form>
+
+                {!creation && (
+                  <p className="mt-6 text-xs text-[#5E5E5E]">
+                    Code perdu ? Appelez-nous au{' '}
+                    <a href="tel:0184190174" className="text-bleu underline underline-offset-2">01 84 19 01 74</a>{' '}
+                    : nous vous en donnerons un nouveau après vérification.
+                  </p>
+                )}
               </div>
             </div>
           </Container>
@@ -600,6 +575,29 @@ export function FinancingProfile() {
                   </div>
                 )}
               </div>
+
+              {codeCree && (
+                <div role="status" className="mb-8 rounded-2xl border border-or bg-[#FBF7EE] p-5">
+                  <div className="flex items-start gap-3">
+                    <KeyRound className="w-6 h-6 text-or-texte flex-shrink-0 mt-0.5" aria-hidden="true" />
+                    <div className="min-w-0">
+                      <p className="font-semibold text-noir">Votre code d'accès personnel</p>
+                      <p className="text-sm text-gris mt-1">
+                        Notez-le précieusement : il vous sera demandé pour revenir sur votre dossier. Pour votre sécurité, il ne sera plus affiché.
+                      </p>
+                      <div className="flex flex-wrap items-center gap-3 mt-3">
+                        <span className="font-mono text-2xl font-bold tracking-[0.2em] text-noir bg-white border border-bordure rounded-lg px-4 py-2 select-all">
+                          {codeCree}
+                        </span>
+                        <Button type="button" size="sm" variant="secondary" onClick={copierCode}>
+                          <Copy className="w-4 h-4" aria-hidden="true" />
+                          {codeCopie ? 'Copié' : 'Copier'}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <form className="space-y-8">
                 <div>
@@ -829,7 +827,8 @@ export function FinancingProfile() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SingleFileUpload
                           label="Recto *"
-                          value={profile.id_card_front ? `financing-documents/${profile.id_card_front}` : ''}
+                          value={profile.id_card_front}
+                          fileUrl={fileUrls.id_card_front}
                           onChange={(file) => handleSingleFileUpload('id_card_front', file)}
                           onDelete={() => handleDeleteFile('id_card_front')}
                           disabled={isSubmitted}
@@ -838,7 +837,8 @@ export function FinancingProfile() {
                         />
                         <SingleFileUpload
                           label="Verso *"
-                          value={profile.id_card_back ? `financing-documents/${profile.id_card_back}` : ''}
+                          value={profile.id_card_back}
+                          fileUrl={fileUrls.id_card_back}
                           onChange={(file) => handleSingleFileUpload('id_card_back', file)}
                           onDelete={() => handleDeleteFile('id_card_back')}
                           disabled={isSubmitted}
@@ -853,7 +853,8 @@ export function FinancingProfile() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SingleFileUpload
                           label="Recto *"
-                          value={profile.driver_license_front ? `financing-documents/${profile.driver_license_front}` : ''}
+                          value={profile.driver_license_front}
+                          fileUrl={fileUrls.driver_license_front}
                           onChange={(file) => handleSingleFileUpload('driver_license_front', file)}
                           onDelete={() => handleDeleteFile('driver_license_front')}
                           disabled={isSubmitted}
@@ -861,7 +862,8 @@ export function FinancingProfile() {
                         />
                         <SingleFileUpload
                           label="Verso *"
-                          value={profile.driver_license_back ? `financing-documents/${profile.driver_license_back}` : ''}
+                          value={profile.driver_license_back}
+                          fileUrl={fileUrls.driver_license_back}
                           onChange={(file) => handleSingleFileUpload('driver_license_back', file)}
                           onDelete={() => handleDeleteFile('driver_license_back')}
                           disabled={isSubmitted}
@@ -872,7 +874,8 @@ export function FinancingProfile() {
 
                     <SingleFileUpload
                       label="Justificatif de domicile (moins de 3 mois) *"
-                      value={profile.proof_of_residence ? `financing-documents/${profile.proof_of_residence}` : ''}
+                      value={profile.proof_of_residence}
+                          fileUrl={fileUrls.proof_of_residence}
                       onChange={(file) => handleSingleFileUpload('proof_of_residence', file)}
                       onDelete={() => handleDeleteFile('proof_of_residence')}
                       disabled={isSubmitted}
@@ -884,7 +887,8 @@ export function FinancingProfile() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <SingleFileUpload
                           label="Bulletin 1 *"
-                          value={profile.payslip_1 ? `financing-documents/${profile.payslip_1}` : ''}
+                          value={profile.payslip_1}
+                          fileUrl={fileUrls.payslip_1}
                           onChange={(file) => handleSingleFileUpload('payslip_1', file)}
                           onDelete={() => handleDeleteFile('payslip_1')}
                           disabled={isSubmitted}
@@ -892,7 +896,8 @@ export function FinancingProfile() {
                         />
                         <SingleFileUpload
                           label="Bulletin 2 *"
-                          value={profile.payslip_2 ? `financing-documents/${profile.payslip_2}` : ''}
+                          value={profile.payslip_2}
+                          fileUrl={fileUrls.payslip_2}
                           onChange={(file) => handleSingleFileUpload('payslip_2', file)}
                           onDelete={() => handleDeleteFile('payslip_2')}
                           disabled={isSubmitted}
@@ -900,7 +905,8 @@ export function FinancingProfile() {
                         />
                         <SingleFileUpload
                           label="Bulletin 3 *"
-                          value={profile.payslip_3 ? `financing-documents/${profile.payslip_3}` : ''}
+                          value={profile.payslip_3}
+                          fileUrl={fileUrls.payslip_3}
                           onChange={(file) => handleSingleFileUpload('payslip_3', file)}
                           onDelete={() => handleDeleteFile('payslip_3')}
                           disabled={isSubmitted}
@@ -911,7 +917,8 @@ export function FinancingProfile() {
 
                     <SingleFileUpload
                       label="Dernier avis d'imposition *"
-                      value={profile.tax_notice ? `financing-documents/${profile.tax_notice}` : ''}
+                      value={profile.tax_notice}
+                          fileUrl={fileUrls.tax_notice}
                       onChange={(file) => handleSingleFileUpload('tax_notice', file)}
                       onDelete={() => handleDeleteFile('tax_notice')}
                       disabled={isSubmitted}
@@ -920,7 +927,8 @@ export function FinancingProfile() {
 
                     <SingleFileUpload
                       label="RIB *"
-                      value={profile.rib ? `financing-documents/${profile.rib}` : ''}
+                      value={profile.rib}
+                          fileUrl={fileUrls.rib}
                       onChange={(file) => handleSingleFileUpload('rib', file)}
                       onDelete={() => handleDeleteFile('rib')}
                       disabled={isSubmitted}
@@ -933,7 +941,8 @@ export function FinancingProfile() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <SingleFileUpload
                             label="Attestation d'hébergement *"
-                            value={profile.hosting_certificate ? `financing-documents/${profile.hosting_certificate}` : ''}
+                            value={profile.hosting_certificate}
+                          fileUrl={fileUrls.hosting_certificate}
                             onChange={(file) => handleSingleFileUpload('hosting_certificate', file)}
                             onDelete={() => handleDeleteFile('hosting_certificate')}
                             disabled={isSubmitted}
@@ -941,7 +950,8 @@ export function FinancingProfile() {
                           />
                           <SingleFileUpload
                             label="Pièce d'identité hébergeur *"
-                            value={profile.host_id_card ? `financing-documents/${profile.host_id_card}` : ''}
+                            value={profile.host_id_card}
+                          fileUrl={fileUrls.host_id_card}
                             onChange={(file) => handleSingleFileUpload('host_id_card', file)}
                             onDelete={() => handleDeleteFile('host_id_card')}
                             disabled={isSubmitted}

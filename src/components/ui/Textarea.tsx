@@ -15,7 +15,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className={widthClass}>
         {label && (
           <label htmlFor={textareaId} className="block text-sm font-medium text-noir mb-2">
-            {label}
+            {props.required ? label.replace(/\s*\*$/, '') : label}
             {props.required && <span className="text-bleu ml-1" aria-hidden="true">*</span>}
           </label>
         )}

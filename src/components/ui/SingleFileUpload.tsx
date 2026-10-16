@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Upload, X, FileText, AlertTriangle } from 'lucide-react';
-import { supabase } from '../../lib/supabase';
 
 interface SingleFileUploadProps {
   label?: string;
+  /** Chemin du fichier déjà envoyé (vide s'il n'y en a pas) */
   value?: string;
+  /** Lien temporaire de consultation du fichier déjà envoyé (fichiers privés) */
+  fileUrl?: string;
   onChange: (file: File) => void;
   onDelete?: () => void;
   disabled?: boolean;
@@ -15,6 +17,7 @@ interface SingleFileUploadProps {
 export function SingleFileUpload({
   label,
   value,
+  fileUrl,
   onChange,
   onDelete,
   disabled = false,
@@ -29,54 +32,33 @@ export function SingleFileUpload({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const loadExistingFile = async () => {
-      if (value && value.startsWith('financing-documents/')) {
-        const filePath = value.replace('financing-documents/', '');
-        const { data } = supabase.storage
-          .from('financing-documents')
-          .getPublicUrl(filePath);
+    // Fichier déjà envoyé : aperçu par lien temporaire (l'espace de stockage est privé)
+    if (!value) {
+      setPreviewUrl(null);
+      setFileInfo(null);
+      setLowQuality(false);
+      return;
+    }
+    if (!fileUrl) return;
 
-        if (data?.publicUrl) {
-          setPreviewUrl(data.publicUrl);
-          const fileName = value.split('/').pop() || 'document';
+    const fileName = value.split('/').pop() || 'document';
+    const fileExt = fileName.split('.').pop()?.toLowerCase() || '';
+    let fileType = 'application/octet-stream';
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'].includes(fileExt)) {
+      fileType = `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`;
+    } else if (fileExt === 'pdf') {
+      fileType = 'application/pdf';
+    }
 
-          const fileExt = fileName.split('.').pop()?.toLowerCase() || '';
-          let fileType = 'application/octet-stream';
+    setPreviewUrl(fileUrl);
+    setFileInfo({ name: fileName, size: 0, type: fileType });
 
-          if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(fileExt)) {
-            fileType = `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`;
-          } else if (fileExt === 'pdf') {
-            fileType = 'application/pdf';
-          }
-
-          try {
-            const response = await fetch(data.publicUrl, { method: 'HEAD' });
-            const contentLength = response.headers.get('content-length');
-            const size = contentLength ? parseInt(contentLength, 10) : 0;
-
-            setFileInfo({ name: fileName, size, type: fileType });
-
-            if (fileType.startsWith('image/')) {
-              const img = new Image();
-              img.onload = () => {
-                const isLowQuality = img.width < 800 && img.height < 800;
-                setLowQuality(isLowQuality);
-              };
-              img.src = data.publicUrl;
-            }
-          } catch (error) {
-            setFileInfo({ name: fileName, size: 0, type: fileType });
-          }
-        }
-      } else {
-        setPreviewUrl(null);
-        setFileInfo(null);
-        setLowQuality(false);
-      }
-    };
-
-    loadExistingFile();
-  }, [value]);
+    if (fileType.startsWith('image/')) {
+      const img = new Image();
+      img.onload = () => setLowQuality(img.width < 800 && img.height < 800);
+      img.src = fileUrl;
+    }
+  }, [value, fileUrl]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
