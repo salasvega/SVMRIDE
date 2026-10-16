@@ -9,7 +9,7 @@ export function DepotOnglets({ demandes, dossiers }: { demandes?: number; dossie
   const pastille = (n?: number) =>
     n ? <span className="ml-1.5 inline-flex min-w-5 h-5 px-1.5 items-center justify-center rounded-full bg-brand text-white text-xs">{n}</span> : null;
   return (
-    <nav aria-label="Dépôt-vente" className="flex gap-1 border-b border-[#D1D5DB] overflow-x-auto">
+    <nav aria-label="Dépôt-vente" className="flex gap-1 border-b border-[#D1D5DB] overflow-x-auto overflow-y-hidden">
       <NavLink to="/admin/depot-vente" end className={classe}>
         Demandes d'estimation{pastille(demandes)}
       </NavLink>

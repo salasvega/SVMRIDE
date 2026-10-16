@@ -149,7 +149,7 @@ export function DepotDossierDetail() {
           )}
         </header>
 
-        <nav aria-label="Sections du dossier" className="flex gap-1 border-b border-[#D1D5DB] overflow-x-auto">
+        <nav aria-label="Sections du dossier" className="flex gap-1 border-b border-[#D1D5DB] overflow-x-auto overflow-y-hidden">
           {ONGLETS.map((o) => (
             <button
               key={o.cle}
