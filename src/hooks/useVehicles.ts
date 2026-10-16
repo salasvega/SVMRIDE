@@ -2,6 +2,14 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Vehicle, VehicleFilters } from '../types/vehicle';
 
+/**
+ * Colonnes lisibles par les visiteurs. Ne jamais remettre select('*') ici :
+ * prix d'achat, prix et date de vente sont réservés à l'admin, et Supabase
+ * refuse désormais de les donner aux visiteurs (la requête échouerait).
+ */
+export const PUBLIC_VEHICLE_COLUMNS =
+  'id,slug,brand,model,year,type,displacement,price,mileage,condition,description,images,features,warranty,available,status,created_at,updated_at';
+
 export function useVehicles(filters?: VehicleFilters) {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +21,7 @@ export function useVehicles(filters?: VehicleFilters) {
         setLoading(true);
         let query = supabase
           .from('vehicles')
-          .select('*')
+          .select(PUBLIC_VEHICLE_COLUMNS)
           .eq('available', true)
           .order('created_at', { ascending: false });
 
@@ -74,7 +82,7 @@ export function useVehicle(slug: string) {
         setLoading(true);
         const { data, error: fetchError } = await supabase
           .from('vehicles')
-          .select('*')
+          .select(PUBLIC_VEHICLE_COLUMNS)
           .eq('slug', slug)
           .single();
 
