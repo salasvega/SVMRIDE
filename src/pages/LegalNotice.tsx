@@ -35,15 +35,20 @@ export function LegalNotice() {
               M. Mattia SARAVIA
             </p>
  
-            <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Hébergement</h2>
+            <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Conception du site</h2>
             <p className="text-gris mb-6">
-              Le site est crée par: SALAS VEGA @ AXSDESIGN : salasvega@gmail.com<br />
-              
+              Salas Vega (AXSDESIGN) : salasvega@gmail.com
             </p>
+
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Hébergement</h2>
-            <p className="text-gris mb-6">
-              Le site est hébergé par: AMEN.fr<br />
-              
+            <p className="text-gris mb-6 leading-relaxed">
+              <strong>Site web :</strong> Netlify, Inc., 101 2nd Street, Suite 575, San Francisco, CA 94105, États-Unis
+              (netlify.com).
+              <br />
+              <strong>Base de données et fichiers :</strong> Supabase Pte. Ltd., 65 Chulia Street #38-02/03, OCBC Centre,
+              Singapour 049513 (supabase.com). Données hébergées dans l'Union européenne (centre de données de Paris).
+              <br />
+              <strong>Nom de domaine et messagerie :</strong> OVH SAS, 2 rue Kellermann, 59100 Roubaix, France (ovhcloud.com).
             </p>
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Propriété intellectuelle</h2>
