@@ -9,11 +9,14 @@ import { Button } from '../components/ui/Button';
 import { formatPrice, formatMileage } from '../utils/vehicle-filters';
 import { useVehicle } from '../hooks/useVehicles';
 import { vehicleSeo, vehicleNotFoundSeo } from '../config/seo';
+import { PistePhotos } from '../components/PhotosGlissantes';
+import { useGlissementPhotos } from '../hooks/useGlissementPhotos';
 
 export function VehicleDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { vehicle, loading, error } = useVehicle(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const glisse = useGlissementPhotos(vehicle?.images.length ?? 0, currentImageIndex, setCurrentImageIndex);
 
   const handlePrevImage = () => {
     if (!vehicle) return;
@@ -80,11 +83,20 @@ export function VehicleDetail() {
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             {/* --- Colonne gauche : galerie photos --- */}
             <div>
-              <div className="relative aspect-[4/3] rounded-[18px] overflow-hidden bg-fond mb-3 md:mb-4 group shadow-vehicule">
-                <img
-                  src={vehicle.images[currentImageIndex]}
-                  alt={`${vehicle.brand} ${vehicle.model} - Image ${currentImageIndex + 1}`}
-                  className="w-full h-full object-cover"
+              {/* Photo principale : glisser au doigt (ou à la souris) en plus des flèches */}
+              <div
+                ref={glisse.zoneRef}
+                {...glisse.ecouteurs}
+                className={`relative aspect-[4/3] rounded-[18px] overflow-hidden bg-fond mb-3 md:mb-4 group shadow-vehicule ${vehicle.images.length > 1 ? 'touch-pan-y cursor-grab active:cursor-grabbing' : ''}`}
+              >
+                <PistePhotos
+                  images={vehicle.images}
+                  index={currentImageIndex}
+                  alt={(i) => `${vehicle.brand} ${vehicle.model} - Image ${i + 1}`}
+                  dx={glisse.dx}
+                  anime={glisse.anime}
+                  voisinsCharges={glisse.voisinsCharges}
+                  chargement="eager"
                 />
 
                 {vehicle.images.length > 1 && (

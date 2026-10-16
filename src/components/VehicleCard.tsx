@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { PistePhotos } from './PhotosGlissantes';
+import { useGlissementPhotos } from '../hooks/useGlissementPhotos';
 import { Calendar, Gauge, Route, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Vehicle } from '../types/vehicle';
 import { formatPrice, formatMileage } from '../utils/vehicle-filters';
@@ -41,6 +43,7 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const statusInfo = getStatusBadge(vehicle.status);
   const hasMultipleImages = displayImages.length > 1;
+  const glisse = useGlissementPhotos(displayImages.length, currentImageIndex, setCurrentImageIndex);
 
   const handlePrevImage = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -59,13 +62,20 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
   };
 
   const content = (
-    <article className="bg-white rounded-[18px] overflow-hidden shadow-vehicule transition-[box-shadow,transform] duration-200 ease-out hover:shadow-vehicule-fort hover:-translate-y-1 group relative h-full flex flex-col">
-      <div className="relative aspect-[4/3] overflow-hidden bg-fond">
-        <img
-          src={displayImages[currentImageIndex]}
-          alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year} - Image ${currentImageIndex + 1}`}
-          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-          loading="lazy"
+    <article
+      {...glisse.ecouteurs}
+      className={`bg-white rounded-[18px] overflow-hidden shadow-vehicule transition-[box-shadow,transform] duration-200 ease-out hover:shadow-vehicule-fort hover:-translate-y-1 group relative h-full flex flex-col ${hasMultipleImages ? 'touch-pan-y' : ''}`}
+    >
+      {/* Photos : glisser au doigt (ou à la souris) en plus des flèches */}
+      <div ref={glisse.zoneRef} className="relative aspect-[4/3] overflow-hidden bg-fond">
+        <PistePhotos
+          images={displayImages}
+          index={currentImageIndex}
+          alt={(i) => `${vehicle.brand} ${vehicle.model} ${vehicle.year} - Image ${i + 1}`}
+          dx={glisse.dx}
+          anime={glisse.anime}
+          voisinsCharges={glisse.voisinsCharges}
+          classeImage="transition-transform duration-500 ease-out group-hover:scale-[1.04]"
         />
 
         {hasMultipleImages && (
