@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
@@ -119,11 +120,7 @@ export function TradeIn() {
 
   return (
     <>
-      <SEOHead
-        title="Reprise de votre véhicule"
-        description="Faites reprendre votre moto ou scooter rapidement et au meilleur prix. Expertise gratuite, offre attractive et virement immédiat."
-        path="/reprises"
-      />
+      <SEOHead meta={pageSeo['/reprises']} />
 
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>

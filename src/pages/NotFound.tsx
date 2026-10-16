@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
+import { notFoundSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
@@ -9,11 +10,7 @@ import { IconeOr } from '../components/ui/IconeOr';
 export function NotFound() {
   return (
     <>
-      <SEOHead
-        title="Page non trouvée"
-        description="La page que vous recherchez n'existe pas"
-        path="/404"
-      />
+      <SEOHead meta={notFoundSeo} />
 
       <Section background="white" className="py-24">
         <Container className="text-center">

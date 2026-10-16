@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { CheckCircle, Search } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
@@ -121,11 +122,7 @@ export function CustomSearch() {
 
   return (
     <>
-      <SEOHead
-        title="Recherche Personnalisée"
-        description="Vous cherchez un deux-roues spécifique ? Confiez-nous votre recherche et nous trouvons le véhicule qui vous correspond."
-        path="/recherche-personnalisee"
-      />
+      <SEOHead meta={pageSeo['/recherche-personnalisee']} />
 
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>

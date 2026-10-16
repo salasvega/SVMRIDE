@@ -8,7 +8,7 @@ import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { formatPrice, formatMileage } from '../utils/vehicle-filters';
 import { useVehicle } from '../hooks/useVehicles';
-import { siteConfig } from '../config/site';
+import { vehicleSeo, vehicleNotFoundSeo } from '../config/seo';
 
 export function VehicleDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -42,6 +42,7 @@ export function VehicleDetail() {
   if (error || !vehicle) {
     return (
       <Section>
+        <SEOHead meta={vehicleNotFoundSeo} />
         <Container className="text-center py-12">
           <h1 className="filet-apres text-center mb-8">Véhicule non trouvé</h1>
           <Link to="/vehicules">
@@ -52,28 +53,6 @@ export function VehicleDetail() {
     );
   }
 
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: `${vehicle.brand} ${vehicle.model} ${vehicle.year}`,
-    description: vehicle.description,
-    image: vehicle.images.map((img) => `${siteConfig.baseUrl}${img}`),
-    brand: {
-      '@type': 'Brand',
-      name: vehicle.brand,
-    },
-    offers: {
-      '@type': 'Offer',
-      price: vehicle.price,
-      priceCurrency: 'EUR',
-      itemCondition: 'https://schema.org/UsedCondition',
-      availability: vehicle.available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      seller: {
-        '@type': 'Organization',
-        name: siteConfig.name,
-      },
-    },
-  };
 
   const vehicleLabel = `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
   const financingLink = `/financement?vehicle=${encodeURIComponent(
@@ -82,13 +61,7 @@ export function VehicleDetail() {
 
   return (
     <>
-      <SEOHead
-        title={`${vehicle.brand} ${vehicle.model} ${vehicle.year}`}
-        description={vehicle.description}
-        path={`/vehicules/${vehicle.slug}`}
-        image={vehicle.images[0]}
-        schema={schema}
-      />
+      <SEOHead meta={vehicleSeo(vehicle)} />
 
       <Section background="gray" className="!py-5">
         <Container>

@@ -9,6 +9,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
@@ -122,11 +123,7 @@ export function Contact() {
 
   return (
     <>
-      <SEOHead
-        title="Contact"
-        description="Contactez SVM Ride pour toute question sur nos véhicules, nos services ou pour prendre rendez-vous."
-        path="/contact"
-      />
+      <SEOHead meta={pageSeo['/contact']} />
 
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>

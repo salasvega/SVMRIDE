@@ -10,6 +10,7 @@ import { SingleFileUpload } from '../components/ui/SingleFileUpload';
 import Toast from '../components/ui/Toast';
 import { supabase } from '../lib/supabase';
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { DeleteConfirmModal } from '../components/admin/DeleteConfirmModal';
 import { Save, Send, Trash2, CheckCircle, Edit } from 'lucide-react';
 
@@ -478,10 +479,7 @@ export function FinancingProfile() {
   if (showEmailModal) {
     return (
       <>
-        <SEOHead
-          title="Mon Dossier Financement - SVM-RIDE"
-          description="Gérez votre dossier de financement automobile en ligne"
-        />
+        <SEOHead meta={pageSeo['/financement/dossier']} />
         <Section className="py-12 bg-fond">
           <Container>
             <div className="max-w-md mx-auto">
@@ -571,10 +569,7 @@ export function FinancingProfile() {
 
   return (
     <>
-      <SEOHead
-        title="Mon Dossier Financement - Garage Vaillant"
-        description="Gérez votre dossier de financement automobile en ligne"
-      />
+      <SEOHead meta={pageSeo['/financement/dossier']} />
 
       {message && (
         <Toast

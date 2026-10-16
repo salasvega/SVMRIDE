@@ -1,17 +1,54 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0E0E10" />
+
+    <!-- Icônes : logo SVM Ride (navigateur, iPhone, Android) -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="SVM Ride" />
+    <meta name="application-name" content="SVM Ride" />
+
+    <!-- Balises SEO de la page : ce bloc est réécrit par la fonction Netlify
+         « seo » pour chaque page et chaque véhicule (netlify/edge-functions/seo.ts).
+         Les valeurs ci-dessous sont celles de l'accueil. -->
+    <!--seo-->
+    <title>SVM Ride – Motos et scooters d'occasion à Chaville (92)</title>
+    <meta name="description" content="Motos et scooters d'occasion contrôlés et garantis à Chaville (92). Reprise de votre deux-roues, financement et recherche sur mesure en Île-de-France." />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://svmride.com/" />
+    <meta property="og:site_name" content="SVM Ride" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SVM Ride – Motos et scooters d'occasion à Chaville (92)" />
+    <meta property="og:description" content="Motos et scooters d'occasion contrôlés et garantis à Chaville (92). Reprise de votre deux-roues, financement et recherche sur mesure en Île-de-France." />
+    <meta property="og:url" content="https://svmride.com/" />
+    <meta property="og:image" content="https://svmride.com/og-image.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SVM Ride – Motos et scooters d'occasion à Chaville (92)" />
+    <meta name="twitter:description" content="Motos et scooters d'occasion contrôlés et garantis à Chaville (92). Reprise de votre deux-roues, financement et recherche sur mesure en Île-de-France." />
+    <meta name="twitter:image" content="https://svmride.com/og-image.jpg" />
+    <script type="application/ld+json" id="seo-jsonld">[{"@context":"https://schema.org","@type":"MotorcycleDealer","@id":"https://svmride.com/#concession","name":"SVM Ride","description":"Concession de motos et scooters d'occasion contrôlés et garantis à Chaville (Hauts-de-Seine) : vente, reprise, financement et recherche personnalisée en Île-de-France.","url":"https://svmride.com/","logo":"https://svmride.com/icon-512.png","image":"https://svmride.com/og-image.jpg","telephone":"+33184190174","email":"contact@svmride.com","address":{"@type":"PostalAddress","streetAddress":"310 Avenue Roger Salengro","postalCode":"92370","addressLocality":"Chaville","addressRegion":"Île-de-France","addressCountry":"FR"},"hasMap":"https://www.google.com/maps/search/?api=1&query=310+Avenue+Roger+Salengro+92370+Chaville","areaServed":{"@type":"AdministrativeArea","name":"Île-de-France"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Tuesday","Wednesday","Thursday","Friday","Saturday"],"opens":"09:00","closes":"18:00"}],"sameAs":["https://instagram.com/svm_ride"]},{"@context":"https://schema.org","@type":"WebSite","@id":"https://svmride.com/#site","name":"SVM Ride","url":"https://svmride.com/","inLanguage":"fr-FR","publisher":{"@id":"https://svmride.com/#concession"}}]</script>
+    <!--/seo-->
+
+    <!-- Image d'accueil chargée en priorité (accélère l'affichage) -->
+    <link rel="preload" as="image" href="/accueil-showroom.webp" media="(max-width: 1023px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/accueil-showroom-logo.webp" media="(min-width: 1024px)" fetchpriority="high" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
-    <title>SVM Ride - Vente de motos d'occasion</title>
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      SVM Ride – motos et scooters d'occasion à Chaville (92). Activez JavaScript pour consulter nos véhicules,
+      ou contactez-nous au 01 84 19 01 74 – contact@svmride.com.
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

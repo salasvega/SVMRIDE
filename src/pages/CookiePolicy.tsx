@@ -1,15 +1,12 @@
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 
 export function CookiePolicy() {
   return (
     <>
-      <SEOHead
-        title="Politique des Cookies"
-        description="Politique d'utilisation des cookies sur SVM Ride"
-        path="/politique-cookies"
-      />
+      <SEOHead meta={pageSeo['/politique-cookies']} />
 
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>

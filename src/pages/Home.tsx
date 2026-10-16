@@ -1,37 +1,16 @@
 import { Link } from 'react-router-dom';
 import { CheckCircle, Shield, Clock, Award, Star, Users } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
-import { siteConfig } from '../config/site';
 
 export function Home() {
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'Organization',
-    name: siteConfig.name,
-    url: siteConfig.baseUrl,
-    logo: `${siteConfig.baseUrl}/logo.png`,
-    description: siteConfig.description,
-    contactPoint: {
-      '@type': 'ContactPoint',
-      telephone: siteConfig.contact.phone,
-      contactType: 'Customer Service',
-      email: siteConfig.contact.email,
-    },
-    sameAs: [siteConfig.contact.instagramUrl],
-  };
-
   return (
     <>
-      <SEOHead
-        title={siteConfig.name}
-        description={siteConfig.description}
-        path="/"
-        schema={schema}
-      />
+      <SEOHead meta={pageSeo['/']} />
 
       <Section background="dark" className="relative !py-0 overflow-hidden">
         {/* Mobile et tablette : cadrage sur les motos. Ordinateur : photo large

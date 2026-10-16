@@ -21,3 +21,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Généré au build (scripts/config-edge.mjs)
+netlify/edge-functions/_supabase.generated.ts

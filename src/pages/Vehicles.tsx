@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Search, ChevronDown, ChevronUp, X, SlidersHorizontal } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Select } from '../components/ui/Select';
@@ -106,11 +107,7 @@ export function Vehicles() {
 
   return (
     <>
-      <SEOHead
-        title="Nos Véhicules d'Occasion"
-        description="Découvrez notre sélection de motos et scooters d'occasion en Île-de-France. Véhicules vérifiés, garantis et au meilleur prix."
-        path="/vehicules"
-      />
+      <SEOHead meta={pageSeo['/vehicules']} />
 
       <Section background="gray" className="!pt-8 md:!pt-12">
         <Container>

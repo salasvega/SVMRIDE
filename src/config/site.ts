@@ -19,7 +19,7 @@ export const siteConfig = {
     instagram: '@svm_ride',
     instagramUrl: 'https://instagram.com/svm_ride',
   },
-  baseUrl: 'https://svmride.netlify.app',
+  baseUrl: 'https://svmride.com',
   ogImage: '/og-image.jpg',
 } as const;
 

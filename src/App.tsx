@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/admin/ProtectedRoute';
@@ -11,7 +12,6 @@ import { Vehicles } from './pages/Vehicles';
 import { VehicleDetail } from './pages/VehicleDetail';
 import { TradeIn } from './pages/TradeIn';
 import { Financing } from './pages/Financing';
-import { FinancingProfile } from './pages/FinancingProfile';
 import { CustomSearch } from './pages/CustomSearch';
 import { Contact } from './pages/Contact';
 import { LegalNotice } from './pages/LegalNotice';
@@ -19,21 +19,27 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { CookiePolicy } from './pages/CookiePolicy';
 import { Sitemap } from './pages/Sitemap';
 import { NotFound } from './pages/NotFound';
-import { AdminLogin } from './pages/admin/AdminLogin';
-import { AdminDashboard } from './pages/admin/AdminDashboard';
-import { VehiclesList } from './pages/admin/VehiclesList';
-import { VehicleForm } from './pages/admin/VehicleForm';
-import SubmissionsList from './pages/admin/SubmissionsList';
-import FinancingProfilesList from './pages/admin/FinancingProfilesList';
-import { SalesFoldersList } from './pages/admin/SalesFoldersList';
-import { SalesFolderForm } from './pages/admin/SalesFolderForm';
-import { SalesFolderDetails } from './pages/admin/SalesFolderDetails';
+// Espace admin et dossier de financement chargés à la demande : ils ne pèsent
+// plus sur le chargement des pages publiques (vitesse = référencement).
+const nomme = <K extends string>(charger: () => Promise<Record<K, React.ComponentType>>, nom: K) =>
+  lazy(() => charger().then((m) => ({ default: m[nom] })));
+const FinancingProfile = nomme(() => import('./pages/FinancingProfile'), 'FinancingProfile');
+const AdminLogin = nomme(() => import('./pages/admin/AdminLogin'), 'AdminLogin');
+const AdminDashboard = nomme(() => import('./pages/admin/AdminDashboard'), 'AdminDashboard');
+const VehiclesList = nomme(() => import('./pages/admin/VehiclesList'), 'VehiclesList');
+const VehicleForm = nomme(() => import('./pages/admin/VehicleForm'), 'VehicleForm');
+const SubmissionsList = lazy(() => import('./pages/admin/SubmissionsList'));
+const FinancingProfilesList = lazy(() => import('./pages/admin/FinancingProfilesList'));
+const SalesFoldersList = nomme(() => import('./pages/admin/SalesFoldersList'), 'SalesFoldersList');
+const SalesFolderForm = nomme(() => import('./pages/admin/SalesFolderForm'), 'SalesFolderForm');
+const SalesFolderDetails = nomme(() => import('./pages/admin/SalesFolderDetails'), 'SalesFolderDetails');
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <ScrollToTop />
+        <Suspense fallback={<div className="min-h-screen bg-fond" aria-busy="true" />}>
         <Routes>
           <Route path="/admin/login" element={<AdminLogin />} />
 
@@ -147,6 +153,7 @@ function App() {
             }
           />
         </Routes>
+        </Suspense>
       </Router>
     </AuthProvider>
   );

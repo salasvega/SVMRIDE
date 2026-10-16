@@ -1,4 +1,5 @@
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { siteConfig } from '../config/site';
@@ -6,11 +7,7 @@ import { siteConfig } from '../config/site';
 export function PrivacyPolicy() {
   return (
     <>
-      <SEOHead
-        title="Politique de Confidentialité"
-        description="Politique de confidentialité et protection des données personnelles de SVM Ride"
-        path="/politique-confidentialite"
-      />
+      <SEOHead meta={pageSeo['/politique-confidentialite']} />
 
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, Calculator, FileText, HelpCircle } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
@@ -124,11 +125,7 @@ export function Financing() {
 
   return (
     <>
-      <SEOHead
-        title="Solutions de Financement"
-        description="Financez votre moto ou scooter avec nos solutions adaptées. Simulation gratuite et réponse rapide."
-        path="/financement"
-      />
+      <SEOHead meta={pageSeo['/financement']} />
 
       {/* Bandeau titre */}
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
@@ -151,7 +148,8 @@ export function Financing() {
           <div className="sur-sombre relative bg-noir-profond text-white p-6 md:p-12 rounded-2xl mb-12 overflow-hidden border border-or/30 shadow-vehicule">
             <div className="absolute inset-0 opacity-20">
               <img
-                src="/image copy copy.png"
+                src="/simulateur-fond.webp"
+                loading="lazy"
                 alt=""
                 className="w-full h-full object-cover"
                 aria-hidden="true"

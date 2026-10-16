@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /api/*
+Disallow: /admin
+Disallow: /api/
 
 Sitemap: https://svmride.com/sitemap.xml

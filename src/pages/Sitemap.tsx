@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { SEOHead } from '../components/layout/SEOHead';
+import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 
@@ -29,11 +30,7 @@ export function Sitemap() {
 
   return (
     <>
-      <SEOHead
-        title="Plan du Site"
-        description="Plan du site SVM Ride - Toutes les pages du site"
-        path="/plan-du-site"
-      />
+      <SEOHead meta={pageSeo['/plan-du-site']} />
 
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>

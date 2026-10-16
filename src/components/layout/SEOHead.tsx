@@ -1,73 +1,78 @@
 import { useEffect } from 'react';
 import { siteConfig } from '../../config/site';
+import { SeoMeta, canonicalUrl, DEFAULT_IMAGE } from '../../config/seo';
 
 interface SEOHeadProps {
-  title: string;
-  description: string;
-  path?: string;
-  image?: string;
-  type?: 'website' | 'article';
-  schema?: Record<string, any>;
+  /** Balises de la page : voir src/config/seo.ts (pageSeo, vehicleSeo…) */
+  meta: SeoMeta;
 }
 
-export function SEOHead({
-  title,
-  description,
-  path = '',
-  image = siteConfig.ogImage,
-  type = 'website',
-  schema,
-}: SEOHeadProps) {
-  const fullTitle = title === siteConfig.name ? title : `${title} | ${siteConfig.name}`;
-  const url = `${siteConfig.baseUrl}${path}`;
-  const imageUrl = image.startsWith('http') ? image : `${siteConfig.baseUrl}${image}`;
+/**
+ * Met à jour les balises SEO quand on navigue dans le site.
+ * Au premier chargement, ces balises sont déjà écrites dans le HTML par la
+ * fonction Netlify `seo` (rendu serveur) ; ce composant garde le même contenu.
+ */
+export function SEOHead({ meta }: SEOHeadProps) {
+  const url = canonicalUrl(meta);
+  const image = meta.image
+    ? meta.image.startsWith('http')
+      ? meta.image
+      : `${siteConfig.baseUrl}${meta.image}`
+    : DEFAULT_IMAGE;
+  const schemaJson = meta.schema ? JSON.stringify(meta.schema) : '';
 
   useEffect(() => {
-    document.title = fullTitle;
+    document.title = meta.title;
 
-    const updateMeta = (property: string, content: string, isProperty = true) => {
-      const attr = isProperty ? 'property' : 'name';
-      let meta = document.querySelector(`meta[${attr}="${property}"]`);
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute(attr, property);
-        document.head.appendChild(meta);
+    const setMeta = (attr: 'name' | 'property', key: string, content: string) => {
+      let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
       }
-      meta.setAttribute('content', content);
+      el.setAttribute('content', content);
     };
 
-    updateMeta('description', description, false);
-    updateMeta('og:title', fullTitle);
-    updateMeta('og:description', description);
-    updateMeta('og:url', url);
-    updateMeta('og:type', type);
-    updateMeta('og:image', imageUrl);
-    updateMeta('og:site_name', siteConfig.name);
-    updateMeta('twitter:card', 'summary_large_image', false);
-    updateMeta('twitter:title', fullTitle, false);
-    updateMeta('twitter:description', description, false);
-    updateMeta('twitter:image', imageUrl, false);
+    setMeta('name', 'description', meta.description);
+    setMeta('name', 'robots', meta.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large');
+    setMeta('property', 'og:type', meta.type === 'product' ? 'product' : 'website');
+    setMeta('property', 'og:title', meta.title);
+    setMeta('property', 'og:description', meta.description);
+    setMeta('property', 'og:url', url);
+    setMeta('property', 'og:image', image);
+    setMeta('name', 'twitter:card', 'summary_large_image');
+    setMeta('name', 'twitter:title', meta.title);
+    setMeta('name', 'twitter:description', meta.description);
+    setMeta('name', 'twitter:image', image);
 
-    if (schema) {
-      let scriptTag = document.querySelector('script[type="application/ld+json"]');
-      if (!scriptTag) {
-        scriptTag = document.createElement('script');
-        scriptTag.setAttribute('type', 'application/ld+json');
-        document.head.appendChild(scriptTag);
-      }
-      scriptTag.textContent = JSON.stringify(schema);
-    }
-
-    const canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
-    if (canonicalLink) {
-      canonicalLink.href = url;
+    // Adresse canonique (aucune pour une page exclue des moteurs)
+    let canonical = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (meta.noindex) {
+      canonical?.remove();
     } else {
-      const link = document.createElement('link');
-      link.rel = 'canonical';
-      link.href = url;
-      document.head.appendChild(link);
+      if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.rel = 'canonical';
+        document.head.appendChild(canonical);
+      }
+      canonical.href = url;
     }
-  }, [fullTitle, description, url, imageUrl, type, schema]);
+
+    // Données structurées : remplacées à chaque page, retirées si la page n'en a pas
+    let ld = document.getElementById('seo-jsonld');
+    if (schemaJson) {
+      if (!ld) {
+        ld = document.createElement('script');
+        ld.id = 'seo-jsonld';
+        ld.setAttribute('type', 'application/ld+json');
+        document.head.appendChild(ld);
+      }
+      ld.textContent = schemaJson;
+    } else {
+      ld?.remove();
+    }
+  }, [meta.title, meta.description, meta.noindex, meta.type, url, image, schemaJson]);
 
   return null;
 }
