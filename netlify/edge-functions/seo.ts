@@ -24,7 +24,7 @@ import {
   type SeoMeta,
   type SeoVehicle,
 } from '../../src/config/seo.ts';
-import { SUPABASE_KEY, SUPABASE_URL } from './_supabase.generated.ts';
+import { SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
 
 const TIMEOUT_MS = 2500;
 
@@ -122,6 +122,8 @@ export default async function seo(request: Request, context: Context) {
 }
 
 export const config: Config = {
+  // En cas d'erreur de la fonction, la page s'affiche normalement (balises par défaut)
+  onError: 'bypass',
   path: '/*',
   excludedPath: [
     '/assets/*',

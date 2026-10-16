@@ -23,4 +23,7 @@ dist-ssr
 .env
 
 # Généré au build (scripts/config-edge.mjs)
-netlify/edge-functions/_supabase.generated.ts
+netlify/generated/supabase-config.ts
+
+# Dossier local de la CLI Netlify
+.netlify/
