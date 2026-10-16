@@ -126,7 +126,7 @@ export const pageSeo = {
   '/recherche-personnalisee': {
     title: 'Recherche personnalisée de moto ou scooter | SVM Ride',
     description:
-      'Vous cherchez un modèle précis ? Confiez-nous votre recherche : nous trouvons la moto ou le scooter qui vous correspond, gratuitement et sans engagement.',
+      'Vous cherchez un modèle précis ? Confiez-nous votre recherche : nous trouvons la moto ou le scooter qui vous correspond, selon vos critères et votre budget.',
     path: '/recherche-personnalisee',
   },
   '/contact': {

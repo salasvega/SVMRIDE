@@ -213,14 +213,6 @@ export function CustomSearch() {
                 </div>
               </div>
 
-              <div className="mt-8 p-5 md:p-6 bg-white border border-bordure border-l-[3px] border-l-or rounded-xl">
-                <p className="text-sm text-gris">
-                  <strong>
-                    Service gratuit et sans engagement.
-                  </strong>{' '}
-                  Vous ne payez que si vous achetez le véhicule trouvé.
-                </p>
-              </div>
             </div>
 
             {/* Colonne droite : formulaire */}

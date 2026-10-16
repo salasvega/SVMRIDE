@@ -24,7 +24,8 @@ export function LegalNotice() {
             <p className="text-gris mb-6">
               <strong>{siteConfig.name}</strong><br />
               SIREN: 988004719<br />
-              Siège social: {siteConfig.adresse.split('\n')[0]}<br />
+              Siège social : {siteConfig.siegeSocial}<br />
+              Showroom : {siteConfig.showrooms[0].fullAddress}<br />
               Email: {siteConfig.contact.email}<br />
               Téléphone: {siteConfig.contact.phone}
             </p>
