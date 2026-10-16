@@ -34,8 +34,8 @@ export function Home() {
 
       <Section className="relative bg-gradient-to-br from-[#111111] via-[#1a1a1a] to-[#111111] text-white py-24 md:py-32 overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-90"
-          style={{ backgroundImage: 'url(/image.png)' }}
+          className="absolute inset-0 bg-cover bg-[position:50%_40%] opacity-90"
+          style={{ backgroundImage: 'url(/accueil-showroom.webp)' }}
           aria-hidden="true"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#111111]/50 via-[#111111]/30 to-[#111111]/70" aria-hidden="true" />
