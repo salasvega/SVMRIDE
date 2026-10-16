@@ -124,7 +124,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 <span className="text-xl font-bold text-[#111111]">Admin</span>
               </Link>
 
-              <div className="hidden md:flex space-x-4">
+              <div className="hidden lg:flex space-x-2 xl:space-x-4">
                 {liens}
               </div>
             </div>
@@ -144,7 +144,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </div>
-          <div className="md:hidden flex gap-1 overflow-x-auto pb-2 -mx-1 px-1">
+          <div className="lg:hidden flex gap-1 overflow-x-auto pb-2 -mx-1 px-1">
             {liens}
           </div>
         </div>
