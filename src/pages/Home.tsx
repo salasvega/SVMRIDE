@@ -34,9 +34,10 @@ export function Home() {
       />
 
       <Section background="dark" className="relative !py-0 overflow-hidden">
+        {/* Mobile et tablette : cadrage sur les motos. Ordinateur : photo large
+            avec le panneau SVM RIDE, calée en haut à gauche au-dessus du titre. */}
         <div
-          className="absolute inset-0 bg-cover bg-[position:50%_40%]"
-          style={{ backgroundImage: 'url(/accueil-showroom.webp)' }}
+          className="absolute inset-0 bg-cover bg-[url('/accueil-showroom.webp')] bg-[position:50%_40%] lg:bg-[url('/accueil-showroom-logo.webp')] lg:bg-[position:0%_0%]"
           aria-hidden="true"
         />
         <div
