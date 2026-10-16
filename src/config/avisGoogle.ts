@@ -22,7 +22,7 @@ export const AVIS_GOOGLE = {
    * Identifiant Google de la fiche SVM Ride (Place ID, commence souvent par « ChIJ »).
    * Sert à construire les deux liens ci-dessous.
    */
-  placeId: '',
+  placeId: 'ChIJf6XDRAkw3E0RthciV1AF06g', // fiche « SVM Ride », 310 av. Roger Salengro, Chaville
   /** Passer à true après avoir testé les deux liens sur ordinateur et sur mobile. */
   liensVerifies: false,
   /** Au-delà de ce délai sans synchronisation réussie, note et avis sont masqués. */
