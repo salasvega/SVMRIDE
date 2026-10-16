@@ -121,7 +121,18 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
 
       <div className="p-5 md:p-6 flex flex-col flex-1">
         <h3 className="titre-display text-[21px] md:text-[22px] mb-3">
-          {vehicle.brand} {vehicle.model}
+          {disableLink ? (
+            `${vehicle.brand} ${vehicle.model}`
+          ) : (
+            // Lien unique de la carte : sa zone cliquable couvre toute la carte
+            // (les flèches et pastilles du carrousel restent au-dessus).
+            <Link
+              to={`/vehicules/${vehicle.slug}`}
+              className="after:absolute after:inset-0 after:rounded-[18px] after:content-[''] focus-visible:outline-none focus-visible:after:ring-4 focus-visible:after:ring-bleu-vif/60"
+            >
+              {vehicle.brand} {vehicle.model}
+            </Link>
+          )}
         </h3>
 
         <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-gris mb-5 pb-5 border-b border-bordure">
@@ -140,21 +151,15 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
         </div>
 
         {!disableLink && (
-          <Link to={`/vehicules/${vehicle.slug}`} className="mt-auto" tabIndex={-1}>
-            <Button fullWidth>
+          <div className="mt-auto" aria-hidden="true">
+            <Button fullWidth tabIndex={-1} type="button">
               Voir le véhicule
             </Button>
-          </Link>
+          </div>
         )}
       </div>
     </article>
   );
 
-  if (disableLink) return content;
-
-  return (
-    <Link to={`/vehicules/${vehicle.slug}`} className="block h-full rounded-[18px]">
-      {content}
-    </Link>
-  );
+  return content;
 }

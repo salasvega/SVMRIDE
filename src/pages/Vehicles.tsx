@@ -6,7 +6,6 @@ import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Select } from '../components/ui/Select';
-import { Input } from '../components/ui/Input';
 import { VehicleCard } from '../components/VehicleCard';
 import { getUniqueBrands } from '../utils/vehicle-filters';
 import { VehicleFilters } from '../types/vehicle';

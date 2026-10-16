@@ -37,17 +37,15 @@ cp .env.example .env
 
 # Lancer le serveur de développement
 npm run dev
-
-# Dans un autre terminal, lancer l'API de formulaires (optionnel)
-npm run api
 ```
+
+Les formulaires sont enregistrés directement dans Supabase (tables + fonctions edge) ; il n'y a plus de serveur API séparé.
 
 ## Scripts disponibles
 
 - `npm run dev` - Lance le serveur de développement (port 5173)
 - `npm run build` - Compile le projet pour la production
 - `npm run preview` - Prévisualise le build de production
-- `npm run api` - Lance le serveur API pour les formulaires (port 3001)
 - `npm run lint` - Vérifie le code avec ESLint
 - `npm run typecheck` - Vérifie les types TypeScript
 

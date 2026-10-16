@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Trash2, Filter, Search, Circle, Clock, CheckCircle2, Download, FileText, KeyRound } from 'lucide-react';
+import { Trash2, Search, Circle, Clock, CheckCircle2, Download, FileText, KeyRound } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
@@ -637,8 +637,7 @@ export default function FinancingProfilesList() {
 
         {profileToDelete && (
           <DeleteConfirmModal
-            isOpen={true}
-            onClose={() => setProfileToDelete(null)}
+            onCancel={() => setProfileToDelete(null)}
             onConfirm={handleDelete}
             title="Supprimer le dossier"
             message="Êtes-vous sûr de vouloir supprimer ce dossier de financement ? Cette action est irréversible."

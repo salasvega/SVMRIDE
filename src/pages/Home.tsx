@@ -6,6 +6,7 @@ import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
+import { DerniersArrivages } from '../components/DerniersArrivages';
 
 export function Home() {
   return (
@@ -97,6 +98,8 @@ export function Home() {
         </Container>
       </Section>
 
+      <DerniersArrivages />
+
       <Section background="dark">
         <Container>
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
@@ -169,7 +172,7 @@ export function Home() {
             <div className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
               <h3 className="titre-display text-[22px] md:text-2xl mb-3">Entretien & Réparation</h3>
               <p className="text-gris mb-6 leading-relaxed flex-1">
-                Service d'entretien et de réparation pour tous types de deux-roues. Prenez rendez-vous en ligne facilement.
+                Service d'entretien et de réparation pour tous types de deux-roues. Prenez rendez-vous par téléphone ou par notre formulaire de contact.
               </p>
               <Link to="/contact" className="lien self-start">
                 Prendre rendez-vous →

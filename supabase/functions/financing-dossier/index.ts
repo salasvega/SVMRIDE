@@ -420,6 +420,9 @@ Deno.serve(async (req: Request) => {
         const jeton = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
         const { data: u, error: eu } = await db.auth.getUser(jeton);
         if (eu || !u?.user) throw new Erreur(401, "admin", "Réservé à l'administration.");
+        // Un compte connecté ne suffit pas : il doit être administrateur
+        const { data: estAdmin } = await db.rpc("est_admin_compte", { p_user: u.user.id });
+        if (estAdmin !== true) throw new Erreur(403, "admin", "Réservé à l'administration.");
         const id = String(body.profileId ?? "");
         const code = nouveauCode();
         const { error } = await db.from("user_financing_profiles").update({

@@ -104,11 +104,7 @@ Deno.serve(async (req: Request) => {
     const payload: WebhookPayload = await req.json();
     const record = payload.record;
 
-    console.log("Received financing profile submission:", {
-      id: record.id,
-      email: record.user_email,
-      submitted_at: record.submitted_at,
-    });
+    console.log("financing-profile-notification : dossier soumis", record.id);
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = getSecretKey();

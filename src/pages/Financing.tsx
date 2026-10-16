@@ -10,7 +10,6 @@ import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
 import { useFormSubmit } from '../hooks/useFormSubmit';
-import { supabase } from '../lib/supabase';
 
 export function Financing() {
   // Lecture des paramètres passés depuis la fiche véhicule

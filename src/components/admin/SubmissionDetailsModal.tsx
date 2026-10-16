@@ -1,8 +1,7 @@
-import { X, Mail, Phone, Calendar, MessageSquare, Tag, User, Paperclip, Download, FileText, FileEdit } from 'lucide-react';
+import { X, Mail, Phone, MessageSquare, Tag, User, Paperclip, Download, FileText } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
-import { Textarea } from '../ui/Textarea';
 import { supabase } from '../../lib/supabase';
 import Toast from '../ui/Toast';
 
@@ -52,16 +51,6 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
       custom_search: 'Recherche personnalisée',
     };
     return labels[type] || type;
-  };
-
-  const getTypeColor = (type: string) => {
-    const colors: Record<string, string> = {
-      contact: 'bg-blue-100 text-blue-800',
-      financing: 'bg-green-100 text-green-800',
-      trade_in: 'bg-orange-100 text-orange-800',
-      custom_search: 'bg-purple-100 text-purple-800',
-    };
-    return colors[type] || 'bg-gray-100 text-gray-800';
   };
 
   const getSelectBackgroundColor = (status: string) => {

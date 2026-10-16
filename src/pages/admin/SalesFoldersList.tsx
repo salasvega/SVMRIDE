@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../../components/ui/Button';
-import { FileText, Search, Filter, Trash2, Plus } from 'lucide-react';
+import { FileText, Search, Trash2, Plus } from 'lucide-react';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 
 interface DocumentMetadata {

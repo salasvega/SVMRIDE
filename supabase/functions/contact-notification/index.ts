@@ -97,7 +97,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const payload: WebhookPayload = await req.json();
-    console.log("Webhook received:", payload);
+    console.log("contact-notification : demande reçue", payload.record?.id);
 
     if (payload.type !== "INSERT") {
       return new Response(

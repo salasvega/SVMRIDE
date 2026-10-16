@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Trash2, Filter, Search, Circle, Clock, CheckCircle2 } from 'lucide-react';
+import { Trash2, Search, Circle, Clock, CheckCircle2 } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
-import { Select } from '../../components/ui/Select';
 import { supabase } from '../../lib/supabase';
 import { SubmissionDetailsModal } from '../../components/admin/SubmissionDetailsModal';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
@@ -281,15 +280,6 @@ export default function SubmissionsList() {
         {statusInfo.icon}
       </div>
     );
-  };
-
-  const getSelectBackgroundColor = (status: string) => {
-    const colors: Record<string, string> = {
-      new: 'bg-white border-2 border-blue-200 text-black font-semibold rounded-lg',
-      in_progress: 'bg-white border-2 border-orange-200 text-black font-semibold rounded-lg',
-      completed: 'bg-white border-2 border-green-200 text-black font-semibold rounded-lg',
-    };
-    return colors[status] || 'bg-white border-2 border-gray-200 rounded-lg';
   };
 
   if (loading) {

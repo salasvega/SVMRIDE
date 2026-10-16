@@ -84,7 +84,7 @@ Deno.serve(async (req: Request) => {
     const resendApiKey = Deno.env.get("RESEND_API_KEY")!;
 
     const payload: WebhookPayload = await req.json();
-    console.log("Custom search webhook received:", payload);
+    console.log("custom-search-notification : demande reçue", payload.record?.id);
 
     const record = payload.record;
 

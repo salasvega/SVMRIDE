@@ -57,7 +57,7 @@ export function useVehicles(filters?: VehicleFilters) {
 
         if (fetchError) throw fetchError;
 
-        setVehicles(data as Vehicle[]);
+        setVehicles(data as unknown as Vehicle[]);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An error occurred'));
       } finally {
@@ -88,7 +88,7 @@ export function useVehicle(slug: string) {
 
         if (fetchError) throw fetchError;
 
-        setVehicle(data as Vehicle);
+        setVehicle(data as unknown as Vehicle);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('An error occurred'));
       } finally {
