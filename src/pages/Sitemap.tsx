@@ -12,6 +12,7 @@ export function Sitemap() {
         { href: '/', label: 'Accueil' },
         { href: '/vehicules', label: 'Nos Véhicules' },
         { href: '/reprises', label: 'Reprise de véhicule' },
+        { href: '/vendre-ma-moto', label: 'Vendre ma moto (dépôt-vente)' },
         { href: '/financement', label: 'Solutions de financement' },
         { href: '/recherche-personnalisee', label: 'Recherche personnalisée' },
         { href: '/contact', label: 'Contact' },

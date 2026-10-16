@@ -37,7 +37,7 @@ export function PrivacyPolicy() {
               <li>Nom et prénom</li>
               <li>Adresse email</li>
               <li>Numéro de téléphone</li>
-              <li>Informations sur les véhicules (dans le cadre d'une reprise ou recherche)</li>
+              <li>Informations et photos de votre véhicule (dans le cadre d'une reprise, d'un dépôt-vente ou d'une recherche)</li>
               <li>Messages et commentaires que vous nous envoyez</li>
             </ul>
 
@@ -48,6 +48,7 @@ export function PrivacyPolicy() {
             <ul className="list-disc list-inside text-gris mb-6 space-y-2 ml-4">
               <li>Répondre à vos demandes d'information</li>
               <li>Traiter vos demandes de reprise de véhicule</li>
+              <li>Étudier vos demandes de dépôt-vente et vous recontacter pour une estimation</li>
               <li>Vous proposer des solutions de financement</li>
               <li>Effectuer des recherches personnalisées de véhicules</li>
               <li>Améliorer nos services</li>
@@ -60,7 +61,14 @@ export function PrivacyPolicy() {
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Conservation des données</h2>
             <p className="text-gris mb-6 leading-relaxed">
-              Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées, puis archivées conformément aux obligations légales.
+              Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées, puis supprimées ou archivées conformément aux obligations légales. Pour les demandes envoyées par nos formulaires (contact, reprise, recherche, demande de financement, dépôt-vente) :
+            </p>
+            <ul className="list-disc list-inside text-gris mb-6 space-y-2 ml-4">
+              <li>les photos et pièces jointes sont supprimées 12 mois après votre demande ;</li>
+              <li>la demande elle-même est supprimée 3 ans après son envoi, sauf si elle a donné lieu à un contrat (dépôt-vente, achat), qui suit alors ses propres durées légales.</li>
+            </ul>
+            <p className="text-gris mb-6 leading-relaxed">
+              Ces suppressions sont automatiques. Vos données sont hébergées dans l'Union européenne.
             </p>
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Partage des données</h2>

@@ -366,6 +366,7 @@ export function CustomSearch() {
                   />
 
                   <FileUpload
+                    elements="fichiers"
                     label="Pièces jointes (optionnel)"
                     maxFiles={10}
                     maxSizeMB={10}

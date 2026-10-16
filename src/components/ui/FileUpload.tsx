@@ -22,6 +22,8 @@ interface FileUploadProps {
   accept?: string; // ex: "image/*,application/pdf"
   value?: UploadedDoc[]; // liste contrôlée par le parent
   onChange: (files: UploadedDoc[]) => void; // callback pour mettre à jour côté parent
+  elements?: string; // ce qu'on dépose : « documents », « photos »…
+  aide?: string; // aide affichée sous la zone (facultative)
 }
 
 export function FileUpload({
@@ -31,6 +33,8 @@ export function FileUpload({
   accept = '',
   value = [],
   onChange,
+  elements = 'fichiers',
+  aide,
 }: FileUploadProps) {
   // état local visuel
   const [dragOver, setDragOver] = useState(false);
@@ -293,7 +297,7 @@ export function FileUpload({
             <UploadIcon className="w-8 h-8 text-[#6B6B6B] mb-2 pointer-events-none" />
 
             <p className="text-sm leading-snug text-center">
-              Glissez-déposez vos documents
+              Glissez-déposez vos {elements}
               <br />
               <span className="text-[#666666]">
                 ou cliquez pour parcourir
@@ -369,10 +373,7 @@ export function FileUpload({
           </div>
         )}
 
-        <p className="text-[11px] text-[#6B6B6B] leading-snug">
-          Exemples : pièce d'identité, justificatif de domicile,
-          bulletin de salaire.
-        </p>
+        {aide && <p className="text-[11px] text-[#6B6B6B] leading-snug">{aide}</p>}
       </div>
 
       {/* Lightbox plein écran pour prévisualiser une image */}

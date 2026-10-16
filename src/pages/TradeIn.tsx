@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
@@ -206,6 +207,20 @@ export function TradeIn() {
                   </div>
                 </div>
               </div>
+
+              <div className="mt-8 carte p-5 md:p-6">
+                <h3 className="font-semibold text-noir mb-1.5">
+                  Vous préférez vendre au meilleur prix ?
+                </h3>
+                <p className="text-sm text-gris leading-relaxed mb-3">
+                  Avec le dépôt-vente, nous vendons votre moto pour vous :
+                  annonce, visites, essais et démarches. Estimation gratuite
+                  et sans engagement.
+                </p>
+                <Link to="/vendre-ma-moto" className="lien">
+                  Confier ma moto en dépôt-vente →
+                </Link>
+              </div>
             </div>
 
             {/* Colonne droite : formulaire de reprise */}
@@ -319,6 +334,7 @@ export function TradeIn() {
                   />
 
                   <FileUpload
+                    elements="photos ou documents"
                     label="Photos du véhicule (fortement recommandé)"
                     maxFiles={10}
                     maxSizeMB={10}

@@ -624,6 +624,8 @@ export function SalesFolderForm() {
               </div>
 
               <FileUpload
+                elements="documents"
+                aide="Exemples : pièce d'identité, justificatif de domicile, bulletin de salaire."
                 label="Ajouter des documents"
                 maxFiles={10}
                 maxSizeMB={10}

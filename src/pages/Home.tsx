@@ -110,6 +110,12 @@ export function Home() {
               <Link to="/reprises" tabIndex={-1}>
                 <Button>Demande de reprise</Button>
               </Link>
+              <p className="mt-6 text-sm text-[#D6D6D6]">
+                Vous préférez vendre au meilleur prix ?{' '}
+                <Link to="/vendre-ma-moto" className="text-or-clair underline underline-offset-4 hover:decoration-2">
+                  Confiez-nous votre moto en dépôt-vente
+                </Link>
+              </p>
             </div>
             <div className="grid grid-cols-2 gap-3 md:gap-4">
               <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 md:p-6">

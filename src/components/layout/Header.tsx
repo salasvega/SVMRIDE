@@ -38,13 +38,13 @@ export function Header() {
           </Link>
 
           {/* Navigation desktop */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden xl:flex items-center gap-7">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 to={link.href}
                 aria-current={isActive(link.href) ? 'page' : undefined}
-                className={`relative py-2 text-sm font-medium transition-colors duration-180 hover:text-bleu after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-[2px] after:rounded-full after:bg-degrade-or after:transition-opacity after:duration-180 ${
+                className={`relative py-2 text-sm font-medium whitespace-nowrap transition-colors duration-180 hover:text-bleu after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-[2px] after:rounded-full after:bg-degrade-or after:transition-opacity after:duration-180 ${
                   isActive(link.href)
                     ? 'text-bleu after:opacity-100'
                     : 'text-gris after:opacity-0'
@@ -62,7 +62,7 @@ export function Header() {
           {/* Bouton burger mobile */}
           <button
             type="button"
-            className="lg:hidden -mr-2 p-2.5 text-noir hover:bg-fond rounded-xl transition-colors duration-180"
+            className="xl:hidden -mr-2 p-2.5 text-noir hover:bg-fond rounded-xl transition-colors duration-180"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-expanded={mobileMenuOpen}
             aria-label={mobileMenuOpen ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation'}
@@ -78,7 +78,7 @@ export function Header() {
         {/* Menu mobile déroulant */}
         <div
           className={`
-            lg:hidden border-t border-bordure overflow-hidden
+            xl:hidden border-t border-bordure overflow-hidden
             transition-all duration-300 ease-out
             ${mobileMenuOpen
               ? 'max-h-[560px] opacity-100 translate-y-0 pointer-events-auto pt-3 pb-6'

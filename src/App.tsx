@@ -11,6 +11,7 @@ import { Home } from './pages/Home';
 import { Vehicles } from './pages/Vehicles';
 import { VehicleDetail } from './pages/VehicleDetail';
 import { TradeIn } from './pages/TradeIn';
+import { VendreMaMoto } from './pages/VendreMaMoto';
 import { Financing } from './pages/Financing';
 import { CustomSearch } from './pages/CustomSearch';
 import { Contact } from './pages/Contact';
@@ -32,6 +33,7 @@ const SubmissionsList = lazy(() => import('./pages/admin/SubmissionsList'));
 const FinancingProfilesList = lazy(() => import('./pages/admin/FinancingProfilesList'));
 const SalesFoldersList = nomme(() => import('./pages/admin/SalesFoldersList'), 'SalesFoldersList');
 const SalesFolderForm = nomme(() => import('./pages/admin/SalesFolderForm'), 'SalesFolderForm');
+const DepotDemandesList = nomme(() => import('./pages/admin/DepotDemandesList'), 'DepotDemandesList');
 const SalesFolderDetails = nomme(() => import('./pages/admin/SalesFolderDetails'), 'SalesFolderDetails');
 
 function App() {
@@ -92,6 +94,14 @@ function App() {
             }
           />
           <Route
+            path="/admin/depot-vente"
+            element={
+              <ProtectedRoute>
+                <DepotDemandesList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/admin/sales-folders"
             element={
               <ProtectedRoute>
@@ -136,6 +146,7 @@ function App() {
                     <Route path="/vehicules" element={<Vehicles />} />
                     <Route path="/vehicules/:slug" element={<VehicleDetail />} />
                     <Route path="/reprises" element={<TradeIn />} />
+                    <Route path="/vendre-ma-moto" element={<VendreMaMoto />} />
                     <Route path="/financement" element={<Financing />} />
                     <Route path="/financement/dossier" element={<FinancingProfile />} />
                     <Route path="/recherche-personnalisee" element={<CustomSearch />} />

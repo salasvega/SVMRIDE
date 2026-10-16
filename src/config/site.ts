@@ -27,6 +27,7 @@ export const navLinks = [
   { href: '/', label: 'Accueil' },
   { href: '/vehicules', label: 'Nos Véhicules' },
   { href: '/reprises', label: 'Reprises' },
+  { href: '/vendre-ma-moto', label: 'Vendre ma moto' },
   { href: '/financement', label: 'Financement' },
   { href: '/recherche-personnalisee', label: 'Recherche personnalisée' },
 

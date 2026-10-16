@@ -105,6 +105,12 @@ export const pageSeo = {
       'Faites reprendre votre moto ou votre scooter au meilleur prix : estimation sous 24 h, offre attractive, virement immédiat. SVM Ride, Chaville (92).',
     path: '/reprises',
   },
+  '/vendre-ma-moto': {
+    title: 'Vendre ma moto en dépôt-vente | SVM Ride',
+    description:
+      "Confiez votre moto à SVM Ride : estimation gratuite et sans engagement, réponse sous 48 h ouvrées, nous gérons l'annonce, les visites et la vente. Chaville (92).",
+    path: '/vendre-ma-moto',
+  },
   '/financement': {
     title: "Financement moto et scooter d'occasion | SVM Ride",
     description:
@@ -167,6 +173,7 @@ export const sitemapPages: { path: PagePath; priority: string; changefreq: strin
   { path: '/', priority: '1.0', changefreq: 'weekly' },
   { path: '/vehicules', priority: '0.9', changefreq: 'daily' },
   { path: '/reprises', priority: '0.8', changefreq: 'monthly' },
+  { path: '/vendre-ma-moto', priority: '0.8', changefreq: 'monthly' },
   { path: '/financement', priority: '0.8', changefreq: 'monthly' },
   { path: '/recherche-personnalisee', priority: '0.7', changefreq: 'monthly' },
   { path: '/contact', priority: '0.7', changefreq: 'monthly' },
