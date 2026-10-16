@@ -39,6 +39,8 @@ export function SectionAvisGoogle() {
   const liens = liensGoogle();
   const liensAffiches = !!liens && (AVIS_GOOGLE.liensVerifies || demo);
   const avecAvis = !!resume && resume.avis.length > 0;
+  // Pas encore d'avis Google à afficher : titre et boutons centrés, section plus compacte
+  const compact = !sourceAttendue && !avecAvis;
 
   // Rien de vérifié à montrer : la section n'apparaît pas
   if (charge && !avecAvis && !liensAffiches && !demo) return null;
@@ -47,7 +49,7 @@ export function SectionAvisGoogle() {
     'inline-flex items-center justify-center gap-2 rounded-xl border-2 px-[22px] py-[13px] text-[15px] md:text-base font-semibold transition-[background-color,border-color,box-shadow,color] duration-180 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bleu-vif';
 
   return (
-    <Section background="gray">
+    <Section background="gray" className={compact ? '!py-12 md:!py-16' : ''}>
       <Container>
         {demo && (
           <p className="mb-8 rounded-xl border border-or/50 bg-[#FBF6E9] px-4 py-3 text-sm text-noir">
@@ -56,8 +58,14 @@ export function SectionAvisGoogle() {
           </p>
         )}
 
-        <div className="mb-10 flex flex-col gap-6 md:mb-12 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
+        <div
+          className={
+            compact
+              ? 'text-center'
+              : 'mb-10 flex flex-col gap-6 md:mb-12 lg:flex-row lg:items-end lg:justify-between'
+          }
+        >
+          <div className={compact ? 'mx-auto max-w-2xl' : 'max-w-2xl'}>
             <h2 className="titre-section filet-apres mb-5">Votre confiance, notre plus belle récompense</h2>
             <p className="text-base md:text-lg text-gris leading-relaxed">
               Découvrez ce que nos clients pensent de leur expérience chez SVM Ride.
@@ -96,7 +104,7 @@ export function SectionAvisGoogle() {
         )}
 
         {(liensAffiches || demo) && (
-          <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className={`${compact ? 'mt-8' : 'mt-10'} flex flex-col justify-center gap-3 sm:flex-row`}>
             {liensAffiches ? (
               <>
                 <a href={liens!.voirTous} target="_blank" rel="noopener noreferrer" className={`${bouton} border-transparent bg-bleu text-white shadow-bleu hover:bg-bleu-hover hover:shadow-bleu-fort`}>

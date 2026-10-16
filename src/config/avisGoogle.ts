@@ -24,7 +24,7 @@ export const AVIS_GOOGLE = {
    */
   placeId: 'ChIJf6XDRAkw3E0RthciV1AF06g', // fiche « SVM Ride », 310 av. Roger Salengro, Chaville
   /** Passer à true après avoir testé les deux liens sur ordinateur et sur mobile. */
-  liensVerifies: false,
+  liensVerifies: true, // testés sur ordinateur et mobile par Seb le 17/10/2026
   /** Au-delà de ce délai sans synchronisation réussie, note et avis sont masqués. */
   joursAvantObsolescence: 7,
   /** Nombre maximal d'avis dans le carrousel. */
