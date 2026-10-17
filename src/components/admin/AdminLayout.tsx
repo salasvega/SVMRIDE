@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Store, Users } from 'lucide-react';
+import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Menu, Store, Users, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
@@ -14,6 +14,15 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const { count: unreadFinancingProfiles } = useFinancingProfilesUnreadCount();
 
   const [depotNonLues, setDepotNonLues] = useState(0);
+  // Menu « sandwich » (tablette et téléphone), comme celui du site
+  const [menuOuvert, setMenuOuvert] = useState(false);
+  useEffect(() => setMenuOuvert(false), [location.pathname]);
+  useEffect(() => {
+    if (!menuOuvert) return;
+    const echap = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOuvert(false);
+    window.addEventListener('keydown', echap);
+    return () => window.removeEventListener('keydown', echap);
+  }, [menuOuvert]);
 
   // Dépôt-vente : demandes d'estimation pas encore ouvertes + demandes des déposants à traiter
   useEffect(() => {
@@ -24,6 +33,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   }, [location.pathname]);
 
   const isActive = (path: string) => location.pathname.startsWith(path);
+  /** Total des pastilles, affiché sur le bouton du menu fermé */
+  const aTraiter = unreadCount + unreadFinancingProfiles + depotNonLues;
 
   const handleSignOut = async () => {
     await signOut();
@@ -100,35 +111,107 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 {contenuSite.map((l) => lien(l, true))}
               </nav>
               <span className="hidden xl:block h-6 w-px bg-[#E5E5E5]" aria-hidden="true" />
-              <Link to="/" className="text-[#666666] hover:text-brand" title="Voir le site" aria-label="Voir le site">
+              <Link to="/" className="hidden xl:block text-[#666666] hover:text-brand" title="Voir le site" aria-label="Voir le site">
                 <Home className="w-5 h-5" />
               </Link>
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="text-[#666666] hover:text-brand"
+                className="hidden xl:block text-[#666666] hover:text-brand"
                 title="Se déconnecter"
                 aria-label="Se déconnecter"
               >
                 <LogOut className="w-5 h-5" />
               </button>
+
+              {/* Bouton « sandwich » (tablette et téléphone) */}
+              <button
+                type="button"
+                className="relative xl:hidden -mr-2 p-2.5 text-noir hover:bg-fond rounded-xl transition-colors duration-180"
+                onClick={() => setMenuOuvert(!menuOuvert)}
+                aria-expanded={menuOuvert}
+                aria-controls="menu-admin-mobile"
+                aria-label={menuOuvert ? 'Fermer le menu de navigation' : 'Ouvrir le menu de navigation'}
+              >
+                {menuOuvert ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {!menuOuvert && aTraiter > 0 && (
+                  <span className="absolute top-1 right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand px-1 text-[10px] font-bold text-white" aria-hidden="true">
+                    {aTraiter > 99 ? '99+' : aTraiter}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Tablette et téléphone : deux lignes, chacune défilable si besoin */}
-          <div className="xl:hidden space-y-1 pb-2">
-            <nav aria-label="Activité" className="flex items-center gap-2">
-              <span className="w-[3.25rem] shrink-0 text-[10px] font-semibold uppercase tracking-wider text-[#888888]">Activité</span>
-              <div className="-my-1 flex min-w-0 gap-1 overflow-x-auto py-1 pr-1">
-                {activite.map((l) => lien(l))}
-              </div>
-            </nav>
-            <nav aria-label="Contenu du site" className="flex items-center gap-2 border-t border-[#F0F0F0] pt-1">
-              <span className="w-[3.25rem] shrink-0 text-[10px] font-semibold uppercase tracking-wider text-[#888888]">Site</span>
-              <div className="-my-1 flex min-w-0 gap-1 overflow-x-auto py-1 pr-1">
-                {contenuSite.map((l) => lien(l))}
-              </div>
-            </nav>
+          {/* Menu déroulant (tablette et téléphone) : mêmes effets que le menu du site */}
+          <div
+            id="menu-admin-mobile"
+            aria-hidden={!menuOuvert}
+            className={`xl:hidden border-t border-bordure overflow-hidden transition-all duration-300 ease-out motion-reduce:transition-none ${
+              menuOuvert
+                ? 'max-h-[720px] opacity-100 translate-y-0 pointer-events-auto pt-3 pb-5'
+                : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none py-0'
+            }`}
+          >
+            {[
+              { titre: 'Activité', liens: activite },
+              { titre: 'Contenu du site', liens: contenuSite },
+            ].map((groupe, g) => (
+              <nav key={groupe.titre} aria-label={groupe.titre} className={g > 0 ? 'mt-3 border-t border-bordure pt-3' : ''}>
+                <p className="mb-1.5 px-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#888888]">{groupe.titre}</p>
+                <div className="flex flex-col gap-1.5">
+                  {groupe.liens.map((l) => {
+                    const rang = g === 0 ? activite.indexOf(l) : activite.length + contenuSite.indexOf(l);
+                    const actif = isActive(l.to);
+                    return (
+                      <Link
+                        key={l.to}
+                        to={l.to}
+                        tabIndex={menuOuvert ? undefined : -1}
+                        aria-current={actif ? 'page' : undefined}
+                        onClick={() => setMenuOuvert(false)}
+                        className={`flex items-center gap-3 px-4 py-3 text-base rounded-r-xl border-l-[3px] transition-all duration-300 ease-out motion-reduce:transition-none ${
+                          actif ? 'bg-fond text-bleu font-bold border-or' : 'text-noir font-medium border-transparent hover:bg-fond'
+                        } ${menuOuvert ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+                        style={{ transitionDelay: menuOuvert ? `${rang * 50}ms` : '0ms' }}
+                      >
+                        <span className={actif ? 'text-bleu' : 'text-[#666666]'}>{l.icone}</span>
+                        <span className="flex-1">{l.libelle}</span>
+                        {!!l.badge && l.badge > 0 && (
+                          <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-brand px-1.5 text-xs font-bold text-white">
+                            {l.badge > 99 ? '99+' : l.badge}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </nav>
+            ))}
+
+            {/* Voir le site / Se déconnecter */}
+            <div
+              className={`mt-4 grid grid-cols-2 gap-2 border-t border-bordure pt-4 transition-all duration-300 ease-out motion-reduce:transition-none ${
+                menuOuvert ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'
+              }`}
+              style={{ transitionDelay: menuOuvert ? `${(activite.length + contenuSite.length) * 50}ms` : '0ms' }}
+            >
+              <Link
+                to="/"
+                tabIndex={menuOuvert ? undefined : -1}
+                className="flex items-center justify-center gap-2 rounded-xl border-2 border-or bg-white px-4 py-2.5 text-sm font-semibold text-noir hover:bg-fond"
+              >
+                <Home className="w-4 h-4" aria-hidden="true" /> Voir le site
+              </Link>
+              <button
+                type="button"
+                tabIndex={menuOuvert ? undefined : -1}
+                onClick={handleSignOut}
+                className="flex items-center justify-center gap-2 rounded-xl border-2 border-[#D1D5DB] bg-white px-4 py-2.5 text-sm font-semibold text-[#444444] hover:border-[#111111]"
+              >
+                <LogOut className="w-4 h-4" aria-hidden="true" /> Se déconnecter
+              </button>
+            </div>
           </div>
         </div>
       </header>
