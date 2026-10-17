@@ -11,6 +11,8 @@
  * La page /equipe suit le réglage « Afficher l'équipe sur le site » de l'admin.
  * Icônes (onglet, iPhone, Android) et manifeste : ceux choisis dans l'admin
  * (Infos du site, bloc « Logo et icône »), sinon ceux d'origine.
+ * Couleurs : le thème publié dans le Studio Design est ajouté dans le <head>
+ * (sinon, ou en cas d'erreur, SVM Signature de src/index.css).
  *
  * Les textes viennent de src/config/seo.ts (partagé avec le site).
  */
@@ -34,6 +36,7 @@ import { COORDONNEES_DEFAUT, normaliserCoordonnees, type Coordonnees } from '../
 import { CONTEXTE, SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
 import { balisesIcones, icones, manifeste, URL_MANIFESTE } from '../../src/config/identite.ts';
 import { identite } from '../lib/identite-edge.ts';
+import { injecterTheme, themePublie } from '../lib/theme-edge.ts';
 
 const TIMEOUT_MS = 2500;
 
@@ -153,7 +156,7 @@ export default async function seo(request: Request, context: Context) {
   }
 
   // Accueil et Contact : fiche concession (téléphone, adresse, horaires) et description à jour
-  const id = await identite();
+  const [id, theme] = await Promise.all([identite(), themePublie()]);
   if (path === '/' || path === '/contact') meta = avecCoordonnees(meta, await coordonnees(), icones(id).icon_512);
 
   const res = await context.next();
@@ -166,7 +169,7 @@ export default async function seo(request: Request, context: Context) {
   if (meta.noindex) headers.set('x-robots-tag', 'noindex');
   // Lien de signature personnel : jamais transmis à un autre site
   if (meta === signatureSeo) headers.set('referrer-policy', 'no-referrer');
-  let page = injectSeo(html, meta);
+  let page = injecterTheme(injectSeo(html, meta), theme);
   // Icônes choisies dans l'admin
   if (id.icone) page = page.replace(/<!--icones-->[\s\S]*?<!--\/icones-->/, `<!--icones-->\n    ${balisesIcones(id)}\n    <!--/icones-->`);
   return new Response(page, { status: meta.status ?? res.status, headers });

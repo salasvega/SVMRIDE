@@ -10,7 +10,7 @@
  * qui reste le thème de secours quand aucun thème n'est injecté.
  * Ajouter un réglage = ajouter une entrée ici (et la variable dans index.css).
  */
-import { canaux, estHex, estSombre, ajusterContraste, melanger, texteSur, versRgb } from './couleurs';
+import { ajusterContraste, canaux, contraste, estHex, estSombre, melanger, texteSur, versRgb } from './couleurs.ts';
 
 export const SCHEMA_THEME = 1;
 
@@ -325,4 +325,50 @@ export function cssDuTheme(t: ThemeConfig, selecteur = '.site'): string {
     .map(([k, v]) => `--${k}:${v}`)
     .join(';');
   return `${selecteur}{${corps}}`;
+}
+
+/* ===== Contrôles de lisibilité (WCAG AA) ===== */
+
+export interface Controle {
+  cle: string;
+  libelle: string;
+  /** Couleurs globales concernées (pastille affichée sur leur ligne) */
+  roles: CleRole[];
+  avant: string;
+  fond: string;
+  /** 4,5 pour du texte courant, 3 pour les grands textes et éléments graphiques */
+  seuil: 4.5 | 3;
+}
+
+export const CONTROLES: Controle[] = [
+  { cle: 'texte-fond', libelle: 'Texte principal sur l’arrière-plan', roles: ['texte', 'arriere_plan'], avant: 'noir', fond: 'fond', seuil: 4.5 },
+  { cle: 'texte-surface', libelle: 'Texte principal sur les cartes', roles: ['texte', 'surface'], avant: 'noir', fond: 'surface', seuil: 4.5 },
+  { cle: 'texte2-fond', libelle: 'Paragraphes sur l’arrière-plan', roles: ['texte_secondaire', 'arriere_plan'], avant: 'gris-texte', fond: 'fond', seuil: 4.5 },
+  { cle: 'texte2-surface', libelle: 'Paragraphes sur les cartes', roles: ['texte_secondaire', 'surface'], avant: 'gris-texte', fond: 'surface', seuil: 4.5 },
+  { cle: 'bouton', libelle: 'Texte des boutons', roles: ['boutons'], avant: 'sur-bouton', fond: 'bleu', seuil: 4.5 },
+  { cle: 'bouton-survol', libelle: 'Texte des boutons au survol', roles: ['boutons'], avant: 'sur-bouton', fond: 'bleu-hover', seuil: 4.5 },
+  { cle: 'lien-fond', libelle: 'Liens sur l’arrière-plan', roles: ['liens', 'arriere_plan'], avant: 'lien', fond: 'fond', seuil: 4.5 },
+  { cle: 'lien-surface', libelle: 'Liens sur les cartes', roles: ['liens', 'surface'], avant: 'lien', fond: 'surface', seuil: 4.5 },
+  { cle: 'sombre-texte', libelle: 'Texte sur les sections sombres', roles: ['primaire'], avant: 'inverse', fond: 'noir-profond', seuil: 4.5 },
+  { cle: 'sombre-secondaire', libelle: 'Détails sur les sections sombres', roles: ['secondaire', 'primaire'], avant: 'or-clair', fond: 'noir-profond', seuil: 3 },
+  { cle: 'sombre-accent', libelle: 'Accent sur les sections sombres', roles: ['accent', 'primaire'], avant: 'or', fond: 'noir-profond', seuil: 3 },
+  { cle: 'accent-texte', libelle: 'Accent en texte sur l’arrière-plan', roles: ['accent', 'arriere_plan'], avant: 'or-texte', fond: 'fond', seuil: 4.5 },
+  { cle: 'focus', libelle: 'Contour du champ sélectionné', roles: ['liens', 'arriere_plan'], avant: 'bleu-vif', fond: 'fond', seuil: 3 },
+];
+
+export type Niveau = 'ok' | 'grand' | 'ko';
+
+export interface Resultat {
+  controle: Controle;
+  ratio: number;
+  niveau: Niveau;
+}
+
+/** Contrôles de contraste d'un thème (valeurs résolues, nuances dérivées comprises) */
+export function controlerTheme(t: ThemeConfig, vars = variablesDuTheme(t)): Resultat[] {
+  return CONTROLES.map((controle) => {
+    const ratio = contraste(vars[controle.avant], vars[controle.fond]);
+    const niveau: Niveau = ratio >= controle.seuil ? 'ok' : controle.seuil === 4.5 && ratio >= 3 ? 'grand' : 'ko';
+    return { controle, ratio, niveau };
+  });
 }
