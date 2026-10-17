@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Trash2, Search, Circle, Clock, CheckCircle2, Download, FileText, KeyRound } from 'lucide-react';
+import { Trash2, Search, Circle, Clock, CheckCircle2, Download, FileText, KeyRound, Send, XCircle } from 'lucide-react';
+import { AvisSansSuite } from '../../components/admin/AvisSansSuite';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { Select } from '../../components/ui/Select';
@@ -44,6 +45,8 @@ type FinancingProfile = {
   hosting_certificate: string;
   host_id_card: string;
   status: string;
+  /** Date de passage en « Sans suite » (pièces effacées 7 jours après) */
+  sans_suite_le?: string | null;
   is_complete: boolean;
   submitted_at: string;
   created_at: string;
@@ -110,19 +113,22 @@ export default function FinancingProfilesList() {
 
   const handleStatusChange = async (profileId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('user_financing_profiles')
         .update({ status: newStatus })
-        .eq('id', profileId);
+        .eq('id', profileId)
+        .select('sans_suite_le')
+        .maybeSingle();
 
       if (error) throw error;
 
+      const maj = { status: newStatus, sans_suite_le: (data as { sans_suite_le: string | null } | null)?.sans_suite_le ?? null };
       setProfiles(
-        profiles.map((p) => (p.id === profileId ? { ...p, status: newStatus } : p))
+        profiles.map((p) => (p.id === profileId ? { ...p, ...maj } : p))
       );
 
       if (selectedProfile?.id === profileId) {
-        setSelectedProfile({ ...selectedProfile, status: newStatus });
+        setSelectedProfile({ ...selectedProfile, ...maj });
       }
       setMessage({ type: 'success', text: 'Statut mis à jour avec succès' });
     } catch (error) {
@@ -211,8 +217,10 @@ export default function FinancingProfilesList() {
     const statusConfig = {
       draft: { icon: Circle, color: 'text-gray-500 bg-gray-100', label: 'Brouillon' },
       new: { icon: Circle, color: 'text-blue-500 bg-blue-100', label: 'Nouveau' },
+      submitted: { icon: Send, color: 'text-blue-700 bg-blue-100', label: 'Soumis' },
       in_progress: { icon: Clock, color: 'text-yellow-500 bg-yellow-100', label: 'En cours' },
       completed: { icon: CheckCircle2, color: 'text-green-500 bg-green-100', label: 'Traité' },
+      sans_suite: { icon: XCircle, color: 'text-gray-600 bg-gray-100', label: 'Sans suite' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.draft;
@@ -311,8 +319,10 @@ export default function FinancingProfilesList() {
                   <option value="all">Tous les statuts</option>
                   <option value="draft">Brouillon</option>
                   <option value="new">Nouveau</option>
+                  <option value="submitted">Soumis</option>
                   <option value="in_progress">En cours</option>
                   <option value="completed">Traité</option>
+                  <option value="sans_suite">Sans suite</option>
                 </Select>
               </div>
             </div>
@@ -435,11 +445,14 @@ export default function FinancingProfilesList() {
                     >
                       <option value="draft">Brouillon</option>
                       <option value="new">Nouveau</option>
+                      <option value="submitted">Soumis</option>
                       <option value="in_progress">En cours</option>
                       <option value="completed">Traité</option>
+                      <option value="sans_suite">Sans suite</option>
                     </Select>
                   </div>
                 </div>
+                <AvisSansSuite statut={selectedProfile.status} sansSuiteLe={selectedProfile.sans_suite_le} nbFichiers={documents.length} />
 
                 <div className="border-t border-[#E5E5E5] pt-6">
                   <h3 className="text-lg font-semibold text-[#111111] mb-4">Informations Personnelles</h3>

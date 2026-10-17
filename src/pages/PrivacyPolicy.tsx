@@ -70,7 +70,7 @@ export function PrivacyPolicy() {
               Vos données personnelles sont conservées pendant la durée nécessaire aux finalités pour lesquelles elles ont été collectées, puis supprimées ou archivées conformément aux obligations légales. Pour les demandes envoyées par nos formulaires (contact, reprise, recherche, demande de financement, dépôt-vente) :
             </p>
             <ul className="list-disc list-inside text-gris mb-6 space-y-2 ml-4">
-              <li>les photos et pièces jointes sont supprimées 12 mois après votre demande ;</li>
+              <li>les photos et pièces jointes sont supprimées 12 mois après votre demande ; pour une demande de dépôt-vente, de reprise ou de financement classée sans suite, elles sont supprimées 7 jours après ;</li>
               <li>la demande elle-même est supprimée 3 ans après son envoi, sauf si elle a donné lieu à un contrat (dépôt-vente, achat), qui suit alors ses propres durées légales ;</li>
               <li>un dossier de dépôt-vente (contrat signé, documents, preuves de signature) est conservé 5 ans après la fin du mandat, puis supprimé.</li>
             </ul>

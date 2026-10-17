@@ -12,8 +12,9 @@ import { DepotOnglets } from '../../components/admin/DepotOnglets';
 import { appelAdmin, messageErreur } from '../../lib/depot';
 import { DeleteConfirmModal } from '../../components/admin/DeleteConfirmModal';
 import { supabase } from '../../lib/supabase';
+import { AvisSansSuite } from '../../components/admin/AvisSansSuite';
 
-type Statut = 'nouvelle' | 'a_qualifier' | 'en_echange' | 'acceptee' | 'refusee' | 'abandonnee';
+type Statut = 'nouvelle' | 'a_qualifier' | 'en_echange' | 'acceptee' | 'refusee' | 'sans_suite';
 
 interface Demande {
   id: string;
@@ -38,6 +39,7 @@ interface Demande {
   lu_le: string | null;
   accuse_envoye_le: string | null;
   consentement_le: string;
+  sans_suite_le: string | null;
 }
 
 interface Evenement {
@@ -56,9 +58,12 @@ export const STATUTS: Record<Statut, { libelle: string; classe: string }> = {
   en_echange: { libelle: 'En échange', classe: 'bg-violet-50 text-violet-800 border-violet-200' },
   acceptee: { libelle: 'Acceptée', classe: 'bg-green-50 text-green-800 border-green-200' },
   refusee: { libelle: 'Refusée', classe: 'bg-red-50 text-red-800 border-red-200' },
-  abandonnee: { libelle: 'Abandonnée', classe: 'bg-gray-100 text-gray-700 border-gray-200' },
+  sans_suite: { libelle: 'Sans suite', classe: 'bg-gray-100 text-gray-700 border-gray-200' },
 };
-const ORDRE: Statut[] = ['nouvelle', 'a_qualifier', 'en_echange', 'acceptee', 'refusee', 'abandonnee'];
+/** Libellés des statuts qui n'existent plus (historique) */
+const ANCIENS_STATUTS: Record<string, string> = { abandonnee: 'Abandonnée' };
+const libelleStatut = (s: string | null) => (s && (STATUTS[s as Statut]?.libelle ?? ANCIENS_STATUTS[s])) || s;
+const ORDRE: Statut[] = ['nouvelle', 'a_qualifier', 'en_echange', 'acceptee', 'refusee', 'sans_suite'];
 const ACTIVES: Statut[] = ['nouvelle', 'a_qualifier', 'en_echange'];
 
 const ETATS: Record<string, string> = {
@@ -314,9 +319,9 @@ function FicheDemande({
     setMessage('');
     try {
       if (statut !== d.statut) {
-        const { error } = await supabase.from('depot_demandes').update({ statut }).eq('id', d.id);
+        const { data, error } = await supabase.from('depot_demandes').update({ statut }).eq('id', d.id).select('sans_suite_le').single();
         if (error) throw error;
-        onMaj({ id: d.id, statut });
+        onMaj({ id: d.id, statut, sans_suite_le: (data as { sans_suite_le: string | null } | null)?.sans_suite_le ?? null });
       }
       if (note.trim()) {
         const { error } = await supabase
@@ -463,6 +468,7 @@ function FicheDemande({
                 ))}
               </select>
             </label>
+            <AvisSansSuite statut={statut} sansSuiteLe={d.statut === 'sans_suite' ? d.sans_suite_le : null} nbFichiers={d.photos.length} />
             <label className="block">
               <span className="block text-sm font-medium text-[#111111] mb-1.5">Note interne (jamais visible par le client)</span>
               <textarea
@@ -499,7 +505,7 @@ function FicheDemande({
                     <p className="text-[#111111]">
                       {h.action === 'creation' && 'Demande reçue par le formulaire'}
                       {h.action === 'statut' &&
-                        `Statut : ${STATUTS[h.ancien_statut as Statut]?.libelle ?? h.ancien_statut} → ${STATUTS[h.nouveau_statut as Statut]?.libelle ?? h.nouveau_statut}`}
+                        `Statut : ${libelleStatut(h.ancien_statut)} → ${libelleStatut(h.nouveau_statut)}`}
                       {h.action === 'note' && <span className="whitespace-pre-line">{h.note}</span>}
                     </p>
                   </li>
@@ -518,7 +524,7 @@ function FicheDemande({
             </button>
             <p className="text-xs text-[#666666] mt-1">
               À utiliser si le propriétaire demande l'effacement de ses données. Sinon, la suppression est automatique
-              (photos après 12 mois si refusée ou abandonnée, demande après 3 ans).
+              (photos 7 jours après le passage en « Sans suite », 12 mois après la demande si elle est refusée ; demande après 3 ans).
             </p>
           </section>
         </div>

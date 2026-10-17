@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Trash2, Search, Circle, Clock, CheckCircle2 } from 'lucide-react';
+import { Trash2, Search, Circle, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { Container } from '../../components/ui/Container';
 import { supabase } from '../../lib/supabase';
@@ -16,7 +16,9 @@ type Attachment = {
 type Submission = {
   id: string;
   type: 'contact' | 'financing' | 'trade_in' | 'custom_search';
-  status: 'new' | 'in_progress' | 'completed';
+  status: 'new' | 'in_progress' | 'completed' | 'sans_suite';
+  /** Date de passage en « Sans suite » (reprise et financement) */
+  sans_suite_le?: string | null;
   name: string;
   email: string;
   phone: string;
@@ -76,6 +78,7 @@ export default function SubmissionsList() {
             id: item.id,
             type: 'financing' as const,
             status: item.status,
+            sans_suite_le: item.sans_suite_le ?? null,
             name: item.name,
             email: item.email,
             phone: item.phone,
@@ -97,6 +100,7 @@ export default function SubmissionsList() {
             id: item.id,
             type: 'trade_in' as const,
             status: item.status,
+            sans_suite_le: item.sans_suite_le ?? null,
             name: item.name,
             email: item.email,
             phone: item.phone,
@@ -165,20 +169,24 @@ export default function SubmissionsList() {
       };
 
       const tableName = tableNames[submission.type];
-      const { error } = await supabase
-        .from(tableName)
-        .update({ status: newStatus })
-        .eq('id', id);
+      // Reprise et financement : la base note la date de passage en « Sans suite »
+      const avecSansSuite = submission.type === 'trade_in' || submission.type === 'financing';
+      const requete = supabase.from(tableName).update({ status: newStatus }).eq('id', id);
+      const { data, error } = avecSansSuite ? await requete.select('sans_suite_le').maybeSingle() : await requete;
 
       if (error) throw error;
 
+      const maj = {
+        status: newStatus as Submission['status'],
+        ...(avecSansSuite ? { sans_suite_le: (data as { sans_suite_le: string | null } | null)?.sans_suite_le ?? null } : {}),
+      };
       const updatedSubmissions = submissions.map((sub) =>
-        sub.id === id ? { ...sub, status: newStatus as any } : sub
+        sub.id === id ? { ...sub, ...maj } : sub
       );
       setSubmissions(updatedSubmissions);
 
       if (selectedSubmission && selectedSubmission.id === id) {
-        setSelectedSubmission({ ...selectedSubmission, status: newStatus as any });
+        setSelectedSubmission({ ...selectedSubmission, ...maj });
       }
     } catch (error) {
       console.error('Error updating status:', error);
@@ -273,6 +281,11 @@ export default function SubmissionsList() {
         color: 'text-green-500',
         label: 'Terminée'
       },
+      sans_suite: {
+        icon: <XCircle {...iconProps} />,
+        color: 'text-gray-400',
+        label: 'Sans suite'
+      },
     };
     const statusInfo = icons[status] || icons.new;
     return (
@@ -338,6 +351,7 @@ export default function SubmissionsList() {
                   <option value="new">Nouvelles</option>
                   <option value="in_progress">En cours</option>
                   <option value="completed">Terminées</option>
+                  <option value="sans_suite">Sans suite</option>
                 </select>
               </div>
             </div>

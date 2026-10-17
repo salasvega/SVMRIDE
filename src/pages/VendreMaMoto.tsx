@@ -103,7 +103,7 @@ const FAQ = [
   },
   {
     q: 'Que deviennent mes informations ?',
-    r: 'Elles servent uniquement à traiter votre demande. Sans dépôt, elles sont conservées au plus 3 ans et vos photos 12 mois au plus. Si vous nous confiez votre moto, le dossier est conservé 5 ans après la fin du mandat (obligations légales). Vous pouvez demander à consulter ou corriger vos données à tout moment.',
+    r: 'Elles servent uniquement à traiter votre demande. Sans dépôt, elles sont conservées au plus 3 ans et vos photos 12 mois au plus (7 jours seulement si la demande est classée sans suite). Si vous nous confiez votre moto, le dossier est conservé 5 ans après la fin du mandat (obligations légales). Vous pouvez demander à consulter ou corriger vos données à tout moment.',
   },
 ];
 

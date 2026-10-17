@@ -4,6 +4,7 @@ import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
 import { supabase } from '../../lib/supabase';
 import Toast from '../ui/Toast';
+import { AvisSansSuite } from './AvisSansSuite';
 
 type Attachment = {
   filename: string;
@@ -15,7 +16,8 @@ type Attachment = {
 type Submission = {
   id: string;
   type: 'contact' | 'financing' | 'trade_in' | 'custom_search';
-  status: 'new' | 'in_progress' | 'completed';
+  status: 'new' | 'in_progress' | 'completed' | 'sans_suite';
+  sans_suite_le?: string | null;
   name: string;
   email: string;
   phone: string;
@@ -58,6 +60,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
       new: 'bg-white border-2 border-blue-200 text-black font-semibold rounded-lg',
       in_progress: 'bg-white border-2 border-orange-200 text-black font-semibold rounded-lg',
       completed: 'bg-white border-2 border-green-200 text-black font-semibold rounded-lg',
+      sans_suite: 'bg-white border-2 border-gray-300 text-black font-semibold rounded-lg',
     };
     return colors[status] || 'bg-white border-2 border-gray-200 rounded-lg';
   };
@@ -181,9 +184,14 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
                   <option value="new">Nouvelle</option>
                   <option value="in_progress">En cours</option>
                   <option value="completed">Terminée</option>
+                  {/* « Sans suite » : reprise et financement (fichiers effacés 7 jours après) */}
+                  {(submission.type === 'trade_in' || submission.type === 'financing' || submission.status === 'sans_suite') && (
+                    <option value="sans_suite">Sans suite</option>
+                  )}
                 </Select>
               </div>
             </div>
+            <AvisSansSuite statut={submission.status} sansSuiteLe={submission.sans_suite_le} nbFichiers={submission.attachments?.length ?? 0} />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
