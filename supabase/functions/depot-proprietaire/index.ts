@@ -3,7 +3,8 @@
  *
  *  - code      : e-mail → code à 6 chiffres (10 min), seulement si un dossier existe ;
  *                réponse identique dans tous les cas (on ne révèle pas qui est client)
- *  - connexion : e-mail + code (5 essais, puis blocage 15 min) → session signée de 12 h
+ *  - connexion : e-mail + code (5 essais, puis blocage 15 min) → session signée de 12 h,
+ *                ou de 30 jours si « Rester connecté sur cet appareil » est coché
  *  - dossiers  : dossiers du déposant, sans les données internes
  *  - document  : lien temporaire (5 min) vers un document partagé
  *  - demande   : rappel, prolongation, reprise anticipée, nouveau prix, question
@@ -20,6 +21,7 @@ const ESSAIS = 5;
 const BLOCAGE_MIN = 15;
 const ENVOIS_PAR_HEURE = 5;
 const SESSION_HEURES = 12;
+const SESSION_LONGUE_HEURES = 30 * 24;
 const STATUTS_VISIBLES = ["a_signer", "actif", "vendu", "resilie", "expire", "cloture"];
 
 const normEmail = (e: unknown) => String(e ?? "").trim().toLowerCase();
@@ -97,7 +99,8 @@ Deno.serve(async (req: Request) => {
         if (!compte) throw new Erreur(409, "reessayer", "Réessayez.");
         if (saisi.length !== 6 || !egal(await empreinte(`${email}:${saisi}`, "code-proprietaire"), a.code_hash)) throw refus;
         await db.from("depot_acces").update({ code_hash: null, code_expire_le: null, essais: 0, bloque_jusqu_au: null, derniere_connexion: new Date().toISOString() }).eq("email", email);
-        return json(200, { session: await creerSession(email, SESSION_HEURES), heures: SESSION_HEURES });
+        const heures = body.rester === true ? SESSION_LONGUE_HEURES : SESSION_HEURES;
+        return json(200, { session: await creerSession(email, heures), heures });
       }
 
       case "dossiers": {

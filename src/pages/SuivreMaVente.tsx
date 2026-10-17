@@ -46,13 +46,20 @@ interface DossierProp {
   demandes: { id: string; cree_le: string; type: string; message: string | null; statut: string; reponse: string | null }[];
 }
 
+// Session : onglet seulement (sessionStorage), ou 30 jours sur cet appareil (localStorage)
 const CLE_SESSION = 'svm-suivi-vente';
 const lireSession = (): { jeton: string; expire: number } | null => {
-  try {
-    const s = JSON.parse(sessionStorage.getItem(CLE_SESSION) ?? 'null');
-    return s && s.expire > Date.now() ? s : null;
-  } catch {
-    return null;
+  for (const stockage of [() => sessionStorage, () => localStorage]) {
+    try {
+      const s = JSON.parse(stockage().getItem(CLE_SESSION) ?? 'null');
+      if (s && s.expire > Date.now()) return s;
+    } catch { /* stockage indisponible */ }
+  }
+  return null;
+};
+const oublierSession = () => {
+  for (const stockage of [() => sessionStorage, () => localStorage]) {
+    try { stockage().removeItem(CLE_SESSION); } catch { /* ignore */ }
   }
 };
 
@@ -90,7 +97,7 @@ export function SuivreMaVente() {
   const [erreur, setErreur] = useState('');
 
   const deconnecter = useCallback(() => {
-    try { sessionStorage.removeItem(CLE_SESSION); } catch { /* ignore */ }
+    oublierSession();
     setSession(null);
     setDossiers(null);
   }, []);
@@ -115,9 +122,10 @@ export function SuivreMaVente() {
       <Section background="gray" className="!py-8 md:!py-12 min-h-[70vh]">
         <Container size="md">
           {!session ? (
-            <Connexion onConnecte={(jeton, heures) => {
+            <Connexion onConnecte={(jeton, heures, rester) => {
               const s = { jeton, expire: Date.now() + heures * 3600_000 };
-              try { sessionStorage.setItem(CLE_SESSION, JSON.stringify(s)); } catch { /* session en mémoire seulement */ }
+              oublierSession();
+              try { (rester ? localStorage : sessionStorage).setItem(CLE_SESSION, JSON.stringify(s)); } catch { /* session en mémoire seulement */ }
               setSession(s);
             }} />
           ) : (
@@ -147,9 +155,10 @@ export function SuivreMaVente() {
   );
 }
 
-function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number) => void }) {
+function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number, rester: boolean) => void }) {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
+  const [rester, setRester] = useState(true);
   const [etape, setEtape] = useState<'email' | 'code'>('email');
   const [envoi, setEnvoi] = useState(false);
   const [info, setInfo] = useState('');
@@ -177,8 +186,8 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number)
     setErreur('');
     setEnvoi(true);
     try {
-      const r = await appelProprietaire<{ session: string; heures: number }>('connexion', { email, code });
-      onConnecte(r.session, r.heures);
+      const r = await appelProprietaire<{ session: string; heures: number }>('connexion', { email, code, rester });
+      onConnecte(r.session, r.heures, rester);
     } catch (err) {
       setErreur(messageErreur(err));
     } finally {
@@ -216,6 +225,13 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number)
             />
             <p className="text-xs text-gris mt-1">Valable 10 minutes. Pensez à vos courriers indésirables.</p>
           </div>
+          <label className="flex items-start gap-3 text-sm text-noir">
+            <input type="checkbox" checked={rester} onChange={(e) => setRester(e.target.checked)} className="mt-0.5 w-5 h-5 flex-shrink-0 accent-[#254893]" />
+            <span>
+              Rester connecté sur cet appareil pendant 30 jours
+              <span className="block text-xs text-gris">Décochez si vous utilisez un ordinateur partagé.</span>
+            </span>
+          </label>
           <Button type="submit" size="lg" disabled={envoi || code.length !== 6} fullWidth>{envoi ? 'Connexion…' : 'Me connecter'}</Button>
           <div className="flex justify-between text-sm">
             <button type="button" className="lien" onClick={() => { setEtape('email'); setCode(''); setErreur(''); }}>Changer d'e-mail</button>
