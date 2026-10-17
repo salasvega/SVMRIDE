@@ -112,7 +112,7 @@ export function VehiclesList() {
           <button
             onClick={() => setStatusFilter('all')}
             className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
-              statusFilter === 'all' ? 'border-[#E31837] ring-2 ring-[#E31837] ring-opacity-20' : 'border-[#D1D5DB]'
+              statusFilter === 'all' ? 'border-bleu ring-2 ring-bleu ring-opacity-20' : 'border-[#D1D5DB]'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -188,7 +188,7 @@ export function VehiclesList() {
                   placeholder="Rechercher par marque, modèle..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent"
                 />
               </div>
 
@@ -196,7 +196,7 @@ export function VehiclesList() {
                 <select
                   value={typeFilter}
                   onChange={(e) => setTypeFilter(e.target.value)}
-                  className="min-w-[120px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent bg-white text-[#111111]"
+                  className="min-w-[120px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent bg-white text-[#111111]"
                 >
                   <option value="all">Tous types</option>
                   <option value="moto">Moto</option>
@@ -206,7 +206,7 @@ export function VehiclesList() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="min-w-[150px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent bg-white text-[#111111]"
+                  className="min-w-[150px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent bg-white text-[#111111]"
                 >
                   <option value="all">Tous les statuts</option>
                   <option value="available">Disponible</option>

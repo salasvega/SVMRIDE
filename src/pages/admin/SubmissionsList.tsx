@@ -312,7 +312,7 @@ export default function SubmissionsList() {
                   placeholder="Rechercher par nom, email, téléphone, message..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent"
                 />
               </div>
 
@@ -320,7 +320,7 @@ export default function SubmissionsList() {
                 <select
                   value={filter}
                   onChange={(e) => setFilter(e.target.value)}
-                  className="min-w-[180px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent bg-white text-[#111111]"
+                  className="min-w-[180px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent bg-white text-[#111111]"
                 >
                   <option value="all">Tous les types</option>
                   <option value="contact">Contact</option>
@@ -332,7 +332,7 @@ export default function SubmissionsList() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="min-w-[150px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent bg-white text-[#111111]"
+                  className="min-w-[150px] px-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent bg-white text-[#111111]"
                 >
                   <option value="all">Tous les statuts</option>
                   <option value="new">Nouvelles</option>

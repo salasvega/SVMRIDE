@@ -313,7 +313,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
               <textarea
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
-                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent resize-none"
+                className="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent resize-none"
                 rows={4}
                 placeholder="Ajoutez des notes internes sur ce dossier..."
               />
@@ -321,7 +321,7 @@ export function SubmissionDetailsModal({ submission, onClose, onStatusChange, on
                 <button
                   onClick={handleSaveAdminNotes}
                   disabled={isSavingNotes}
-                  className="px-4 py-2 bg-[#E31837] text-white rounded-lg hover:bg-[#C1132E] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-5 py-2.5 bg-bleu text-white font-semibold rounded-xl hover:bg-bleu-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSavingNotes ? 'Enregistrement...' : 'Enregistrer les notes'}
                 </button>

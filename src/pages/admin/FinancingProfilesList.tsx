@@ -298,7 +298,7 @@ export default function FinancingProfilesList() {
                   placeholder="Rechercher par nom, email, véhicule..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent"
                 />
               </div>
 
@@ -577,7 +577,7 @@ export default function FinancingProfilesList() {
                           onClick={() => downloadDocument(doc.path, doc.label)}
                           className="flex items-center gap-2 p-3 border border-[#E5E5E5] rounded-lg hover:bg-gray-50 transition-colors text-left"
                         >
-                          <FileText className="w-5 h-5 text-[#E31837] flex-shrink-0" />
+                          <FileText className="w-5 h-5 text-bleu flex-shrink-0" />
                           <span className="text-sm text-[#111111] flex-1">{doc.label}</span>
                           <Download className="w-4 h-4 text-[#666666]" />
                         </button>
@@ -616,7 +616,7 @@ export default function FinancingProfilesList() {
                   <textarea
                     value={adminNotes}
                     onChange={(e) => setAdminNotes(e.target.value)}
-                    className="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-[#E31837] focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 border border-[#E5E5E5] rounded-lg focus:ring-2 focus:ring-bleu/40 focus:border-transparent resize-none"
                     rows={4}
                     placeholder="Ajoutez des notes internes sur ce dossier..."
                   />
@@ -624,7 +624,7 @@ export default function FinancingProfilesList() {
                     <button
                       onClick={handleSaveNotes}
                       disabled={savingNotes}
-                      className="px-4 py-2 bg-[#E31837] text-white rounded-lg hover:bg-[#C1132E] disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-5 py-2.5 bg-bleu text-white font-semibold rounded-xl hover:bg-bleu-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {savingNotes ? 'Enregistrement...' : 'Enregistrer les notes'}
                     </button>
