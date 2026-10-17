@@ -1,27 +1,23 @@
 /**
- * Équipe SVM Ride : section d'accueil « Des passionnés à votre service » et page /equipe.
+ * Équipe SVM Ride : section d'accueil « Des passionnés à votre service », page
+ * /equipe et carte du responsable sur la page Contact.
  *
- * PUBLICATION
- * - EQUIPE_EN_LIGNE = false : section et page visibles uniquement en aperçu
- *   (développement, aperçus Netlify), jamais sur svmride.com (la page y renvoie une 404).
- * - Passer à true une fois les vraies photos et les textes validés par Mattia,
- *   et après l'accord écrit de chaque personne pour publier sa photo et son prénom.
- * - Les fiches `exemple: true` (contenu fictif) ne s'affichent JAMAIS en production,
- *   même si EQUIPE_EN_LIGNE vaut true : il faut les remplacer par les vraies personnes.
+ * LES FICHES SE GÈRENT DANS L'ADMIN (onglet « Équipe », depuis le 17/10/2026) :
+ * ajout, modification, ordre, photo, affichage, suppression. Elles sont lues dans
+ * la table Supabase `equipe_membres` (voir src/lib/equipe.ts).
  *
- * AJOUTER / MODIFIER / RETIRER UNE PERSONNE
- * - Une entrée par personne ci-dessous ; `ordre` fixe la position (le responsable
- *   est toujours mis en avant à part). Supprimer l'entrée retire la fiche partout.
- * - Photo : portrait carré d'au moins 600 px, déposé dans public/equipe/ en WebP
- *   (et AVIF si possible) ; sans photo, des initiales s'affichent à la place.
- *   Portraits d'Amanda, Pedro et Valentin fournis le 16/10, recadrés en 480 px.
+ * MEMBRES ci-dessous ne sert plus que de secours, si la base ne répond pas
+ * (c'est l'équipe publiée le 16/10/2026, reprise telle quelle dans la base).
+ *
+ * EQUIPE_EN_LIGNE = false masquerait la section, la page et le lien du pied de
+ * page sur svmride.com (la page renverrait une 404).
  */
 
-/** Change à true pour publier sur svmride.com. */
-export const EQUIPE_EN_LIGNE = true; // publié le 16/10/2026 (textes validés)
+/** Change à false pour masquer l'équipe sur svmride.com. */
+export const EQUIPE_EN_LIGNE = true; // publié le 16/10/2026
 
 export interface PhotoMembre {
-  /** Chemin du fichier WebP (obligatoire), ex. /equipe/ines.webp */
+  /** Fichier principal (WebP en général, JPEG possible), ex. /equipe/ines.webp */
   webp: string;
   /** Version AVIF, plus légère (facultative) */
   avif?: string;
@@ -37,17 +33,14 @@ export interface Membre {
   photo?: PhotoMembre;
   /** Phrase personnelle (facultative), affichée entre guillemets */
   citation?: string;
-  /** Présentation plus longue, utilisée pour le responsable */
+  /** Présentation plus longue (paragraphes), utilisée pour le responsable */
   presentation?: string[];
   ordre: number;
   /** Mis en avant (Mattia) */
   responsable?: boolean;
-  /** Personne fictive pour les tests : jamais affichée en production */
-  exemple?: boolean;
-  /** Personne réelle mais textes en attente de validation */
-  textesProvisoires?: boolean;
 }
 
+/** Secours si la base ne répond pas */
 export const MEMBRES: Membre[] = [
   {
     id: 'mattia',
@@ -93,13 +86,5 @@ export function equipeAffichee(contexte: string): boolean {
   return EQUIPE_EN_LIGNE || contexte !== 'production';
 }
 
-/** Membres à afficher dans ce contexte (jamais de fiche fictive en production). */
-export function membresAffiches(contexte: string): Membre[] {
-  if (!equipeAffichee(contexte)) return [];
-  return MEMBRES.filter((m) => contexte !== 'production' || !m.exemple).sort((a, b) => a.ordre - b.ordre);
-}
-
-/** Vrai si l'aperçu contient des fiches fictives ou des textes provisoires. */
-export function contenuProvisoire(membres: Membre[]): boolean {
-  return membres.some((m) => m.exemple || m.textesProvisoires);
-}
+/** Nom affiché : « Prénom » ou « Prénom Nom » */
+export const nomAffiche = (m: Pick<Membre, 'prenom' | 'nom'>) => `${m.prenom}${m.nom ? ` ${m.nom}` : ''}`;

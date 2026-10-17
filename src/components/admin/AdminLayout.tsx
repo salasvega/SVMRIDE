@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut } from 'lucide-react';
+import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Users } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
@@ -107,6 +107,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                       {depotNonLues > 99 ? '99+' : depotNonLues}
                     </span>
                   )}
+                </Link>
+                <Link
+                  to="/admin/equipe"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
+                    isActive('/admin/equipe')
+                      ? 'text-brand bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
+                  }`}
+                >
+                  <Users className="w-4 h-4" />
+                  Équipe
                 </Link>
               </>
   );

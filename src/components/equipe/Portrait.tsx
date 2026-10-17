@@ -1,9 +1,11 @@
-import type { Membre } from '../../config/equipe';
+import { nomAffiche, type Membre } from '../../config/equipe';
 
 interface PortraitProps {
   membre: Membre;
   /** Côté affiché en px (le portrait est rond) */
   taille: number;
+  /** Classes de taille (ex. « h-20 w-20 sm:h-28 sm:w-28 ») : remplacent la taille fixe à l'écran */
+  classeTaille?: string;
   className?: string;
   /** Anneau or (mise en avant) */
   anneauOr?: boolean;
@@ -18,18 +20,19 @@ interface PortraitProps {
  * Portrait rond, même cadrage pour toute l'équipe : AVIF puis WebP puis JPEG,
  * sans déformation (object-cover). Sans photo : initiales sur fond noir et or.
  */
-export function Portrait({ membre, taille, className = '', anneauOr = false, decoratif = true, chargement = 'lazy', surSombre = false }: PortraitProps) {
+export function Portrait({ membre, taille, classeTaille, className = '', anneauOr = false, decoratif = true, chargement = 'lazy', surSombre = false }: PortraitProps) {
   const anneau = anneauOr
     ? `ring-2 ring-or ring-offset-[3px] ${surSombre ? 'ring-offset-noir-profond' : 'ring-offset-white'}`
     : 'ring-1 ring-bordure';
-  const alt = decoratif ? '' : `${membre.prenom}${membre.nom ? ` ${membre.nom}` : ''}, ${membre.fonction}`;
-  const style = { width: taille, height: taille };
+  const alt = decoratif ? '' : `${nomAffiche(membre)}, ${membre.fonction}`;
+  const style = classeTaille ? undefined : { width: taille, height: taille };
+  const dimension = classeTaille ?? '';
 
   if (!membre.photo) {
     const initiales = `${membre.prenom[0] ?? ''}${membre.nom?.[0] ?? ''}`.toUpperCase();
     return (
       <span
-        className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-noir-profond ${anneau} ${className}`}
+        className={`relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-noir-profond ${dimension} ${anneau} ${className}`}
         style={style}
         role={decoratif ? undefined : 'img'}
         aria-label={decoratif ? undefined : alt}
@@ -47,9 +50,9 @@ export function Portrait({ membre, taille, className = '', anneauOr = false, dec
   }
 
   return (
-    <picture className={`inline-block shrink-0 overflow-hidden rounded-full bg-fond ${anneau} ${className}`} style={style}>
+    <picture className={`inline-block shrink-0 overflow-hidden rounded-full bg-fond ${dimension} ${anneau} ${className}`} style={style}>
       {membre.photo.avif && <source srcSet={membre.photo.avif} type="image/avif" />}
-      <source srcSet={membre.photo.webp} type="image/webp" />
+      {/\.webp($|\?)/i.test(membre.photo.webp) && <source srcSet={membre.photo.webp} type="image/webp" />}
       <img
         src={membre.photo.jpg ?? membre.photo.webp}
         alt={alt}

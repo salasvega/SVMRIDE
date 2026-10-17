@@ -23,7 +23,7 @@ export const estImageCompressible = (fichier: Blob & { name?: string }) =>
   TYPES_COMPRESSIBLES.test(fichier.type) ||
   (!fichier.type && /\.(jpe?g|png|webp|heic|heif)$/i.test(fichier.name ?? ''));
 
-async function decoder(fichier: Blob): Promise<{ source: CanvasImageSource; largeur: number; hauteur: number; liberer: () => void }> {
+export async function decoder(fichier: Blob): Promise<{ source: CanvasImageSource; largeur: number; hauteur: number; liberer: () => void }> {
   // createImageBitmap applique l'orientation EXIF (photos prises en portrait)
   if (typeof createImageBitmap === 'function') {
     try {

@@ -37,6 +37,7 @@ const SalesFolderForm = nomme(() => import('./pages/admin/SalesFolderForm'), 'Sa
 const DepotDemandesList = nomme(() => import('./pages/admin/DepotDemandesList'), 'DepotDemandesList');
 const DepotDossiersList = nomme(() => import('./pages/admin/DepotDossiersList'), 'DepotDossiersList');
 const DepotDossierDetail = nomme(() => import('./pages/admin/DepotDossierDetail'), 'DepotDossierDetail');
+const EquipeAdmin = nomme(() => import('./pages/admin/EquipeAdmin'), 'EquipeAdmin');
 const Signature = nomme(() => import('./pages/Signature'), 'Signature');
 const SuivreMaVente = nomme(() => import('./pages/SuivreMaVente'), 'SuivreMaVente');
 const SalesFolderDetails = nomme(() => import('./pages/admin/SalesFolderDetails'), 'SalesFolderDetails');
@@ -119,6 +120,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <DepotDossierDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/equipe"
+            element={
+              <ProtectedRoute>
+                <EquipeAdmin />
               </ProtectedRoute>
             }
           />

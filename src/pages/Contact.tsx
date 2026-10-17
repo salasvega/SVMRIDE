@@ -20,10 +20,16 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { siteConfig } from '../config/site';
 import { supabase } from '../lib/supabase';
 import { compresserImage, extensionDe } from '../lib/compressionImage';
+import { useEquipe } from '../lib/equipe';
+import { MEMBRES } from '../config/equipe';
+import { Portrait } from '../components/equipe/Portrait';
 
 export function Contact() {
   // Si on arrive depuis une fiche véhicule, on a passé `state={{ vehicle: "Yamaha MT-07 2021" }}`
   const location = useLocation();
+  // Carte du responsable : fiche « responsable » de l'admin (onglet Équipe)
+  const equipe = useEquipe();
+  const responsable = (equipe ?? MEMBRES).find((m) => m.responsable) ?? MEMBRES[0];
   const vehicleRef =
     (location.state as { vehicle?: string } | undefined)?.vehicle || '';
 
@@ -151,27 +157,27 @@ export function Contact() {
                 <div className="liseret-or" aria-hidden="true" />
                 <div className="flex flex-col sm:flex-row sm:items-center gap-5 p-5 md:p-6">
                   <div className="flex items-center gap-4 sm:block flex-shrink-0">
-                    <img
-                      src="/equipe-mattia.webp"
-                      alt="Mattia, responsable commercial de SVM Ride"
-                      width={96}
-                      height={96}
-                      loading="lazy"
-                      className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover ring-2 ring-or ring-offset-2 ring-offset-noir-profond"
+                    <Portrait
+                      membre={responsable}
+                      taille={96}
+                      classeTaille="h-20 w-20 md:h-24 md:w-24"
+                      anneauOr
+                      surSombre
+                      decoratif={false}
                     />
                     <div className="sm:hidden">
-                      <p className="titre-display text-2xl leading-none">Mattia</p>
+                      <p className="titre-display text-2xl leading-none">{responsable.prenom}</p>
                       <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-or-clair">
-                        Responsable commercial
+                        {responsable.fonction}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex-1 min-w-0 sm:border-l sm:border-white/15 sm:pl-5">
                     <div className="hidden sm:block mb-3">
-                      <p className="titre-display text-[26px] leading-none">Mattia</p>
+                      <p className="titre-display text-[26px] leading-none">{responsable.prenom}</p>
                       <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-or-clair">
-                        Responsable commercial
+                        {responsable.fonction}
                       </p>
                     </div>
                     <div className="space-y-1">

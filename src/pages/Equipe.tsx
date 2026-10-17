@@ -1,27 +1,27 @@
 /**
  * Page /equipe : « Rencontrez l'équipe SVM Ride ».
- * Données : src/config/equipe.ts. Sur svmride.com, la page n'existe pas (404)
- * tant que EQUIPE_EN_LIGNE vaut false.
+ * Fiches gérées dans l'admin (onglet Équipe), lues par src/lib/equipe.ts. Sur
+ * svmride.com, la page n'existe pas (404) si EQUIPE_EN_LIGNE vaut false.
  */
 import { Link } from 'react-router-dom';
 import { Quote } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
-import { contenuProvisoire, equipeAffichee, membresAffiches } from '../config/equipe';
+import { equipeAffichee, nomAffiche } from '../config/equipe';
+import { useEquipe } from '../lib/equipe';
 import { CONTEXTE_SITE } from '../lib/contexte';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { Portrait } from '../components/equipe/Portrait';
-import { BandeauApercu } from '../components/equipe/BandeauApercu';
 import { NotFound } from './NotFound';
 
 export function Equipe() {
+  const membres = useEquipe();
   if (!equipeAffichee(CONTEXTE_SITE)) return <NotFound />;
 
-  const membres = membresAffiches(CONTEXTE_SITE);
-  const responsable = membres.find((m) => m.responsable);
-  const collaborateurs = membres.filter((m) => !m.responsable);
+  const responsable = membres?.find((m) => m.responsable);
+  const collaborateurs = membres?.filter((m) => !m.responsable) ?? [];
 
   return (
     <>
@@ -29,7 +29,6 @@ export function Equipe() {
 
       <Section background="gray" className="!pt-8 md:!pt-12 !pb-10 md:!pb-14">
         <Container>
-          {contenuProvisoire(membres) && <BandeauApercu className="mb-8" />}
           <h1 className="filet-apres mb-5">Rencontrez l'équipe SVM Ride</h1>
           <p className="max-w-3xl text-base md:text-lg text-gris leading-relaxed">
             Chez SVM Ride, la passion de la moto se partage au quotidien. Découvrez les femmes et les hommes qui
@@ -37,6 +36,14 @@ export function Equipe() {
           </p>
         </Container>
       </Section>
+
+      {membres === null && (
+        <Section background="white" className="!py-10 md:!py-14">
+          <Container>
+            <div className="h-[380px] animate-pulse rounded-2xl bg-fond motion-reduce:animate-none" aria-label="Chargement de l'équipe" role="status" />
+          </Container>
+        </Section>
+      )}
 
       {responsable && (
         <Section background="white" className="!py-10 md:!py-14">
@@ -50,8 +57,7 @@ export function Equipe() {
                 <div className="flex flex-col items-center text-center md:w-[220px]">
                   <Portrait membre={responsable} taille={180} anneauOr surSombre decoratif={false} chargement="eager" />
                   <h2 id="equipe-responsable" className="titre-display mt-6 text-[34px] leading-none">
-                    {responsable.prenom}
-                    {responsable.nom ? ` ${responsable.nom}` : ''}
+                    {nomAffiche(responsable)}
                   </h2>
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-or-clair">
                     {responsable.fonction}
@@ -90,8 +96,7 @@ export function Equipe() {
                   <article className="carte flex h-full flex-col items-center px-6 pb-7 pt-8 text-center transition-[box-shadow,transform] duration-180 hover:-translate-y-1 hover:shadow-vehicule motion-reduce:hover:translate-y-0">
                     <Portrait membre={m} taille={128} decoratif={false} />
                     <h3 className="mt-5 text-xl font-semibold text-noir">
-                      {m.prenom}
-                      {m.nom ? ` ${m.nom}` : ''}
+                      {nomAffiche(m)}
                     </h3>
                     <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-or-texte">{m.fonction}</p>
                     {m.citation && (
