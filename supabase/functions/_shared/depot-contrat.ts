@@ -9,7 +9,7 @@
  */
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "npm:pdf-lib@1.17.1";
 
-export const MODELE_VERSION = "mandat-depot-vente-2026-10-17";
+export const MODELE_VERSION = "mandat-depot-vente-2026-10-17b";
 
 export const SOCIETE = {
   nom: "SVM RIDE",
@@ -17,6 +17,8 @@ export const SOCIETE = {
   siren: "988 004 719",
   siege: "3 Rue Émile Verhaeren, 92210 Saint-Cloud",
   showroom: "310 Avenue Roger Salengro, 92370 Chaville",
+  /** Assureur du garage (réponse de Mattia, 17/10/2026) */
+  assureur: "AXA",
   email: "contact@svmride.com",
   telephone: "01 84 19 01 74",
 };
@@ -117,7 +119,7 @@ function articlesMandat(i: Instantane): Bloc[] {
       `Le Déposant peut reprendre son véhicule avant le terme du mandat ; une indemnité forfaitaire de ${eur(c.frais_resiliation)} TTC est alors due à ${SOCIETE.nom}. Cette indemnité est également due si le véhicule est vendu pendant la durée du mandat par un autre canal que ${SOCIETE.nom}. ${SOCIETE.nom} peut y renoncer, notamment en cas de cession du véhicule à un proche du Déposant.`,
     ] },
     { titre: "Article 9 – Garde, assurance et essais", texte: [
-      `Pendant le dépôt, le véhicule est conservé au showroom de ${SOCIETE.nom}, ${SOCIETE.showroom}, sauf accord contraire, et couvert par l'assurance professionnelle du garage. Aucun essai routier n'est réalisé sans l'accord préalable du Déposant.`,
+      `Pendant le dépôt, le véhicule est conservé au showroom de ${SOCIETE.nom}, ${SOCIETE.showroom}, sauf accord contraire, et couvert par l'assurance professionnelle du garage, souscrite auprès d'${SOCIETE.assureur}. Aucun essai routier n'est réalisé sans l'accord préalable du Déposant.`,
     ] },
     { titre: "Article 10 – État des lieux et documents", texte: [
       "Un état des lieux contradictoire est établi à la remise du véhicule (kilométrage, état, accessoires, clés) ; il figure en annexe.",
