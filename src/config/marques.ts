@@ -44,16 +44,16 @@ export const MARQUES: Marque[] = [
   // Amérique
   { id: 'harley-davidson', nom: 'Harley-Davidson', alias: ['Harley'], pays: 'États-Unis', logo: 'harley-davidson.svg', actif: true },
   { id: 'indian', nom: 'Indian Motorcycle', alias: ['Indian'], pays: 'États-Unis', logo: 'indian.svg', actif: true },
-  { id: 'zero', nom: 'Zero Motorcycles', alias: ['Zero'], pays: 'États-Unis', actif: true },
+  { id: 'zero', nom: 'Zero Motorcycles', alias: ['Zero'], pays: 'États-Unis', actif: false },
   // Autres
   { id: 'royal-enfield', nom: 'Royal Enfield', alias: ['Enfield'], pays: 'Inde', logo: 'royal-enfield.svg', actif: true },
-  { id: 'benelli', nom: 'Benelli', pays: 'Italie', actif: true },
+  { id: 'benelli', nom: 'Benelli', pays: 'Italie', actif: false },
   { id: 'cfmoto', nom: 'CFMOTO', pays: 'Chine', logo: 'cfmoto.svg', actif: true },
-  { id: 'bsa', nom: 'BSA', pays: 'Royaume-Uni', actif: true },
-  { id: 'voge', nom: 'Voge', pays: 'Chine', actif: true },
-  { id: 'zontes', nom: 'Zontes', pays: 'Chine', actif: true },
+  { id: 'bsa', nom: 'BSA', pays: 'Royaume-Uni', actif: false },
+  { id: 'voge', nom: 'Voge', pays: 'Chine', actif: false },
+  { id: 'zontes', nom: 'Zontes', pays: 'Chine', actif: false },
   { id: 'qjmotor', nom: 'QJMotor', pays: 'Chine', logo: 'qjmotor.png', actif: true },
-  { id: 'mash', nom: 'Mash', pays: 'France', actif: true },
+  { id: 'mash', nom: 'Mash', pays: 'France', actif: false },
   { id: 'fantic', nom: 'Fantic', pays: 'Italie', logo: 'fantic.svg', actif: true },
 ];
 
