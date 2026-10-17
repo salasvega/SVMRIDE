@@ -199,16 +199,16 @@ const GRIS = rgb(0.4, 0.4, 0.4);
 const GRIS_CLAIR = rgb(0.8, 0.8, 0.8);
 const FOND = rgb(0.955, 0.955, 0.955);
 
-/** Logo de l'en-tête : public/logo-contrat.jpg du site, lu une fois par instance (sans logo si le site ne répond pas) */
+/** Logo de l'en-tête : public/logo-contrat.jpg du site, gardé en mémoire une fois lu (sans logo si le site ne répond pas) */
 export const URL_LOGO = "https://svmride.com/logo-contrat.jpg";
-let logoCache: Uint8Array | null | undefined;
+let logoCache: Uint8Array | null = null;
 async function logoJpg(): Promise<Uint8Array | null> {
-  if (logoCache !== undefined) return logoCache;
+  if (logoCache) return logoCache;
   try {
     const r = await fetch(URL_LOGO, { signal: AbortSignal.timeout(4000) });
-    logoCache = r.ok ? new Uint8Array(await r.arrayBuffer()) : null;
+    if (r.ok) logoCache = new Uint8Array(await r.arrayBuffer());
   } catch (_) {
-    logoCache = null;
+    // sans logo cette fois-ci
   }
   return logoCache;
 }
