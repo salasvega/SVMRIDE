@@ -287,7 +287,7 @@ function EtatDesLieuxForm({ dossier: d, onMaj, verrouille, boutonsPhotos }: { do
       action={d.etat_des_lieux?.fait_le && <span className="text-sm text-green-800">Fait le {jour(d.etat_des_lieux.fait_le)}{d.etat_des_lieux.heure ? ` à ${heureFr(d.etat_des_lieux.heure)}` : ''}</span>}
     >
       <p className="text-sm text-[#666666] mb-4">
-        À faire avec le déposant, au showroom. Il est repris en annexe du contrat{signe ? ' (le contrat signé garde la version du jour de la signature)' : ''}.
+        À faire avec le déposant, au showroom. Il est repris en page 2 du contrat{signe ? ' (le contrat signé garde la version du jour de la signature)' : ''}.
       </p>
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <Champ libelle="Date">
