@@ -3,14 +3,19 @@
  * depot-proprietaire, depot-notifications).
  */
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
+import { ADRESSE, coordonnees, EMAIL_AFFICHE, RECEPTION, remplir, TEL } from "./coordonnees.ts";
 
 // E-mails (domaine svmride.com vérifié chez Resend)
 export const EXPEDITEUR = "SVM Ride <contact@svmride.com>";
-export const BOITE_SVM = "contact@svmride.com";
+/** Adresse qui reçoit les demandes (admin, « Infos du site ») : repère remplacé à l'envoi */
+export const BOITE_SVM = RECEPTION;
+/** E-mail affiché aux clients */
+export const EMAIL_CONTACT = EMAIL_AFFICHE;
 // Copie cachée au développeur pendant les tests ; vider la liste pour l'arrêter.
 // Jamais pour les e-mails qui contiennent un code ou un contrat signé (voir sansCopie).
 export const COPIE_DEV: string[] = ["salasvega@gmail.com"];
-export const TELEPHONE = "01 84 19 01 74";
+/** Téléphone (admin, « Infos du site ») : repère remplacé à l'envoi et dans les réponses */
+export const TELEPHONE = TEL;
 export const SITE = "https://svmride.com";
 export const URL_ADMIN = `${SITE}/admin/depot-vente/dossiers`;
 export const BUCKET_DOCS = "depot-documents";
@@ -63,7 +68,7 @@ export class Erreur extends Error {
 
 export function reponse(origin: string | null) {
   return (status: number, data: unknown) =>
-    new Response(JSON.stringify(data), { status, headers: { ...cors(origin), "Content-Type": "application/json" } });
+    new Response(remplir(JSON.stringify(data)), { status, headers: { ...cors(origin), "Content-Type": "application/json" } });
 }
 
 /** Vérifie que l'appelant est un administrateur (jeton de session Supabase). */
@@ -143,7 +148,7 @@ export function gabarit(contenu: string): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #ECE9E0;border-radius:12px">
 <tr><td style="padding:20px 24px;border-bottom:3px solid #B8902F;font-size:20px;font-weight:bold;letter-spacing:.5px">SVM RIDE</td></tr>
 <tr><td style="padding:24px;font-size:15px;line-height:1.6">${contenu}</td></tr>
-<tr><td style="padding:16px 24px;border-top:1px solid #ECE9E0;font-size:12px;color:#5E5E5E">SVM Ride · 310 Avenue Roger Salengro, 92370 Chaville · ${TELEPHONE} · svmride.com</td></tr>
+<tr><td style="padding:16px 24px;border-top:1px solid #ECE9E0;font-size:12px;color:#5E5E5E">SVM Ride · ${ADRESSE} · ${TELEPHONE} · svmride.com</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -164,7 +169,16 @@ export interface Courriel {
 export async function envoyer(m: Courriel): Promise<string | null> {
   const cle = Deno.env.get("RESEND_API_KEY");
   if (!cle) throw new Error("RESEND_API_KEY manquante");
-  const { sansCopie, ...message } = m;
+  // Coordonnées à jour dans les destinataires et le texte
+  await coordonnees();
+  const { sansCopie, ...brut } = m;
+  const message = {
+    ...brut,
+    to: Array.isArray(brut.to) ? brut.to.map((t) => remplir(t)) : remplir(brut.to),
+    subject: remplir(brut.subject),
+    html: remplir(brut.html, true),
+    ...(brut.reply_to ? { reply_to: remplir(brut.reply_to) } : {}),
+  };
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${cle}` },
@@ -181,7 +195,8 @@ export async function envoyer(m: Courriel): Promise<string | null> {
  * pourra être relancé.
  */
 export async function envoyerUneFois(db: SupabaseClient, cle: string, dossierId: string | null, m: Courriel): Promise<boolean> {
-  const destinataire = Array.isArray(m.to) ? m.to.join(", ") : m.to;
+  await coordonnees();
+  const destinataire = remplir(Array.isArray(m.to) ? m.to.join(", ") : m.to);
   const { data: existant } = await db.from("depot_emails").select("id, statut").eq("cle", cle).maybeSingle();
   if (existant && existant.statut !== "erreur") return false;
   if (!existant) {

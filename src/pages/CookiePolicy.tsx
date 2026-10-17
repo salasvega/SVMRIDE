@@ -2,8 +2,10 @@ import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
+import { useCoordonnees } from '../lib/coordonnees';
 
 export function CookiePolicy() {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   return (
     <>
       <SEOHead meta={pageSeo['/politique-cookies']} />
@@ -93,7 +95,7 @@ export function CookiePolicy() {
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Contact</h2>
             <p className="text-gris leading-relaxed">
-              Pour toute question concernant notre utilisation des cookies, contactez-nous à l'adresse: contact@svmride.com
+              Pour toute question concernant notre utilisation des cookies, contactez-nous à l'adresse : {c.email}
             </p>
           </div>
         </Container>

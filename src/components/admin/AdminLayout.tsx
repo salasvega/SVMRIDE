@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Users } from 'lucide-react';
+import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Store, Users } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
@@ -119,6 +119,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                   <Users className="w-4 h-4" />
                   Équipe
                 </Link>
+                <Link
+                  to="/admin/infos-site"
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap ${
+                    isActive('/admin/infos-site')
+                      ? 'text-brand bg-[#F9F9F9]'
+                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
+                  }`}
+                >
+                  <Store className="w-4 h-4" />
+                  Infos du site
+                </Link>
               </>
   );
 
@@ -133,7 +144,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                 <span className="text-xl font-bold text-[#111111]">Admin</span>
               </Link>
 
-              <div className="hidden lg:flex space-x-2 xl:space-x-4">
+              <div className="hidden xl:flex space-x-1 2xl:space-x-3">
                 {liens}
               </div>
             </div>
@@ -153,7 +164,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </div>
-          <div className="lg:hidden flex gap-1 overflow-x-auto pb-2 -mx-1 px-1">
+          <div className="xl:hidden flex gap-1 overflow-x-auto pb-2 -mx-1 px-1">
             {liens}
           </div>
         </div>

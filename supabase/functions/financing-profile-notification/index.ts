@@ -1,11 +1,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { coordonnees } from "../_shared/coordonnees.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.4";
 
 // Adresses des notifications (domaine svmride.com vérifié chez Resend le 16/10/2026).
 // Pas de copie au développeur ici : cet e-mail joint les pièces du client
 // (identité, fiches de paie, RIB), qui ne doivent pas sortir de la boîte SVM Ride.
 const EXPEDITEUR = "SVM Ride <contact@svmride.com>";
-const DESTINATAIRE = "contact@svmride.com";
+// Destinataire : « adresse qui reçoit les demandes », modifiable dans l'admin (« Infos du site »)
 const COPIE_DEV: string[] = [];
 
 const corsHeaders = {
@@ -215,7 +216,7 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         from: EXPEDITEUR,
-        to: DESTINATAIRE,
+        to: (await coordonnees()).reception,
         ...(COPIE_DEV.length ? { bcc: COPIE_DEV } : {}),
         subject: `Nouveau dossier de financement - ${record.first_name} ${record.last_name}`,
         html: emailHtml,

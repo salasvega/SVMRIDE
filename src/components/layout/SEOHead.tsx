@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { siteConfig } from '../../config/site';
-import { SeoMeta, canonicalUrl, DEFAULT_IMAGE } from '../../config/seo';
+import { SeoMeta, canonicalUrl, DEFAULT_IMAGE, avecCoordonnees } from '../../config/seo';
+import { useCoordonnees } from '../../lib/coordonnees';
 
 interface SEOHeadProps {
   /** Balises de la page : voir src/config/seo.ts (pageSeo, vehicleSeo…) */
@@ -12,7 +13,9 @@ interface SEOHeadProps {
  * Au premier chargement, ces balises sont déjà écrites dans le HTML par la
  * fonction Netlify `seo` (rendu serveur) ; ce composant garde le même contenu.
  */
-export function SEOHead({ meta }: SEOHeadProps) {
+export function SEOHead({ meta: brut }: SEOHeadProps) {
+  // Fiche concession et description de Contact avec les coordonnées à jour (admin, « Infos du site »)
+  const meta = avecCoordonnees(brut, useCoordonnees());
   const url = canonicalUrl(meta);
   const image = meta.image
     ? meta.image.startsWith('http')

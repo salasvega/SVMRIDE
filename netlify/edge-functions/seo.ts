@@ -14,6 +14,7 @@
  */
 import type { Config, Context } from '@netlify/edge-functions';
 import {
+  avecCoordonnees,
   injectSeo,
   notFoundSeo,
   pageSeo,
@@ -27,6 +28,7 @@ import {
   type SeoVehicle,
 } from '../../src/config/seo.ts';
 import { equipeAffichee, EQUIPE_EN_LIGNE } from '../../src/config/equipe.ts';
+import { COORDONNEES_DEFAUT, normaliserCoordonnees, type Coordonnees } from '../../src/config/coordonnees.ts';
 import { CONTEXTE, SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
 
 const TIMEOUT_MS = 2500;
@@ -63,6 +65,17 @@ async function equipeMasquee(): Promise<boolean> {
   } catch (e) {
     console.error('seo: réglage équipe', e);
     return false;
+  }
+}
+
+/** Coordonnées modifiables dans l'admin (« Infos du site ») ; valeurs de secours en cas d'erreur */
+async function coordonnees(): Promise<Coordonnees> {
+  try {
+    const rows = await supabase<{ valeur: unknown }[]>('site_reglages?select=valeur&cle=eq.coordonnees&limit=1');
+    return rows[0] ? normaliserCoordonnees(rows[0].valeur) : COORDONNEES_DEFAUT;
+  } catch (e) {
+    console.error('seo: coordonnées', e);
+    return COORDONNEES_DEFAUT;
   }
 }
 
@@ -129,6 +142,9 @@ export default async function seo(request: Request, context: Context) {
   } else {
     meta = notFoundSeo;
   }
+
+  // Accueil et Contact : fiche concession (téléphone, adresse, horaires) et description à jour
+  if (path === '/' || path === '/contact') meta = avecCoordonnees(meta, await coordonnees());
 
   const res = await context.next();
   if (!(res.headers.get('content-type') ?? '').includes('text/html')) return res;

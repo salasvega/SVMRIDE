@@ -9,11 +9,11 @@ import { Link, useParams } from 'react-router-dom';
 import { CheckCircle2, Download, FileText, Lock, ShieldCheck } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { signatureSeo } from '../config/seo';
-import { siteConfig } from '../config/site';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { appelSignature, ErreurDepot, euros, jour, messageErreur } from '../lib/depot';
+import { useCoordonnees } from '../lib/coordonnees';
 
 interface Resume {
   titre: string;
@@ -38,6 +38,7 @@ interface Resume {
 }
 
 export function Signature() {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   const { jeton = '' } = useParams();
   const [etat, setEtat] = useState<'chargement' | 'erreur' | 'pret' | 'signe'>('chargement');
   const [erreur, setErreur] = useState('');
@@ -143,7 +144,7 @@ export function Signature() {
 
   const mandat = contrat?.type === 'mandat';
   const pretACoder = accord && (!mandat || renonciation);
-  const tel = siteConfig.contact.phone;
+  const tel = c.telephone;
 
   return (
     <>

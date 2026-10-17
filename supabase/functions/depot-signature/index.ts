@@ -14,7 +14,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
 import {
   base, BOITE_SVM, BUCKET_DOCS, code6, cors, dateFr, echapper, egal, empreinte, envoyer, Erreur, euros, gabarit,
-  ip, reponse, sha256, URL_ADMIN,
+  ip, reponse, sha256, TELEPHONE, URL_ADMIN,
 } from "../_shared/depot-commun.ts";
 import { pdfSigne, type Instantane } from "../_shared/depot-contrat.ts";
 
@@ -28,7 +28,7 @@ async function contratDuLien(db: SupabaseClient, jeton: unknown): Promise<Contra
   const j = String(jeton ?? "");
   if (j.length < 30 || j.length > 60) throw new Erreur(404, "lien", "Ce lien de signature n'est pas valable.");
   const { data: c } = await db.from("depot_contrats").select("*").eq("invitation_hash", await empreinte(j, "invitation")).maybeSingle();
-  if (!c) throw new Erreur(404, "lien", "Ce lien de signature n'est plus valable : il a été remplacé, annulé ou déjà utilisé. Contactez SVM Ride au 01 84 19 01 74.");
+  if (!c) throw new Erreur(404, "lien", `Ce lien de signature n'est plus valable : il a été remplacé, annulé ou déjà utilisé. Contactez SVM Ride au ${TELEPHONE}.`);
   if (c.statut !== "a_signer") throw new Erreur(410, "lien", "Ce contrat n'est plus à signer.");
   if (new Date(c.invitation_expire_le) < new Date()) throw new Erreur(410, "lien", "Ce lien de signature a expiré. Demandez-en un nouveau à SVM Ride.");
   return c;
@@ -102,7 +102,7 @@ Deno.serve(async (req: Request) => {
 <p>Votre code pour signer le document « ${echapper(titreContrat(c))} » (${echapper(i.reference)}) :</p>
 <p style="font-size:32px;font-weight:bold;letter-spacing:6px;margin:20px 0">${code}</p>
 <p>Il est valable ${CODE_MINUTES} minutes. Ne le communiquez à personne : il vaut signature.</p>
-<p style="font-size:13px;color:#5E5E5E">Si vous n'êtes pas en train de signer un contrat avec SVM Ride, ignorez ce message et prévenez-nous au 01 84 19 01 74.</p>`),
+<p style="font-size:13px;color:#5E5E5E">Si vous n'êtes pas en train de signer un contrat avec SVM Ride, ignorez ce message et prévenez-nous au ${TELEPHONE}.</p>`),
           sansCopie: true,
         });
         await preuve("code_envoye", { a: i.deposant.email });

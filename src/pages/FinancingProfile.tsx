@@ -13,6 +13,8 @@ import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
 import { DeleteConfirmModal } from '../components/admin/DeleteConfirmModal';
 import { Save, Send, Trash2, CheckCircle, Edit, KeyRound, Copy } from 'lucide-react';
+import { useCoordonnees } from '../lib/coordonnees';
+import { lienTelephone } from '../config/coordonnees';
 
 interface FinancingProfile {
   id?: string;
@@ -57,6 +59,7 @@ interface FinancingProfile {
 }
 
 export function FinancingProfile() {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -482,7 +485,7 @@ export function FinancingProfile() {
                 {!creation && (
                   <p className="mt-6 text-xs text-[#5E5E5E]">
                     Code perdu ? Appelez-nous au{' '}
-                    <a href="tel:0184190174" className="text-bleu underline underline-offset-2">01 84 19 01 74</a>{' '}
+                    <a href={lienTelephone(c.telephone)} className="text-bleu underline underline-offset-2">{c.telephone}</a>{' '}
                     : nous vous en donnerons un nouveau après vérification.
                   </p>
                 )}

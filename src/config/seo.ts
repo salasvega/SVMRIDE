@@ -12,6 +12,15 @@
  * Il ne doit donc importer ni React ni aucune bibliothèque du navigateur.
  */
 import { siteConfig } from './site.ts';
+import {
+  COORDONNEES_DEFAUT,
+  horairesSchema,
+  lienInstagram,
+  lienMaps,
+  phraseHoraires,
+  telephoneInternational,
+  type Coordonnees,
+} from './coordonnees.ts';
 
 export const SITE_URL = siteConfig.baseUrl;
 export const DEFAULT_IMAGE = `${SITE_URL}${siteConfig.ogImage}`;
@@ -37,40 +46,52 @@ export interface SeoMeta {
 // ---------------------------------------------------------------------------
 // Fiche « concession » pour Google (référencement local)
 // ---------------------------------------------------------------------------
-const showroom = siteConfig.showrooms[0];
-
-export const dealerSchema = {
-  '@context': 'https://schema.org',
-  '@type': 'MotorcycleDealer',
-  '@id': `${SITE_URL}/#concession`,
-  name: siteConfig.name,
-  description:
-    "Concession de motos et scooters d'occasion contrôlés et garantis à Chaville (Hauts-de-Seine) : vente, reprise, financement et recherche personnalisée en Île-de-France.",
-  url: `${SITE_URL}/`,
-  logo: `${SITE_URL}/icon-512.png`,
-  image: DEFAULT_IMAGE,
-  telephone: '+33184190174',
-  email: siteConfig.contact.email,
-  address: {
-    '@type': 'PostalAddress',
-    streetAddress: showroom.address,
-    postalCode: showroom.postalCode,
-    addressLocality: showroom.city,
-    addressRegion: 'Île-de-France',
-    addressCountry: 'FR',
-  },
-  hasMap: showroom.mapsUrl,
-  areaServed: { '@type': 'AdministrativeArea', name: 'Île-de-France' },
-  openingHoursSpecification: [
-    {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-      opens: '09:00',
-      closes: '18:00',
+/** Fiche « concession » pour Google, à partir des coordonnées (modifiables dans l'admin) */
+export function dealerSchemaDe(c: Coordonnees) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'MotorcycleDealer',
+    '@id': `${SITE_URL}/#concession`,
+    name: siteConfig.name,
+    description:
+      `Concession de motos et scooters d'occasion contrôlés et garantis à ${c.showroom.ville} : vente, reprise, financement et recherche personnalisée en Île-de-France.`,
+    url: `${SITE_URL}/`,
+    logo: `${SITE_URL}/icon-512.png`,
+    image: DEFAULT_IMAGE,
+    telephone: telephoneInternational(c.telephone),
+    email: c.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: c.showroom.adresse,
+      postalCode: c.showroom.code_postal,
+      addressLocality: c.showroom.ville,
+      addressRegion: 'Île-de-France',
+      addressCountry: 'FR',
     },
-  ],
-  sameAs: [siteConfig.contact.instagramUrl],
-};
+    hasMap: lienMaps(c),
+    areaServed: { '@type': 'AdministrativeArea', name: 'Île-de-France' },
+    openingHoursSpecification: horairesSchema(c.horaires),
+    ...(c.instagram ? { sameAs: [lienInstagram(c.instagram)] } : {}),
+  };
+}
+
+/** Valeurs de secours ; remplacées par les coordonnées à jour (avecCoordonnees) */
+export const dealerSchema = dealerSchemaDe(COORDONNEES_DEFAUT);
+
+/** Description de la page Contact */
+export function descriptionContact(c: Coordonnees): string {
+  const horaires = phraseHoraires(c.horaires);
+  return `Contactez SVM Ride au ${c.telephone} ou par e-mail. Showroom au ${c.showroom.adresse} à ${c.showroom.ville} (${c.showroom.code_postal.slice(0, 2)})${horaires ? `, ${horaires}` : ''}.`;
+}
+
+/** Balises d'une page avec les coordonnées à jour (fiche concession, description de Contact) */
+export function avecCoordonnees(meta: SeoMeta, c: Coordonnees): SeoMeta {
+  const fiche = dealerSchemaDe(c);
+  const schema = Array.isArray(meta.schema)
+    ? meta.schema.map((s) => (s === dealerSchema ? fiche : s))
+    : meta.schema === dealerSchema ? fiche : meta.schema;
+  return { ...meta, schema, ...(meta.path === '/contact' ? { description: descriptionContact(c) } : {}) };
+}
 
 const websiteSchema = {
   '@context': 'https://schema.org',
@@ -137,8 +158,7 @@ export const pageSeo = {
   },
   '/contact': {
     title: 'Contact et showroom à Chaville | SVM Ride',
-    description:
-      'Contactez SVM Ride au 01 84 19 01 74 ou par e-mail. Showroom au 310 avenue Roger Salengro à Chaville (92), ouvert du mardi au samedi de 9 h à 18 h.',
+    description: descriptionContact(COORDONNEES_DEFAUT),
     path: '/contact',
     schema: dealerSchema,
   },

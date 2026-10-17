@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { Printer, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { formatPrice, formatMileage } from '../../utils/vehicle-filters';
-import { siteConfig } from '../../config/site';
+import { useCoordonnees } from '../../lib/coordonnees';
+import { adresseComplete } from '../../config/coordonnees';
 
 interface VehicleSalesSheetProps {
   vehicle: {
@@ -23,6 +24,7 @@ interface VehicleSalesSheetProps {
 }
 
 export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   const [showModal, setShowModal] = useState(false);
 
   const conditionLabels: Record<string, string> = {
@@ -181,7 +183,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
           marginBottom: '12px',
           flexWrap: 'wrap'
         }}>
-          {siteConfig.showrooms.map((showroom, idx) => (
+          {[c.showroom].map((showroom, idx) => (
             <div key={idx} style={{
               flex: '1 1 200px',
               minWidth: '200px',
@@ -193,10 +195,10 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
                 color: 'rgb(var(--brand))',
                 marginBottom: '4px'
               }}>
-                📍 {showroom.name}
+                📍 {showroom.nom}
               </div>
               <div style={{ fontSize: '12px', color: '#333333', lineHeight: 1.4 }}>
-                {showroom.fullAddress}
+                {adresseComplete(c)}
               </div>
               {showroom.note && (
                 <div style={{ fontSize: '11px', fontStyle: 'italic', color: '#666666', marginTop: '2px' }}>
@@ -213,7 +215,7 @@ export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
           paddingTop: '8px',
           borderTop: '2px solid #EEEEEE'
         }}>
-          📞 {siteConfig.contact.phone} | ✉️ {siteConfig.contact.email}
+          📞 {c.telephone} | ✉️ {c.email}
         </div>
       </div>
     </div>

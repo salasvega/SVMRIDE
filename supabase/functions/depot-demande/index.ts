@@ -15,6 +15,7 @@
  */
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
+import { ADRESSE, coordonnees, EMAIL_AFFICHE, RECEPTION, remplir, TEL } from "../_shared/coordonnees.ts";
 
 const BUCKET = "depot-photos";
 const MAX_PHOTOS = 10;
@@ -25,10 +26,11 @@ const VERSION_CONSENTEMENT = "depot-vente-2026-10-16";
 
 // E-mails (domaine svmride.com vérifié chez Resend)
 const EXPEDITEUR = "SVM Ride <contact@svmride.com>";
-const BOITE_SVM = "contact@svmride.com";
+// Coordonnées modifiables dans l'admin (« Infos du site ») : repères remplacés à l'envoi
+const BOITE_SVM = RECEPTION;
 // Copie cachée au développeur pendant les tests ; vider la liste pour l'arrêter.
 const COPIE_DEV: string[] = ["salasvega@gmail.com"];
-const TELEPHONE = "01 84 19 01 74";
+const TELEPHONE = TEL;
 const URL_ADMIN = "https://svmride.com/admin/depot-vente";
 
 const ALLOWED_ORIGINS = ["https://svmride.com", "https://www.svmride.com", "https://svmride.netlify.app"];
@@ -153,7 +155,7 @@ function gabarit(contenu: string): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #ECE9E0;border-radius:12px">
 <tr><td style="padding:20px 24px;border-bottom:3px solid #B8902F;font-size:20px;font-weight:bold;letter-spacing:.5px">SVM RIDE</td></tr>
 <tr><td style="padding:24px;font-size:15px;line-height:1.6">${contenu}</td></tr>
-<tr><td style="padding:16px 24px;border-top:1px solid #ECE9E0;font-size:12px;color:#5E5E5E">SVM Ride · 310 Avenue Roger Salengro, 92370 Chaville · ${TELEPHONE} · svmride.com</td></tr>
+<tr><td style="padding:16px 24px;border-top:1px solid #ECE9E0;font-size:12px;color:#5E5E5E">SVM Ride · ${ADRESSE} · ${TELEPHONE} · svmride.com</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -177,7 +179,7 @@ conditions du dépôt-vente vous sont présentés de vive voix, avant tout engag
 <p style="margin-top:24px">À très vite,<br>L'équipe SVM Ride</p>
 <p style="margin-top:24px;font-size:12px;color:#5E5E5E">Vos informations servent uniquement à traiter votre demande. Elles sont conservées
 au plus 3 ans si votre moto n'est pas confiée à SVM Ride, et vos photos 12 mois au plus. Vous pouvez à tout moment
-demander à les consulter ou à les supprimer en écrivant à ${BOITE_SVM}.</p>`);
+demander à les consulter ou à les supprimer en écrivant à ${EMAIL_AFFICHE}.</p>`);
 }
 
 function alerteHtml(d: Demande): string {
@@ -206,10 +208,12 @@ ${d.commentaire ? `<p><strong>Commentaire</strong><br>${echapper(d.commentaire).
 async function envoyerEmail(message: Record<string, unknown>): Promise<void> {
   const cleResend = Deno.env.get("RESEND_API_KEY");
   if (!cleResend) throw new Error("RESEND_API_KEY manquante");
+  await coordonnees();
+  const rempli = Object.fromEntries(Object.entries(message).map(([k, v]) => [k, typeof v === "string" ? remplir(v, k === "html") : v]));
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${cleResend}` },
-    body: JSON.stringify({ from: EXPEDITEUR, ...(COPIE_DEV.length ? { bcc: COPIE_DEV } : {}), ...message }),
+    body: JSON.stringify({ from: EXPEDITEUR, ...(COPIE_DEV.length ? { bcc: COPIE_DEV } : {}), ...rempli }),
   });
   if (!r.ok) throw new Error(`Resend ${r.status} : ${await r.text()}`);
 }
@@ -263,7 +267,7 @@ async function finaliser(db: SupabaseClient, id: string): Promise<string> {
 }
 
 const json = (status: number, corps: unknown, cors: Record<string, string>) =>
-  new Response(JSON.stringify(corps), { status, headers: { ...cors, "Content-Type": "application/json" } });
+  new Response(remplir(JSON.stringify(corps)), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
 Deno.serve(async (req: Request) => {
   const cors = corsHeaders(req.headers.get("origin"));

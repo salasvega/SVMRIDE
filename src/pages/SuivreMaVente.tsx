@@ -10,7 +10,6 @@ import { Link } from 'react-router-dom';
 import { Check, Download, LogOut, MessageSquare, Phone } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
-import { siteConfig } from '../config/site';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
@@ -20,6 +19,8 @@ import {
   DEMANDES_PROPRIETAIRE, ErreurDepot, ORDRE_VENTE, STATUTS_DEMANDE, StatutMandat, StatutVente, appelProprietaire, dateHeure, euros,
   joursRestants, jour, messageErreur,
 } from '../lib/depot';
+import { useCoordonnees } from '../lib/coordonnees';
+import { lienTelephone } from '../config/coordonnees';
 
 interface DossierProp {
   id: string;
@@ -248,6 +249,7 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number,
 }
 
 function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; session: string; onMaj: () => void }) {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   const liste = etapes(d);
   const derniere = liste.reduce((n, e, i) => (e.fait ? i : n), -1);
   const j = d.statut_mandat === 'actif' ? joursRestants(d.date_fin) : null;
@@ -297,7 +299,7 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
       {d.a_signer && (
         <div className="mx-5 md:mx-6 mb-5 rounded-xl border-2 border-or bg-or/10 p-4 text-sm text-noir">
           Un document attend votre signature : utilisez le lien reçu par e-mail ou le QR code présenté au showroom. Lien perdu ?
-          Demandez-en un nouveau ci-dessous (« Être rappelé ») ou au {siteConfig.contact.phone}.
+          Demandez-en un nouveau ci-dessous (« Être rappelé ») ou au {c.telephone}.
         </div>
       )}
 
@@ -363,6 +365,7 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
 }
 
 function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; session: string; onMaj: () => void }) {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   const [type, setType] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [envoi, setEnvoi] = useState(false);
@@ -442,7 +445,7 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
       )}
       <p className="mt-5 text-sm text-gris flex items-center gap-2">
         <Phone className="w-4 h-4" aria-hidden="true" /> Ou appelez-nous au{' '}
-        <a href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`} className="lien">{siteConfig.contact.phone}</a>
+        <a href={lienTelephone(c.telephone)} className="lien">{c.telephone}</a>
       </p>
     </div>
   );

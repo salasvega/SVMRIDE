@@ -1,10 +1,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { coordonnees } from "../_shared/coordonnees.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.4";
 
 // Adresses des notifications (domaine svmride.com vérifié chez Resend le 16/10/2026).
 // COPIE_DEV : copie cachée au développeur pendant les tests ; vider la liste pour l'arrêter.
 const EXPEDITEUR = "SVM Ride <contact@svmride.com>";
-const DESTINATAIRE = "contact@svmride.com";
+// Destinataire : « adresse qui reçoit les demandes », modifiable dans l'admin (« Infos du site »)
 const COPIE_DEV: string[] = ["salasvega@gmail.com"];
 
 const corsHeaders = {
@@ -154,7 +155,7 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         from: EXPEDITEUR,
-        to: DESTINATAIRE,
+        to: (await coordonnees()).reception,
         ...(COPIE_DEV.length ? { bcc: COPIE_DEV } : {}),
         subject: `Nouvelle recherche personnalisée - ${record.type}`,
         html: emailHtml,

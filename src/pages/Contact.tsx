@@ -17,18 +17,21 @@ import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
 import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
-import { siteConfig } from '../config/site';
 import { supabase } from '../lib/supabase';
 import { compresserImage, extensionDe } from '../lib/compressionImage';
 import { useEquipe } from '../lib/equipe';
 import { MEMBRES } from '../config/equipe';
 import { Portrait } from '../components/equipe/Portrait';
+import { useCoordonnees } from '../lib/coordonnees';
+import { adresseComplete, lienInstagram, lienMaps, lienTelephone, lignesHoraires } from '../config/coordonnees';
 
 export function Contact() {
   // Si on arrive depuis une fiche véhicule, on a passé `state={{ vehicle: "Yamaha MT-07 2021" }}`
   const location = useLocation();
   // Carte du responsable : fiche « responsable » de l'admin (onglet Équipe)
   const equipe = useEquipe();
+  // Coordonnées modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees();
   const responsable = (equipe?.membres ?? MEMBRES).find((m) => m.responsable) ?? MEMBRES[0];
   const vehicleRef =
     (location.state as { vehicle?: string } | undefined)?.vehicle || '';
@@ -182,27 +185,27 @@ export function Contact() {
                     </div>
                     <div className="space-y-1">
                       <a
-                        href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
+                        href={lienTelephone(c.telephone)}
                         className="flex items-center gap-2.5 rounded-lg py-1.5 text-[#E8E8E8] hover:text-white transition-colors duration-180"
                       >
                         <Phone className="w-[18px] h-[18px] text-or-clair flex-shrink-0" strokeWidth={1.8} aria-hidden="true" />
-                        <span className="font-medium">{siteConfig.contact.phone}</span>
+                        <span className="font-medium">{c.telephone}</span>
                       </a>
                       <a
-                        href={`mailto:${siteConfig.contact.email}`}
+                        href={`mailto:${c.email}`}
                         className="flex items-center gap-2.5 rounded-lg py-1.5 text-[#E8E8E8] hover:text-white transition-colors duration-180 break-all"
                       >
                         <Mail className="w-[18px] h-[18px] text-or-clair flex-shrink-0" strokeWidth={1.8} aria-hidden="true" />
-                        <span>{siteConfig.contact.email}</span>
+                        <span>{c.email}</span>
                       </a>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-6 mb-8">
+              {c.instagram && <div className="space-y-6 mb-8">
                 <a
-                  href={siteConfig.contact.instagramUrl}
+                  href={lienInstagram(c.instagram)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 p-4 bg-fond rounded-xl hover:bg-bordure transition-colors"
@@ -216,11 +219,11 @@ export function Contact() {
                       Instagram
                     </h3>
                     <p className="text-gris">
-                      {siteConfig.contact.instagram}
+                      @{c.instagram}
                     </p>
                   </div>
                 </a>
-              </div>
+              </div>}
 
               <div className="bg-fond p-6 rounded-xl">
                 <div className="flex items-start gap-3 mb-6">
@@ -234,10 +237,10 @@ export function Contact() {
                 </div>
 
                 <div className="space-y-4 mb-6">
-                  {siteConfig.showrooms.map((showroom, index) => (
+                  {[c.showroom].map((showroom, index) => (
                     <a
                       key={index}
-                      href={showroom.mapsUrl}
+                      href={lienMaps(c)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-start gap-3 p-4 bg-white rounded-lg hover:shadow-md transition-all border border-bordure hover:border-brand group"
@@ -248,10 +251,10 @@ export function Contact() {
                       />
                       <div className="flex-1">
                         <div className="font-semibold text-noir mb-1 group-hover:text-bleu transition-colors duration-180">
-                          {showroom.name}
+                          {showroom.nom}
                         </div>
                         <div className="text-sm text-gris mb-1">
-                          {showroom.fullAddress}
+                          {adresseComplete(c)}
                         </div>
                         {showroom.note && (
                           <div className="text-xs text-[#666666] italic">
@@ -278,12 +281,13 @@ export function Contact() {
                     <h4 className="font-semibold text-noir">Horaires</h4>
                   </div>
                   <div className="pl-8 text-sm text-gris space-y-1">
-                    <div>Mardi - Samedi : 9h-18h</div>
-                    <div>Lundi : Sur rendez-vous</div>
+                    {lignesHoraires(c.horaires).map((l) => <div key={l}>{l}</div>)}
                   </div>
-                  <div className="pl-8 text-xs text-[#666666] mt-3 italic">
-                    Sur rendez-vous à notre showroom de Chaville
-                  </div>
+                  {c.horaires_note && (
+                    <div className="pl-8 text-xs text-[#666666] mt-3 italic">
+                      {c.horaires_note}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
-import { siteConfig } from '../config/site';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Input } from '../components/ui/Input';
@@ -24,6 +23,8 @@ import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
 import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { DonneesDemande, ErreurDemande, envoyerDemande } from '../lib/depotDemande';
+import { useCoordonnees } from '../lib/coordonnees';
+import { lienTelephone } from '../config/coordonnees';
 
 const ETAPES_PARCOURS = [
   {
@@ -127,6 +128,7 @@ const VIDE: DonneesDemande = {
 const TITRES_ETAPES = ['Vous', 'Votre moto', 'Photos et prix'];
 
 export function VendreMaMoto() {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   const [donnees, setDonnees] = useState<DonneesDemande>(VIDE);
   const [photos, setPhotos] = useState<UploadedDoc[]>([]);
   const [consentement, setConsentement] = useState(false);
@@ -218,10 +220,10 @@ export function VendreMaMoto() {
               <a href="#formulaire" tabIndex={-1}>
                 <Button size="lg" className="w-full sm:w-auto">Demander une estimation</Button>
               </a>
-              <a href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`} tabIndex={-1}>
+              <a href={lienTelephone(c.telephone)} tabIndex={-1}>
                 <Button size="lg" variant="outline" className="w-full sm:w-auto">
                   <Phone className="w-4 h-4" aria-hidden="true" />
-                  {siteConfig.contact.phone}
+                  {c.telephone}
                 </Button>
               </a>
             </div>
@@ -520,8 +522,8 @@ export function VendreMaMoto() {
           </div>
           <p className="mt-8 text-gris">
             Une autre question ? Appelez-nous au{' '}
-            <a href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`} className="lien whitespace-nowrap">
-              {siteConfig.contact.phone}
+            <a href={lienTelephone(c.telephone)} className="lien whitespace-nowrap">
+              {c.telephone}
             </a>{' '}
             ou passez au showroom de Chaville, sur rendez-vous.
           </p>

@@ -3,8 +3,11 @@ import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { siteConfig } from '../config/site';
+import { useCoordonnees } from '../lib/coordonnees';
+import { adresseComplete } from '../config/coordonnees';
 
 export function LegalNotice() {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   return (
     <>
       <SEOHead meta={pageSeo['/mentions-legales']} />
@@ -25,9 +28,9 @@ export function LegalNotice() {
               <strong>{siteConfig.name}</strong><br />
               SIREN: 988004719<br />
               Siège social : {siteConfig.siegeSocial}<br />
-              Showroom : {siteConfig.showrooms[0].fullAddress}<br />
-              Email: {siteConfig.contact.email}<br />
-              Téléphone: {siteConfig.contact.phone}
+              Showroom : {adresseComplete(c)}<br />
+              Email: {c.email}<br />
+              Téléphone: {c.telephone}
             </p>
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Directeur de la publication</h2>
@@ -58,7 +61,7 @@ export function LegalNotice() {
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Données personnelles</h2>
             <p className="text-gris mb-6 leading-relaxed">
-              Conformément à la loi « Informatique et Libertés » du 6 janvier 1978 modifiée et au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données personnelles vous concernant. Pour exercer ce droit, veuillez nous contacter à l'adresse {siteConfig.contact.email}.
+              Conformément à la loi « Informatique et Libertés » du 6 janvier 1978 modifiée et au Règlement Général sur la Protection des Données (RGPD), vous disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données personnelles vous concernant. Pour exercer ce droit, veuillez nous contacter à l'adresse {c.email}.
             </p>
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Cookies</h2>
@@ -72,7 +75,7 @@ export function LegalNotice() {
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Limitation de responsabilité</h2>
             <p className="text-gris leading-relaxed">
-              Les informations contenues sur ce site sont aussi précises que possibles et le site est périodiquement remis à jour, mais peut toutefois contenir des inexactitudes, des omissions ou des lacunes. Si vous constatez une lacune, erreur ou ce qui semble être un dysfonctionnement, merci de bien vouloir le signaler par email à {siteConfig.contact.email}.
+              Les informations contenues sur ce site sont aussi précises que possibles et le site est périodiquement remis à jour, mais peut toutefois contenir des inexactitudes, des omissions ou des lacunes. Si vous constatez une lacune, erreur ou ce qui semble être un dysfonctionnement, merci de bien vouloir le signaler par email à {c.email}.
             </p>
           </div>
         </Container>

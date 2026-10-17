@@ -20,6 +20,7 @@
  */
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
+import { remplir, TEL } from "../_shared/coordonnees.ts";
 
 const BUCKET = "financing-documents";
 const MAX_ESSAIS = 5;
@@ -193,7 +194,7 @@ async function dossierDuClient(db: SupabaseClient, body: Record<string, unknown>
   if (!d) throw new Erreur(401, "acces_refuse", "E-mail ou code d'accès incorrect.");
   if (!d.access_code_hash) {
     throw new Erreur(403, "code_a_demander",
-      "Votre dossier a été créé avant la mise en place des codes d'accès. Contactez SVM Ride au 01 84 19 01 74 pour recevoir votre code.");
+      `Votre dossier a été créé avant la mise en place des codes d'accès. Contactez SVM Ride au ${TEL} pour recevoir votre code.`);
   }
 
   // Réserve l'essai AVANT de vérifier le code (atomique dans la base)
@@ -269,7 +270,7 @@ function fichiersDuDossier(d: Record<string, unknown>): string[] {
 Deno.serve(async (req: Request) => {
   const cors = corsHeaders(req.headers.get("Origin"));
   const json = (status: number, data: unknown) =>
-    new Response(JSON.stringify(data), { status, headers: { ...cors, "Content-Type": "application/json" } });
+    new Response(remplir(JSON.stringify(data)), { status, headers: { ...cors, "Content-Type": "application/json" } });
 
   if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: cors });
   if (req.method !== "POST") return json(405, { error: "methode", message: "Méthode non autorisée." });

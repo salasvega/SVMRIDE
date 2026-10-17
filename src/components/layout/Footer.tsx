@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom';
 import { useEquipe } from '../../lib/equipe';
+import { useCoordonnees } from '../../lib/coordonnees';
+import { adresseComplete, lienInstagram, lienMaps, lienTelephone, lignesHoraires } from '../../config/coordonnees';
 import { Mail, Phone, Instagram, MapPin } from 'lucide-react';
 import { siteConfig } from '../../config/site';
 
 export function Footer() {
   // Lien « Notre équipe » : seulement si l'équipe est affichée (réglage de l'admin)
   const equipe = useEquipe();
+  // Coordonnées modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees();
   const currentYear = new Date().getFullYear();
 
   return (
@@ -24,18 +28,18 @@ export function Footer() {
 
             <div className="space-y-3">
               <h3 className="titre-display text-sm tracking-[1px] mb-2">Notre showroom</h3>
-              {siteConfig.showrooms.map((showroom, index) => (
+              {[c.showroom].map((showroom, index) => (
                 <a
                   key={index}
-                  href={showroom.mapsUrl}
+                  href={lienMaps(c)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-2 text-[#AAAAAA] hover:text-white transition-colors duration-180 group"
                 >
                   <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5 text-or-clair group-hover:text-white transition-colors duration-180" aria-hidden="true" />
                   <div className="text-sm">
-                    <div className="font-medium">{showroom.name}</div>
-                    <div className="text-xs">{showroom.fullAddress}</div>
+                    <div className="font-medium">{showroom.nom}</div>
+                    <div className="text-xs">{adresseComplete(c)}</div>
                     {showroom.note && (
                       <div className="text-xs italic text-[#888888]">({showroom.note})</div>
                     )}
@@ -43,8 +47,7 @@ export function Footer() {
                 </a>
               ))}
               <div className="text-xs text-[#888888] mt-3 pl-6">
-                <div>Mardi - Samedi : 9h-18h</div>
-                <div>Lundi : Sur rendez-vous</div>
+                {lignesHoraires(c.horaires).map((l) => <div key={l}>{l}</div>)}
               </div>
             </div>
           </div>
@@ -53,28 +56,30 @@ export function Footer() {
             <h3 className="titre-display text-lg tracking-[1px] mb-4">Contact</h3>
             <div className="space-y-3">
               <a
-                href={`mailto:${siteConfig.contact.email}`}
+                href={`mailto:${c.email}`}
                 className="flex items-center gap-2 text-[#AAAAAA] hover:text-white transition-colors duration-180"
               >
                 <Mail className="w-5 h-5 text-or-clair" aria-hidden="true" />
-                <span className="text-sm">{siteConfig.contact.email}</span>
+                <span className="text-sm">{c.email}</span>
               </a>
               <a
-                href={`tel:${siteConfig.contact.phone.replace(/\s/g, '')}`}
+                href={lienTelephone(c.telephone)}
                 className="flex items-center gap-2 text-[#AAAAAA] hover:text-white transition-colors duration-180"
               >
                 <Phone className="w-5 h-5 text-or-clair" aria-hidden="true" />
-                <span className="text-sm">{siteConfig.contact.phone}</span>
+                <span className="text-sm">{c.telephone}</span>
               </a>
+{c.instagram && (
               <a
-                href={siteConfig.contact.instagramUrl}
+                href={lienInstagram(c.instagram)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 text-[#AAAAAA] hover:text-white transition-colors duration-180"
               >
                 <Instagram className="w-5 h-5 text-or-clair" aria-hidden="true" />
-                <span className="text-sm">{siteConfig.contact.instagram}</span>
+                <span className="text-sm">@{c.instagram}</span>
               </a>
+              )}
             </div>
           </div>
 

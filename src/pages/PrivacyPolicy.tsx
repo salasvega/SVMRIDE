@@ -3,8 +3,10 @@ import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { siteConfig } from '../config/site';
+import { useCoordonnees } from '../lib/coordonnees';
 
 export function PrivacyPolicy() {
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   return (
     <>
       <SEOHead meta={pageSeo['/politique-confidentialite']} />
@@ -96,7 +98,7 @@ export function PrivacyPolicy() {
             </ul>
 
             <p className="text-gris mb-6 leading-relaxed">
-              Pour exercer ces droits, contactez-nous à: {siteConfig.contact.email}
+              Pour exercer ces droits, contactez-nous à: {c.email}
             </p>
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Sécurité</h2>
@@ -107,8 +109,8 @@ export function PrivacyPolicy() {
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Contact</h2>
             <p className="text-gris leading-relaxed">
               Pour toute question concernant cette politique de confidentialité, contactez-nous:<br />
-              Email: {siteConfig.contact.email}<br />
-              Téléphone: {siteConfig.contact.phone}
+              Email: {c.email}<br />
+              Téléphone: {c.telephone}
             </p>
           </div>
         </Container>

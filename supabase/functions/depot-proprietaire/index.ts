@@ -13,7 +13,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
 import {
   base, BUCKET_DOCS, code6, cors, creerSession, echapper, egal, empreinte, envoyer, Erreur, gabarit, lireSession,
-  reponse,
+  reponse, TELEPHONE,
 } from "../_shared/depot-commun.ts";
 
 const CODE_MINUTES = 10;
@@ -163,7 +163,7 @@ Deno.serve(async (req: Request) => {
         if (ouverte && type !== "question") throw new Erreur(409, "deja", "Une demande de ce type est déjà en cours de traitement.");
         const { count } = await db.from("depot_demandes_proprietaire").select("id", { count: "exact", head: true })
           .eq("dossier_id", d.id).gte("cree_le", new Date(Date.now() - 86_400_000).toISOString());
-        if ((count ?? 0) >= 10) throw new Erreur(429, "trop", "Vous avez déjà envoyé plusieurs demandes aujourd'hui. Appelez-nous au 01 84 19 01 74.");
+        if ((count ?? 0) >= 10) throw new Erreur(429, "trop", `Vous avez déjà envoyé plusieurs demandes aujourd'hui. Appelez-nous au ${TELEPHONE}.`);
         const { error } = await db.from("depot_demandes_proprietaire").insert({ dossier_id: d.id, type, message });
         if (error) throw error;
         return json(200, { ok: true });
