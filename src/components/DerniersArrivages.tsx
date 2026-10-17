@@ -2,6 +2,8 @@
  * Accueil : les dernières motos mises en vente (3 maximum, hors vendues),
  * avec un lien vers tout le catalogue. La section disparaît s'il n'y a
  * aucune moto en vente.
+ * Téléphone et tablette : carrousel sur une ligne (défilement automatique,
+ * glisser au doigt, sans boutons) ; ordinateur : les 3 cartes côte à côte.
  */
 import { Link } from 'react-router-dom';
 import { useVehicles } from '../hooks/useVehicles';
@@ -9,6 +11,7 @@ import { VehicleCard } from './VehicleCard';
 import { Section } from './ui/Section';
 import { Container } from './ui/Container';
 import { Button } from './ui/Button';
+import { CarrouselCartes } from './ui/CarrouselCartes';
 
 const NOMBRE = 3;
 
@@ -30,18 +33,18 @@ export function DerniersArrivages() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
+        <CarrouselCartes libelle="Derniers arrivages" libelleCarte="moto">
           {loading
             ? Array.from({ length: NOMBRE }, (_, i) => (
                 <div key={i} className="rounded-[18px] bg-fond border border-bordure aspect-[4/5] animate-pulse motion-reduce:animate-none" aria-hidden="true" />
               ))
-            : enVente.slice(0, NOMBRE).map((v, i) => (
-                // Sur tablette (2 colonnes), la 3e carte est masquée pour ne pas rester seule
-                <div key={v.id} className={i === 2 ? 'sm:hidden lg:block' : ''}>
-                  <VehicleCard vehicle={v} />
+            : enVente.slice(0, NOMBRE).map((v) => (
+                <div key={v.id} className="h-full">
+                  {/* Dans le carrousel, le glissement fait défiler les motos ; les flèches changent la photo */}
+                  <VehicleCard vehicle={v} glissementPhotos={false} />
                 </div>
               ))}
-        </div>
+        </CarrouselCartes>
 
         {!loading && enVente.length > NOMBRE && (
           <div className="mt-8 text-center">

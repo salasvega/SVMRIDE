@@ -13,6 +13,8 @@ interface VehicleCardProps {
     status?: 'available' | 'reserved' | 'sold';
   };
   disableLink?: boolean;
+  /** false : pas de glissement au doigt sur les photos (carte placée dans un carrousel qui glisse déjà) */
+  glissementPhotos?: boolean;
 }
 
 // Récupère la première image (string[] ou {url,path}[])
@@ -37,7 +39,7 @@ function getStatusBadge(status?: string) {
   }
 }
 
-export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) {
+export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = true }: VehicleCardProps) {
   const images = getAllImages(vehicle);
   const displayImages = images.length > 0 ? images : ['/placeholder.jpg'];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -63,8 +65,8 @@ export function VehicleCard({ vehicle, disableLink = false }: VehicleCardProps) 
 
   const content = (
     <article
-      {...glisse.ecouteurs}
-      className={`bg-white rounded-[18px] overflow-hidden shadow-vehicule transition-[box-shadow,transform] duration-200 ease-out hover:shadow-vehicule-fort hover:-translate-y-1 group relative h-full flex flex-col ${hasMultipleImages ? 'touch-pan-y' : ''}`}
+      {...(glissementPhotos ? glisse.ecouteurs : {})}
+      className={`bg-white rounded-[18px] overflow-hidden shadow-vehicule transition-[box-shadow,transform] duration-200 ease-out hover:shadow-vehicule-fort hover:-translate-y-1 group relative h-full flex flex-col ${hasMultipleImages && glissementPhotos ? 'touch-pan-y' : ''}`}
     >
       {/* Photos : glisser au doigt (ou à la souris) en plus des flèches */}
       <div ref={glisse.zoneRef} className="relative aspect-[4/3] overflow-hidden bg-fond">

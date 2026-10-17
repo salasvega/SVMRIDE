@@ -4,7 +4,8 @@
  * Carrousel en boucle infinie, sans dépendance :
  * - défilement automatique lent (requestAnimationFrame + translate3d, donc fluide) ;
  * - glisser au doigt ou à la souris (avec inertie), molette horizontale du pavé tactile ;
- * - boutons précédent / suivant / pause, flèches du clavier entre les marques ;
+ * - pas de boutons (demande du 17/10) : glisser, flèches du clavier entre les marques ;
+ *   pause au survol, au focus, au toucher et hors écran ;
  * - pause au survol, au toucher, au focus clavier, hors écran et onglet masqué ;
  *   reprise 2,5 s après la fin de l'interaction ;
  * - « réduire les animations » : aucun défilement automatique, navigation manuelle conservée.
@@ -20,7 +21,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FocusEvent as FocusEventReact, KeyboardEvent as KeyboardEventReact, PointerEvent as PointerEventReact } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { MARQUES, marqueParId, nomMarque, urlLogo } from '../config/marques';
 import { useStockMarques } from '../hooks/useStockMarques';
 import { usePrefereMoinsDAnimations } from '../hooks/usePrefereMoinsDAnimations';
@@ -82,9 +82,6 @@ export function ExplorezLesMarques() {
   const animation = useRef<{ de: number; vers: number; debut: number; duree: number } | null>(null);
   const bloquerClic = useRef(false);
 
-  const [enPause, setEnPause] = useState(false);
-  const pauseRef = useRef(false);
-  pauseRef.current = enPause;
   const [actif, setActif] = useState(0); // marque qui reçoit la tabulation (tabindex itinérant)
 
   const appliquer = () => {
@@ -155,7 +152,7 @@ export function ExplorezLesMarques() {
       } else {
         inertie.current = 0;
         const enAttente =
-          reduit || pauseRef.current || survol.current || focusDedans.current || glisse.current || !visible.current || t < repriseA.current;
+          reduit || survol.current || focusDedans.current || glisse.current || !visible.current || t < repriseA.current;
         if (!enAttente) position.current += VITESSE * dt;
       }
       if (!animation.current) recentrer();
@@ -177,12 +174,6 @@ export function ExplorezLesMarques() {
       animation.current = { de: position.current, vers: cible, debut: performance.now(), duree: 450 };
     }
     differerReprise();
-  };
-
-  const defiler = (sens: 1 | -1) => {
-    const largeurVue = fenetreRef.current?.clientWidth ?? 600;
-    const base = animation.current ? animation.current.vers : position.current;
-    allerA(base + sens * Math.max(160, largeurVue * 0.7));
   };
 
   // Molette horizontale (pavé tactile) : écouteur non passif pour bloquer le retour arrière du navigateur
@@ -316,9 +307,6 @@ export function ExplorezLesMarques() {
     );
   };
 
-  const bouton =
-    'inline-flex h-10 w-10 items-center justify-center rounded-full border border-champ bg-white text-noir transition-colors duration-180 hover:border-or hover:text-or-texte';
-
   return (
     <Section background="gray" className="!py-12 md:!py-16 overflow-clip">
       <Container>
@@ -328,25 +316,6 @@ export function ExplorezLesMarques() {
             <p className="text-base md:text-lg text-gris leading-relaxed">
               Retrouvez les plus grandes marques de motos et découvrez les modèles actuellement disponibles chez SVM Ride.
             </p>
-          </div>
-          <div className="flex items-center gap-2 self-start md:self-auto">
-            <button type="button" className={bouton} onClick={() => defiler(-1)} aria-label="Marques précédentes">
-              <ChevronLeft className="h-5 w-5" aria-hidden="true" />
-            </button>
-            {!reduit && (
-              <button
-                type="button"
-                className={bouton}
-                onClick={() => setEnPause((p) => !p)}
-                aria-label={enPause ? 'Reprendre le défilement' : 'Mettre en pause le défilement'}
-                aria-pressed={enPause}
-              >
-                {enPause ? <Play className="h-4 w-4" aria-hidden="true" /> : <Pause className="h-4 w-4" aria-hidden="true" />}
-              </button>
-            )}
-            <button type="button" className={bouton} onClick={() => defiler(1)} aria-label="Marques suivantes">
-              <ChevronRight className="h-5 w-5" aria-hidden="true" />
-            </button>
           </div>
         </div>
       </Container>

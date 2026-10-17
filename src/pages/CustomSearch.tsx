@@ -142,7 +142,7 @@ export function CustomSearch() {
         </Container>
       </Section>
 
-      <Section background="white" className="!py-8">
+      <Section background="white" className="!py-8 lg:!pt-16">
         <Container size="md">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Colonne gauche : explication du service */}
@@ -232,7 +232,7 @@ export function CustomSearch() {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className="space-y-6 bg-fond p-8 rounded-xl sticky top-24"
+                  className="space-y-6 bg-fond p-8 rounded-xl sticky top-24 lg:-mt-8"
                 >
                   <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
                     Votre recherche
