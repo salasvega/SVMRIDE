@@ -1,12 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { siteConfig, navLinks } from '../../config/site';
 import { Button } from '../ui/Button';
+import { FondMenu } from './FondMenu';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  // Menu fermé au changement de page et avec Échap (le clic en dehors : voir FondMenu)
+  useEffect(() => setMobileMenuOpen(false), [location.pathname]);
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const echap = (e: KeyboardEvent) => e.key === 'Escape' && setMobileMenuOpen(false);
+    window.addEventListener('keydown', echap);
+    return () => window.removeEventListener('keydown', echap);
+  }, [mobileMenuOpen]);
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -16,6 +25,8 @@ export function Header() {
   };
 
   return (
+    <>
+    <FondMenu ouvert={mobileMenuOpen} onFermer={() => setMobileMenuOpen(false)} />
     <header className="sticky top-0 z-50 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Navigation principale">
         {/* Barre du haut */}
@@ -131,5 +142,6 @@ export function Header() {
       {/* Liseré or repris du logo */}
       <div className="liseret-or" aria-hidden="true" />
     </header>
+    </>
   );
 }

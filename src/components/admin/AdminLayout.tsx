@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Menu, Store, Users, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { FondMenu } from '../layout/FondMenu';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
 import { useFinancingProfilesUnreadCount } from '../../hooks/useFinancingProfilesUnreadCount';
 
@@ -91,7 +92,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
-      <header className="bg-white border-b border-[#E5E5E5]">
+      <FondMenu ouvert={menuOuvert} onFermer={() => setMenuOuvert(false)} z="z-30" />
+      <header className="relative z-40 bg-white border-b border-[#E5E5E5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-6">
