@@ -39,6 +39,7 @@ const DepotDossiersList = nomme(() => import('./pages/admin/DepotDossiersList'),
 const DepotDossierDetail = nomme(() => import('./pages/admin/DepotDossierDetail'), 'DepotDossierDetail');
 const EquipeAdmin = nomme(() => import('./pages/admin/EquipeAdmin'), 'EquipeAdmin');
 const InfosSite = nomme(() => import('./pages/admin/InfosSite'), 'InfosSite');
+const StudioDesign = nomme(() => import('./pages/admin/StudioDesign'), 'StudioDesign');
 const Signature = nomme(() => import('./pages/Signature'), 'Signature');
 const SuivreMaVente = nomme(() => import('./pages/SuivreMaVente'), 'SuivreMaVente');
 const SalesFolderDetails = nomme(() => import('./pages/admin/SalesFolderDetails'), 'SalesFolderDetails');
@@ -129,6 +130,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <InfosSite />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/studio-design"
+            element={
+              <ProtectedRoute>
+                <StudioDesign />
               </ProtectedRoute>
             }
           />

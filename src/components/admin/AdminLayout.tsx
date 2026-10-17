@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
-import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Menu, Store, Users, X } from 'lucide-react';
+import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Menu, Palette, Store, Users, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { FondMenu } from '../layout/FondMenu';
@@ -65,6 +65,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const contenuSite: Lien[] = [
     { to: '/admin/equipe', libelle: 'Équipe', icone: <Users className="w-4 h-4" aria-hidden="true" /> },
     { to: '/admin/infos-site', libelle: 'Infos du site', icone: <Store className="w-4 h-4" aria-hidden="true" /> },
+    { to: '/admin/studio-design', libelle: 'Studio Design', icone: <Palette className="w-4 h-4" aria-hidden="true" /> },
   ];
 
   /** Lien du menu ; « surFond » : dans le groupe grisé du contenu du site */
@@ -75,6 +76,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         key={l.to}
         to={l.to}
         aria-current={actif ? 'page' : undefined}
+        title={surFond ? l.libelle : undefined}
         className={`relative flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
           actif
             ? surFond ? 'bg-white text-brand shadow-sm' : 'bg-[#F5F5F5] text-brand'
@@ -82,7 +84,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         }`}
       >
         {l.icone}
-        {l.libelle}
+        {/* Groupe « Contenu du site » : icônes seules sur les écrans moyens, pour que tout tienne sur une ligne */}
+        {surFond ? <span className="sr-only 2xl:not-sr-only">{l.libelle}</span> : l.libelle}
         {!!l.badge && l.badge > 0 && (
           <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
             {l.badge > 99 ? '99+' : l.badge}
@@ -97,7 +100,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       <FondMenu ouvert={menuOuvert} onFermer={() => setMenuOuvert(false)} z="z-30" />
       {/* Figé en haut de l'écran, sur ordinateur comme sur téléphone (le menu ouvert se ferme si la page défile) */}
       <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl 2xl:max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-6">
               <Link to="/admin/dashboard" className="flex shrink-0 items-center space-x-2">

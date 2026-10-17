@@ -204,22 +204,45 @@ export type CleSection =
   | 'boutons'
   | 'footer';
 
-export const SECTIONS: { cle: CleSection; libelle: string }[] = [
-  { cle: 'header', libelle: 'Header et navigation' },
-  { cle: 'hero', libelle: "Bandeau principal de l'accueil" },
-  { cle: 'catalogue', libelle: 'Catalogue de motos' },
-  { cle: 'cartes', libelle: 'Cartes de présentation des motos' },
-  { cle: 'fiche', libelle: 'Fiches détaillées des motos' },
-  { cle: 'marques', libelle: 'Section marques' },
-  { cle: 'equipe', libelle: 'Section équipe' },
-  { cle: 'avis', libelle: 'Section avis clients' },
-  { cle: 'formulaires', libelle: 'Formulaires' },
-  { cle: 'boutons', libelle: 'Boutons et appels à l’action' },
-  { cle: 'footer', libelle: 'Footer' },
-];
-
 export const REGLAGES_SECTION = ['fond', 'texte', 'titres', 'accent', 'bouton', 'bordure'] as const;
 export type ReglageSection = (typeof REGLAGES_SECTION)[number];
+
+export interface Section {
+  cle: CleSection;
+  libelle: string;
+  aide: string;
+  /** Section sur fond sombre (couleur primaire) */
+  sombre: boolean;
+  /** Couleurs globales remplacées par le réglage « fond » */
+  fond: CleRole[];
+  reglages: { cle: ReglageSection; libelle: string }[];
+}
+
+const REGLAGES_CLAIRS: Section['reglages'] = [
+  { cle: 'fond', libelle: 'Arrière-plan' },
+  { cle: 'titres', libelle: 'Titres' },
+  { cle: 'texte', libelle: 'Texte' },
+  { cle: 'accent', libelle: 'Accent' },
+  { cle: 'bouton', libelle: 'Boutons' },
+  { cle: 'bordure', libelle: 'Bordures' },
+];
+
+export const SECTIONS: Section[] = [
+  { cle: 'header', libelle: 'Header et navigation', aide: 'Barre du haut, menu et lien actif', sombre: false, fond: ['surface'], reglages: REGLAGES_CLAIRS },
+  { cle: 'hero', libelle: "Bandeau principal de l'accueil", aide: 'Grande photo, titre et boutons en haut de l’accueil', sombre: true, fond: ['primaire'], reglages: REGLAGES_CLAIRS },
+  { cle: 'catalogue', libelle: 'Catalogue de motos', aide: 'Page Nos véhicules : recherche, filtres et liste', sombre: false, fond: ['arriere_plan'], reglages: REGLAGES_CLAIRS },
+  { cle: 'cartes', libelle: 'Cartes de présentation des motos', aide: 'Cartes du catalogue et des derniers arrivages', sombre: false, fond: ['surface'], reglages: REGLAGES_CLAIRS },
+  { cle: 'fiche', libelle: 'Fiches détaillées des motos', aide: 'Page d’une moto : photos, prix, caractéristiques', sombre: false, fond: ['arriere_plan', 'surface'], reglages: REGLAGES_CLAIRS },
+  { cle: 'marques', libelle: 'Section marques', aide: 'Bandeau « Explorez les marques » de l’accueil', sombre: false, fond: ['arriere_plan'], reglages: REGLAGES_CLAIRS },
+  { cle: 'equipe', libelle: 'Section équipe', aide: 'Équipe sur l’accueil et page Équipe', sombre: false, fond: ['surface'], reglages: REGLAGES_CLAIRS },
+  { cle: 'avis', libelle: 'Section avis clients', aide: 'Avis Google sur l’accueil', sombre: false, fond: ['arriere_plan'], reglages: REGLAGES_CLAIRS },
+  { cle: 'formulaires', libelle: 'Formulaires', aide: 'Contact, reprise, financement, dépôt-vente…', sombre: false, fond: ['arriere_plan', 'surface'], reglages: REGLAGES_CLAIRS },
+  {
+    cle: 'boutons', libelle: 'Boutons et appels à l’action', aide: 'Boutons principaux de tout le site', sombre: false, fond: ['boutons'],
+    reglages: [{ cle: 'fond', libelle: 'Fond des boutons' }, { cle: 'texte', libelle: 'Texte des boutons' }],
+  },
+  { cle: 'footer', libelle: 'Footer', aide: 'Pied de page', sombre: true, fond: ['primaire'], reglages: REGLAGES_CLAIRS },
+];
 
 /* ===== Thème ===== */
 
@@ -282,9 +305,40 @@ export function couleursDuTheme(t: ThemeConfig): Couleurs {
   return c;
 }
 
-/** Nuances dérivées recalculées à partir des couleurs (après un changement dans l'éditeur) */
+/** Nuances dérivées recalculées à partir des couleurs */
 export function calculerDerivees(c: Couleurs): Record<string, string> {
   return Object.fromEntries(DERIVEES.map((d) => [d.variable, d.calcul(c)]));
+}
+
+/** Couleurs globales dont dépend chaque nuance dérivée (calculé une fois) */
+let dependances: Record<string, CleRole[]> | null = null;
+function dependancesDerivees(): Record<string, CleRole[]> {
+  if (dependances) return dependances;
+  const essais = ['#000000', '#FFFFFF', '#7F3FBF', '#20A060'];
+  dependances = {};
+  for (const d of DERIVEES) {
+    dependances[d.variable] = ROLES.filter((r) =>
+      essais.some((x) => d.calcul({ ...COULEURS_SIGNATURE, [r.cle]: x }) !== d.calcul(COULEURS_SIGNATURE)),
+    ).map((r) => r.cle);
+  }
+  return dependances;
+}
+
+/**
+ * Nuances dérivées d'un thème en cours de modification : celles dont les
+ * couleurs d'origine n'ont pas changé gardent la valeur du thème de départ
+ * (pour SVM Signature, les valeurs exactes du site) ; les autres sont recalculées.
+ */
+export function deriveesPour(couleurs: Couleurs, base: ThemeConfig): Record<string, string> {
+  const dep = dependancesDerivees();
+  const origine = couleursDuTheme(base);
+  const sortie: Record<string, string> = {};
+  for (const d of DERIVEES) {
+    const intacte = dep[d.variable].every((r) => couleurs[r] === origine[r]);
+    const figee = base.derivees?.[d.variable];
+    sortie[d.variable] = intacte && estHex(figee) ? figee.toUpperCase() : d.calcul(couleurs);
+  }
+  return sortie;
 }
 
 /**
@@ -315,16 +369,100 @@ export function variablesDuTheme(t: ThemeConfig): Record<string, string> {
 }
 
 /**
- * Bloc CSS du thème. Il vise le site public (.site) : l'admin garde toujours
- * sa propre charte. Le texte produit ne contient que des noms du registre et
- * des valeurs vérifiées : aucune saisie n'y est recopiée telle quelle.
+ * Variables d'une section personnalisée : ses couleurs remplacent celles du
+ * thème global, les nuances qui en dépendent sont recalculées, et seules les
+ * variables qui changent sont renvoyées (le reste est hérité du thème global).
  */
-export function cssDuTheme(t: ThemeConfig, selecteur = '.site'): string {
-  const vars = variablesDuTheme(t);
-  const corps = Object.entries(vars)
+export function variablesSection(t: ThemeConfig, cle: CleSection, globales = variablesDuTheme(t)): Record<string, string> {
+  const section = SECTIONS.find((s) => s.cle === cle);
+  const r = t.sections?.[cle];
+  if (!section || !r) return {};
+  const v = (k: ReglageSection) => (estHex(r[k]) ? r[k]!.toUpperCase() : undefined);
+  const c = couleursDuTheme(t);
+  const fond = v('fond');
+  if (fond) for (const role of section.fond) c[role] = fond;
+  if (cle === 'boutons') {
+    const derivees = deriveesPour(c, t);
+    if (v('texte')) derivees['sur-bouton'] = v('texte')!;
+    return difference(variablesDuTheme({ ...t, couleurs: c, derivees }), globales);
+  }
+  // Les sections partent des boutons tels que réglés pour tout le site
+  const boutons = t.sections?.boutons;
+  if (estHex(boutons?.fond)) c.boutons = boutons.fond.toUpperCase();
+  if (!section.sombre) {
+    if (v('titres')) c.texte = v('titres')!;
+    if (v('texte')) c.texte_secondaire = v('texte')!;
+  }
+  if (v('accent')) {
+    c.accent = v('accent')!;
+    if (section.sombre) c.secondaire = v('accent')!;
+  }
+  if (v('bouton')) c.boutons = v('bouton')!;
+  if (v('bordure')) c.bordure = v('bordure')!;
+  const derivees = deriveesPour(c, t);
+  if (estHex(boutons?.texte) && !v('bouton')) derivees['sur-bouton'] = boutons.texte.toUpperCase();
+  if (section.sombre) {
+    const titres = v('titres');
+    const texte = v('texte');
+    if (titres) derivees.inverse = titres;
+    if (texte) {
+      for (const n of ['91', '88', '84']) derivees[`inverse-${n}`] = texte;
+      for (const n of ['74', '66']) derivees[`inverse-${n}`] = melanger(texte, c.primaire, 0.85);
+      for (const n of ['53', '52']) derivees[`inverse-${n}`] = melanger(texte, c.primaire, 0.65);
+    }
+  }
+  return difference(variablesDuTheme({ ...t, couleurs: c, derivees }), globales);
+}
+
+function difference(a: Record<string, string>, b: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(a).filter(([k, x]) => b[k] !== x));
+}
+
+const declarations = (vars: Record<string, string>) =>
+  Object.entries(vars)
     .map(([k, v]) => `--${k}:${v}`)
     .join(';');
-  return `${selecteur}{${corps}}`;
+
+/**
+ * Bloc CSS du thème. Il vise le site public (.site) : l'admin garde toujours
+ * sa propre charte. Les sections personnalisées suivent (attribut data-zone).
+ * Le texte produit ne contient que des noms du registre et des valeurs
+ * vérifiées : aucune saisie n'y est recopiée telle quelle.
+ */
+export function cssDuTheme(t: ThemeConfig, selecteur = '.site'): string {
+  const globales = variablesDuTheme(t);
+  let css = `${selecteur}{${declarations(globales)}}`;
+  const boutons = variablesSection(t, 'boutons', globales);
+  if (Object.keys(boutons).length) css += `${selecteur}{${declarations(boutons)}}`;
+  for (const s of SECTIONS) {
+    if (s.cle === 'boutons') continue;
+    const vars = variablesSection(t, s.cle, { ...globales, ...boutons });
+    if (Object.keys(vars).length) css += `${selecteur} [data-zone="${s.cle}"]{${declarations(vars)}}`;
+  }
+  return css;
+}
+
+/** Forme complète et ordonnée d'un thème (enregistrement et comparaison) */
+export function themeComplet(t: ThemeConfig): ThemeConfig {
+  const couleurs = couleursDuTheme(t);
+  const sections: NonNullable<ThemeConfig['sections']> = {};
+  for (const s of SECTIONS) {
+    const r = t.sections?.[s.cle];
+    if (!r) continue;
+    const propre: Partial<Record<ReglageSection, string>> = {};
+    for (const k of REGLAGES_SECTION) {
+      const v = r[k];
+      if (estHex(v)) propre[k] = v.toUpperCase();
+    }
+    if (Object.keys(propre).length) sections[s.cle] = propre;
+  }
+  return {
+    schema: SCHEMA_THEME,
+    couleurs,
+    derivees: deriveesPour(couleurs, t),
+    sections,
+    style: Object.fromEntries(STYLE.map((s) => [s.cle, t.style?.[s.cle] ?? s.defaut])) as Style,
+  };
 }
 
 /* ===== Contrôles de lisibilité (WCAG AA) ===== */
@@ -338,22 +476,24 @@ export interface Controle {
   fond: string;
   /** 4,5 pour du texte courant, 3 pour les grands textes et éléments graphiques */
   seuil: 4.5 | 3;
+  /** Correction proposée : couleur globale à ajuster, contre quelle variable */
+  corrige: { role: CleRole; contre: string };
 }
 
 export const CONTROLES: Controle[] = [
-  { cle: 'texte-fond', libelle: 'Texte principal sur l’arrière-plan', roles: ['texte', 'arriere_plan'], avant: 'noir', fond: 'fond', seuil: 4.5 },
-  { cle: 'texte-surface', libelle: 'Texte principal sur les cartes', roles: ['texte', 'surface'], avant: 'noir', fond: 'surface', seuil: 4.5 },
-  { cle: 'texte2-fond', libelle: 'Paragraphes sur l’arrière-plan', roles: ['texte_secondaire', 'arriere_plan'], avant: 'gris-texte', fond: 'fond', seuil: 4.5 },
-  { cle: 'texte2-surface', libelle: 'Paragraphes sur les cartes', roles: ['texte_secondaire', 'surface'], avant: 'gris-texte', fond: 'surface', seuil: 4.5 },
-  { cle: 'bouton', libelle: 'Texte des boutons', roles: ['boutons'], avant: 'sur-bouton', fond: 'bleu', seuil: 4.5 },
-  { cle: 'bouton-survol', libelle: 'Texte des boutons au survol', roles: ['boutons'], avant: 'sur-bouton', fond: 'bleu-hover', seuil: 4.5 },
-  { cle: 'lien-fond', libelle: 'Liens sur l’arrière-plan', roles: ['liens', 'arriere_plan'], avant: 'lien', fond: 'fond', seuil: 4.5 },
-  { cle: 'lien-surface', libelle: 'Liens sur les cartes', roles: ['liens', 'surface'], avant: 'lien', fond: 'surface', seuil: 4.5 },
-  { cle: 'sombre-texte', libelle: 'Texte sur les sections sombres', roles: ['primaire'], avant: 'inverse', fond: 'noir-profond', seuil: 4.5 },
-  { cle: 'sombre-secondaire', libelle: 'Détails sur les sections sombres', roles: ['secondaire', 'primaire'], avant: 'or-clair', fond: 'noir-profond', seuil: 3 },
-  { cle: 'sombre-accent', libelle: 'Accent sur les sections sombres', roles: ['accent', 'primaire'], avant: 'or', fond: 'noir-profond', seuil: 3 },
-  { cle: 'accent-texte', libelle: 'Accent en texte sur l’arrière-plan', roles: ['accent', 'arriere_plan'], avant: 'or-texte', fond: 'fond', seuil: 4.5 },
-  { cle: 'focus', libelle: 'Contour du champ sélectionné', roles: ['liens', 'arriere_plan'], avant: 'bleu-vif', fond: 'fond', seuil: 3 },
+  { cle: 'texte-fond', libelle: 'Texte principal sur l’arrière-plan', roles: ['texte', 'arriere_plan'], avant: 'noir', fond: 'fond', seuil: 4.5, corrige: { role: 'texte', contre: 'fond' } },
+  { cle: 'texte-surface', libelle: 'Texte principal sur les cartes', roles: ['texte', 'surface'], avant: 'noir', fond: 'surface', seuil: 4.5, corrige: { role: 'texte', contre: 'surface' } },
+  { cle: 'texte2-fond', libelle: 'Paragraphes sur l’arrière-plan', roles: ['texte_secondaire', 'arriere_plan'], avant: 'gris-texte', fond: 'fond', seuil: 4.5, corrige: { role: 'texte_secondaire', contre: 'fond' } },
+  { cle: 'texte2-surface', libelle: 'Paragraphes sur les cartes', roles: ['texte_secondaire', 'surface'], avant: 'gris-texte', fond: 'surface', seuil: 4.5, corrige: { role: 'texte_secondaire', contre: 'surface' } },
+  { cle: 'bouton', libelle: 'Texte des boutons', roles: ['boutons'], avant: 'sur-bouton', fond: 'bleu', seuil: 4.5, corrige: { role: 'boutons', contre: 'sur-bouton' } },
+  { cle: 'bouton-survol', libelle: 'Texte des boutons au survol', roles: ['boutons'], avant: 'sur-bouton', fond: 'bleu-hover', seuil: 4.5, corrige: { role: 'boutons', contre: 'sur-bouton' } },
+  { cle: 'lien-fond', libelle: 'Liens sur l’arrière-plan', roles: ['liens', 'arriere_plan'], avant: 'lien', fond: 'fond', seuil: 4.5, corrige: { role: 'liens', contre: 'fond' } },
+  { cle: 'lien-surface', libelle: 'Liens sur les cartes', roles: ['liens', 'surface'], avant: 'lien', fond: 'surface', seuil: 4.5, corrige: { role: 'liens', contre: 'surface' } },
+  { cle: 'sombre-texte', libelle: 'Texte sur les sections sombres', roles: ['primaire'], avant: 'inverse', fond: 'noir-profond', seuil: 4.5, corrige: { role: 'primaire', contre: 'inverse' } },
+  { cle: 'sombre-secondaire', libelle: 'Détails sur les sections sombres', roles: ['secondaire', 'primaire'], avant: 'or-clair', fond: 'noir-profond', seuil: 3, corrige: { role: 'secondaire', contre: 'noir-profond' } },
+  { cle: 'sombre-accent', libelle: 'Accent sur les sections sombres', roles: ['accent', 'primaire'], avant: 'or', fond: 'noir-profond', seuil: 3, corrige: { role: 'accent', contre: 'noir-profond' } },
+  { cle: 'accent-texte', libelle: 'Accent en texte sur l’arrière-plan', roles: ['accent', 'arriere_plan'], avant: 'or-texte', fond: 'fond', seuil: 4.5, corrige: { role: 'accent', contre: 'fond' } },
+  { cle: 'focus', libelle: 'Contour du champ sélectionné', roles: ['liens', 'arriere_plan'], avant: 'bleu-vif', fond: 'fond', seuil: 3, corrige: { role: 'liens', contre: 'fond' } },
 ];
 
 export type Niveau = 'ok' | 'grand' | 'ko';
@@ -362,6 +502,16 @@ export interface Resultat {
   controle: Controle;
   ratio: number;
   niveau: Niveau;
+}
+
+/**
+ * Couleur corrigée pour réussir un contrôle : la couleur globale concernée,
+ * foncée ou éclaircie juste assez (marge de 0,3 au-dessus du seuil).
+ */
+export function correction(r: Resultat, c: Couleurs, vars: Record<string, string>): { role: CleRole; couleur: string } {
+  const { role, contre } = r.controle.corrige;
+  const cible = r.controle.seuil + 0.3 + (r.controle.cle === 'bouton-survol' ? 1 : 0);
+  return { role, couleur: ajusterContraste(c[role], vars[contre], cible) };
 }
 
 /** Contrôles de contraste d'un thème (valeurs résolues, nuances dérivées comprises) */
