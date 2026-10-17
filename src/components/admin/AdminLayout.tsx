@@ -1,9 +1,10 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Menu, Store, Users, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { FondMenu } from '../layout/FondMenu';
+import { useFermerAuDefilement } from '../../hooks/useFermerAuDefilement';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
 import { useFinancingProfilesUnreadCount } from '../../hooks/useFinancingProfilesUnreadCount';
 
@@ -18,6 +19,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   // Menu « sandwich » (tablette et téléphone), comme celui du site
   const [menuOuvert, setMenuOuvert] = useState(false);
   useEffect(() => setMenuOuvert(false), [location.pathname]);
+  useFermerAuDefilement(menuOuvert, useCallback(() => setMenuOuvert(false), []));
   useEffect(() => {
     if (!menuOuvert) return;
     const echap = (e: KeyboardEvent) => e.key === 'Escape' && setMenuOuvert(false);
@@ -93,8 +95,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
       <FondMenu ouvert={menuOuvert} onFermer={() => setMenuOuvert(false)} z="z-30" />
-      {/* Figé en haut sur ordinateur (comme le site) ; sur tablette et téléphone il défile avec la page */}
-      <header className="relative z-40 xl:sticky xl:top-0 bg-white border-b border-[#E5E5E5]">
+      {/* Figé en haut de l'écran, sur ordinateur comme sur téléphone (le menu ouvert se ferme si la page défile) */}
+      <header className="sticky top-0 z-40 bg-white border-b border-[#E5E5E5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-6">
@@ -150,10 +152,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <div
             id="menu-admin-mobile"
             aria-hidden={!menuOuvert}
-            className={`xl:hidden border-t border-bordure overflow-hidden transition-all duration-300 ease-out motion-reduce:transition-none ${
+            className={`xl:hidden absolute inset-x-0 top-full bg-white px-4 sm:px-6 lg:px-8 border-t border-bordure shadow-[0_12px_24px_rgba(17,17,17,0.08)] transition-all duration-300 ease-out motion-reduce:transition-none ${
               menuOuvert
-                ? 'max-h-[720px] opacity-100 translate-y-0 pointer-events-auto pt-3 pb-5'
-                : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none py-0'
+                ? 'max-h-[calc(100dvh-4.25rem)] overflow-y-auto overscroll-contain opacity-100 translate-y-0 pointer-events-auto pt-3 pb-5'
+                : 'max-h-0 overflow-hidden opacity-0 -translate-y-2 pointer-events-none py-0'
             }`}
           >
             {[

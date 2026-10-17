@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 import { siteConfig, navLinks } from '../../config/site';
 import { Button } from '../ui/Button';
 import { FondMenu } from './FondMenu';
+import { useFermerAuDefilement } from '../../hooks/useFermerAuDefilement';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   // Menu fermé au changement de page et avec Échap (le clic en dehors : voir FondMenu)
   useEffect(() => setMobileMenuOpen(false), [location.pathname]);
+  useFermerAuDefilement(mobileMenuOpen, useCallback(() => setMobileMenuOpen(false), []));
   useEffect(() => {
     if (!mobileMenuOpen) return;
     const echap = (e: KeyboardEvent) => e.key === 'Escape' && setMobileMenuOpen(false);
@@ -27,8 +29,8 @@ export function Header() {
   return (
     <>
     <FondMenu ouvert={mobileMenuOpen} onFermer={() => setMobileMenuOpen(false)} />
-    {/* Figé en haut sur ordinateur ; sur tablette et téléphone il défile avec la page (comme l'admin) */}
-    <header className="relative z-50 xl:sticky xl:top-0 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
+    {/* Figé en haut de l'écran, sur ordinateur comme sur téléphone (le menu ouvert se ferme si la page défile) */}
+    <header className="sticky top-0 z-50 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Navigation principale">
         {/* Barre du haut */}
         <div className="flex justify-between items-center h-[68px] lg:h-20">
@@ -87,14 +89,14 @@ export function Header() {
           </button>
         </div>
 
-        {/* Menu mobile déroulant */}
+        {/* Menu mobile déroulant, posé par-dessus la page sous la barre figée */}
         <div
           className={`
-            xl:hidden border-t border-bordure overflow-hidden
-            transition-all duration-300 ease-out
+            xl:hidden absolute inset-x-0 top-full bg-white px-4 sm:px-6 lg:px-8 border-t border-bordure
+            shadow-[0_12px_24px_rgba(17,17,17,0.08)] transition-all duration-300 ease-out
             ${mobileMenuOpen
-              ? 'max-h-[560px] opacity-100 translate-y-0 pointer-events-auto pt-3 pb-6'
-              : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none py-0'
+              ? 'max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain opacity-100 translate-y-0 pointer-events-auto pt-3 pb-6'
+              : 'max-h-0 overflow-hidden opacity-0 -translate-y-2 pointer-events-none py-0'
             }
           `}
         >
