@@ -96,7 +96,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-[#F5F5F5]">
       <FondMenu ouvert={menuOuvert} onFermer={() => setMenuOuvert(false)} z="z-30" />
       {/* Figé en haut de l'écran, sur ordinateur comme sur téléphone (le menu ouvert se ferme si la page défile) */}
-      <header className="sticky top-0 z-40 bg-white border-b border-[#E5E5E5]">
+      <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-6">
@@ -219,6 +219,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </div>
+        {/* Liseré or sous la barre, comme sur le site */}
+        <div className="liseret-or" aria-hidden="true" />
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
