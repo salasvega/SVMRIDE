@@ -1,7 +1,9 @@
 /**
  * Accueil : « Des passionnés à votre service ».
- * Mattia mis en avant (carte noir et or, comme sur la page Contact) + aperçu de
- * trois collaborateurs + lien vers /equipe. Données : src/config/equipe.ts.
+ * Mattia mis en avant (carte noir et or, comme sur la page Contact) + photo de
+ * groupe d'Amanda, Pedro et Valentin au showroom (17/10/2026), leurs prénoms et
+ * fonctions posés en texte sur la photo (lisibles, traduisibles, corrigeables dans
+ * src/config/equipe.ts) + lien vers /equipe, qui présente chacun en détail.
  * Rien ne s'affiche sur svmride.com tant que EQUIPE_EN_LIGNE vaut false.
  */
 import { Link } from 'react-router-dom';
@@ -52,19 +54,35 @@ export function SectionEquipe() {
           )}
 
           {apercu.length > 0 && (
-            <ul className="grid gap-4 sm:grid-cols-3 md:gap-5 lg:col-span-7" aria-label="Une partie de l'équipe">
-              {apercu.map((m) => (
-                <li key={m.id}>
-                  <div className="carte flex h-full items-center gap-4 p-4 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule motion-reduce:hover:translate-y-0 sm:flex-col sm:justify-center sm:gap-0 sm:p-6 sm:text-center">
-                    <Portrait membre={m} taille={112} className="sm:mb-4 max-sm:!h-16 max-sm:!w-16" />
-                    <div>
-                      <p className="text-lg font-semibold text-noir">{m.prenom}</p>
-                      <p className="mt-0.5 text-sm text-gris sm:min-h-[2.5rem]">{m.fonction}</p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <figure className="relative overflow-hidden rounded-2xl bg-noir-profond shadow-vehicule lg:col-span-7">
+              <picture>
+                <source type="image/avif" srcSet="/equipe/equipe-accueil-960.avif 960w, /equipe/equipe-accueil.avif 1536w" sizes="(min-width: 1024px) 58vw, 100vw" />
+                <source type="image/webp" srcSet="/equipe/equipe-accueil-960.webp 960w, /equipe/equipe-accueil.webp 1536w" sizes="(min-width: 1024px) 58vw, 100vw" />
+                <img
+                  src="/equipe/equipe-accueil-960.jpg"
+                  srcSet="/equipe/equipe-accueil-960.jpg 960w, /equipe/equipe-accueil.jpg 1536w"
+                  sizes="(min-width: 1024px) 58vw, 100vw"
+                  width={1536}
+                  height={826}
+                  loading="lazy"
+                  decoding="async"
+                  alt={`${apercu.map((m) => m.prenom).join(', ').replace(/, ([^,]*)$/, ' et $1')}, de l'équipe SVM Ride, au showroom de Chaville`}
+                  className="block h-auto w-full lg:h-full lg:object-cover lg:object-[50%_35%]"
+                />
+              </picture>
+              {/* Prénoms et fonctions sous chaque personne, sur un dégradé pour rester lisibles */}
+              <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/55 to-transparent px-3 pb-3 pt-14 sm:px-6 sm:pb-5 sm:pt-20">
+                <ul className="grid grid-cols-3 gap-2 sm:gap-4">
+                  {apercu.map((m) => (
+                    <li key={m.id} className="min-w-0">
+                      <p className="font-semibold leading-tight text-white text-[15px] sm:text-xl">{m.prenom}</p>
+                      <p className="mt-0.5 text-[11px] leading-snug text-[#E0E0E0] sm:mt-1 sm:text-sm">{m.fonction}</p>
+                      <span className="mt-2 block h-0.5 w-6 bg-or sm:w-8" aria-hidden="true" />
+                    </li>
+                  ))}
+                </ul>
+              </figcaption>
+            </figure>
           )}
         </div>
 
