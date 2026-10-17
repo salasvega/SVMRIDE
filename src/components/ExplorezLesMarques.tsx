@@ -21,7 +21,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { FocusEvent as FocusEventReact, KeyboardEvent as KeyboardEventReact, PointerEvent as PointerEventReact } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
-import { MARQUES, marqueParId, nomMarque } from '../config/marques';
+import { MARQUES, marqueParId, nomMarque, urlLogo } from '../config/marques';
 import { useStockMarques } from '../hooks/useStockMarques';
 import { usePrefereMoinsDAnimations } from '../hooks/usePrefereMoinsDAnimations';
 import { Section } from './ui/Section';
@@ -51,7 +51,7 @@ export function ExplorezLesMarques() {
       id: m.id,
       nom: m.nom,
       pays: m.pays,
-      logo: m.logo,
+      logo: urlLogo(m.logo),
       enStock: !!enStock?.has(m.id),
     }));
     // Une marque en stock absente de la liste est ajoutée automatiquement

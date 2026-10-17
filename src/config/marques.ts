@@ -9,9 +9,10 @@
  * - alias  : autres écritures possibles dans le catalogue (« BMW » pour « BMW Motorrad »…).
  *            La comparaison ignore déjà la casse, les accents, les espaces et les tirets.
  * - pays   : pays d'origine de la marque, affiché sous le nom
- * - logo   : facultatif, chemin d'un fichier SVG/WebP placé dans /public/marques/
- *            (logo issu du kit presse officiel ou d'une source autorisée). Sans logo,
- *            le nom est affiché en lettres.
+ * - logo   : facultatif. Nom d'un fichier du bucket public Supabase « marques »
+ *            (ex. « bmw.svg »), ou chemin /… ou adresse https://… Sans logo, le nom
+ *            est affiché en lettres. Les logos actuels viennent de Wikimedia Commons /
+ *            Wikipedia (versions officielles vectorisées), importés le 17/10/2026.
  */
 export interface Marque {
   id: string;
@@ -24,37 +25,44 @@ export interface Marque {
 
 export const MARQUES: Marque[] = [
   // Japon
-  { id: 'honda', nom: 'Honda', pays: 'Japon', actif: true },
-  { id: 'yamaha', nom: 'Yamaha', alias: ['Yamaha Motor'], pays: 'Japon', actif: true },
-  { id: 'kawasaki', nom: 'Kawasaki', pays: 'Japon', actif: true },
-  { id: 'suzuki', nom: 'Suzuki', pays: 'Japon', actif: true },
+  { id: 'honda', nom: 'Honda', pays: 'Japon', logo: 'honda.svg', actif: true },
+  { id: 'yamaha', nom: 'Yamaha', alias: ['Yamaha Motor'], pays: 'Japon', logo: 'yamaha.svg', actif: true },
+  { id: 'kawasaki', nom: 'Kawasaki', pays: 'Japon', logo: 'kawasaki.svg', actif: true },
+  { id: 'suzuki', nom: 'Suzuki', pays: 'Japon', logo: 'suzuki.svg', actif: true },
   // Europe
-  { id: 'bmw', nom: 'BMW Motorrad', alias: ['BMW'], pays: 'Allemagne', actif: true },
-  { id: 'ducati', nom: 'Ducati', pays: 'Italie', actif: true },
-  { id: 'triumph', nom: 'Triumph', pays: 'Royaume-Uni', actif: true },
-  { id: 'ktm', nom: 'KTM', pays: 'Autriche', actif: true },
-  { id: 'aprilia', nom: 'Aprilia', pays: 'Italie', actif: true },
-  { id: 'moto-guzzi', nom: 'Moto Guzzi', alias: ['Guzzi'], pays: 'Italie', actif: true },
-  { id: 'mv-agusta', nom: 'MV Agusta', alias: ['Agusta'], pays: 'Italie', actif: true },
-  { id: 'husqvarna', nom: 'Husqvarna', alias: ['Husqvarna Motorcycles'], pays: 'Suède', actif: true },
-  { id: 'gasgas', nom: 'GasGas', pays: 'Espagne', actif: true },
-  { id: 'beta', nom: 'Beta', pays: 'Italie', actif: true },
-  { id: 'sherco', nom: 'Sherco', pays: 'France', actif: true },
+  { id: 'bmw', nom: 'BMW Motorrad', alias: ['BMW'], pays: 'Allemagne', logo: 'bmw.svg', actif: true },
+  { id: 'ducati', nom: 'Ducati', pays: 'Italie', logo: 'ducati.svg', actif: true },
+  { id: 'triumph', nom: 'Triumph', pays: 'Royaume-Uni', logo: 'triumph.svg', actif: true },
+  { id: 'ktm', nom: 'KTM', pays: 'Autriche', logo: 'ktm.svg', actif: true },
+  { id: 'aprilia', nom: 'Aprilia', pays: 'Italie', logo: 'aprilia.svg', actif: true },
+  { id: 'moto-guzzi', nom: 'Moto Guzzi', alias: ['Guzzi'], pays: 'Italie', logo: 'moto-guzzi.svg', actif: true },
+  { id: 'mv-agusta', nom: 'MV Agusta', alias: ['Agusta'], pays: 'Italie', logo: 'mv-agusta.svg', actif: true },
+  { id: 'husqvarna', nom: 'Husqvarna', alias: ['Husqvarna Motorcycles'], pays: 'Suède', logo: 'husqvarna.svg', actif: true },
+  { id: 'gasgas', nom: 'GasGas', pays: 'Espagne', logo: 'gasgas.svg', actif: true },
+  { id: 'beta', nom: 'Beta', pays: 'Italie', logo: 'beta.svg', actif: true },
+  { id: 'sherco', nom: 'Sherco', pays: 'France', logo: 'sherco.svg', actif: true },
   // Amérique
-  { id: 'harley-davidson', nom: 'Harley-Davidson', alias: ['Harley'], pays: 'États-Unis', actif: true },
-  { id: 'indian', nom: 'Indian Motorcycle', alias: ['Indian'], pays: 'États-Unis', actif: true },
+  { id: 'harley-davidson', nom: 'Harley-Davidson', alias: ['Harley'], pays: 'États-Unis', logo: 'harley-davidson.svg', actif: true },
+  { id: 'indian', nom: 'Indian Motorcycle', alias: ['Indian'], pays: 'États-Unis', logo: 'indian.svg', actif: true },
   { id: 'zero', nom: 'Zero Motorcycles', alias: ['Zero'], pays: 'États-Unis', actif: true },
   // Autres
-  { id: 'royal-enfield', nom: 'Royal Enfield', alias: ['Enfield'], pays: 'Inde', actif: true },
+  { id: 'royal-enfield', nom: 'Royal Enfield', alias: ['Enfield'], pays: 'Inde', logo: 'royal-enfield.svg', actif: true },
   { id: 'benelli', nom: 'Benelli', pays: 'Italie', actif: true },
-  { id: 'cfmoto', nom: 'CFMOTO', pays: 'Chine', actif: true },
+  { id: 'cfmoto', nom: 'CFMOTO', pays: 'Chine', logo: 'cfmoto.svg', actif: true },
   { id: 'bsa', nom: 'BSA', pays: 'Royaume-Uni', actif: true },
   { id: 'voge', nom: 'Voge', pays: 'Chine', actif: true },
   { id: 'zontes', nom: 'Zontes', pays: 'Chine', actif: true },
-  { id: 'qjmotor', nom: 'QJMotor', pays: 'Chine', actif: true },
+  { id: 'qjmotor', nom: 'QJMotor', pays: 'Chine', logo: 'qjmotor.png', actif: true },
   { id: 'mash', nom: 'Mash', pays: 'France', actif: true },
-  { id: 'fantic', nom: 'Fantic', pays: 'Italie', actif: true },
+  { id: 'fantic', nom: 'Fantic', pays: 'Italie', logo: 'fantic.svg', actif: true },
 ];
+
+/** Adresse complète d'un logo (nom de fichier du bucket « marques », chemin ou URL). */
+export function urlLogo(logo: string | undefined): string | undefined {
+  if (!logo) return undefined;
+  if (/^(https?:)?\/\//.test(logo) || logo.startsWith('/')) return logo;
+  return `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/marques/${logo}`;
+}
 
 /** « Harley-Davidson », « harley davidson », « HARLEY DAVIDSON » → « harleydavidson ». */
 export function normaliser(texte: string): string {
