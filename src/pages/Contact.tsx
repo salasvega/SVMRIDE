@@ -29,7 +29,7 @@ export function Contact() {
   const location = useLocation();
   // Carte du responsable : fiche « responsable » de l'admin (onglet Équipe)
   const equipe = useEquipe();
-  const responsable = (equipe ?? MEMBRES).find((m) => m.responsable) ?? MEMBRES[0];
+  const responsable = (equipe?.membres ?? MEMBRES).find((m) => m.responsable) ?? MEMBRES[0];
   const vehicleRef =
     (location.state as { vehicle?: string } | undefined)?.vehicle || '';
 

@@ -3,10 +3,10 @@ import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
-import { equipeAffichee } from '../config/equipe';
-import { CONTEXTE_SITE } from '../lib/contexte';
+import { useEquipe } from '../lib/equipe';
 
 export function Sitemap() {
+  const equipe = useEquipe();
   const siteStructure = [
     {
       title: 'Pages principales',
@@ -17,7 +17,7 @@ export function Sitemap() {
         { href: '/vendre-ma-moto', label: 'Dépôt-vente' },
         { href: '/financement', label: 'Solutions de financement' },
         { href: '/recherche-personnalisee', label: 'Recherche personnalisée' },
-        ...(equipeAffichee(CONTEXTE_SITE) ? [{ href: '/equipe', label: 'Notre équipe' }] : []),
+        ...(equipe?.affichee ? [{ href: '/equipe', label: 'Notre équipe' }] : []),
         { href: '/contact', label: 'Contact' },
       ],
     },

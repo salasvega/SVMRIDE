@@ -8,6 +8,7 @@
  *  - pour chaque véhicule, ses informations lues en direct dans Supabase ;
  *  - un vrai statut 404 pour les pages et véhicules inexistants.
  * Elle génère aussi /sitemap.xml avec tous les véhicules en vente.
+ * La page /equipe suit le réglage « Afficher l'équipe sur le site » de l'admin.
  *
  * Les textes viennent de src/config/seo.ts (partagé avec le site).
  */
@@ -53,11 +54,24 @@ async function metaVehicule(slug: string, path: string): Promise<SeoMeta> {
   }
 }
 
+/** Équipe masquée depuis l'admin (réglage « equipe_affichee » = false) ; en cas d'erreur : affichée */
+async function equipeMasquee(): Promise<boolean> {
+  if (!equipeAffichee(CONTEXTE)) return true;
+  try {
+    const rows = await supabase<{ valeur: unknown }[]>('site_reglages?select=valeur&cle=eq.equipe_affichee&limit=1');
+    return rows[0]?.valeur === false;
+  } catch (e) {
+    console.error('seo: réglage équipe', e);
+    return false;
+  }
+}
+
 const xml = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 async function sitemap(): Promise<Response> {
-  const urls = sitemapPages.filter((p) => p.path !== '/equipe' || EQUIPE_EN_LIGNE).map(
+  const masquee = await equipeMasquee();
+  const urls = sitemapPages.filter((p) => p.path !== '/equipe' || (EQUIPE_EN_LIGNE && !masquee)).map(
     (p) =>
       `  <url>\n    <loc>${SITE_URL}${p.path === '/' ? '/' : p.path}</loc>\n` +
       `    <changefreq>${p.changefreq}</changefreq>\n    <priority>${p.priority}</priority>\n  </url>`,
@@ -102,8 +116,8 @@ export default async function seo(request: Request, context: Context) {
 
   let meta: SeoMeta;
   const vehicule = path.match(/^\/vehicules\/([^/]+)$/);
-  if (path === '/equipe' && !equipeAffichee(CONTEXTE)) {
-    meta = notFoundSeo; // page en préparation : invisible sur svmride.com
+  if (path === '/equipe' && (await equipeMasquee())) {
+    meta = notFoundSeo; // masquée depuis l'admin (ou pas encore publiée) : 404 pour Google
   } else if (path in pageSeo) {
     meta = pageSeo[path as keyof typeof pageSeo];
   } else if (/^\/signature\/[A-Za-z0-9_-]{20,80}$/.test(path)) {

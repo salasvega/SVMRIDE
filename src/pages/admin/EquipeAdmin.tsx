@@ -13,7 +13,7 @@ import { RecadragePortrait } from '../../components/admin/RecadragePortrait';
 import { Portrait } from '../../components/equipe/Portrait';
 import { ChoixSource, SOURIS_SEULEMENT } from '../../components/ui/ChoixSource';
 import { supabase } from '../../lib/supabase';
-import { BUCKET_EQUIPE, oublierEquipe, versMembre, type LigneEquipe } from '../../lib/equipe';
+import { BUCKET_EQUIPE, oublierEquipe, REGLAGE_EQUIPE, versMembre, type LigneEquipe } from '../../lib/equipe';
 import { nomAffiche } from '../../config/equipe';
 
 const LIMITES = { prenom: 40, nom: 60, fonction: 60, citation: 220, presentation: 1500 };
@@ -56,8 +56,12 @@ export function EquipeAdmin() {
   const [edition, setEdition] = useState<Brouillon | null>(null);
   const [aSupprimer, setASupprimer] = useState<LigneEquipe | null>(null);
   const [occupe, setOccupe] = useState(false);
+  /** Réglage « Afficher l'équipe sur le site » (null : pas encore lu) */
+  const [affichee, setAffichee] = useState<boolean | null>(null);
 
   const charger = async () => {
+    supabase.from('site_reglages').select('valeur').eq('cle', REGLAGE_EQUIPE).maybeSingle()
+      .then(({ data }) => setAffichee(data?.valeur !== false));
     const { data, error } = await supabase.from('equipe_membres').select('*').order('ordre').order('created_at');
     if (error) setErreur("Impossible de charger l'équipe. Vérifiez que vous êtes connecté avec un compte administrateur.");
     else setLignes(data as LigneEquipe[]);
@@ -112,6 +116,19 @@ export function EquipeAdmin() {
     informer(`La fiche de ${l.prenom} est supprimée (photo comprise).`);
   };
 
+  const changerAffichage = async (valeur: boolean) => {
+    if (valeur === affichee || occupe) return;
+    setOccupe(true);
+    const { data: u } = await supabase.auth.getUser();
+    const { error } = await supabase.from('site_reglages').upsert({ cle: REGLAGE_EQUIPE, valeur, updated_by: u.user?.email ?? null });
+    setOccupe(false);
+    if (error) return setErreur("Le réglage n'a pas pu être enregistré. Réessayez.");
+    setAffichee(valeur);
+    informer(valeur
+      ? "L'équipe est de nouveau affichée sur le site : section de l'accueil, page Équipe et lien du pied de page."
+      : "L'équipe est masquée sur le site. Vous pouvez continuer à préparer les fiches.");
+  };
+
   const apresEnregistrement = (prenom: string, nouvelle: boolean) => {
     setEdition(null);
     charger();
@@ -150,6 +167,40 @@ export function EquipeAdmin() {
           </div>
         </div>
 
+        {/* Afficher / masquer toute l'équipe sur le site (réorganisation) */}
+        <section
+          aria-labelledby="reglage-equipe"
+          className={`rounded-xl border-2 p-4 md:p-5 ${affichee === false ? 'border-amber-300 bg-amber-50' : 'border-[#D1D5DB] bg-white'}`}
+        >
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl">
+              <h2 id="reglage-equipe" className="text-lg font-bold text-[#111111]">Afficher l'équipe sur le site</h2>
+              <p className="mt-1 text-sm text-[#444444]">
+                {affichee === false
+                  ? "Masquée : la section « Des passionnés à votre service » et son bouton sur l'accueil, la page Équipe et le lien « Notre équipe » du pied de page ne sont plus visibles. Les fiches restent modifiables ; « Voir la page Équipe » en montre l'aperçu, visible seulement par les administrateurs."
+                  : "Section « Des passionnés à votre service » et bouton « Découvrir notre équipe » sur l'accueil, page Équipe et lien du pied de page. Choisissez Non pendant une réorganisation."}
+              </p>
+            </div>
+            <div className="inline-flex shrink-0 self-start rounded-xl border-2 border-[#111111] p-1 sm:self-center" role="radiogroup" aria-labelledby="reglage-equipe">
+              {[{ v: true, l: 'Oui' }, { v: false, l: 'Non' }].map(({ v, l }) => (
+                <button
+                  key={l}
+                  type="button"
+                  role="radio"
+                  aria-checked={affichee === v}
+                  disabled={affichee === null || occupe}
+                  onClick={() => changerAffichage(v)}
+                  className={`min-w-[72px] rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-wait ${
+                    affichee === v ? 'bg-[#111111] text-white' : 'text-[#444444] hover:bg-[#F5F5F5]'
+                  }`}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {message && (
           <p className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900" role="status">{message}</p>
         )}
@@ -166,7 +217,9 @@ export function EquipeAdmin() {
         ) : (
           <>
             <p className="text-sm text-[#666666]">
-              {affichees} fiche{affichees > 1 ? 's' : ''} affichée{affichees > 1 ? 's' : ''} sur le site, dans l'ordre ci-dessous.
+              {affichee === false
+                ? `${affichees} fiche${affichees > 1 ? 's' : ''} prête${affichees > 1 ? 's' : ''} à être affichée${affichees > 1 ? 's' : ''} quand l'équipe sera de nouveau visible, dans l'ordre ci-dessous.`
+                : `${affichees} fiche${affichees > 1 ? 's' : ''} affichée${affichees > 1 ? 's' : ''} sur le site, dans l'ordre ci-dessous.`}
               La personne mise en avant (couronne) apparaît dans la grande carte noire ; sur l'accueil, les 6 premières autres personnes sont présentées.
             </p>
             <ul className="space-y-3">

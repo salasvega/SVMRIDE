@@ -50,28 +50,49 @@ export function versMembre(l: Pick<LigneEquipe, 'id' | 'prenom' | 'nom' | 'fonct
   };
 }
 
-let requete: Promise<Membre[]> | null = null;
+export const REGLAGE_EQUIPE = 'equipe_affichee';
 
-/** Fiches affichées, dans l'ordre (le responsable d'abord à ordre égal) */
-export function chargerEquipe(): Promise<Membre[]> {
-  if (!equipeAffichee(CONTEXTE_SITE)) return Promise.resolve([]);
-  requete ??= (async () => {
-    try {
-      if (!supabase) throw new Error('Supabase non configuré');
-      const { data, error } = await supabase
-        .from('equipe_membres')
-        .select(COLONNES_PUBLIQUES)
-        .eq('visible', true)
-        .order('ordre')
-        .order('created_at');
-      if (error) throw error;
-      return (data as unknown as LigneEquipe[]).map(versMembre);
-    } catch (e) {
-      console.error('Équipe : lecture impossible, équipe de secours affichée', e);
-      requete = null; // nouvel essai à la prochaine page
-      return MEMBRES;
-    }
-  })();
+export interface Equipe {
+  /** Réglage de l'admin (onglet Équipe) : section, page /equipe et lien du pied de page affichés */
+  affichee: boolean;
+  /** Fiches affichées, dans l'ordre */
+  membres: Membre[];
+}
+
+/** Réglage « équipe affichée » (oui si absent ou illisible : on ne masque jamais par erreur) */
+async function lireAffichage(): Promise<boolean> {
+  if (!equipeAffichee(CONTEXTE_SITE)) return false;
+  const { data, error } = await supabase.from('site_reglages').select('valeur').eq('cle', REGLAGE_EQUIPE).maybeSingle();
+  if (error) {
+    console.error('Équipe : réglage illisible, équipe affichée', error);
+    return true;
+  }
+  return data?.valeur !== false;
+}
+
+async function lireMembres(): Promise<Membre[]> {
+  try {
+    const { data, error } = await supabase
+      .from('equipe_membres')
+      .select(COLONNES_PUBLIQUES)
+      .eq('visible', true)
+      .order('ordre')
+      .order('created_at');
+    if (error) throw error;
+    return (data as unknown as LigneEquipe[]).map(versMembre);
+  } catch (e) {
+    console.error('Équipe : lecture impossible, équipe de secours affichée', e);
+    requete = null; // nouvel essai à la prochaine page
+    return MEMBRES;
+  }
+}
+
+let requete: Promise<Equipe> | null = null;
+
+/** Une seule lecture par visite, partagée par l'accueil, /equipe, Contact et le pied de page */
+export function chargerEquipe(): Promise<Equipe> {
+  if (!supabase) return Promise.resolve({ affichee: equipeAffichee(CONTEXTE_SITE), membres: MEMBRES });
+  requete ??= Promise.all([lireAffichage().catch(() => true), lireMembres()]).then(([affichee, membres]) => ({ affichee, membres }));
   return requete;
 }
 
@@ -81,14 +102,33 @@ export function oublierEquipe() {
 }
 
 /** null pendant le chargement */
-export function useEquipe(): Membre[] | null {
-  const [membres, setMembres] = useState<Membre[] | null>(null);
+export function useEquipe(): Equipe | null {
+  const [equipe, setEquipe] = useState<Equipe | null>(null);
   useEffect(() => {
     let actif = true;
-    chargerEquipe().then((m) => actif && setMembres(m));
+    chargerEquipe().then((e) => actif && setEquipe(e));
     return () => {
       actif = false;
     };
   }, []);
-  return membres;
+  return equipe;
+}
+
+/** Vrai si la personne connectée est administrateur (aperçu de la page Équipe masquée) */
+export function useEstAdmin(actif: boolean): boolean | null {
+  const [admin, setAdmin] = useState<boolean | null>(actif ? null : false);
+  useEffect(() => {
+    if (!actif) return;
+    let vivant = true;
+    (async () => {
+      const { data: s } = await supabase.auth.getSession();
+      if (!s.session) return vivant && setAdmin(false);
+      const { data } = await supabase.rpc('est_admin');
+      if (vivant) setAdmin(data === true);
+    })().catch(() => vivant && setAdmin(false));
+    return () => {
+      vivant = false;
+    };
+  }, [actif]);
+  return admin;
 }

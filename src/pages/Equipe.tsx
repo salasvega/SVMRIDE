@@ -8,7 +8,8 @@ import { Quote } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
 import { equipeAffichee, nomAffiche } from '../config/equipe';
-import { useEquipe } from '../lib/equipe';
+import { EyeOff } from 'lucide-react';
+import { useEquipe, useEstAdmin } from '../lib/equipe';
 import { CONTEXTE_SITE } from '../lib/contexte';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
@@ -17,8 +18,13 @@ import { Portrait } from '../components/equipe/Portrait';
 import { NotFound } from './NotFound';
 
 export function Equipe() {
-  const membres = useEquipe();
+  const equipe = useEquipe();
+  const masquee = equipe !== null && !equipe.affichee;
+  // Page masquée depuis l'admin : 404 pour le public, aperçu pour les administrateurs
+  const admin = useEstAdmin(masquee);
   if (!equipeAffichee(CONTEXTE_SITE)) return <NotFound />;
+  if (masquee && admin === false) return <NotFound />;
+  const membres = masquee && admin === null ? null : equipe?.membres ?? null;
 
   const responsable = membres?.find((m) => m.responsable);
   const collaborateurs = membres?.filter((m) => !m.responsable) ?? [];
@@ -29,6 +35,15 @@ export function Equipe() {
 
       <Section background="gray" className="!pt-8 md:!pt-12 !pb-10 md:!pb-14">
         <Container>
+          {masquee && admin && (
+            <p className="mb-6 flex items-start gap-2.5 rounded-xl border border-or/50 bg-[#FBF6E9] px-4 py-3 text-sm text-noir" role="note">
+              <EyeOff className="mt-0.5 h-4 w-4 shrink-0 text-or-texte" aria-hidden="true" />
+              <span>
+                <strong className="font-semibold">Aperçu administrateur :</strong> l'équipe est masquée sur le site (onglet Équipe de
+                l'admin). Les visiteurs ne voient ni cette page, ni la section de l'accueil.
+              </span>
+            </p>
+          )}
           <h1 className="filet-apres mb-5">Rencontrez l'équipe SVM Ride</h1>
           <p className="max-w-3xl text-base md:text-lg text-gris leading-relaxed">
             Chez SVM Ride, la passion de la moto se partage au quotidien. Découvrez les femmes et les hommes qui

@@ -3,7 +3,8 @@
  * Mattia (fiche « responsable ») mis en avant dans la carte noir et or, puis les
  * portraits individuels des autres membres affichés (6 au plus), dans l'ordre
  * choisi dans l'admin (onglet Équipe) ; lien vers /equipe, qui présente chacun
- * en détail. Les portraits remplacent depuis le 17/10/2026 la photo de groupe,
+ * en détail. Masquable depuis l'admin (réglage « equipe_affichee »).
+ * Les portraits remplacent depuis le 17/10/2026 la photo de groupe,
  * pour rester justes quand l'équipe change.
  */
 import { Link } from 'react-router-dom';
@@ -16,8 +17,11 @@ import { Portrait } from './Portrait';
 const MAX_APERCU = 6;
 
 export function SectionEquipe() {
-  const membres = useEquipe();
-  if (membres === null) return <div className="min-h-[560px] bg-white" aria-hidden="true" />;
+  const equipe = useEquipe();
+  if (equipe === null) return <div className="min-h-[560px] bg-white" aria-hidden="true" />;
+  // Masquée depuis l'admin (onglet Équipe, « Afficher l'équipe sur le site » = Non)
+  if (!equipe.affichee) return null;
+  const membres = equipe.membres;
   const responsable = membres.find((m) => m.responsable);
   const apercu = membres.filter((m) => !m.responsable).slice(0, MAX_APERCU);
   if (!responsable && apercu.length === 0) return null;
