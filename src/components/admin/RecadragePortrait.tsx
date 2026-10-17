@@ -132,8 +132,8 @@ export function RecadragePortrait({
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 p-4" role="dialog" aria-modal="true" aria-labelledby="recadrage-titre">
-      <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/60 p-4" role="dialog" aria-modal="true" aria-labelledby="recadrage-titre">
+      <div className="my-auto w-full max-w-sm shrink-0 overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-[#E5E5E5] px-5 py-4">
           <h2 id="recadrage-titre" className="text-lg font-bold text-[#111111]">Cadrer la photo</h2>
           <button type="button" onClick={onAnnuler} className="rounded-full p-1 hover:bg-[#F5F5F5]" aria-label="Annuler">

@@ -395,9 +395,11 @@ function FormulaireFiche({
     }
   };
 
+  // items-start + my-auto : fiche centrée quand elle tient à l'écran, sinon on la fait
+  // défiler depuis son haut (items-center coupait le haut sans pouvoir y remonter)
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 sm:items-center" role="dialog" aria-modal="true" aria-labelledby="fiche-titre">
-      <form onSubmit={enregistrer} className="my-4 w-full max-w-xl overflow-hidden rounded-2xl bg-white shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="fiche-titre">
+      <form onSubmit={enregistrer} className="my-auto w-full max-w-xl shrink-0 overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-[#E5E5E5] px-5 py-4">
           <h2 id="fiche-titre" className="text-xl font-bold text-[#111111]">{b.id ? `Modifier la fiche de ${brouillon.prenom}` : 'Ajouter une personne'}</h2>
           <button type="button" onClick={onFermer} className="rounded-full p-1 hover:bg-[#F5F5F5]" aria-label="Fermer sans enregistrer">
