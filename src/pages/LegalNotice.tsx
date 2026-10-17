@@ -32,7 +32,7 @@ export function LegalNotice() {
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Directeur de la publication</h2>
             <p className="text-gris mb-6">
-              Salas Vega Sébastien : salasvega@gmail.com
+              M. Mattia SARAVIA
             </p>
  
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Conception du site</h2>
