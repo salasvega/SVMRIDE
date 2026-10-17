@@ -91,8 +91,8 @@ export function DepotDossiersList() {
 
         <DepotOnglets demandes={nouvellesDemandes} dossiers={aTraiter} />
 
-        <div className="flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1" role="group" aria-label="Filtrer par statut du mandat">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrer par statut du mandat">
             {filtres.map((f) => (
               <button
                 key={f.cle}
@@ -107,7 +107,7 @@ export function DepotDossiersList() {
               </button>
             ))}
           </div>
-          <label className="relative block lg:w-80">
+          <label className="relative block w-full sm:max-w-md">
             <span className="sr-only">Rechercher un dossier</span>
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#767676]" aria-hidden="true" />
             <input
