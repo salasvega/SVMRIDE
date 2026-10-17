@@ -6,15 +6,22 @@
  * J+7, reversement sous 48 h, démarches par SVM, 5 ans de conservation).
  * TEXTE À FAIRE RELIRE PAR UN JURISTE : chaque changement de texte doit changer
  * MODELE_VERSION (chaque contrat garde la version utilisée).
+ *
+ * Mise en page (17/10/2026) : celle du modèle de Mattia (« Contrat de dépôt-vente ·
+ * 2 et 3 roues d'occasion ») – page 1 parties, véhicule, conditions financières ;
+ * page 2 engagements du garage, état des lieux, signatures ; puis conditions
+ * générales en deux colonnes. Le texte des articles est inchangé.
  */
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "npm:pdf-lib@1.17.1";
+import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage, type RGB } from "npm:pdf-lib@1.17.1";
 
-export const MODELE_VERSION = "mandat-depot-vente-2026-10-17c";
+export const MODELE_VERSION = "mandat-depot-vente-2026-10-17d";
 
 export const SOCIETE = {
   nom: "SVM RIDE",
   forme: "SAS",
   siren: "988 004 719",
+  siret: "988 004 719 00015",
+  rcs: "RCS Nanterre",
   siege: "3 Rue Émile Verhaeren, 92210 Saint-Cloud",
   showroom: "310 Avenue Roger Salengro, 92370 Chaville",
   /** Assureur du garage (réponse de Mattia, 17/10/2026) */
@@ -96,7 +103,7 @@ function articlesMandat(i: Instantane): Bloc[] {
     ] },
     { titre: "Article 2 – Véhicule et déclarations du Déposant", texte: [
       `${v.marque} ${v.modele}${v.version ? ` ${v.version}` : ""} – immatriculation : ${v.immatriculation ?? "—"} – n° d'identification (VIN) : ${v.vin ?? "—"} – 1re mise en circulation : ${v.mise_circulation ? jour(v.mise_circulation) : v.annee ?? "—"} – kilométrage au dépôt : ${v.kilometrage != null ? `${v.kilometrage.toLocaleString("fr-FR").replace(/[  ]/g, " ")} km` : "—"}.`,
-      "Le Déposant déclare être propriétaire du véhicule et seul titulaire du certificat d'immatriculation, que le véhicule n'est ni gagé ni frappé d'opposition, et qu'il n'a pas connaissance d'autres défauts que ceux mentionnés à l'état des lieux annexé.",
+      "Le Déposant déclare être propriétaire du véhicule et seul titulaire du certificat d'immatriculation, que le véhicule n'est ni gagé ni frappé d'opposition, et qu'il n'a pas connaissance d'autres défauts que ceux mentionnés à l'état des lieux du présent contrat.",
     ] },
     { titre: "Article 3 – Prix", texte: [
       `Prix de vente affiché : ${eur(c.prix_affiche)} TTC. Somme revenant au Déposant (« net vendeur ») : ${eur(c.net_vendeur)}.`,
@@ -122,7 +129,7 @@ function articlesMandat(i: Instantane): Bloc[] {
       `Pendant le dépôt, le véhicule est conservé au showroom de ${SOCIETE.nom}, ${SOCIETE.showroom}, sauf accord contraire, et couvert par l'assurance professionnelle du garage, souscrite auprès d'${SOCIETE.assureur}. Aucun essai routier n'est réalisé sans l'accord préalable du Déposant.`,
     ] },
     { titre: "Article 10 – État des lieux et documents", texte: [
-      "Un état des lieux contradictoire est établi à la remise du véhicule (kilométrage, état, accessoires, clés) ; il figure en annexe.",
+      "Un état des lieux contradictoire est établi à la remise du véhicule (kilométrage, état, accessoires, clés) ; il figure dans le présent contrat, rubrique « État des lieux contradictoire ».",
       "Le Déposant remet, le cas échéant : le certificat d'immatriculation, une pièce d'identité, un certificat de situation administrative (non-gage) de moins de 15 jours, le double des clés, le carnet d'entretien et les factures. Il remet son relevé d'identité bancaire au moment de la vente.",
     ] },
     { titre: "Article 11 – Encaissement et paiement du Déposant", texte: [
@@ -170,6 +177,7 @@ function articlesAvenant(i: Instantane): Bloc[] {
   return blocs;
 }
 
+
 // --- PDF ---
 // Les polices standard du PDF n'acceptent que l'alphabet WinAnsi : on remplace le reste.
 const WINANSI_EXTRA = "€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ";
@@ -187,29 +195,118 @@ function propre(t: string): string {
 }
 
 const NOIR = rgb(0.067, 0.067, 0.067);
-const GRIS = rgb(0.37, 0.37, 0.37);
-const OR = rgb(0.72, 0.565, 0.184);
+const GRIS = rgb(0.4, 0.4, 0.4);
+const GRIS_CLAIR = rgb(0.8, 0.8, 0.8);
+const FOND = rgb(0.955, 0.955, 0.955);
 
+/** Logo de l'en-tête : public/logo-contrat.jpg du site, lu une fois par instance (sans logo si le site ne répond pas) */
+export const URL_LOGO = "https://svmride.com/logo-contrat.jpg";
+let logoCache: Uint8Array | null | undefined;
+async function logoJpg(): Promise<Uint8Array | null> {
+  if (logoCache !== undefined) return logoCache;
+  try {
+    const r = await fetch(URL_LOGO, { signal: AbortSignal.timeout(4000) });
+    logoCache = r.ok ? new Uint8Array(await r.arrayBuffer()) : null;
+  } catch (_) {
+    logoCache = null;
+  }
+  return logoCache;
+}
+/** Pour les tests : logo fourni directement */
+export function definirLogo(octets: Uint8Array | null) {
+  logoCache = octets;
+}
+
+// A4, marges du modèle de Mattia
+const L = 595.28, H = 841.89, M = 56, LARG = L - 2 * M, BAS = 60;
+const ENTETE = "Contrat de dépôt-vente · 2 et 3 roues d'occasion";
+
+interface Opt {
+  taille?: number; gras?: boolean; italique?: boolean; couleur?: RGB; x?: number; largeur?: number;
+  apres?: number; centre?: boolean; justifie?: boolean; retrait?: number; interligne?: number;
+}
+
+/** Mise en page : en-tête (logo) et pied de page sur chaque page, texte qui coule d'une page à l'autre, deux colonnes. */
 class Mise {
-  doc: PDFDocument;
   page!: PDFPage;
   y = 0;
-  constructor(doc: PDFDocument, public f: PDFFont, public fb: PDFFont, public pied: string) {
-    this.doc = doc;
+  private cols: { x: number[]; largeur: number; i: number; haut: number; bas: number; limite: number } | null = null;
+
+  constructor(
+    public doc: PDFDocument, public f: PDFFont, public fb: PDFFont, public fi: PDFFont,
+    public logo: PDFImage | null, public pied: string,
+  ) {
     this.nouvelle();
   }
+
+  static async creer(doc: PDFDocument, pied: string) {
+    const [f, fb, fi] = await Promise.all([
+      doc.embedFont(StandardFonts.Helvetica), doc.embedFont(StandardFonts.HelveticaBold), doc.embedFont(StandardFonts.HelveticaOblique),
+    ]);
+    const octets = await logoJpg();
+    const logo = octets ? await doc.embedJpg(octets).catch(() => null) : null;
+    return new Mise(doc, f, fb, fi, logo, pied);
+  }
+
   nouvelle() {
-    this.page = this.doc.addPage([595.28, 841.89]);
-    this.y = 841.89 - 56;
+    if (this.cols && this.page) this.filetColonnes(Math.min(this.cols.bas, this.y));
+    this.page = this.doc.addPage([L, H]);
+    if (this.logo) this.page.drawImage(this.logo, { x: M - 12, y: H - 92, width: 62, height: 62 });
+    const t = propre(ENTETE);
+    this.page.drawText(t, { x: L - M - this.f.widthOfTextAtSize(t, 7.5), y: H - 50, size: 7.5, font: this.f, color: GRIS });
+    this.page.drawLine({ start: { x: M, y: H - 100 }, end: { x: L - M, y: H - 100 }, thickness: 0.5, color: GRIS_CLAIR });
+    this.y = H - 120;
+    if (this.cols) Object.assign(this.cols, { i: 0, haut: this.y, bas: this.y, limite: -Infinity });
   }
+
+  get x() { return this.cols ? this.cols.x[this.cols.i] : M; }
+  get largeur() { return this.cols ? this.cols.largeur : LARG; }
+
+  /** Place pour h points, sinon colonne suivante ou nouvelle page */
   place(h: number) {
-    if (this.y - h < 64) this.nouvelle();
+    if (this.cols && this.cols.i === 0 && this.y - h < this.cols.limite) {
+      this.cols.bas = this.y;
+      this.cols.i = 1;
+      this.y = this.cols.haut;
+      return;
+    }
+    if (this.y - h >= BAS) return;
+    if (this.cols && this.cols.i === 0) {
+      this.cols.bas = this.y;
+      this.cols.i = 1;
+      this.y = this.cols.haut;
+      return;
+    }
+    this.nouvelle();
   }
-  lignes(texte: string, police: PDFFont, taille: number, largeur: number): string[] {
+
+  /** Deux colonnes ; avec la hauteur totale du texte, elles sont équilibrées */
+  colonnes(hauteurTotale?: number) {
+    const ecart = 26;
+    const limite = hauteurTotale ? this.y - hauteurTotale / 2 - 6 : -Infinity;
+    this.cols = { x: [M, M + (LARG + ecart) / 2], largeur: (LARG - ecart) / 2, i: 0, haut: this.y, bas: this.y, limite };
+  }
+  get largeurColonne() { return (LARG - 26) / 2; }
+  finColonnes() {
+    if (!this.cols) return;
+    const bas = this.cols.i === 1 ? Math.min(this.cols.bas, this.y) : this.y;
+    this.filetColonnes(bas);
+    this.cols = null;
+    this.y = bas - 6;
+  }
+  private filetColonnes(bas: number) {
+    if (!this.cols || this.cols.i === 0) return; // une seule colonne remplie sur cette page
+    const x = M + LARG / 2;
+    this.page.drawLine({ start: { x, y: this.cols.haut }, end: { x, y: bas + 4 }, thickness: 0.5, color: GRIS_CLAIR });
+  }
+
+  police(o: Opt) { return o.gras ? this.fb : o.italique ? this.fi : this.f; }
+
+  couper(texte: string, police: PDFFont, taille: number, largeur: number): string[] {
     const sortie: string[] = [];
     for (const para of propre(texte).split("\n")) {
       let ligne = "";
-      for (const mot of para.split(/\s+/)) {
+      for (const mot of para.split(/\s+/).filter(Boolean)) {
         const essai = ligne ? `${ligne} ${mot}` : mot;
         if (police.widthOfTextAtSize(essai, taille) > largeur && ligne) {
           sortie.push(ligne);
@@ -220,27 +317,188 @@ class Mise {
     }
     return sortie;
   }
-  texte(t: string, o: { taille?: number; gras?: boolean; couleur?: ReturnType<typeof rgb>; x?: number; largeur?: number; apres?: number } = {}) {
-    const taille = o.taille ?? 9.5, police = o.gras ? this.fb : this.f, x = o.x ?? 56, largeur = o.largeur ?? 595.28 - 112;
-    for (const l of this.lignes(t, police, taille, largeur)) {
-      this.place(taille + 4);
-      this.page.drawText(l, { x, y: this.y, size: taille, font: police, color: o.couleur ?? NOIR });
-      this.y -= taille + 3.6;
+
+  /** Dessine une ligne (y = haut de la ligne), éventuellement justifiée */
+  private ligne(l: string, x: number, y: number, larg: number, taille: number, police: PDFFont, couleur: RGB, o: Opt, derniere: boolean) {
+    const w = police.widthOfTextAtSize(l, taille);
+    const base = y - taille;
+    if (o.justifie && !derniere && l.includes(" ")) {
+      const mots = l.split(" ");
+      const total = mots.reduce((s, m) => s + police.widthOfTextAtSize(m, taille), 0);
+      const espace = (larg - total) / (mots.length - 1);
+      if (espace < taille * 1.2) {
+        let cx = x;
+        for (const m of mots) {
+          this.page.drawText(m, { x: cx, y: base, size: taille, font: police, color: couleur });
+          cx += police.widthOfTextAtSize(m, taille) + espace;
+        }
+        return;
+      }
     }
-    this.y -= o.apres ?? 4;
+    const cx = o.centre ? x + (larg - w) / 2 : x;
+    this.page.drawText(l, { x: cx, y: base, size: taille, font: police, color: couleur });
   }
-  filet() {
-    this.place(10);
-    this.page.drawLine({ start: { x: 56, y: this.y + 4 }, end: { x: 595.28 - 56, y: this.y + 4 }, thickness: 0.6, color: OR });
-    this.y -= 8;
-  }
-  numeroter() {
-    const pages = this.doc.getPages();
-    pages.forEach((p, i) => {
-      const t = propre(`${this.pied} – page ${i + 1}/${pages.length}`);
-      p.drawText(t, { x: 56, y: 36, size: 7.5, font: this.f, color: GRIS });
+
+  /** Texte qui coule (colonnes, pages) */
+  texte(t: string, o: Opt = {}) {
+    const taille = o.taille ?? 9, police = this.police(o), inter = taille * (o.interligne ?? 1.35), retrait = o.retrait ?? 0;
+    const larg = (o.largeur ?? this.largeur) - retrait;
+    const lignes = this.couper(t, police, taille, larg);
+    lignes.forEach((l, k) => {
+      this.place(inter);
+      this.ligne(l, (o.x ?? this.x) + retrait, this.y, larg, taille, police, o.couleur ?? NOIR, o, k === lignes.length - 1);
+      this.y -= inter;
     });
+    this.y -= o.apres ?? 3;
   }
+
+  /** Texte à une position donnée, sans saut de page ; renvoie la hauteur utilisée */
+  bloc(t: string, x: number, y: number, larg: number, o: Opt = {}): number {
+    const taille = o.taille ?? 9, police = this.police(o), inter = taille * 1.35;
+    const lignes = this.couper(t, police, taille, larg);
+    lignes.forEach((l, k) => this.ligne(l, x, y - k * inter, larg, taille, police, o.couleur ?? NOIR, o, k === lignes.length - 1));
+    return lignes.length * inter;
+  }
+  hauteur(t: string, larg: number, o: Opt = {}) {
+    const taille = o.taille ?? 9;
+    return this.couper(t, this.police(o), taille, larg).length * taille * (o.interligne ?? 1.35);
+  }
+
+  /** Suite de morceaux sur une ligne (libellés gris, montants en gras), centrée */
+  morceaux(parts: { t: string; gras?: boolean; gris?: boolean }[], taille: number) {
+    const largeur = (s: number) => parts.reduce((w, p) => w + (p.gras ? this.fb : this.f).widthOfTextAtSize(propre(p.t), s), 0);
+    let s = taille;
+    while (largeur(s) > LARG && s > 7) s -= 0.5;
+    this.place(s * 1.6);
+    let x = M + (LARG - largeur(s)) / 2;
+    for (const p of parts) {
+      const t = propre(p.t), police = p.gras ? this.fb : this.f;
+      this.page.drawText(t, { x, y: this.y - s, size: s, font: police, color: p.gris ? GRIS : NOIR });
+      x += police.widthOfTextAtSize(t, s);
+    }
+    this.y -= s * 1.6 + 4;
+  }
+
+  trait(epaisseur = 0.5, couleur: RGB = GRIS_CLAIR) {
+    this.page.drawLine({ start: { x: M, y: this.y }, end: { x: L - M, y: this.y }, thickness: epaisseur, color: couleur });
+  }
+
+  /** Titre de rubrique : « VEHICULE DÉPOSÉ » souligné d'un trait noir */
+  section(titre: string, place = 70) {
+    this.place(place);
+    this.y -= 14;
+    this.texte(titre.toUpperCase(), { gras: true, taille: 8.5, apres: 0 });
+    this.y -= 2;
+    this.trait(0.9, NOIR);
+    this.y -= 10;
+  }
+
+  /** Libellé / valeur, deux paires par ligne (ou une seule si large) */
+  paires(items: { l: string; v: string; gras?: boolean }[], parLigne: 1 | 2 = 2) {
+    const largCol = parLigne === 2 ? (LARG - 20) / 2 : LARG;
+    const largLib = parLigne === 2 ? 92 : 130;
+    for (let i = 0; i < items.length; i += parLigne) {
+      const rang = items.slice(i, i + parLigne);
+      const h = Math.max(...rang.map((it) => Math.max(this.hauteur(it.l, largLib - 6, { taille: 8.5 }), this.hauteur(it.v, largCol - largLib, { taille: 8.5, gras: it.gras }))));
+      this.place(h + 4);
+      rang.forEach((it, k) => {
+        const x = M + k * (largCol + 20);
+        this.bloc(it.l, x, this.y, largLib - 6, { taille: 8.5, couleur: GRIS });
+        this.bloc(it.v, x + largLib, this.y, largCol - largLib, { taille: 8.5, gras: it.gras });
+      });
+      this.y -= h + 4;
+    }
+  }
+
+  /** Deux blocs côte à côte (rubrique « Responsabilités » du modèle) */
+  deuxBlocs(gauche: (x: number, larg: number) => void, droite: (x: number, larg: number) => void) {
+    const ecart = 30, larg = (LARG - ecart) / 2, haut = this.y;
+    gauche(M, larg);
+    const basG = this.y;
+    this.y = haut;
+    droite(M + larg + ecart, larg);
+    const bas = Math.min(basG, this.y);
+    this.page.drawLine({ start: { x: M + LARG / 2, y: haut }, end: { x: M + LARG / 2, y: bas + 6 }, thickness: 0.5, color: GRIS_CLAIR });
+    this.y = bas;
+  }
+
+  /** Cadres de signature : le Déposant à gauche, SVM RIDE à droite */
+  signatures(i: Instantane, titre?: string) {
+    const h = 74;
+    this.place(h + (titre ? 26 : 12));
+    if (titre) this.texte(titre, { gras: true, taille: 9, apres: 6 });
+    const larg = (LARG - 30) / 2, haut = this.y;
+    const cadre = (x: number, titreCadre: string, sous: string, lignes: string[]) => {
+      this.page.drawRectangle({ x, y: haut - h, width: larg, height: h, color: FOND });
+      let y = haut - 12;
+      y -= this.bloc(titreCadre, x + 12, y, larg - 24, { gras: true, taille: 9 });
+      y -= this.bloc(sous, x + 12, y, larg - 24, { italique: true, taille: 7.5, couleur: GRIS }) + 6;
+      for (const l of lignes) y -= this.bloc(l, x + 12, y, larg - 24, { taille: 7.5 }) + 2;
+    };
+    cadre(M, "Le Déposant", nomComplet(i), [
+      "Signature électronique du Déposant : voir le certificat de signature joint à la version signée de ce document.",
+    ]);
+    cadre(M + larg + 30, `Le Garage – ${SOCIETE.nom}`, "Lu et approuvé · Bon pour dépôt", [
+      `Pour ${SOCIETE.nom} : ${i.representant}.`,
+      `Fait à Chaville, le ${dateParis(i.genere_le)}.`,
+    ]);
+    this.y = haut - h - 10;
+  }
+
+  /** Pied de page : société au centre, n° de page à droite, référence du document dessous */
+  numeroter(premiere = 0, total?: number) {
+    const pages = this.doc.getPages();
+    const n = total ?? pages.length;
+    pages.slice(premiere).forEach((p, k) => this.piedDePage(p, `${premiere + k + 1} / ${n}`));
+  }
+  piedDePage(p: PDFPage, droite: string) {
+    p.drawLine({ start: { x: M, y: 52 }, end: { x: L - M, y: 52 }, thickness: 0.5, color: GRIS_CLAIR });
+    const centre = propre(`${SOCIETE.nom} · ${SOCIETE.rcs.toUpperCase()} · SIRET ${SOCIETE.siret}`);
+    p.drawText(centre, { x: (L - this.f.widthOfTextAtSize(centre, 7)) / 2, y: 40, size: 7, font: this.f, color: GRIS });
+    const d = propre(droite);
+    p.drawText(d, { x: L - M - this.f.widthOfTextAtSize(d, 7), y: 40, size: 7, font: this.f, color: GRIS });
+    const bas = propre(this.pied);
+    p.drawText(bas, { x: (L - this.f.widthOfTextAtSize(bas, 6)) / 2, y: 30, size: 6, font: this.f, color: GRIS });
+  }
+}
+
+const dateParis = (iso: string) =>
+  new Date(iso).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "long", year: "numeric" });
+const km = (n: number | null | undefined) =>
+  n != null ? `${Number(n).toLocaleString("fr-FR").replace(/[  ]/g, " ")} km` : "—";
+const ou = (v: unknown) => (v != null && v !== "" ? String(v) : "—");
+/** « Article 9 – Garde, assurance et essais » → « 9.  GARDE, ASSURANCE ET ESSAIS » */
+const titreCG = (t: string) => t.replace(/^Article (\d+) – (.*)$/, (_, n, s) => `${n}.  ${s.toUpperCase()}`);
+
+/** En-tête commun : titre, sous-titre, référence, puis les deux parties côte à côte */
+function enTete(m: Mise, i: Instantane, titre: string, sousTitre: string) {
+  m.texte(titre, { gras: true, taille: 19, centre: true, apres: 6 });
+  m.texte(sousTitre, { italique: true, taille: 10, centre: true, apres: 3 });
+  m.texte(`Réf. ${i.reference}   ·   Chaville, le ${dateParis(i.genere_le)}`, { taille: 8, centre: true, couleur: GRIS, apres: 14 });
+  m.trait();
+  m.y -= 16;
+  const d = i.deposant;
+  m.deuxBlocs(
+    (x, larg) => {
+      m.texte("LE DÉPOSANT", { gras: true, taille: 7.5, x: x + 10, largeur: larg - 10, apres: 1 });
+      m.texte(nomComplet(i), { gras: true, taille: 10, x: x + 10, largeur: larg - 10, apres: 1 });
+      for (const l of [`Adresse : ${ou(d.adresse)}`, `Tél. : ${d.telephone} · ${d.email}`, ...(d.piece ? [d.piece] : [])]) {
+        m.texte(l, { taille: 8, couleur: GRIS, x: x + 10, largeur: larg - 10, apres: 0 });
+      }
+      m.texte("Ci-après désigné « le Déposant »", { italique: true, taille: 8, couleur: GRIS, x: x + 10, largeur: larg - 10, apres: 0 });
+    },
+    (x, larg) => {
+      m.texte("LE GARAGE", { gras: true, taille: 7.5, x, largeur: larg, apres: 1 });
+      m.texte(SOCIETE.nom, { gras: true, taille: 10, x, largeur: larg, apres: 1 });
+      for (const l of [
+        `${SOCIETE.forme} – siège : ${SOCIETE.siege}`, `SIRET : ${SOCIETE.siret} – ${SOCIETE.rcs}`,
+        `Showroom : ${SOCIETE.showroom}`, `Représentée par ${i.representant}`,
+      ]) m.texte(l, { taille: 8, couleur: GRIS, x, largeur: larg, apres: 0 });
+      m.texte("Ci-après désigné « SVM RIDE » ou « le Garage »", { italique: true, taille: 8, couleur: GRIS, x, largeur: larg, apres: 0 });
+    },
+  );
+  m.y -= 12;
+  m.trait();
 }
 
 export async function genererPdf(i: Instantane): Promise<Uint8Array> {
@@ -253,47 +511,145 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
   doc.setModificationDate(new Date(i.genere_le));
   doc.setProducer("svmride.com");
   doc.setCreator("svmride.com");
-  const f = await doc.embedFont(StandardFonts.Helvetica);
-  const fb = await doc.embedFont(StandardFonts.HelveticaBold);
-  const m = new Mise(doc, f, fb, `${titre} ${i.reference} – modèle ${i.modele_version}`);
-
-  m.texte("SVM RIDE", { taille: 18, gras: true, apres: 2 });
-  m.texte(`${SOCIETE.forme} – SIREN ${SOCIETE.siren} – siège : ${SOCIETE.siege} – showroom : ${SOCIETE.showroom}`, { taille: 8, couleur: GRIS, apres: 10 });
-  m.filet();
-  m.texte(titre.toUpperCase(), { taille: 13, gras: true, apres: 2 });
-  m.texte(`Référence ${i.reference}${i.type === "avenant" ? ` – avenant n° ${i.numero - 1}` : ""}`, { taille: 9, couleur: GRIS, apres: 12 });
-
-  m.texte("ENTRE LES SOUSSIGNÉS", { taille: 9, gras: true, apres: 4 });
-  m.texte(`${SOCIETE.nom}, ${SOCIETE.forme}, SIREN ${SOCIETE.siren}, dont le siège est ${SOCIETE.siege}, représentée par ${i.representant}, ci-après « SVM RIDE »,`, { apres: 4 });
-  m.texte("ET", { gras: true, apres: 4 });
-  const d = i.deposant;
-  m.texte(`${nomComplet(i)}, demeurant ${d.adresse ?? "—"}, e-mail ${d.email}, téléphone ${d.telephone}${d.piece ? `, ${d.piece}` : ""}, ci-après « le Déposant ».`, { apres: 12 });
-
-  for (const b of i.type === "mandat" ? articlesMandat(i) : articlesAvenant(i)) {
-    m.place(40);
-    if (b.titre) m.texte(b.titre, { gras: true, taille: 10, apres: 2 });
-    for (const t of b.texte) m.texte(t, { apres: 3 });
-    m.y -= 4;
-  }
+  const m = await Mise.creer(doc, `${titre} ${i.reference} – modèle ${i.modele_version}`);
+  const v = i.vehicule, c = i.conditions, e = i.etat_des_lieux ?? {};
 
   if (i.type === "mandat") {
-    m.place(120);
-    m.filet();
-    m.texte("ANNEXE – ÉTAT DES LIEUX D'ENTRÉE", { gras: true, taille: 10, apres: 4 });
-    const e = i.etat_des_lieux ?? {};
-    const ligne = (l: string, v: unknown) => m.texte(`${l} : ${v != null && v !== "" ? v : "—"}`, { apres: 1 });
-    ligne("Date et heure", e.fait_le ? `${jour(e.fait_le)}${/^\d{2}:\d{2}/.test(e.heure ?? "") ? ` à ${e.heure!.slice(0, 2)} h ${e.heure!.slice(3, 5)}` : ""}` : null);
-    ligne("Kilométrage", e.kilometrage != null ? `${Number(e.kilometrage).toLocaleString("fr-FR").replace(/[  ]/g, " ")} km` : null);
-    ligne("État général", e.etat);
-    ligne("Accessoires remis", e.accessoires);
-    ligne("Clés remises", e.cles);
-    ligne("Défauts et remarques", e.remarques);
-    m.y -= 6;
-  }
+    const art = articlesMandat(i);
+    // ---- Page 1 : parties, véhicule, conditions ----
+    enTete(m, i, "CONTRAT DE DÉPÔT-VENTE", "Mandat de dépôt-vente exclusif · véhicule deux ou trois roues d'occasion");
+    m.section("Véhicule déposé");
+    m.paires([
+      { l: "Marque", v: v.marque }, { l: "N° de série (VIN)", v: ou(v.vin) },
+      { l: "Modèle", v: `${v.modele}${v.version ? ` ${v.version}` : ""}`, gras: true }, { l: "Kilométrage", v: km(v.kilometrage) },
+      { l: "Immatriculation", v: ou(v.immatriculation) }, { l: "1re mise en circulation", v: v.mise_circulation ? jour(v.mise_circulation) : ou(v.annee) },
+      { l: "État général", v: ou(e.etat) }, { l: "Date de dépôt", v: e.fait_le ? jour(e.fait_le) : "—" },
+    ]);
+    m.y -= 4;
+    m.section("Conditions financières & mandat");
+    m.morceaux([
+      { t: "Prix de vente public  ", gris: true }, { t: eur(c.prix_affiche), gras: true }, { t: "  TTC        ", gris: true },
+      { t: "Rémunération SVM RIDE  ", gris: true }, { t: eur(c.remuneration), gras: true }, { t: "  TTC        ", gris: true },
+      { t: "Prix net vendeur  ", gris: true }, { t: eur(c.net_vendeur), gras: true },
+    ], 11);
+    m.texte(`Reversement du net vendeur par virement, sous ${c.reversement_heures} heures à compter de l'encaissement intégral du prix (art. 11).`, { italique: true, taille: 8, couleur: GRIS, apres: 10 });
+    m.paires([
+      { l: "Durée du mandat", v: `${c.duree_mois} mois, du ${jour(c.date_debut)} au ${jour(c.date_fin)} ; prolongation par avenant écrit uniquement (art. 6)` },
+      { l: "Type de mandat", v: "Exclusif – le Déposant s'interdit de proposer le véhicule à la vente, directement ou par un intermédiaire (art. 7)" },
+      { l: "Prix", v: "Le prix de vente ne peut être modifié qu'avec l'accord écrit du Déposant (art. 3)" },
+      { l: "Rémunération", v: "Différence entre le prix de vente effectif et le net vendeur ; aucun autre frais sans accord préalable sur devis (art. 4)" },
+      { l: "Fin du mandat sans vente", v: `Frais de gardiennage de ${eur(c.gardiennage_par_jour)} TTC par jour à compter du ${c.gardiennage_delai_jours}e jour suivant la fin du mandat (art. 13)` },
+    ], 1);
+    m.y -= 10;
+    m.place(70);
+    m.trait(0.9, NOIR);
+    m.y -= 10;
+    m.texte(`Frais de résiliation anticipée par le Déposant : ${eur(c.frais_resiliation)} TTC`, { gras: true, taille: 11, apres: 3 });
+    m.texte(`Indemnité forfaitaire due à ${SOCIETE.nom} si le Déposant reprend son véhicule avant le terme du mandat, ou si le véhicule est vendu pendant le mandat par un autre canal (art. 8).`, { italique: true, taille: 8, couleur: GRIS, apres: 8 });
+    m.trait(0.9, NOIR);
 
-  m.place(70);
-  m.filet();
-  m.texte(`Fait à Chaville. Signature électronique du Déposant : voir le certificat de signature joint à la version signée de ce document. Pour ${SOCIETE.nom} : ${i.representant}.`, { taille: 8.5, couleur: GRIS });
+    // ---- Page 2 : engagements du garage, état des lieux, signatures ----
+    m.nouvelle();
+    m.section("Responsabilités, assurances & obligations du garage", 200);
+    m.deuxBlocs(
+      (x, larg) => {
+        m.texte("Garde, assurance et essais", { gras: true, taille: 8.5, x, largeur: larg, apres: 2 });
+        m.texte(art[8].texte.join(" "), { taille: 8, x, largeur: larg, justifie: true, apres: 8 });
+        m.texte("Déroulement de la vente", { gras: true, taille: 8.5, x, largeur: larg, apres: 2 });
+        m.texte(art[4].texte.join(" "), { taille: 8, x, largeur: larg, justifie: true, apres: 0 });
+      },
+      (x, larg) => {
+        m.texte(`Engagements de ${SOCIETE.nom}`, { gras: true, taille: 8.5, x, largeur: larg, apres: 4 });
+        for (const puce of [
+          `Conservation du véhicule au showroom de Chaville (art. 9)`,
+          `Assurance professionnelle du garage, souscrite auprès d'${SOCIETE.assureur} (art. 9)`,
+          "Aucun essai routier sans l'accord préalable du Déposant (art. 9)",
+          "Aucun entretien ni remise en état sans accord préalable sur devis (art. 4)",
+          "Prix modifié uniquement avec l'accord écrit du Déposant (art. 3)",
+          `Encaissement du prix et virement du net vendeur sous ${c.reversement_heures} h (art. 11)`,
+          "Déclaration de cession et changement de titulaire du certificat d'immatriculation (art. 12)",
+          "État des lieux contradictoire à la remise du véhicule (art. 10)",
+        ]) {
+          const y = m.y;
+          m.page.drawText("–", { x, y: y - 8, size: 8, font: m.f, color: GRIS });
+          m.texte(puce, { taille: 8, x, largeur: larg, retrait: 11, apres: 3 });
+        }
+      },
+    );
+    m.section("État des lieux contradictoire – à la remise des clés", 190);
+    const lignesEdl: [string, string][] = [
+      ["Date et heure", e.fait_le ? `${jour(e.fait_le)}${/^\d{2}:\d{2}/.test(e.heure ?? "") ? ` à ${e.heure!.slice(0, 2)} h ${e.heure!.slice(3, 5)}` : ""}` : "—"],
+      ["Kilométrage relevé", km(e.kilometrage)],
+      ["Clés remises", ou(e.cles)],
+      ["État général", ou(e.etat)],
+      ["Accessoires remis", ou(e.accessoires)],
+      ["Défauts et remarques", ou(e.remarques)],
+    ];
+    const largLib = 150;
+    m.place(40);
+    m.bloc("Élément contrôlé", M + 4, m.y, largLib - 10, { gras: true, taille: 8 });
+    m.bloc("Constat à l'entrée", M + largLib, m.y, LARG - largLib, { gras: true, taille: 8 });
+    m.y -= 8 * 1.35 + 3;
+    m.trait(0.6, NOIR);
+    m.y -= 2;
+    lignesEdl.forEach(([l, val], k) => {
+      const h = Math.max(m.hauteur(l, largLib - 10, { taille: 8.5 }), m.hauteur(val, LARG - largLib - 8, { taille: 8.5 })) + 10;
+      m.place(h);
+      if (k % 2 === 1) m.page.drawRectangle({ x: M, y: m.y - h, width: LARG, height: h, color: FOND });
+      m.bloc(l, M + 4, m.y - 5, largLib - 10, { taille: 8.5, couleur: GRIS });
+      m.bloc(val, M + largLib, m.y - 5, LARG - largLib - 8, { taille: 8.5 });
+      m.y -= h;
+      m.page.drawLine({ start: { x: M, y: m.y }, end: { x: L - M, y: m.y }, thickness: 0.4, color: GRIS_CLAIR });
+    });
+    m.y -= 14;
+    m.texte("Les parties reconnaissent avoir pris connaissance de l'intégralité du présent contrat et des conditions générales qui suivent.", { italique: true, taille: 8, couleur: GRIS, apres: 10 });
+    m.signatures(i);
+
+    // ---- Conditions générales, en deux colonnes ----
+    m.nouvelle();
+    m.y += 6;
+    m.texte("Conditions générales du contrat de dépôt-vente", { gras: true, taille: 12, centre: true, apres: 6 });
+    m.trait();
+    m.y -= 10;
+    const optTitre: Opt = { gras: true, taille: 7.4, interligne: 1.3, apres: 1 };
+    const optTexte: Opt = { taille: 7, interligne: 1.24, justifie: true, apres: 1.2 };
+    const lc = m.largeurColonne;
+    const total = art.reduce((h, b) =>
+      h + (b.titre ? m.hauteur(titreCG(b.titre), lc, optTitre) + 1 : 0) +
+      b.texte.reduce((s, t) => s + m.hauteur(t, lc, optTexte) + 1.2, 0) + 3, 0);
+    m.colonnes(total);
+    for (const b of art) {
+      m.place(24);
+      if (b.titre) m.texte(titreCG(b.titre), optTitre);
+      for (const t of b.texte) m.texte(t, optTexte);
+      m.y -= 3;
+    }
+    m.finColonnes();
+    m.y -= 2;
+    const rappel = `Rappel art. 8 – Fin anticipée : toute reprise du véhicule par le Déposant avant le terme du mandat entraîne une indemnité forfaitaire de ${eur(c.frais_resiliation)} TTC.`;
+    const hRappel = m.hauteur(rappel, LARG, { gras: true, taille: 8 });
+    m.place(hRappel + 4);
+    m.page.drawLine({ start: { x: M - 7, y: m.y + 1 }, end: { x: M - 7, y: m.y - hRappel + 1 }, thickness: 1.5, color: NOIR });
+    m.texte(rappel, { gras: true, taille: 8, apres: 8 });
+    m.signatures(i, "Signatures – Bon pour acceptation des conditions générales :");
+  } else {
+    // ---- Avenant ----
+    enTete(m, i, `AVENANT N° ${i.numero - 1}`, `au contrat de dépôt-vente ${i.avenant?.mandat_reference ?? i.reference}`);
+    m.section("Véhicule déposé");
+    m.paires([
+      { l: "Marque", v: v.marque }, { l: "N° de série (VIN)", v: ou(v.vin) },
+      { l: "Modèle", v: `${v.modele}${v.version ? ` ${v.version}` : ""}`, gras: true }, { l: "Immatriculation", v: ou(v.immatriculation) },
+    ]);
+    m.section("Objet de l'avenant");
+    for (const b of articlesAvenant(i)) {
+      m.place(40);
+      if (b.titre) m.texte(b.titre, { gras: true, taille: 9.5, apres: 2 });
+      for (const t of b.texte) m.texte(t, { taille: 9, justifie: true, apres: 3 });
+      m.y -= 6;
+    }
+    m.y -= 10;
+    m.signatures(i);
+  }
   m.numeroter();
   return await doc.save({ useObjectStreams: false });
 }
@@ -305,27 +661,28 @@ export async function pdfSigne(original: Uint8Array, preuve: {
   ouvert_le: string | null; modele_version: string;
 }): Promise<Uint8Array> {
   const doc = await PDFDocument.load(original);
-  const f = await doc.embedFont(StandardFonts.Helvetica);
-  const fb = await doc.embedFont(StandardFonts.HelveticaBold);
-  const m = new Mise(doc, f, fb, `Certificat de signature ${preuve.reference}`);
+  const m = await Mise.creer(doc, `Certificat de signature ${preuve.reference}`);
   const heure = (iso: string | null) => (iso ? new Date(iso).toLocaleString("fr-FR", { timeZone: "Europe/Paris" }) + " (heure de Paris)" : "—");
-  m.texte("CERTIFICAT DE SIGNATURE ÉLECTRONIQUE", { taille: 13, gras: true, apres: 6 });
-  m.filet();
-  const l = (a: string, b: string) => m.texte(`${a} : ${b}`, { apres: 2 });
-  l("Document", `${preuve.titre} ${preuve.reference} (modèle ${preuve.modele_version})`);
-  l("Empreinte SHA-256 du document signé (pages précédentes)", preuve.empreinte_original);
-  l("Signataire", `${preuve.signataire} – ${preuve.email}`);
-  l("Document ouvert le", heure(preuve.ouvert_le));
-  l("Code à usage unique envoyé à", `${preuve.email}, le ${heure(preuve.code_envoye_le)}`);
-  l("Code validé et document signé le", heure(preuve.signe_le));
-  l("Adresse IP", preuve.ip || "—");
-  l("Navigateur", preuve.navigateur.slice(0, 180) || "—");
-  l("Lecture et acceptation du contrat", "case cochée par le signataire");
+  m.texte("CERTIFICAT DE SIGNATURE ÉLECTRONIQUE", { taille: 14, gras: true, centre: true, apres: 10 });
+  m.trait();
+  m.y -= 12;
+  const lignes: [string, string][] = [
+    ["Document", `${preuve.titre} ${preuve.reference} (modèle ${preuve.modele_version})`],
+    ["Empreinte SHA-256 du document signé (pages précédentes)", preuve.empreinte_original],
+    ["Signataire", `${preuve.signataire} – ${preuve.email}`],
+    ["Document ouvert le", heure(preuve.ouvert_le)],
+    ["Code à usage unique envoyé à", `${preuve.email}, le ${heure(preuve.code_envoye_le)}`],
+    ["Code validé et document signé le", heure(preuve.signe_le)],
+    ["Adresse IP", preuve.ip || "—"],
+    ["Navigateur", preuve.navigateur.slice(0, 180) || "—"],
+    ["Lecture et acceptation du contrat", "case cochée par le signataire"],
+  ];
   if (preuve.renonciation !== null) {
-    l("Exécution immédiate et renonciation au délai de rétractation", preuve.renonciation ? "case cochée par le signataire" : "non");
+    lignes.push(["Exécution immédiate et renonciation au délai de rétractation", preuve.renonciation ? "case cochée par le signataire" : "non"]);
   }
-  m.y -= 8;
-  m.texte("Ce certificat est généré automatiquement par svmride.com au moment de la signature. Le dossier de preuve complet (journal horodaté des étapes) est conservé par SVM RIDE. Toute modification des pages précédentes change leur empreinte SHA-256 et peut être détectée en la recalculant sur le document d'origine.", { taille: 8.5, couleur: GRIS });
-  m.numeroter = () => {};
+  m.paires(lignes.map(([l, v]) => ({ l, v })), 1);
+  m.y -= 10;
+  m.texte("Ce certificat est généré automatiquement par svmride.com au moment de la signature. Le dossier de preuve complet (journal horodaté des étapes) est conservé par SVM RIDE. Toute modification des pages précédentes change leur empreinte SHA-256 et peut être détectée en la recalculant sur le document d'origine.", { taille: 8, couleur: GRIS, justifie: true });
+  m.piedDePage(m.page, "Certificat de signature");
   return await doc.save({ useObjectStreams: false });
 }
