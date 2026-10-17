@@ -30,126 +30,76 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     navigate('/');
   };
 
-  const liens = (
-              <>
-                <Link
-                  to="/admin/vehicles"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                    isActive('/admin/vehicles')
-                      ? 'text-brand bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
-                  }`}
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m18 14-1-3"/>
-                    <path d="m3 9 6 2a2 2 0 0 1 2-2h2a2 2 0 0 1 1.99 1.81"/>
-                    <path d="M8 17h3a1 1 0 0 0 1-1 6 6 0 0 1 6-6 1 1 0 0 0 1-1v-.75A5 5 0 0 0 17 5"/>
-                    <circle cx="19" cy="17" r="3"/>
-                    <circle cx="5" cy="17" r="3"/>
-                  </svg>
-                  Véhicules
-                </Link>
-                <Link
-                  to="/admin/submissions"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 relative ${
-                    isActive('/admin/submissions')
-                      ? 'text-brand bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
-                  }`}
-                >
-                  <Mail className="w-4 h-4" />
-                  Messages
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-brand text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  to="/admin/financing-profiles"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 relative ${
-                    isActive('/admin/financing-profiles')
-                      ? 'text-brand bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
-                  }`}
-                >
-                  <FileText className="w-4 h-4" />
-                  Dossiers Financement
-                  {unreadFinancingProfiles > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-brand text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadFinancingProfiles > 99 ? '99+' : unreadFinancingProfiles}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  to="/admin/sales-folders"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                    isActive('/admin/sales-folders')
-                      ? 'text-brand bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
-                  }`}
-                >
-                  <FolderOpen className="w-4 h-4" />
-                  Dossiers Vente
-                </Link>
-                <Link
-                  to="/admin/depot-vente"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 relative whitespace-nowrap ${
-                    isActive('/admin/depot-vente')
-                      ? 'text-brand bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
-                  }`}
-                >
-                  <Handshake className="w-4 h-4" />
-                  Dépôt-vente
-                  {depotNonLues > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-brand text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {depotNonLues > 99 ? '99+' : depotNonLues}
-                    </span>
-                  )}
-                </Link>
-                <Link
-                  to="/admin/equipe"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${
-                    isActive('/admin/equipe')
-                      ? 'text-brand bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
-                  }`}
-                >
-                  <Users className="w-4 h-4" />
-                  Équipe
-                </Link>
-                <Link
-                  to="/admin/infos-site"
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap ${
-                    isActive('/admin/infos-site')
-                      ? 'text-brand bg-[#F9F9F9]'
-                      : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
-                  }`}
-                >
-                  <Store className="w-4 h-4" />
-                  Infos du site
-                </Link>
-              </>
+  // Deux familles de liens : l'activité (au quotidien) et le contenu du site (réglages occasionnels)
+  type Lien = { to: string; libelle: string; icone: React.ReactNode; badge?: number; actif?: string };
+  const VEHICULE = (
+    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m18 14-1-3"/>
+      <path d="m3 9 6 2a2 2 0 0 1 2-2h2a2 2 0 0 1 1.99 1.81"/>
+      <path d="M8 17h3a1 1 0 0 0 1-1 6 6 0 0 1 6-6 1 1 0 0 0 1-1v-.75A5 5 0 0 0 17 5"/>
+      <circle cx="19" cy="17" r="3"/>
+      <circle cx="5" cy="17" r="3"/>
+    </svg>
   );
+  const activite: Lien[] = [
+    { to: '/admin/vehicles', libelle: 'Véhicules', icone: VEHICULE },
+    { to: '/admin/submissions', libelle: 'Messages', icone: <Mail className="w-4 h-4" aria-hidden="true" />, badge: unreadCount },
+    { to: '/admin/financing-profiles', libelle: 'Dossiers Financement', icone: <FileText className="w-4 h-4" aria-hidden="true" />, badge: unreadFinancingProfiles },
+    { to: '/admin/sales-folders', libelle: 'Dossiers Vente', icone: <FolderOpen className="w-4 h-4" aria-hidden="true" /> },
+    { to: '/admin/depot-vente', libelle: 'Dépôt-vente', icone: <Handshake className="w-4 h-4" aria-hidden="true" />, badge: depotNonLues },
+  ];
+  const contenuSite: Lien[] = [
+    { to: '/admin/equipe', libelle: 'Équipe', icone: <Users className="w-4 h-4" aria-hidden="true" /> },
+    { to: '/admin/infos-site', libelle: 'Infos du site', icone: <Store className="w-4 h-4" aria-hidden="true" /> },
+  ];
+
+  /** Lien du menu ; « surFond » : dans le groupe grisé du contenu du site */
+  const lien = (l: Lien, surFond = false) => {
+    const actif = isActive(l.to);
+    return (
+      <Link
+        key={l.to}
+        to={l.to}
+        aria-current={actif ? 'page' : undefined}
+        className={`relative flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+          actif
+            ? surFond ? 'bg-white text-brand shadow-sm' : 'bg-[#F5F5F5] text-brand'
+            : surFond ? 'text-[#444444] hover:bg-white hover:text-brand' : 'text-[#444444] hover:bg-[#F9F9F9] hover:text-brand'
+        }`}
+      >
+        {l.icone}
+        {l.libelle}
+        {!!l.badge && l.badge > 0 && (
+          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-brand text-xs font-bold text-white">
+            {l.badge > 99 ? '99+' : l.badge}
+          </span>
+        )}
+      </Link>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
-      <nav className="bg-white border-b border-[#E5E5E5]">
+      <header className="bg-white border-b border-[#E5E5E5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <Link to="/admin/dashboard" className="flex items-center space-x-2">
+          <div className="flex h-16 items-center justify-between gap-4">
+            <div className="flex min-w-0 items-center gap-6">
+              <Link to="/admin/dashboard" className="flex shrink-0 items-center space-x-2">
                 <Crown className="w-6 h-6 text-brand" />
                 <span className="text-xl font-bold text-[#111111]">Admin</span>
               </Link>
-
-              <div className="hidden xl:flex space-x-1 2xl:space-x-3">
-                {liens}
-              </div>
+              {/* Ordinateur : l'activité à gauche… */}
+              <nav aria-label="Activité" className="hidden xl:flex items-center gap-1">
+                {activite.map((l) => lien(l))}
+              </nav>
             </div>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex shrink-0 items-center gap-4">
+              {/* … le contenu du site à droite, groupé, près de « Voir le site » */}
+              <nav aria-label="Contenu du site" className="hidden xl:flex items-center gap-0.5 rounded-xl bg-[#F5F5F5] p-1">
+                {contenuSite.map((l) => lien(l, true))}
+              </nav>
+              <span className="hidden xl:block h-6 w-px bg-[#E5E5E5]" aria-hidden="true" />
               <Link to="/" className="text-[#666666] hover:text-brand" title="Voir le site" aria-label="Voir le site">
                 <Home className="w-5 h-5" />
               </Link>
@@ -164,11 +114,24 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
               </button>
             </div>
           </div>
-          <div className="xl:hidden flex gap-1 overflow-x-auto pb-2 -mx-1 px-1">
-            {liens}
+
+          {/* Tablette et téléphone : deux lignes, chacune défilable si besoin */}
+          <div className="xl:hidden space-y-1 pb-2">
+            <nav aria-label="Activité" className="flex items-center gap-2">
+              <span className="w-[3.25rem] shrink-0 text-[10px] font-semibold uppercase tracking-wider text-[#888888]">Activité</span>
+              <div className="-my-1 flex min-w-0 gap-1 overflow-x-auto py-1 pr-1">
+                {activite.map((l) => lien(l))}
+              </div>
+            </nav>
+            <nav aria-label="Contenu du site" className="flex items-center gap-2 border-t border-[#F0F0F0] pt-1">
+              <span className="w-[3.25rem] shrink-0 text-[10px] font-semibold uppercase tracking-wider text-[#888888]">Site</span>
+              <div className="-my-1 flex min-w-0 gap-1 overflow-x-auto py-1 pr-1">
+                {contenuSite.map((l) => lien(l))}
+              </div>
+            </nav>
           </div>
         </div>
-      </nav>
+      </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {children}

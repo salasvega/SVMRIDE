@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, FileText, Package, ShoppingCart, CheckCircle, TrendingUp, FolderOpen } from 'lucide-react';
+import { Mail, FileText, Package, ShoppingCart, CheckCircle, TrendingUp, FolderOpen, Handshake } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { useUnreadCount } from '../../hooks/useUnreadCount';
@@ -62,6 +62,18 @@ export function AdminDashboard() {
     salesFolders: 0,
     salesFoldersEnCours: 0,
   });
+  // Dépôt-vente : dossiers (motos confiées), mandats en cours, demandes à traiter
+  const [depot, setDepot] = useState({ dossiers: 0, actifs: 0, aTraiter: 0 });
+
+  useEffect(() => {
+    Promise.all([
+      supabase.from('depot_dossiers').select('id', { count: 'exact', head: true }),
+      supabase.from('depot_dossiers').select('id', { count: 'exact', head: true }).eq('statut_mandat', 'actif'),
+      supabase.from('depot_demandes').select('id', { count: 'exact', head: true }).eq('envoi_termine', true).is('lu_le', null),
+      supabase.from('depot_demandes_proprietaire').select('id', { count: 'exact', head: true }).eq('statut', 'nouvelle'),
+    ]).then(([d, a, n, p]: { count: number | null }[]) =>
+      setDepot({ dossiers: d.count ?? 0, actifs: a.count ?? 0, aTraiter: (n.count ?? 0) + (p.count ?? 0) }));
+  }, []);
 
   useEffect(() => {
     async function fetchStats() {
@@ -213,6 +225,37 @@ export function AdminDashboard() {
               </div>
               <div className="relative w-16 h-16 bg-gradient-to-br from-teal-100 to-teal-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
                 <FolderOpen className="w-8 h-8 text-teal-600" />
+              </div>
+            </div>
+          </Link>
+
+          <Link
+            to="/admin/depot-vente/dossiers"
+            className="group relative bg-gradient-to-br from-white to-amber-50/30 rounded-xl p-6 shadow-sm border-2 border-[#D1D5DB] hover:border-amber-400 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-amber-600/10 transition-all duration-300" />
+            <div className="relative flex items-center justify-between">
+              <div>
+                <p className="text-sm text-[#666666] mb-2 font-medium">Dossiers dépôt-vente</p>
+                <p className="text-4xl font-bold text-[#111111]">
+                  <AnimatedCounter value={depot.dossiers} />
+                </p>
+                {depot.actifs > 0 && (
+                  <p className="text-xs text-amber-700 mt-1 font-medium">
+                    {depot.actifs} mandat{depot.actifs > 1 ? 's' : ''} en cours
+                  </p>
+                )}
+              </div>
+              <div className="relative w-16 h-16 bg-gradient-to-br from-amber-100 to-amber-200 rounded-2xl flex items-center justify-center transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300 shadow-lg">
+                <Handshake className="w-8 h-8 text-amber-700" />
+                {depot.aTraiter > 0 && (
+                  <span
+                    className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse"
+                    title="Demandes à traiter (estimations non lues, demandes des déposants)"
+                  >
+                    {depot.aTraiter > 99 ? '99+' : depot.aTraiter}
+                  </span>
+                )}
               </div>
             </div>
           </Link>
