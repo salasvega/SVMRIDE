@@ -93,7 +93,8 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
       <FondMenu ouvert={menuOuvert} onFermer={() => setMenuOuvert(false)} z="z-30" />
-      <header className="relative z-40 bg-white border-b border-[#E5E5E5]">
+      {/* Figé en haut sur ordinateur (comme le site) ; sur tablette et téléphone il défile avec la page */}
+      <header className="relative z-40 xl:sticky xl:top-0 bg-white border-b border-[#E5E5E5]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between gap-4">
             <div className="flex min-w-0 items-center gap-6">

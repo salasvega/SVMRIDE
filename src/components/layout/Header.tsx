@@ -27,7 +27,8 @@ export function Header() {
   return (
     <>
     <FondMenu ouvert={mobileMenuOpen} onFermer={() => setMobileMenuOpen(false)} />
-    <header className="sticky top-0 z-50 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
+    {/* Figé en haut sur ordinateur ; sur tablette et téléphone il défile avec la page (comme l'admin) */}
+    <header className="relative z-50 xl:sticky xl:top-0 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Navigation principale">
         {/* Barre du haut */}
         <div className="flex justify-between items-center h-[68px] lg:h-20">
