@@ -24,7 +24,7 @@ export const siteConfig = {
   name: 'SVM Ride',
   description: 'Spécialiste du deux-roues en Île-de-France',
   showrooms,
-  /** Siège social (mentions légales) — différent du showroom */
+  /** Ancienne valeur : le siège se modifie désormais dans l'admin (« Infos du site », bloc Société) */
   siegeSocial: '3 Rue Émile Verhaeren, 92210 Saint-Cloud',
   adresse:
     "310 Avenue Roger Salengro, 92370 Chaville\nSur rendez-vous sur nos points de vente en Ile de France.\nHoraires:\nMardi - Samedi : 9h-18h\nLundi : Sur rendez-vous",

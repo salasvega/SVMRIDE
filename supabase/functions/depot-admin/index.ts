@@ -16,7 +16,7 @@ import {
   admin, base, bouton, BUCKET_DOCS, cors, dateFr, echapper, empreinte, envoyer, Erreur, euros, gabarit,
   jetonAleatoire, reponse, sha256, SITE,
 } from "../_shared/depot-commun.ts";
-import { construireInstantane, genererPdf, MODELE_VERSION } from "../_shared/depot-contrat.ts";
+import { construireInstantane, genererPdf, MODELE_VERSION, societeContrat } from "../_shared/depot-contrat.ts";
 
 const VALIDITE_INVITATION_JOURS = 7;
 /** Pièces exigées avant la signature (réponses de Mattia : « obligatoires pour signer ») */
@@ -180,7 +180,11 @@ Deno.serve(async (req: Request) => {
         }
         const numero = ((contrats ?? []).at(-1)?.numero ?? 0) + 1;
         const representant = String(body.representant ?? "").trim().slice(0, 80) || "Mattia SARAVIA";
-        const inst = construireInstantane(d, p ?? {}, { type, numero, representant, dateDebut, dateFin, ancienneDateFin, prixModifie });
+        // Société et coordonnées du moment (admin, « Infos du site ») : copiées dans le contrat
+        const { data: reglages } = await db.from("site_reglages").select("cle, valeur").in("cle", ["societe", "coordonnees"]);
+        const reglage = (cle: string) => reglages?.find((r) => r.cle === cle)?.valeur;
+        const societe = societeContrat(reglage("societe"), reglage("coordonnees"));
+        const inst = construireInstantane(d, p ?? {}, { type, numero, representant, dateDebut, dateFin, ancienneDateFin, prixModifie, societe });
         const pdf = await genererPdf(inst);
         const hash = await sha256(pdf);
         const chemin = `${d.id}/contrats/${String(numero).padStart(2, "0")}-${type}-${hash.slice(0, 12)}.pdf`;

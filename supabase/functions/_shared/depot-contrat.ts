@@ -17,15 +17,30 @@
  * (police libre Architects Daughter) avec la date et l'heure de la signature, dans
  * les cadres du contrat et sur le certificat. Le PDF présenté à la signature reste
  * conservé tel quel : son empreinte figure sur le certificat.
+ *
+ * Société (17/10/2026) : raison sociale, forme, capital, SIRET, RCS, siège,
+ * assureur et médiateur se modifient dans l'admin (« Infos du site », bloc
+ * Société), de même que le showroom, l'e-mail et le téléphone. Chaque contrat en
+ * garde une copie (Instantane.societe) : un contrat créé ou signé ne change
+ * jamais ; les contrats plus anciens, sans copie, utilisent SOCIETE ci-dessous.
  */
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage, type RGB } from "npm:pdf-lib@1.17.1";
 import fontkit from "npm:@pdf-lib/fontkit@1.1.1";
 
-export const MODELE_VERSION = "mandat-depot-vente-2026-10-17e";
+export const MODELE_VERSION = "mandat-depot-vente-2026-10-17f";
 
-export const SOCIETE = {
+export interface SocieteContrat {
+  nom: string; forme: string; capital: string; siren: string; siret: string; rcs: string; siege: string;
+  showroom: string; assureur: string; email: string; telephone: string;
+  /** Médiateur de la consommation (vide tant qu'il n'est pas désigné) */
+  mediateur: string;
+}
+
+/** Valeurs de secours, et celles des contrats créés avant le 17/10/2026 (sans copie) */
+export const SOCIETE: SocieteContrat = {
   nom: "SVM RIDE",
   forme: "SAS",
+  capital: "",
   siren: "988 004 719",
   siret: "988 004 719 00015",
   rcs: "RCS Nanterre",
@@ -35,9 +50,45 @@ export const SOCIETE = {
   assureur: "AXA",
   email: "contact@svmride.com",
   telephone: "01 84 19 01 74",
+  mediateur: "",
 };
-/** Médiateur de la consommation (obligatoire) : à renseigner dès qu'il est désigné. */
-export const MEDIATEUR = "";
+
+const txt = (v: unknown, max = 160) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim().slice(0, max) : "");
+
+/**
+ * Copie des informations de la société pour un nouveau contrat, à partir des
+ * réglages de l'admin « societe » et « coordonnees » (table site_reglages).
+ * Ce qui manque ou n'est pas valable reprend la valeur de SOCIETE.
+ */
+export function societeContrat(societe: unknown, coordonnees: unknown): SocieteContrat {
+  const s = (societe && typeof societe === "object" ? societe : {}) as Record<string, unknown>;
+  const c = (coordonnees && typeof coordonnees === "object" ? coordonnees : {}) as Record<string, any>;
+  const siret = txt(s.siret, 20).replace(/\s/g, "");
+  const siretOk = /^\d{14}$/.test(siret);
+  const sh = c.showroom ?? {};
+  const rue = txt(sh.adresse), cp = txt(sh.code_postal, 5), ville = txt(sh.ville);
+  const email = txt(c.email, 120);
+  const mediateur = txt(s.mediateur_nom, 120)
+    ? [txt(s.mediateur_nom, 120), txt(s.mediateur_site, 120), txt(s.mediateur_adresse)].filter(Boolean).join(" – ")
+    : "";
+  return {
+    nom: txt(s.raison_sociale, 80) || SOCIETE.nom,
+    forme: txt(s.forme, 40) || SOCIETE.forme,
+    capital: txt(s.capital, 40),
+    siren: siretOk ? `${siret.slice(0, 3)} ${siret.slice(3, 6)} ${siret.slice(6, 9)}` : SOCIETE.siren,
+    siret: siretOk ? `${siret.slice(0, 3)} ${siret.slice(3, 6)} ${siret.slice(6, 9)} ${siret.slice(9)}` : SOCIETE.siret,
+    rcs: txt(s.rcs, 60) || SOCIETE.rcs,
+    siege: txt(s.siege) || SOCIETE.siege,
+    showroom: rue && /^\d{5}$/.test(cp) && ville ? `${rue}, ${cp} ${ville}` : SOCIETE.showroom,
+    assureur: txt(s.assureur, 80) || SOCIETE.assureur,
+    email: /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email) ? email : SOCIETE.email,
+    telephone: /\d{2}.*\d{2}/.test(txt(c.telephone, 30)) ? txt(c.telephone, 30) : SOCIETE.telephone,
+    mediateur,
+  };
+}
+
+/** Société du contrat : sa copie, ou SOCIETE pour les contrats plus anciens */
+const soc = (i?: { societe?: SocieteContrat } | null): SocieteContrat => i?.societe ?? SOCIETE;
 
 export interface Instantane {
   type: "mandat" | "avenant";
@@ -54,6 +105,8 @@ export interface Instantane {
     gardiennage_delai_jours: number; reversement_heures: number; conservation_annees: number;
   };
   etat_des_lieux: { fait_le?: string; heure?: string; kilometrage?: number; etat?: string; accessoires?: string; cles?: string; remarques?: string } | null;
+  /** Copie des informations de la société au moment de la création du contrat */
+  societe?: SocieteContrat;
   /** Emplacements de la signature du déposant dans le PDF (renseignés par genererPdf) */
   cadres_deposant?: Cadre[];
   avenant?: { mandat_reference: string; ancienne_date_fin: string; nouvelle_date_fin: string; prix_modifie: boolean };
@@ -63,7 +116,7 @@ const PIECES: Record<string, string> = { cni: "Carte d'identité", passeport: "P
 
 export function construireInstantane(d: Record<string, any>, p: Record<string, any>, opts: {
   type: "mandat" | "avenant"; numero: number; representant: string; dateDebut: string; dateFin: string;
-  ancienneDateFin?: string; prixModifie?: boolean;
+  ancienneDateFin?: string; prixModifie?: boolean; societe?: SocieteContrat;
 }): Instantane {
   const prix = Number(d.prix_affiche), net = Number(d.net_vendeur);
   return {
@@ -73,6 +126,7 @@ export function construireInstantane(d: Record<string, any>, p: Record<string, a
     modele_version: MODELE_VERSION,
     genere_le: new Date().toISOString(),
     representant: opts.representant,
+    societe: opts.societe ?? SOCIETE,
     deposant: {
       civilite: d.prop_civilite, prenom: d.prop_prenom, nom: d.prop_nom, email: d.prop_email, telephone: d.prop_telephone,
       adresse: d.prop_adresse,
@@ -112,7 +166,7 @@ function articlesMandat(i: Instantane): Bloc[] {
   const c = i.conditions, v = i.vehicule;
   return [
     { titre: "Article 1 – Objet", texte: [
-      `Le Déposant confie à ${SOCIETE.nom}, qui l'accepte, la vente du véhicule désigné à l'article 2, dans le cadre d'un mandat de dépôt-vente exclusif.`,
+      `Le Déposant confie à ${soc(i).nom}, qui l'accepte, la vente du véhicule désigné à l'article 2, dans le cadre d'un mandat de dépôt-vente exclusif.`,
     ] },
     { titre: "Article 2 – Véhicule et déclarations du Déposant", texte: [
       `${v.marque} ${v.modele}${v.version ? ` ${v.version}` : ""} – immatriculation : ${v.immatriculation ?? "—"} – n° d'identification (VIN) : ${v.vin ?? "—"} – 1re mise en circulation : ${v.mise_circulation ? jour(v.mise_circulation) : v.annee ?? "—"} – kilométrage au dépôt : ${v.kilometrage != null ? `${v.kilometrage.toLocaleString("fr-FR").replace(/[  ]/g, " ")} km` : "—"}.`,
@@ -123,11 +177,11 @@ function articlesMandat(i: Instantane): Bloc[] {
       "Le prix de vente ne peut être modifié qu'avec l'accord écrit du Déposant (un e-mail suffit). Sauf accord différent, une baisse du prix de vente réduit le net vendeur du même montant.",
     ] },
     { titre: "Article 4 – Rémunération de SVM RIDE", texte: [
-      `La rémunération de ${SOCIETE.nom} est égale à la différence entre le prix de vente effectif et le net vendeur, soit ${eur(c.remuneration)} TTC sur la base du prix affiché.`,
+      `La rémunération de ${soc(i).nom} est égale à la différence entre le prix de vente effectif et le net vendeur, soit ${eur(c.remuneration)} TTC sur la base du prix affiché.`,
       "Aucun autre frais n'est facturé au Déposant, à l'exception des frais d'entretien ou de remise en état nécessaires à la vente, qui ne sont engagés qu'avec son accord préalable sur devis.",
     ] },
     { titre: "Article 5 – Déroulement de la vente", texte: [
-      `Au moment de la vente, ${SOCIETE.nom} acquiert le véhicule auprès du Déposant au montant du net vendeur et le revend en son nom à l'acheteur. ${SOCIETE.nom} assume seule la relation avec l'acheteur, les garanties qu'elle lui consent et le service après-vente. Le Déposant n'a aucune garantie à assurer envers l'acheteur, sous réserve de l'exactitude de ses déclarations (article 2).`,
+      `Au moment de la vente, ${soc(i).nom} acquiert le véhicule auprès du Déposant au montant du net vendeur et le revend en son nom à l'acheteur. ${soc(i).nom} assume seule la relation avec l'acheteur, les garanties qu'elle lui consent et le service après-vente. Le Déposant n'a aucune garantie à assurer envers l'acheteur, sous réserve de l'exactitude de ses déclarations (article 2).`,
     ] },
     { titre: "Article 6 – Durée", texte: [
       `Le mandat est conclu pour une durée de ${c.duree_mois} mois, du ${jour(c.date_debut)} au ${jour(c.date_fin)}. Il ne peut être prolongé que par un avenant écrit signé des deux parties. À défaut de vente ou de prolongation, il prend fin à son terme.`,
@@ -136,27 +190,27 @@ function articlesMandat(i: Instantane): Bloc[] {
       "Pendant la durée du mandat, le Déposant s'interdit de proposer le véhicule à la vente, directement ou par un intermédiaire, notamment sur les plateformes d'annonces en ligne.",
     ] },
     { titre: "Article 8 – Fin anticipée", texte: [
-      `Le Déposant peut reprendre son véhicule avant le terme du mandat ; une indemnité forfaitaire de ${eur(c.frais_resiliation)} TTC est alors due à ${SOCIETE.nom}. Cette indemnité est également due si le véhicule est vendu pendant la durée du mandat par un autre canal que ${SOCIETE.nom}. ${SOCIETE.nom} peut y renoncer, notamment en cas de cession du véhicule à un proche du Déposant.`,
+      `Le Déposant peut reprendre son véhicule avant le terme du mandat ; une indemnité forfaitaire de ${eur(c.frais_resiliation)} TTC est alors due à ${soc(i).nom}. Cette indemnité est également due si le véhicule est vendu pendant la durée du mandat par un autre canal que ${soc(i).nom}. ${soc(i).nom} peut y renoncer, notamment en cas de cession du véhicule à un proche du Déposant.`,
     ] },
     { titre: "Article 9 – Garde, assurance et essais", texte: [
-      `Pendant le dépôt, le véhicule est conservé au showroom de ${SOCIETE.nom}, ${SOCIETE.showroom}, sauf accord contraire, et couvert par l'assurance professionnelle du garage, souscrite auprès d'${SOCIETE.assureur}. Aucun essai routier n'est réalisé sans l'accord préalable du Déposant.`,
+      `Pendant le dépôt, le véhicule est conservé au showroom de ${soc(i).nom}, ${soc(i).showroom}, sauf accord contraire, et couvert par l'assurance professionnelle du garage, souscrite auprès d'${soc(i).assureur}. Aucun essai routier n'est réalisé sans l'accord préalable du Déposant.`,
     ] },
     { titre: "Article 10 – État des lieux et documents", texte: [
       "Un état des lieux contradictoire est établi à la remise du véhicule (kilométrage, état, accessoires, clés) ; il figure dans le présent contrat, rubrique « État des lieux contradictoire ».",
       "Le Déposant remet, le cas échéant : le certificat d'immatriculation, une pièce d'identité, un certificat de situation administrative (non-gage) de moins de 15 jours, le double des clés, le carnet d'entretien et les factures. Il remet son relevé d'identité bancaire au moment de la vente.",
     ] },
     { titre: "Article 11 – Encaissement et paiement du Déposant", texte: [
-      `${SOCIETE.nom} encaisse le prix payé par l'acheteur et verse le net vendeur au Déposant par virement, sous ${c.reversement_heures} heures à compter de l'encaissement intégral du prix.`,
-      `En cas de réservation avec acompte, si l'acheteur renonce à son achat, l'acompte reste acquis à ${SOCIETE.nom}, sans aucune conséquence pour le Déposant.`,
+      `${soc(i).nom} encaisse le prix payé par l'acheteur et verse le net vendeur au Déposant par virement, sous ${c.reversement_heures} heures à compter de l'encaissement intégral du prix.`,
+      `En cas de réservation avec acompte, si l'acheteur renonce à son achat, l'acompte reste acquis à ${soc(i).nom}, sans aucune conséquence pour le Déposant.`,
     ] },
     { titre: "Article 12 – Démarches administratives", texte: [
-      `${SOCIETE.nom} effectue la déclaration de cession et les démarches de changement de titulaire du certificat d'immatriculation. Le Déposant signe les documents nécessaires.`,
+      `${soc(i).nom} effectue la déclaration de cession et les démarches de changement de titulaire du certificat d'immatriculation. Le Déposant signe les documents nécessaires.`,
     ] },
     { titre: "Article 13 – Fin du mandat sans vente et gardiennage", texte: [
       `À la fin du mandat sans vente ni prolongation, le Déposant récupère son véhicule au showroom. À compter du ${c.gardiennage_delai_jours}e jour suivant la fin du mandat, des frais de gardiennage de ${eur(c.gardiennage_par_jour)} TTC par jour sont dus.`,
     ] },
     { titre: "Article 14 – Données personnelles", texte: [
-      `Les données du Déposant sont traitées par ${SOCIETE.nom} pour l'exécution du présent mandat et le respect de ses obligations légales (notamment la tenue du registre des objets mobiliers). Elles sont conservées ${c.conservation_annees} ans après la fin du mandat. Le Déposant peut exercer ses droits d'accès, de rectification et d'effacement en écrivant à ${SOCIETE.email}. Détails : svmride.com/politique-confidentialite.`,
+      `Les données du Déposant sont traitées par ${soc(i).nom} pour l'exécution du présent mandat et le respect de ses obligations légales (notamment la tenue du registre des objets mobiliers). Elles sont conservées ${c.conservation_annees} ans après la fin du mandat. Le Déposant peut exercer ses droits d'accès, de rectification et d'effacement en écrivant à ${soc(i).email}. Détails : svmride.com/politique-confidentialite.`,
     ] },
     { titre: "Article 15 – Signature électronique et preuve", texte: [
       "Le présent contrat est signé électroniquement. La signature du Déposant est liée à un code à usage unique envoyé à son adresse e-mail. Les parties conviennent que le dossier de preuve conservé par SVM RIDE (horodatage, adresse IP, empreinte SHA-256 du document, étapes de la signature) fait foi entre elles.",
@@ -165,8 +219,8 @@ function articlesMandat(i: Instantane): Bloc[] {
       "Le présent contrat est conclu dans les locaux de SVM RIDE. Si un droit de rétractation devait néanmoins s'appliquer, le Déposant, en cochant la case prévue lors de la signature, demande l'exécution immédiate du mandat et renonce expressément à ce droit dans la mesure permise par la loi.",
     ] },
     { titre: "Article 17 – Litiges", texte: [
-      MEDIATEUR
-        ? `En cas de litige, le Déposant peut recourir gratuitement au médiateur de la consommation : ${MEDIATEUR}. Le contrat est soumis au droit français.`
+      soc(i).mediateur
+        ? `En cas de litige, le Déposant peut recourir gratuitement au médiateur de la consommation : ${soc(i).mediateur}. Le contrat est soumis au droit français.`
         : "Les parties rechercheront d'abord une solution amiable. Le contrat est soumis au droit français.",
     ] },
   ];
@@ -265,6 +319,8 @@ interface Opt {
 class Mise {
   page!: PDFPage;
   y = 0;
+  /** Société du document (pied de page) */
+  soc: SocieteContrat = SOCIETE;
   private cols: { x: number[]; largeur: number; i: number; haut: number; bas: number; limite: number } | null = null;
 
   constructor(
@@ -486,12 +542,12 @@ class Mise {
     // Garage
     const xg = M + larg + 30;
     fond(xg);
-    this.bloc(`Le Garage – ${SOCIETE.nom}`, xg + 12, haut - 12, larg - 24, { gras: true, taille: 9 });
+    this.bloc(`Le Garage – ${soc(i).nom}`, xg + 12, haut - 12, larg - 24, { gras: true, taille: 9 });
     this.bloc("Lu et approuvé · Bon pour dépôt", xg + 12, haut - 25, larg - 24, { italique: true, taille: 7.5, couleur: GRIS });
     // Signataire et date à gauche, tampon à droite (il déborde sur le trait, comme sur le modèle de Mattia)
     const lt = 118, largTexte = larg - 24 - (this.tampon ? lt - 10 : 0);
     let yt = haut - 37;
-    yt -= this.bloc(`Pour ${SOCIETE.nom} :`, xg + 12, yt, largTexte, { taille: 7.5 });
+    yt -= this.bloc(`Pour ${soc(i).nom} :`, xg + 12, yt, largTexte, { taille: 7.5 });
     yt -= this.bloc(i.representant, xg + 12, yt, largTexte, { taille: 7.5, gras: true });
     this.bloc(`Chaville, ${new Date(i.genere_le).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris" })}`, xg + 12, yt, largTexte, { taille: 7.5, couleur: GRIS });
     filet(xg);
@@ -522,7 +578,7 @@ class Mise {
   }
   piedDePage(p: PDFPage, droite: string) {
     p.drawLine({ start: { x: M, y: 52 }, end: { x: L - M, y: 52 }, thickness: 0.5, color: GRIS_CLAIR });
-    const centre = propre(`${SOCIETE.nom} · ${SOCIETE.rcs.toUpperCase()} · SIRET ${SOCIETE.siret}`);
+    const centre = propre(`${this.soc.nom} · ${this.soc.rcs.toUpperCase()} · SIRET ${this.soc.siret}`);
     p.drawText(centre, { x: (L - this.f.widthOfTextAtSize(centre, 7)) / 2, y: 40, size: 7, font: this.f, color: GRIS });
     const d = propre(droite);
     p.drawText(d, { x: L - M - this.f.widthOfTextAtSize(d, 7), y: 40, size: 7, font: this.f, color: GRIS });
@@ -558,10 +614,10 @@ function enTete(m: Mise, i: Instantane, titre: string, sousTitre: string) {
     },
     (x, larg) => {
       m.texte("LE GARAGE", { gras: true, taille: 7.5, x, largeur: larg, apres: 1 });
-      m.texte(SOCIETE.nom, { gras: true, taille: 10, x, largeur: larg, apres: 1 });
+      m.texte(soc(i).nom, { gras: true, taille: 10, x, largeur: larg, apres: 1 });
       for (const l of [
-        `${SOCIETE.forme} – siège : ${SOCIETE.siege}`, `SIRET : ${SOCIETE.siret} – ${SOCIETE.rcs}`,
-        `Showroom : ${SOCIETE.showroom}`, `Représentée par ${i.representant}`,
+        `${soc(i).forme}${soc(i).capital ? ` au capital de ${soc(i).capital}` : ""} – siège : ${soc(i).siege}`, `SIRET : ${soc(i).siret} – ${soc(i).rcs}`,
+        `Showroom : ${soc(i).showroom}`, `Représentée par ${i.representant}`,
       ]) m.texte(l, { taille: 8, couleur: GRIS, x, largeur: larg, apres: 0 });
       m.texte("Ci-après désigné « SVM RIDE » ou « le Garage »", { italique: true, taille: 8, couleur: GRIS, x, largeur: larg, apres: 0 });
     },
@@ -574,13 +630,14 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   const titre = i.type === "mandat" ? "Mandat de dépôt-vente exclusif" : `Avenant n° ${i.numero - 1} au mandat de dépôt-vente`;
   doc.setTitle(`${titre} ${i.reference}`);
-  doc.setAuthor(SOCIETE.nom);
+  doc.setAuthor(soc(i).nom);
   doc.setSubject(`${i.reference} – ${i.vehicule.marque} ${i.vehicule.modele}`);
   doc.setCreationDate(new Date(i.genere_le));
   doc.setModificationDate(new Date(i.genere_le));
   doc.setProducer("svmride.com");
   doc.setCreator("svmride.com");
   const m = await Mise.creer(doc, `${titre} ${i.reference} – modèle ${i.modele_version}`);
+  m.soc = soc(i);
   const v = i.vehicule, c = i.conditions, e = i.etat_des_lieux ?? {};
   i.cadres_deposant = []; // renseignés par m.signatures(), gardés avec les données du contrat
 
@@ -615,7 +672,7 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
     m.trait(0.9, NOIR);
     m.y -= 10;
     m.texte(`Frais de résiliation anticipée par le Déposant : ${eur(c.frais_resiliation)} TTC`, { gras: true, taille: 11, apres: 3 });
-    m.texte(`Indemnité forfaitaire due à ${SOCIETE.nom} si le Déposant reprend son véhicule avant le terme du mandat, ou si le véhicule est vendu pendant le mandat par un autre canal (art. 8).`, { italique: true, taille: 8, couleur: GRIS, apres: 8 });
+    m.texte(`Indemnité forfaitaire due à ${soc(i).nom} si le Déposant reprend son véhicule avant le terme du mandat, ou si le véhicule est vendu pendant le mandat par un autre canal (art. 8).`, { italique: true, taille: 8, couleur: GRIS, apres: 8 });
     m.trait(0.9, NOIR);
 
     // ---- Page 2 : engagements du garage, état des lieux, signatures ----
@@ -629,10 +686,10 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
         m.texte(art[4].texte.join(" "), { taille: 8, x, largeur: larg, justifie: true, apres: 0 });
       },
       (x, larg) => {
-        m.texte(`Engagements de ${SOCIETE.nom}`, { gras: true, taille: 8.5, x, largeur: larg, apres: 4 });
+        m.texte(`Engagements de ${soc(i).nom}`, { gras: true, taille: 8.5, x, largeur: larg, apres: 4 });
         for (const puce of [
           `Conservation du véhicule au showroom de Chaville (art. 9)`,
-          `Assurance professionnelle du garage, souscrite auprès d'${SOCIETE.assureur} (art. 9)`,
+          `Assurance professionnelle du garage, souscrite auprès d'${soc(i).assureur} (art. 9)`,
           "Aucun essai routier sans l'accord préalable du Déposant (art. 9)",
           "Aucun entretien ni remise en état sans accord préalable sur devis (art. 4)",
           "Prix modifié uniquement avec l'accord écrit du Déposant (art. 3)",
@@ -737,6 +794,7 @@ export async function pdfSigne(original: Uint8Array, preuve: {
 }, instantane?: Instantane): Promise<Uint8Array> {
   const doc = await PDFDocument.load(original);
   const m = await Mise.creer(doc, `Certificat de signature ${preuve.reference}`);
+  m.soc = soc(instantane);
   const faite: SignatureFaite | null = instantane ? { nom: nomManuscrit(instantane), signe_le: preuve.signe_le } : null;
   const pages = doc.getPages();
   if (faite) {

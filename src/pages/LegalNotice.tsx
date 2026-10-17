@@ -2,12 +2,16 @@ import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
-import { siteConfig } from '../config/site';
 import { useCoordonnees } from '../lib/coordonnees';
 import { adresseComplete } from '../config/coordonnees';
+import { useSociete } from '../lib/societe';
+import { siren, texteMediateur } from '../config/societe';
 
 export function LegalNotice() {
-  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
+  // Modifiables dans l'admin, onglet « Infos du site » (blocs Contact, Showroom et Société)
+  const c = useCoordonnees();
+  const s = useSociete();
+  const mediateur = texteMediateur(s);
   return (
     <>
       <SEOHead meta={pageSeo['/mentions-legales']} />
@@ -25,18 +29,29 @@ export function LegalNotice() {
           <div className="prose max-w-none">
             <h2 className="text-[22px] md:text-2xl mb-4">Éditeur du site</h2>
             <p className="text-gris mb-6">
-              <strong>{siteConfig.name}</strong><br />
-              SIREN: 988004719<br />
-              Siège social : {siteConfig.siegeSocial}<br />
+              <strong>{s.raison_sociale}</strong>, {s.forme}{s.capital ? ` au capital de ${s.capital}` : ''}<br />
+              SIREN : {siren(s)} · SIRET : {s.siret}<br />
+              {s.rcs}<br />
+              {s.tva && <>N° de TVA intracommunautaire : {s.tva}<br /></>}
+              Siège social : {s.siege}<br />
               Showroom : {adresseComplete(c)}<br />
-              Email: {c.email}<br />
-              Téléphone: {c.telephone}
+              E-mail : {c.email}<br />
+              Téléphone : {c.telephone}
             </p>
 
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Directeur de la publication</h2>
             <p className="text-gris mb-6">
-              M. Mattia SARAVIA
+              {s.directeur_publication}
             </p>
+
+            {mediateur && (
+              <>
+                <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Médiation de la consommation</h2>
+                <p className="text-gris mb-6 leading-relaxed">
+                  En cas de litige, vous pouvez recourir gratuitement au médiateur de la consommation : {mediateur}.
+                </p>
+              </>
+            )}
  
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Conception du site</h2>
             <p className="text-gris mb-6">
