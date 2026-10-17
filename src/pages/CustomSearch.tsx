@@ -145,8 +145,9 @@ export function CustomSearch() {
       <Section background="white" className="!py-8 lg:!pt-16">
         <Container size="md">
           <div className="grid lg:grid-cols-2 gap-12">
-            {/* Colonne gauche : explication du service */}
-            <div>
+            {/* Colonne gauche : explication du service. Sur grand écran assez haut, elle
+                reste visible pendant qu'on remplit le formulaire (plus long qu'elle). */}
+            <div className="lg:self-start [@media(min-width:1024px)_and_(min-height:900px)]:sticky [@media(min-width:1024px)_and_(min-height:900px)]:top-24">
               <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
                 Un service sur-mesure
               </h2>
@@ -232,7 +233,7 @@ export function CustomSearch() {
               ) : (
                 <form
                   onSubmit={handleSubmit}
-                  className="space-y-6 bg-fond p-8 rounded-xl sticky top-24 lg:-mt-8"
+                  className="space-y-6 bg-fond p-8 rounded-xl lg:-mt-8"
                 >
                   <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
                     Votre recherche

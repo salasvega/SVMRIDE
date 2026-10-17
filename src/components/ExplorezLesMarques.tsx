@@ -5,9 +5,10 @@
  * - défilement automatique lent (requestAnimationFrame + translate3d, donc fluide) ;
  * - glisser au doigt ou à la souris (avec inertie), molette horizontale du pavé tactile ;
  * - pas de boutons (demande du 17/10) : glisser, flèches du clavier entre les marques ;
- *   pause au survol, au focus, au toucher et hors écran ;
- * - pause au survol, au toucher, au focus clavier, hors écran et onglet masqué ;
- *   reprise 2,5 s après la fin de l'interaction ;
+ * - pause au survol, au focus clavier, hors écran et onglet masqué (reprise 2,5 s après) ;
+ * - dès que le visiteur fait défiler lui-même (glisser, molette, flèches du clavier),
+ *   le défilement automatique s'arrête pour de bon : c'est le moyen de l'arrêter
+ *   qui remplace le bouton pause (WCAG 2.2.2) ;
  * - « réduire les animations » : aucun défilement automatique, navigation manuelle conservée.
  *
  * La boucle utilise trois copies de la liste ; seule celle du milieu est lisible
@@ -163,7 +164,9 @@ export function ExplorezLesMarques() {
     return () => cancelAnimationFrame(raf);
   }, [reduit]);
 
-  const differerReprise = () => { repriseA.current = performance.now() + REPRISE_MS; };
+  const differerReprise = () => { repriseA.current = Math.max(repriseA.current, performance.now() + REPRISE_MS); };
+  /** Le visiteur a pris la main : plus de défilement automatique jusqu'au prochain chargement de la page. */
+  const arreterAuto = () => { repriseA.current = Infinity; };
 
   const allerA = (cible: number) => {
     inertie.current = 0;
@@ -173,7 +176,7 @@ export function ExplorezLesMarques() {
     } else {
       animation.current = { de: position.current, vers: cible, debut: performance.now(), duree: 450 };
     }
-    differerReprise();
+    arreterAuto();
   };
 
   // Molette horizontale (pavé tactile) : écouteur non passif pour bloquer le retour arrière du navigateur
@@ -186,7 +189,7 @@ export function ExplorezLesMarques() {
       animation.current = null;
       inertie.current = 0;
       position.current += e.deltaX;
-      differerReprise();
+      arreterAuto();
     };
     el.addEventListener('wheel', roue, { passive: false });
     return () => el.removeEventListener('wheel', roue);
@@ -223,6 +226,7 @@ export function ExplorezLesMarques() {
       const premier = g.derniers[0];
       const dt = (performance.now() - premier.t) / 1000;
       if (!reduit && dt > 0) inertie.current = Math.max(-2500, Math.min(2500, -(e.clientX - premier.x) / dt));
+      arreterAuto();
     }
     glisse.current = null;
     differerReprise();

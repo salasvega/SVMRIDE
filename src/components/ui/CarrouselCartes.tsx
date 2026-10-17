@@ -4,8 +4,10 @@
  * - avance seul (5 s par défaut) et revient au début ;
  * - glisser au doigt ou à la souris, flèches du clavier quand le focus est dedans,
  *   points pour savoir où l'on est (et y aller) ;
- * - pause au survol, au focus, pendant un glissement, hors écran, et 8 s après
- *   chaque action de l'utilisateur ; « réduire les animations » : pas d'avance seule ;
+ * - pause au survol, au focus, pendant un glissement et hors écran ; dès que le
+ *   visiteur fait défiler lui-même (glisser, points, clavier), l'avance automatique
+ *   s'arrête pour de bon (moyen d'arrêt qui remplace le bouton pause, WCAG 2.2.2) ;
+ *   « réduire les animations » : pas d'avance seule ;
  * - s'il y a assez de place pour tout montrer, simple rangée, sans commandes.
  * Les cartes hors champ sont inertes (ni focus, ni lecteur d'écran).
  */
@@ -15,7 +17,6 @@ import { usePrefereMoinsDAnimations } from '../../hooks/usePrefereMoinsDAnimatio
 
 const SEUIL_PX = 45;
 const SEUIL_VITESSE = 0.45; // px/ms
-const REPOS_APRES_ACTION_MS = 8000;
 
 export function CarrouselCartes({
   children,
@@ -41,7 +42,7 @@ export function CarrouselCartes({
   const survol = useRef(false);
   const focusDedans = useRef(false);
   const visible = useRef(true);
-  const repriseA = useRef(0);
+  const arrete = useRef(false);
 
   const max = Math.max(0, n - parVue);
   const statique = n <= parVue;
@@ -98,7 +99,7 @@ export function CarrouselCartes({
   useEffect(() => {
     if (reduit || statique) return;
     const t = window.setInterval(() => {
-      if (survol.current || focusDedans.current || geste.current || !visible.current || Date.now() < repriseA.current) return;
+      if (survol.current || focusDedans.current || geste.current || !visible.current || arrete.current) return;
       if (document.hidden) return;
       setIndex((i) => (i >= max ? 0 : i + 1));
     }, intervalle);
@@ -107,7 +108,7 @@ export function CarrouselCartes({
 
   const aller = (i: number) => {
     const cible = i > max ? 0 : i < 0 ? max : i;
-    repriseA.current = Date.now() + REPOS_APRES_ACTION_MS;
+    arrete.current = true;
     setIndex(cible);
     setAnnonce(`${libelleCarte} ${cible + 1} sur ${n}`);
   };
@@ -144,7 +145,7 @@ export function CarrouselCartes({
     const sens = Math.abs(g.dx) > SEUIL_PX || vitesse > SEUIL_VITESSE ? (g.dx < 0 ? 1 : -1) : 0;
     if (sens && !(index === max && sens > 0) && !(index === 0 && sens < 0)) aller(index + sens);
     else {
-      repriseA.current = Date.now() + REPOS_APRES_ACTION_MS;
+      arrete.current = true;
       placer(true);
     }
   };
