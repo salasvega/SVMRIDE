@@ -374,7 +374,7 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
   const textes: Record<string, string> = {
     rappel: 'Un conseiller vous rappelle rapidement.',
     baisse_prix: 'Indiquez le nouveau prix souhaité. Rappel : une baisse du prix affiché réduit d’autant votre net vendeur, sauf accord différent.',
-    prolongation: 'Nous vous préparons un avenant de prolongation à signer en ligne.',
+    prolongation: 'Nous vous préparons un avenant de prolongation, à signer au showroom.',
     reprise_anticipee: `Avant la fin du mandat, une indemnité de ${euros(d.frais_resiliation)} est prévue par votre contrat. Un conseiller vous recontacte pour organiser la reprise.`,
     question: 'Posez votre question, nous vous répondons rapidement.',
   };

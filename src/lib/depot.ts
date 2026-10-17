@@ -14,6 +14,8 @@ export type StatutVente = 'a_publier' | 'en_ligne' | 'reservee' | 'vendue' | 'pr
 
 export interface EtatDesLieux {
   fait_le?: string;
+  /** Heure de l'état des lieux, « HH:MM » (ajoutée le 17/10/2026) */
+  heure?: string;
   kilometrage?: number | null;
   etat?: string;
   accessoires?: string;
@@ -128,6 +130,10 @@ export const jour = (iso: string | null | undefined) =>
 export const dateHeure = (iso: string | null | undefined) =>
   iso ? new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—';
 export const aujourdhui = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Paris' });
+/** Heure actuelle à Paris, « HH:MM » */
+export const maintenantHeure = () => new Date().toLocaleTimeString('fr-FR', { timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit' });
+/** « 14:30 » → « 14 h 30 » */
+export const heureFr = (h: string | null | undefined) => (h && /^\d{2}:\d{2}/.test(h) ? `${h.slice(0, 2)} h ${h.slice(3, 5)}` : '');
 
 /** Jours restants avant la fin du mandat (négatif : dépassé) */
 export function joursRestants(dateFin: string | null): number | null {

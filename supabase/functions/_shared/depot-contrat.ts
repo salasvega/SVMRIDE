@@ -9,7 +9,7 @@
  */
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "npm:pdf-lib@1.17.1";
 
-export const MODELE_VERSION = "mandat-depot-vente-2026-10-17b";
+export const MODELE_VERSION = "mandat-depot-vente-2026-10-17c";
 
 export const SOCIETE = {
   nom: "SVM RIDE",
@@ -39,7 +39,7 @@ export interface Instantane {
     date_debut: string; date_fin: string; frais_resiliation: number; gardiennage_par_jour: number;
     gardiennage_delai_jours: number; reversement_heures: number; conservation_annees: number;
   };
-  etat_des_lieux: { fait_le?: string; kilometrage?: number; etat?: string; accessoires?: string; cles?: string; remarques?: string } | null;
+  etat_des_lieux: { fait_le?: string; heure?: string; kilometrage?: number; etat?: string; accessoires?: string; cles?: string; remarques?: string } | null;
   avenant?: { mandat_reference: string; ancienne_date_fin: string; nouvelle_date_fin: string; prix_modifie: boolean };
 }
 
@@ -282,7 +282,7 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
     m.texte("ANNEXE – ÉTAT DES LIEUX D'ENTRÉE", { gras: true, taille: 10, apres: 4 });
     const e = i.etat_des_lieux ?? {};
     const ligne = (l: string, v: unknown) => m.texte(`${l} : ${v != null && v !== "" ? v : "—"}`, { apres: 1 });
-    ligne("Date", e.fait_le ? jour(e.fait_le) : null);
+    ligne("Date et heure", e.fait_le ? `${jour(e.fait_le)}${/^\d{2}:\d{2}/.test(e.heure ?? "") ? ` à ${e.heure!.slice(0, 2)} h ${e.heure!.slice(3, 5)}` : ""}` : null);
     ligne("Kilométrage", e.kilometrage != null ? `${Number(e.kilometrage).toLocaleString("fr-FR").replace(/[  ]/g, " ")} km` : null);
     ligne("État général", e.etat);
     ligne("Accessoires remis", e.accessoires);

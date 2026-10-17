@@ -4,10 +4,12 @@
  * Les contrats sont produits par le serveur et ne peuvent être ni remplacés ni supprimés.
  */
 import { useEffect, useRef, useState } from 'react';
-import { CheckCircle2, Circle, Eye, EyeOff, FileText, Trash2, Upload } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { Camera, CheckCircle2, Circle, Eye, EyeOff, FileText, Trash2, Upload } from 'lucide-react';
+import { SOURIS_SEULEMENT, TACTILE_SEULEMENT } from '../../ui/ChoixSource';
 import { supabase } from '../../../lib/supabase';
 import { compresserImage, extensionDe } from '../../../lib/compressionImage';
-import { Dossier, EtatDesLieux, PIECES, TYPES_DOCUMENT, aujourdhui, dateHeure, jour } from '../../../lib/depot';
+import { Dossier, EtatDesLieux, PIECES, TYPES_DOCUMENT, aujourdhui, dateHeure, heureFr, jour, maintenantHeure } from '../../../lib/depot';
 import { Carte, Champ, Message, boutonPrincipal, boutonSecondaire, champClasse } from './ui';
 
 export interface DocumentDossier {
@@ -50,6 +52,7 @@ export function DossierPieces({
   const [message, setMessage] = useState<{ texte: string; erreur?: boolean }>({ texte: '' });
   const [envoi, setEnvoi] = useState<string | null>(null);
   const fichier = useRef<HTMLInputElement>(null);
+  const camera = useRef<HTMLInputElement>(null);
   const cible = useRef<string>('autre');
   const verrouille = ['resilie', 'cloture'].includes(d.statut_mandat);
 
@@ -60,18 +63,33 @@ export function DossierPieces({
     onMaj(data as Dossier);
   };
 
-  const choisir = (type: string) => {
+  const choisir = (type: string, viaCamera = false) => {
     cible.current = type;
-    fichier.current?.click();
+    (viaCamera ? camera : fichier).current?.click();
   };
 
-  const envoyer = async (liste: FileList | null) => {
-    if (!liste?.length) return;
+  /** Boutons d'ajout : « Ajouter un fichier » sur ordinateur ; « Photothèque » et « Caméra » sur téléphone */
+  const boutonsAjout = (type: string, libelle: string, classe = '') => (
+    <span className="inline-flex flex-wrap gap-2">
+      <button type="button" onClick={() => choisir(type)} disabled={!!envoi} className={`${boutonSecondaire} ${classe}`}>
+        <Upload className="w-4 h-4" aria-hidden="true" />
+        <span className={SOURIS_SEULEMENT}>{libelle}</span>
+        <span className={TACTILE_SEULEMENT}>Photothèque</span>
+      </button>
+      <button type="button" onClick={() => choisir(type, true)} disabled={!!envoi} className={`${boutonSecondaire} ${classe} ${TACTILE_SEULEMENT}`}>
+        <Camera className="w-4 h-4" aria-hidden="true" /> Caméra
+      </button>
+    </span>
+  );
+
+  const envoyer = async (fichiers: FileList | null) => {
+    const liste = Array.from(fichiers ?? []);
+    if (!liste.length) return;
     setMessage({ texte: '' });
     const type = cible.current;
     let n = 0;
     try {
-      for (const original of Array.from(liste)) {
+      for (const original of liste) {
         n += 1;
         setEnvoi(`Envoi ${n}/${liste.length}…`);
         const f = await compresserImage(original, { cote: 2400, qualite: 0.85 });
@@ -94,6 +112,7 @@ export function DossierPieces({
     } finally {
       setEnvoi(null);
       if (fichier.current) fichier.current.value = '';
+      if (camera.current) camera.current.value = '';
       onDocuments();
     }
   };
@@ -119,6 +138,17 @@ export function DossierPieces({
         type="file"
         multiple
         accept="image/*,application/pdf"
+        className="sr-only"
+        tabIndex={-1}
+        aria-hidden="true"
+        onChange={(e) => envoyer(e.target.files)}
+      />
+      {/* Appareil photo du téléphone, sans passer par la photothèque */}
+      <input
+        ref={camera}
+        type="file"
+        accept="image/*"
+        capture="environment"
         className="sr-only"
         tabIndex={-1}
         aria-hidden="true"
@@ -150,9 +180,7 @@ export function DossierPieces({
                   </span>
                 </button>
                 {p.cle !== 'double_cles' && !verrouille && (
-                  <button type="button" onClick={() => choisir(p.cle)} disabled={!!envoi} className={`${boutonSecondaire} !py-1.5`}>
-                    <Upload className="w-4 h-4" aria-hidden="true" /> Ajouter un fichier
-                  </button>
+                  boutonsAjout(p.cle, 'Ajouter un fichier', '!py-1.5')
                 )}
               </li>
             );
@@ -161,15 +189,13 @@ export function DossierPieces({
         <p className="text-xs text-[#666666] mt-2">Cliquez sur une pièce pour la cocher ou la décocher. Ajouter un fichier la coche automatiquement.</p>
       </Carte>
 
-      <EtatDesLieuxForm dossier={d} onMaj={onMaj} verrouille={verrouille} onPhotos={() => choisir('photo')} />
+      <EtatDesLieuxForm dossier={d} onMaj={onMaj} verrouille={verrouille} boutonsPhotos={boutonsAjout('photo', "Photos de l'état des lieux")} />
 
       <Carte
         titre={`Documents (${documents.length})`}
         id="t-documents"
         action={!verrouille && (
-          <button type="button" onClick={() => choisir('autre')} disabled={!!envoi} className={`${boutonSecondaire} !py-1.5`}>
-            <Upload className="w-4 h-4" aria-hidden="true" /> Autre document
-          </button>
+          boutonsAjout('autre', 'Autre document', '!py-1.5')
         )}
       >
         {documents.length === 0 ? (
@@ -212,9 +238,10 @@ export function DossierPieces({
   );
 }
 
-function EtatDesLieuxForm({ dossier: d, onMaj, verrouille, onPhotos }: { dossier: Dossier; onMaj: (d: Dossier) => void; verrouille: boolean; onPhotos: () => void }) {
+function EtatDesLieuxForm({ dossier: d, onMaj, verrouille, boutonsPhotos }: { dossier: Dossier; onMaj: (d: Dossier) => void; verrouille: boolean; boutonsPhotos: ReactNode }) {
   const initial = (): Record<string, string> => ({
     fait_le: d.etat_des_lieux?.fait_le ?? '',
+    heure: d.etat_des_lieux?.heure ?? '',
     kilometrage: d.etat_des_lieux?.kilometrage != null ? String(d.etat_des_lieux.kilometrage) : d.kilometrage != null ? String(d.kilometrage) : '',
     etat: d.etat_des_lieux?.etat ?? '',
     accessoires: d.etat_des_lieux?.accessoires ?? '',
@@ -233,6 +260,7 @@ function EtatDesLieuxForm({ dossier: d, onMaj, verrouille, onPhotos }: { dossier
     setMessage({ texte: '' });
     const e: EtatDesLieux = {
       fait_le: f.fait_le || aujourdhui(),
+      heure: f.heure || maintenantHeure(),
       kilometrage: f.kilometrage === '' ? null : Number(f.kilometrage),
       etat: f.etat.trim(), accessoires: f.accessoires.trim(), cles: f.cles.trim(), remarques: f.remarques.trim(),
     };
@@ -256,14 +284,17 @@ function EtatDesLieuxForm({ dossier: d, onMaj, verrouille, onPhotos }: { dossier
     <Carte
       titre="État des lieux d'entrée"
       id="t-edl"
-      action={d.etat_des_lieux?.fait_le && <span className="text-sm text-green-800">Fait le {jour(d.etat_des_lieux.fait_le)}</span>}
+      action={d.etat_des_lieux?.fait_le && <span className="text-sm text-green-800">Fait le {jour(d.etat_des_lieux.fait_le)}{d.etat_des_lieux.heure ? ` à ${heureFr(d.etat_des_lieux.heure)}` : ''}</span>}
     >
       <p className="text-sm text-[#666666] mb-4">
         À faire avec le déposant, au showroom. Il est repris en annexe du contrat{signe ? ' (le contrat signé garde la version du jour de la signature)' : ''}.
       </p>
-      <div className="grid sm:grid-cols-3 gap-4 mb-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <Champ libelle="Date">
           {(id) => <input id={id} type="date" value={f.fait_le} disabled={verrouille} onChange={(e) => setF((x) => ({ ...x, fait_le: e.target.value }))} className={champClasse} />}
+        </Champ>
+        <Champ libelle="Heure">
+          {(id) => <input id={id} type="time" step={60} value={f.heure} disabled={verrouille} onChange={(e) => setF((x) => ({ ...x, heure: e.target.value }))} className={champClasse} />}
         </Champ>
         <Champ libelle="Kilométrage relevé">
           {(id) => <input id={id} type="number" min={0} value={f.kilometrage} disabled={verrouille} onChange={(e) => setF((x) => ({ ...x, kilometrage: e.target.value }))} className={champClasse} />}
@@ -282,9 +313,7 @@ function EtatDesLieuxForm({ dossier: d, onMaj, verrouille, onPhotos }: { dossier
           <button type="button" onClick={enregistrer} disabled={envoi} className={boutonPrincipal}>
             {envoi ? 'Enregistrement…' : d.etat_des_lieux?.fait_le ? "Mettre à jour l'état des lieux" : "Enregistrer l'état des lieux"}
           </button>
-          <button type="button" onClick={onPhotos} className={boutonSecondaire}>
-            <Upload className="w-4 h-4" aria-hidden="true" /> Photos de l'état des lieux
-          </button>
+          {boutonsPhotos}
           <Message texte={message.texte} erreur={message.erreur} />
         </div>
       )}

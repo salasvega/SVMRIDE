@@ -1,11 +1,11 @@
 /**
  * Fiche dossier : déposant, moto et conditions du mandat (prix affiché, net
- * vendeur, rémunération conseillée). Après la signature, un changement de prix
+ * vendeur, rémunération SVM Ride). Après la signature, un changement de prix
  * exige l'accord écrit du déposant et est inscrit dans son suivi.
  */
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../../../lib/supabase';
-import { Dossier, euros, remunerationConseillee } from '../../../lib/depot';
+import { Dossier, euros } from '../../../lib/depot';
 import { Carte, Champ, Message, boutonPrincipal, champClasse } from './ui';
 
 type Formulaire = Record<string, string>;
@@ -34,7 +34,6 @@ export function DossierFiche({ dossier: d, onMaj }: { dossier: Dossier; onMaj: (
   const verrouille = ['resilie', 'cloture'].includes(d.statut_mandat);
   const prix = Number(f.prix_affiche) || 0;
   const net = f.net_vendeur === '' ? null : Number(f.net_vendeur);
-  const conseil = remunerationConseillee(prix);
   const prixChange = String(d.prix_affiche ?? '') !== f.prix_affiche || String(d.net_vendeur ?? '') !== f.net_vendeur;
   const modifie = useMemo(() => JSON.stringify(versFormulaire(d)) !== JSON.stringify(f), [d, f]);
 
@@ -130,19 +129,9 @@ export function DossierFiche({ dossier: d, onMaj }: { dossier: Dossier; onMaj: (
           {texte('duree_mois', 'Durée du mandat (mois)', { type: 'number', min: 1, max: 24 }, 'Par défaut 2 mois')}
         </div>
         {prix > 0 && (
-          <div className="mt-4 rounded-xl bg-[#F7F7F7] p-4 text-sm text-[#333333] space-y-1">
-            <p>
-              Rémunération SVM Ride : <strong>{net != null ? euros(prix - net) : '—'}</strong> TTC
-              {net != null && prix > 0 && <span className="text-[#666666]"> ({Math.round(((prix - net) / prix) * 1000) / 10} % du prix)</span>}
-            </p>
-            <p className="text-[#666666]">
-              Repère : {euros(conseil)} conseillés (≈ 10 %, 1 000 € min., 1 500 € en général, jusqu'à 2 000 € au-delà de 20 000 €).{' '}
-              <button type="button" className="text-bleu underline" onClick={() => setF((x) => ({ ...x, net_vendeur: String(prix - conseil) }))} disabled={verrouille}>
-                Appliquer : net vendeur {euros(prix - conseil)}
-              </button>
-            </p>
-            <p className="text-[#666666]">Jamais affichée sur le site : seul le net vendeur est communiqué au déposant.</p>
-          </div>
+          <p className="mt-4 rounded-xl bg-[#F7F7F7] px-4 py-3 text-lg md:text-xl text-[#111111]">
+            Rémunération SVM Ride : <strong>{net != null ? euros(prix - net) : '—'}</strong> TTC
+          </p>
         )}
         <p className="mt-3 text-xs text-[#666666]">
           Fin anticipée : {euros(d.frais_resiliation)} · gardiennage {euros(d.gardiennage_par_jour)}/jour à partir de J+{d.gardiennage_delai_jours} après la fin du mandat.

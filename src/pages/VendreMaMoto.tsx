@@ -83,7 +83,7 @@ const FAQ = [
   },
   {
     q: 'Combien de temps dure le mandat ?',
-    r: 'Deux mois, en exclusivité : pendant cette période, la moto n’est pas proposée ailleurs. Il peut être prolongé par un avenant que vous signez en ligne. Les conditions d’une reprise anticipée de la moto sont précisées dans le mandat.',
+    r: 'Deux mois, en exclusivité : pendant cette période, la moto n’est pas proposée ailleurs. Il peut être prolongé par un avenant que vous signez au showroom. Les conditions d’une reprise anticipée de la moto sont précisées dans le mandat.',
   },
   {
     q: 'Quand et comment suis-je payé ?',
@@ -225,10 +225,18 @@ export function VendreMaMoto() {
                 </Button>
               </a>
             </div>
-            <p className="mt-5 text-sm text-gris">
-              Votre moto est déjà chez nous ?{' '}
-              <Link to="/suivre-ma-vente" className="lien">Suivez votre vente en ligne</Link>.
-            </p>
+            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-or/50 bg-white p-5 shadow-carte sm:flex-row sm:items-center md:p-6">
+              <IconeOr icon={Eye} className="hidden h-10 w-10 flex-shrink-0 sm:block" />
+              <div className="flex-1">
+                <h2 className="text-lg md:text-xl font-semibold text-noir">Votre moto est déjà chez nous ?</h2>
+                <p className="mt-1 text-sm text-gris leading-relaxed">
+                  Suivez l'avancement de la vente et retrouvez votre contrat et vos documents : il suffit de votre adresse e-mail.
+                </p>
+              </div>
+              <Link to="/suivre-ma-vente" tabIndex={-1} className="flex-shrink-0">
+                <Button size="lg" className="w-full sm:w-auto">Suivez votre vente en ligne</Button>
+              </Link>
+            </div>
           </div>
         </Container>
       </Section>

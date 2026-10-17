@@ -14,7 +14,7 @@ export function Sitemap() {
         { href: '/', label: 'Accueil' },
         { href: '/vehicules', label: 'Nos Véhicules' },
         { href: '/reprises', label: 'Reprise de véhicule' },
-        { href: '/vendre-ma-moto', label: 'Vendre ma moto (dépôt-vente)' },
+        { href: '/vendre-ma-moto', label: 'Dépôt-vente' },
         { href: '/financement', label: 'Solutions de financement' },
         { href: '/recherche-personnalisee', label: 'Recherche personnalisée' },
         ...(equipeAffichee(CONTEXTE_SITE) ? [{ href: '/equipe', label: 'Notre équipe' }] : []),

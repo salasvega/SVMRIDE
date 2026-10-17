@@ -212,7 +212,7 @@ Deno.serve(async (req: Request) => {
         const { data: c } = await db.from("depot_contrats").select("id, dossier_id, type, statut").eq("id", String(body.contrat_id ?? "")).maybeSingle();
         if (!c || c.statut !== "a_signer") throw new Erreur(409, "statut", "Ce contrat n'est plus à signer.");
         const d = await dossier(c.dossier_id);
-        const inv = await nouvelleInvitation(c, d, c.type, body.envoyer_email !== false);
+        const inv = await nouvelleInvitation(c, d, c.type, body.envoyer_email === true);
         return json(200, { url: inv.url, expire_le: inv.expire });
       }
 

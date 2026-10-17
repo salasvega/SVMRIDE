@@ -1,12 +1,13 @@
 /**
  * Contrat : préparation du mandat (ou d'un avenant de prolongation), lien de
- * signature + QR code à montrer au showroom, renvoi, annulation, dossier de preuve.
+ * signature + QR code à montrer au showroom (toutes les signatures se font au
+ * showroom : pas d'envoi du lien par e-mail), nouveau QR code, annulation, dossier de preuve.
  * Le PDF est produit et figé par le serveur (empreinte SHA-256) : il ne peut pas
  * être modifié depuis l'administration.
  */
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { Copy, Download, FileSignature, Mail, QrCode, RefreshCw, ShieldCheck, XCircle } from 'lucide-react';
+import { Copy, Download, FileSignature, QrCode, RefreshCw, ShieldCheck, XCircle } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 import { Dossier, appelAdmin, dateHeure, euros, jour, messageErreur } from '../../../lib/depot';
 import { ouvrirDocument } from './DossierPieces';
@@ -57,7 +58,6 @@ export function DossierContrats({ dossier: d, onChange }: { dossier: Dossier; on
   const [message, setMessage] = useState<{ texte: string; erreur?: boolean }>({ texte: '' });
   const [avenant, setAvenant] = useState(false);
   const [av, setAv] = useState({ mois: '1', prix_affiche: '', net_vendeur: '' });
-  const [envoyerEmail, setEnvoyerEmail] = useState(false);
   const [representant, setRepresentant] = useState('');
 
   const charger = async () => {
@@ -84,7 +84,7 @@ export function DossierContrats({ dossier: d, onChange }: { dossier: Dossier; on
     setEnvoi(true);
     setMessage({ texte: '' });
     try {
-      const corps: Record<string, unknown> = { dossier_id: d.id, type, envoyer_email: envoyerEmail, representant: representant.trim() || undefined };
+      const corps: Record<string, unknown> = { dossier_id: d.id, type, envoyer_email: false, representant: representant.trim() || undefined };
       if (type === 'avenant') {
         corps.mois = Number(av.mois) || 1;
         if (av.prix_affiche) corps.prix_affiche = Number(av.prix_affiche);
@@ -92,7 +92,7 @@ export function DossierContrats({ dossier: d, onChange }: { dossier: Dossier; on
       }
       const r = await appelAdmin<{ contrat_id: string; url: string; expire_le: string }>('contrat-preparer', corps);
       await afficherLien(r.contrat_id, r.url, r.expire_le);
-      setMessage({ texte: envoyerEmail ? 'Contrat prêt : lien envoyé par e-mail au déposant.' : 'Contrat prêt : faites scanner le QR code au déposant.' });
+      setMessage({ texte: 'Contrat prêt : faites scanner le QR code au déposant.' });
       setAvenant(false);
       await charger();
       onChange();
@@ -103,13 +103,13 @@ export function DossierContrats({ dossier: d, onChange }: { dossier: Dossier; on
     }
   };
 
-  const renvoyer = async (c: Contrat, email: boolean) => {
+  const renvoyer = async (c: Contrat) => {
     setEnvoi(true);
     setMessage({ texte: '' });
     try {
-      const r = await appelAdmin<{ url: string; expire_le: string }>('contrat-renvoyer', { contrat_id: c.id, envoyer_email: email });
+      const r = await appelAdmin<{ url: string; expire_le: string }>('contrat-renvoyer', { contrat_id: c.id, envoyer_email: false });
       await afficherLien(c.id, r.url, r.expire_le);
-      setMessage({ texte: email ? 'Nouveau lien envoyé par e-mail (l’ancien ne fonctionne plus).' : 'Nouveau lien créé (l’ancien ne fonctionne plus).' });
+      setMessage({ texte: 'Nouveau lien créé (l’ancien ne fonctionne plus).' });
       await charger();
     } catch (e) {
       setMessage({ texte: messageErreur(e), erreur: true });
@@ -201,10 +201,6 @@ export function DossierContrats({ dossier: d, onChange }: { dossier: Dossier; on
               <Champ libelle="Signé pour SVM Ride par" aide="Toute personne habilitée (par défaut : Mattia SARAVIA)">
                 {(id) => <input id={id} maxLength={80} value={representant} placeholder="Mattia SARAVIA" onChange={(e) => setRepresentant(e.target.value)} className={champClasse} />}
               </Champ>
-              <label className="flex items-start gap-2 text-sm self-end pb-2">
-                <input type="checkbox" checked={envoyerEmail} onChange={(e) => setEnvoyerEmail(e.target.checked)} className="mt-0.5 w-4 h-4" />
-                <span>Envoyer aussi le lien par e-mail au déposant (signature à distance)</span>
-              </label>
             </div>
           )}
           <div className="flex flex-wrap gap-2">
@@ -260,11 +256,8 @@ export function DossierContrats({ dossier: d, onChange }: { dossier: Dossier; on
                 </button>
                 {c.statut === 'a_signer' && (
                   <>
-                    <button type="button" onClick={() => renvoyer(c, false)} disabled={envoi} className={`${boutonSecondaire} !py-1.5`}>
+                    <button type="button" onClick={() => renvoyer(c)} disabled={envoi} className={`${boutonSecondaire} !py-1.5`}>
                       <RefreshCw className="w-4 h-4" aria-hidden="true" /> Nouveau QR code
-                    </button>
-                    <button type="button" onClick={() => renvoyer(c, true)} disabled={envoi} className={`${boutonSecondaire} !py-1.5`}>
-                      <Mail className="w-4 h-4" aria-hidden="true" /> Renvoyer par e-mail
                     </button>
                     <button type="button" onClick={() => annuler(c)} disabled={envoi} className={`${boutonDanger} !py-1.5`}>
                       <XCircle className="w-4 h-4" aria-hidden="true" /> Annuler

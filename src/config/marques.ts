@@ -8,7 +8,7 @@
  * - nom    : nom d'affichage
  * - alias  : autres écritures possibles dans le catalogue (« BMW » pour « BMW Motorrad »…).
  *            La comparaison ignore déjà la casse, les accents, les espaces et les tirets.
- * - pays   : pays d'origine de la marque, affiché sous le nom
+ * - pays   : pays d'origine de la marque (n'est plus affiché depuis le 17/10/2026)
  * - logo   : facultatif. Nom d'un fichier du bucket public Supabase « marques »
  *            (ex. « bmw.svg »), ou chemin /… ou adresse https://… Sans logo, le nom
  *            est affiché en lettres. Les logos actuels viennent de Wikimedia Commons /

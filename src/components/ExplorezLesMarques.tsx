@@ -5,11 +5,11 @@
  * - défilement automatique lent (requestAnimationFrame + translate3d, donc fluide) ;
  * - glisser au doigt ou à la souris (avec inertie), molette horizontale du pavé tactile ;
  * - pas de boutons (demande du 17/10) : glisser, flèches du clavier entre les marques ;
- * - pause au survol, au focus clavier, hors écran et onglet masqué (reprise 2,5 s après) ;
- * - dès que le visiteur fait défiler lui-même (glisser, molette, flèches du clavier),
- *   le défilement automatique s'arrête pour de bon : c'est le moyen de l'arrêter
- *   qui remplace le bouton pause (WCAG 2.2.2) ;
- * - « réduire les animations » : aucun défilement automatique, navigation manuelle conservée.
+ * - défilement continu, sans arrêt (demande de Mattia, 17/10) : pas de pause au survol ;
+ *   après un glissement, la molette ou le clavier, il reprend tout seul 2,5 s plus tard.
+ *   Seuls le focus clavier (pour pouvoir choisir une marque) et la section hors écran
+ *   le suspendent ;
+ * - « réduire les animations » (réglage du système) : aucun défilement automatique.
  *
  * La boucle utilise trois copies de la liste ; seule celle du milieu est lisible
  * par les lecteurs d'écran et atteignable au clavier (les deux autres sont aria-hidden
@@ -35,7 +35,6 @@ const SEUIL_GLISSER = 6; // px avant de considérer qu'on glisse (et non qu'on c
 interface Element {
   id: string;
   nom: string;
-  pays?: string;
   logo?: string;
   enStock: boolean;
 }
@@ -51,7 +50,6 @@ export function ExplorezLesMarques() {
     const liste: Element[] = MARQUES.filter((m) => m.actif).map((m) => ({
       id: m.id,
       nom: m.nom,
-      pays: m.pays,
       logo: urlLogo(m.logo),
       enStock: !!enStock?.has(m.id),
     }));
@@ -74,7 +72,6 @@ export function ExplorezLesMarques() {
 
   const position = useRef(0); // décalage en px depuis le début de la piste
   const largeurGroupe = useRef(0);
-  const survol = useRef(false);
   const focusDedans = useRef(false);
   const visible = useRef(true);
   const repriseA = useRef(0); // horodatage avant lequel on reste en pause
@@ -153,7 +150,7 @@ export function ExplorezLesMarques() {
       } else {
         inertie.current = 0;
         const enAttente =
-          reduit || survol.current || focusDedans.current || glisse.current || !visible.current || t < repriseA.current;
+          reduit || focusDedans.current || glisse.current || !visible.current || t < repriseA.current;
         if (!enAttente) position.current += VITESSE * dt;
       }
       if (!animation.current) recentrer();
@@ -165,8 +162,8 @@ export function ExplorezLesMarques() {
   }, [reduit]);
 
   const differerReprise = () => { repriseA.current = Math.max(repriseA.current, performance.now() + REPRISE_MS); };
-  /** Le visiteur a pris la main : plus de défilement automatique jusqu'au prochain chargement de la page. */
-  const arreterAuto = () => { repriseA.current = Infinity; };
+  /** Le visiteur a pris la main : le défilement automatique reprend peu après. */
+  const arreterAuto = differerReprise;
 
   const allerA = (cible: number) => {
     inertie.current = 0;
@@ -246,8 +243,11 @@ export function ExplorezLesMarques() {
   };
   const auFocus = (i: number) => {
     setActif(i);
-    focusDedans.current = true;
     const lien = liensRef.current[i];
+    // Seul le focus clavier suspend le défilement (un clic ou un glissement à la souris
+    // donne aussi le focus au lien, sans que le visiteur veuille arrêter le carrousel)
+    focusDedans.current = !!lien?.matches(':focus-visible');
+    if (!focusDedans.current) return;
     const vue = fenetreRef.current;
     const piste = pisteRef.current;
     if (!lien || !vue || !piste) return;
@@ -281,9 +281,6 @@ export function ExplorezLesMarques() {
           <span className="titre-display text-center text-[17px] md:text-[19px] leading-[1.1] tracking-[0.04em] text-noir [text-wrap:balance] transition-colors duration-200 group-hover/marque:text-or-texte">
             {el.nom}
           </span>
-        )}
-        {el.pays && (
-          <span className="mt-1.5 text-[10.5px] font-medium uppercase tracking-[0.16em] text-gris">{el.pays}</span>
         )}
       </span>
       <span className="flex h-8 items-end justify-center">
@@ -330,8 +327,6 @@ export function ExplorezLesMarques() {
         aria-roledescription="carrousel"
         aria-label={`Marques de motos${pret && enStock ? `, ${nbEnStock} en stock en premier` : ''}. Flèches gauche et droite pour passer d'une marque à l'autre.`}
         className="relative overflow-clip cursor-grab touch-pan-y active:cursor-grabbing [mask-image:linear-gradient(90deg,transparent,#000_5%,#000_95%,transparent)]"
-        onPointerEnter={(e) => { if (e.pointerType === 'mouse') survol.current = true; }}
-        onPointerLeave={(e) => { if (e.pointerType === 'mouse') { survol.current = false; differerReprise(); } }}
         onPointerDown={auPointerDown}
         onPointerMove={auPointerMove}
         onPointerUp={finGlisser}

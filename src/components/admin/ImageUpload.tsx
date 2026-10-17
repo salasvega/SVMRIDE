@@ -9,6 +9,7 @@ import {
   Star,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { ChoixSource, SOURIS_SEULEMENT } from '../ui/ChoixSource';
 
 export interface UploadedImage {
   url: string;
@@ -402,12 +403,13 @@ export function ImageUpload({
                 </div>
               ) : (
                 <>
-                  <Upload className="w-8 h-8 text-[#AAAAAA] mb-2 pointer-events-none" />
-                  <span className="text-sm text-[#666666] leading-snug">
+                  <Upload className={`w-8 h-8 text-[#AAAAAA] mb-2 pointer-events-none ${SOURIS_SEULEMENT}`} />
+                  <span className={`text-sm text-[#666666] leading-snug ${SOURIS_SEULEMENT}`}>
                     Glissez-déposez
                     <br />
                     ou cliquez
                   </span>
+                  <ChoixSource onFichiers={handleFilesBatch} taille="petite" className="flex-col" />
                   <span className="text-[10px] text-[#AAAAAA] mt-1 leading-tight block">
                     Plusieurs fichiers autorisés
                     <br />

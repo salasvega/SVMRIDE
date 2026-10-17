@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Upload, X, FileText, AlertTriangle } from 'lucide-react';
+import { ChoixSource, SOURIS_SEULEMENT } from './ChoixSource';
 
 interface SingleFileUploadProps {
   label?: string;
@@ -62,7 +63,11 @@ export function SingleFileUpload({
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    e.target.value = '';
+    if (file) traiterFichier(file);
+  };
+
+  const traiterFichier = (file: File) => {
 
     const maxSizeMB = 10;
     const maxBytes = maxSizeMB * 1024 * 1024;
@@ -90,7 +95,6 @@ export function SingleFileUpload({
     }
 
     onChange(file);
-    e.target.value = '';
   };
 
   const handleDelete = () => {
@@ -227,13 +231,20 @@ export function SingleFileUpload({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
-              className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-champ rounded-lg hover:border-brand hover:bg-brand/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-champ rounded-lg hover:border-brand hover:bg-brand/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${SOURIS_SEULEMENT}`}
             >
               <Upload className="w-5 h-5 text-[#6B6B6B]" />
               <span className="text-sm text-gris">
                 Cliquer pour choisir un fichier
               </span>
             </button>
+            <ChoixSource
+              onFichiers={(f) => traiterFichier(f[0])}
+              accept={accept}
+              multiple={false}
+              disabled={disabled}
+              className="rounded-lg border-2 border-dashed border-champ p-3"
+            />
           </div>
         )}
 

@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { ChoixSource, SOURIS_SEULEMENT } from './ChoixSource';
 import {
   X,
   Upload as UploadIcon,
@@ -296,13 +297,14 @@ export function FileUpload({
           <div className="flex flex-col items-center justify-center text-gris">
             <UploadIcon className="w-8 h-8 text-[#6B6B6B] mb-2 pointer-events-none" />
 
-            <p className="text-sm leading-snug text-center">
+            <p className={`text-sm leading-snug text-center ${SOURIS_SEULEMENT}`}>
               Glissez-déposez vos {elements}
               <br />
               <span className="text-[#666666]">
                 ou cliquez pour parcourir
               </span>
             </p>
+            <ChoixSource onFichiers={addFiles} accept={accept} className="mt-1" />
 
             <p className="text-[11px] text-[#6B6B6B] mt-2 leading-snug">
               {value.length}/{maxFiles} fichier(s) ajouté(s)
