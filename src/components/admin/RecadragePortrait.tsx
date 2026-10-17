@@ -36,15 +36,27 @@ async function versBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   return jpeg;
 }
 
+async function enPng(canvas: HTMLCanvasElement): Promise<Blob> {
+  const png = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/png'));
+  if (!png) throw new Error('Image impossible à produire');
+  return png;
+}
+
 export function RecadragePortrait({
   fichier,
   onValider,
   onAnnuler,
+  mode = 'portrait',
 }: {
   fichier: File;
   onValider: (image: Blob) => void;
   onAnnuler: () => void;
+  /** « logo » : cadre carré, zoom arrière possible (zones vides transparentes), PNG 512 px */
+  mode?: 'portrait' | 'logo';
 }) {
+  const logo = mode === 'logo';
+  const zoomMin = logo ? 0.3 : 1;
+  const sortie = logo ? 512 : SORTIE;
   const canvas = useRef<HTMLCanvasElement>(null);
   const [img, setImg] = useState<Image | null>(null);
   const [erreur, setErreur] = useState('');
@@ -61,6 +73,12 @@ export function RecadragePortrait({
         charge = i;
         if (!actif) return i.liberer();
         setImg(i);
+        if (logo) {
+          // Logo en entier dans le carré, centré
+          setZoom(Math.min(i.largeur, i.hauteur) / Math.max(i.largeur, i.hauteur));
+          setCentre({ x: i.largeur / 2, y: i.hauteur / 2 });
+          return;
+        }
         // Centré, un peu remonté : les visages sont souvent dans le haut de la photo
         setCentre({ x: i.largeur / 2, y: i.hauteur > i.largeur ? i.hauteur * 0.4 : i.hauteur / 2 });
       })
@@ -69,14 +87,25 @@ export function RecadragePortrait({
       actif = false;
       charge?.liberer();
     };
-  }, [fichier]);
+  }, [fichier, logo]);
 
   // Garde le centre dans l'image quand le zoom change
   const borne = useCallback((cx: number, cy: number, z: number) => {
     if (!img) return { x: cx, y: cy };
+    if (logo) return { x: Math.min(Math.max(cx, 0), img.largeur), y: Math.min(Math.max(cy, 0), img.hauteur) };
     const z0 = zone(img, cx, cy, z);
     return { x: z0.x + z0.cote / 2, y: z0.y + z0.cote / 2 };
-  }, [img]);
+  }, [img, logo]);
+
+  /** Dessine le cadrage sur un carré de « taille » px (zones hors image transparentes) */
+  const dessiner = useCallback((ctx: CanvasRenderingContext2D, taille: number) => {
+    if (!img) return;
+    const cote = Math.min(img.largeur, img.hauteur) / zoom;
+    const k = taille / cote;
+    ctx.clearRect(0, 0, taille, taille);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img.source, -(centre.x - cote / 2) * k, -(centre.y - cote / 2) * k, img.largeur * k, img.hauteur * k);
+  }, [img, zoom, centre]);
 
   useEffect(() => {
     const c = canvas.current;
@@ -86,13 +115,11 @@ export function RecadragePortrait({
     c.height = APERCU * dpr;
     const ctx = c.getContext('2d');
     if (!ctx) return;
-    const z = zone(img, centre.x, centre.y, zoom);
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(img.source, z.x, z.y, z.cote, z.cote, 0, 0, c.width, c.height);
-  }, [img, centre, zoom]);
+    dessiner(ctx, c.width);
+  }, [img, dessiner]);
 
   const changerZoom = (z: number) => {
-    const n = Math.min(Math.max(z, 1), 4);
+    const n = Math.min(Math.max(z, zoomMin), 4);
     setZoom(n);
     setCentre((c) => borne(c.x, c.y, n));
   };
@@ -118,13 +145,10 @@ export function RecadragePortrait({
     setTravail(true);
     try {
       const c = document.createElement('canvas');
-      c.width = SORTIE;
-      c.height = SORTIE;
-      const ctx = c.getContext('2d')!;
-      ctx.imageSmoothingQuality = 'high';
-      const z = zone(img, centre.x, centre.y, zoom);
-      ctx.drawImage(img.source, z.x, z.y, z.cote, z.cote, 0, 0, SORTIE, SORTIE);
-      onValider(await versBlob(c));
+      c.width = sortie;
+      c.height = sortie;
+      dessiner(c.getContext('2d')!, sortie);
+      onValider(logo ? await enPng(c) : await versBlob(c));
     } catch {
       setErreur("La photo n'a pas pu être préparée. Réessayez avec une autre photo.");
       setTravail(false);
@@ -135,7 +159,7 @@ export function RecadragePortrait({
     <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto overscroll-contain bg-black/60 p-4" role="dialog" aria-modal="true" aria-labelledby="recadrage-titre">
       <div className="my-auto w-full max-w-sm shrink-0 overflow-hidden rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b border-[#E5E5E5] px-5 py-4">
-          <h2 id="recadrage-titre" className="text-lg font-bold text-[#111111]">Cadrer la photo</h2>
+          <h2 id="recadrage-titre" className="text-lg font-bold text-[#111111]">{logo ? "Cadrer l'icône" : 'Cadrer la photo'}</h2>
           <button type="button" onClick={onAnnuler} className="rounded-full p-1 hover:bg-[#F5F5F5]" aria-label="Annuler">
             <X className="h-5 w-5 text-[#666666]" />
           </button>
@@ -146,12 +170,19 @@ export function RecadragePortrait({
             <p className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800" role="alert">{erreur}</p>
           ) : (
             <>
-              <p className="mb-3 text-sm text-[#666666]">Faites glisser la photo pour placer le visage dans le cercle, et zoomez si besoin.</p>
+              <p className="mb-3 text-sm text-[#666666]">
+                {logo
+                  ? 'Faites glisser et zoomez pour placer le logo dans le carré. Les zones vides (damier) restent transparentes.'
+                  : 'Faites glisser la photo pour placer le visage dans le cercle, et zoomez si besoin.'}
+              </p>
               <div className="relative mx-auto select-none" style={{ width: APERCU, height: APERCU }}>
                 <canvas
                   ref={canvas}
-                  style={{ width: APERCU, height: APERCU, touchAction: 'none' }}
-                  className={`block rounded-lg bg-[#F5F5F5] ${img ? 'cursor-grab active:cursor-grabbing' : 'animate-pulse'}`}
+                  style={{
+                    width: APERCU, height: APERCU, touchAction: 'none',
+                    ...(logo ? { background: 'repeating-conic-gradient(#E5E5E5 0% 25%, #FFFFFF 0% 50%) 0 0 / 16px 16px' } : {}),
+                  }}
+                  className={`block rounded-lg ${logo ? '' : 'bg-[#F5F5F5]'} ${img ? 'cursor-grab active:cursor-grabbing' : 'animate-pulse'}`}
                   onPointerDown={appui}
                   onPointerMove={deplace}
                   onPointerUp={relache}
@@ -159,13 +190,19 @@ export function RecadragePortrait({
                   onWheel={(e) => changerZoom(zoom - e.deltaY / 500)}
                   aria-label="Aperçu du cadrage"
                 />
-                {/* Cercle du portrait : l'extérieur est assombri */}
-                <div
-                  className="pointer-events-none absolute inset-0 rounded-lg"
-                  style={{ background: 'radial-gradient(circle closest-side, transparent 99%, rgba(0,0,0,0.45) 100%)' }}
-                  aria-hidden="true"
-                />
-                <div className="pointer-events-none absolute inset-0 rounded-full border-2 border-white/90" aria-hidden="true" />
+                {logo ? (
+                  <div className="pointer-events-none absolute inset-0 rounded-lg border-2 border-[#111111]/70" aria-hidden="true" />
+                ) : (
+                  <>
+                    {/* Cercle du portrait : l'extérieur est assombri */}
+                    <div
+                      className="pointer-events-none absolute inset-0 rounded-lg"
+                      style={{ background: 'radial-gradient(circle closest-side, transparent 99%, rgba(0,0,0,0.45) 100%)' }}
+                      aria-hidden="true"
+                    />
+                    <div className="pointer-events-none absolute inset-0 rounded-full border-2 border-white/90" aria-hidden="true" />
+                  </>
+                )}
               </div>
 
               <div className="mt-4 flex items-center gap-3">
@@ -174,7 +211,7 @@ export function RecadragePortrait({
                 </button>
                 <input
                   type="range"
-                  min={1}
+                  min={zoomMin}
                   max={4}
                   step={0.01}
                   value={zoom}
@@ -200,7 +237,7 @@ export function RecadragePortrait({
             disabled={!img || !!erreur || travail}
             className="flex-1 rounded-xl bg-[#111111] py-2.5 font-semibold text-white disabled:opacity-50"
           >
-            {travail ? 'Préparation…' : 'Utiliser cette photo'}
+            {travail ? 'Préparation…' : logo ? 'Utiliser cette image' : 'Utiliser cette photo'}
           </button>
         </div>
       </div>

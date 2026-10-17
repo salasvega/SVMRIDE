@@ -5,10 +5,14 @@ import { siteConfig, navLinks } from '../../config/site';
 import { Button } from '../ui/Button';
 import { FondMenu } from './FondMenu';
 import { useFermerAuDefilement } from '../../hooks/useFermerAuDefilement';
+import { useIdentite } from '../../lib/identite';
+import { icones } from '../../config/identite';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  // Logo choisi dans l'admin (Infos du site, bloc « Logo et icône »)
+  const logo = icones(useIdentite()).logo;
   // Menu fermé au changement de page et avec Échap (le clic en dehors : voir FondMenu)
   useEffect(() => setMobileMenuOpen(false), [location.pathname]);
   useFermerAuDefilement(mobileMenuOpen, useCallback(() => setMobileMenuOpen(false), []));
@@ -40,7 +44,7 @@ export function Header() {
             className="flex items-center gap-2.5 rounded-lg transition-opacity duration-180 hover:opacity-85"
           >
             <img
-              src="/logo-header.webp"
+              src={logo}
               alt="SVM Ride Logo"
               className="w-11 h-11 object-contain"
               width={44}

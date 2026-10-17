@@ -47,7 +47,7 @@ export interface SeoMeta {
 // Fiche « concession » pour Google (référencement local)
 // ---------------------------------------------------------------------------
 /** Fiche « concession » pour Google, à partir des coordonnées (modifiables dans l'admin) */
-export function dealerSchemaDe(c: Coordonnees) {
+export function dealerSchemaDe(c: Coordonnees, logo = `${SITE_URL}/icon-512.png`) {
   return {
     '@context': 'https://schema.org',
     '@type': 'MotorcycleDealer',
@@ -56,7 +56,7 @@ export function dealerSchemaDe(c: Coordonnees) {
     description:
       `Concession de motos et scooters d'occasion contrôlés et garantis à ${c.showroom.ville} : vente, reprise, financement et recherche personnalisée en Île-de-France.`,
     url: `${SITE_URL}/`,
-    logo: `${SITE_URL}/icon-512.png`,
+    logo: logo.startsWith('/') ? `${SITE_URL}${logo}` : logo,
     image: DEFAULT_IMAGE,
     telephone: telephoneInternational(c.telephone),
     email: c.email,
@@ -85,8 +85,8 @@ export function descriptionContact(c: Coordonnees): string {
 }
 
 /** Balises d'une page avec les coordonnées à jour (fiche concession, description de Contact) */
-export function avecCoordonnees(meta: SeoMeta, c: Coordonnees): SeoMeta {
-  const fiche = dealerSchemaDe(c);
+export function avecCoordonnees(meta: SeoMeta, c: Coordonnees, logo?: string): SeoMeta {
+  const fiche = dealerSchemaDe(c, logo);
   const schema = Array.isArray(meta.schema)
     ? meta.schema.map((s) => (s === dealerSchema ? fiche : s))
     : meta.schema === dealerSchema ? fiche : meta.schema;

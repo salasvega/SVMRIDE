@@ -12,11 +12,14 @@
  * (src/config/societe.ts). Chaque nouveau contrat de dépôt-vente en garde une copie.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Building2, Clock, ExternalLink, History, Mail, MapPin, Phone, Plus, RotateCcw, X } from 'lucide-react';
+import { AlertTriangle, Building2, Image as ImageIcon, Clock, ExternalLink, History, Mail, MapPin, Phone, Plus, RotateCcw, X } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { appliquerCoordonnees } from '../../lib/coordonnees';
 import { appliquerSociete } from '../../lib/societe';
+import { BlocIcone } from '../../components/admin/BlocIcone';
+import { enregistrerIdentite } from '../../lib/identite';
+import { CLE_IDENTITE, IDENTITE_DEFAUT, normaliserIdentite, type Identite } from '../../config/identite';
 import {
   chiffresSiret, CLE_SOCIETE, formaterSiret, normaliserSociete, siren, siretPlausible, SOCIETE_DEFAUT, texteMediateur, type Societe,
 } from '../../config/societe';
@@ -50,6 +53,13 @@ function changements(a: Coordonnees, b: Coordonnees): { champ: string; avant: st
     ['Précision sous les horaires', (c) => c.horaires_note || '(aucune)'],
   ];
   return champs.map(([champ, f]) => ({ champ, avant: f(a), apres: f(b) })).filter((x) => x.avant !== x.apres);
+}
+
+/** Changement du logo et de l'icône (historique) */
+const decrireIdentite = (i: Identite) => (i.icone ? `Icône personnalisée (${i.icone.version.slice(6, 8)}/${i.icone.version.slice(4, 6)}/${i.icone.version.slice(0, 4)})` : "Logo d'origine");
+function changementsIdentite(a: Identite, b: Identite) {
+  const avant = decrireIdentite(a), apres = decrireIdentite(b);
+  return avant === apres && a.icone?.version === b.icone?.version ? [] : [{ champ: 'Logo et icône', avant, apres }];
 }
 
 /** Changements du bloc Société */
@@ -173,19 +183,21 @@ export function InfosSite() {
   const [c, setC] = useState<Coordonnees>(COORDONNEES_DEFAUT);
   const [societeEnregistree, setSocieteEnregistree] = useState<Societe | null>(null);
   const [soc, setSoc] = useState<Societe>(SOCIETE_DEFAUT);
+  const [identite, setIdentite] = useState<Identite>(IDENTITE_DEFAUT);
   const [historique, setHistorique] = useState<Version[]>([]);
   const [erreur, setErreur] = useState('');
   const [message, setMessage] = useState('');
   const [tentative, setTentative] = useState(false);
-  const [confirmation, setConfirmation] = useState<{ coord: Coordonnees; soc: Societe; titre: string } | null>(null);
+  const [confirmation, setConfirmation] = useState<{ coord: Coordonnees; soc: Societe; titre: string; identite?: Identite } | null>(null);
   const [envoi, setEnvoi] = useState(false);
 
   const charger = async () => {
-    const [{ data, error }, { data: ds }, { data: h }] = await Promise.all([
+    const [{ data, error }, { data: ds }, { data: di }, { data: h }] = await Promise.all([
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_COORDONNEES).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_SOCIETE).maybeSingle(),
+      supabase.from('site_reglages').select('valeur').eq('cle', CLE_IDENTITE).maybeSingle(),
       supabase.from('site_reglages_historique').select('id, cle, ancienne_valeur, nouvelle_valeur, par, fait_le')
-        .in('cle', [CLE_COORDONNEES, CLE_SOCIETE]).order('fait_le', { ascending: false }).limit(15),
+        .in('cle', [CLE_COORDONNEES, CLE_SOCIETE, CLE_IDENTITE]).order('fait_le', { ascending: false }).limit(15),
     ]);
     if (error) {
       setErreur("Impossible de charger les informations. Vérifiez que vous êtes connecté avec un compte administrateur.");
@@ -197,6 +209,7 @@ export function InfosSite() {
     setC(v);
     setSocieteEnregistree(vs);
     setSoc(vs);
+    setIdentite(normaliserIdentite(di?.valeur));
     setHistorique((h as Version[]) ?? []);
   };
 
@@ -232,9 +245,18 @@ export function InfosSite() {
     setConfirmation({ coord: propre, soc: propreSoc, titre: 'Enregistrer ces modifications ?' });
   };
 
-  const enregistrer = async (coord: Coordonnees, societe: Societe) => {
+  const enregistrer = async (coord: Coordonnees, societe: Societe, nouvelleIdentite?: Identite) => {
     if (!enregistrees || !societeEnregistree) return;
     setEnvoi(true);
+    if (nouvelleIdentite) {
+      const ok = await enregistrerIdentite(nouvelleIdentite);
+      setEnvoi(false);
+      setConfirmation(null);
+      if (!ok) return setErreur("L'enregistrement n'a pas fonctionné. Réessayez.");
+      setMessage('Logo et icône rétablis.');
+      await charger();
+      return;
+    }
     const lignes = [
       ...(changements(enregistrees, coord).length ? [{ cle: CLE_COORDONNEES, valeur: coord }] : []),
       ...(changementsSociete(societeEnregistree, societe).length ? [{ cle: CLE_SOCIETE, valeur: societe }] : []),
@@ -255,6 +277,11 @@ export function InfosSite() {
 
   const restaurer = (v: Version) => {
     if (!enregistrees || !societeEnregistree) return;
+    if (v.cle === CLE_IDENTITE) {
+      setMessage('');
+      setConfirmation({ coord: enregistrees, soc: societeEnregistree, identite: normaliserIdentite(v.ancienne_valeur), titre: 'Revenir au logo et à l\'icône d\'avant ?' });
+      return;
+    }
     const coord = v.cle === CLE_SOCIETE ? enregistrees : normaliserCoordonnees(v.ancienne_valeur);
     const societe = v.cle === CLE_SOCIETE ? normaliserSociete(v.ancienne_valeur) : societeEnregistree;
     setMessage('');
@@ -415,6 +442,10 @@ export function InfosSite() {
               </div>
             </Bloc>
 
+            <Bloc icone={<ImageIcon className="h-5 w-5" />} titre="Logo et icône" sousTitre="Logo de la barre du haut et du pied de page, icône de l'onglet, des téléphones et de Google.">
+              <BlocIcone identite={identite} onEnregistre={(m) => { setMessage(m); setErreur(''); charger(); }} />
+            </Bloc>
+
             <section className="rounded-xl border-2 border-[#D1D5DB] bg-white p-4 md:p-6" aria-labelledby="historique-titre">
               <div className="mb-4 flex items-start gap-3">
                 <History className="mt-0.5 h-5 w-5 text-[#111111]" aria-hidden="true" />
@@ -428,7 +459,9 @@ export function InfosSite() {
               ) : (
                 <ul className="space-y-3">
                   {historique.map((v) => {
-                    const d = !v.ancienne_valeur ? [] : v.cle === CLE_SOCIETE
+                    const d = !v.ancienne_valeur ? [] : v.cle === CLE_IDENTITE
+                      ? changementsIdentite(normaliserIdentite(v.ancienne_valeur), normaliserIdentite(v.nouvelle_valeur))
+                      : v.cle === CLE_SOCIETE
                       ? changementsSociete(normaliserSociete(v.ancienne_valeur), normaliserSociete(v.nouvelle_valeur))
                       : changements(normaliserCoordonnees(v.ancienne_valeur), normaliserCoordonnees(v.nouvelle_valeur));
                     const avant = !!v.ancienne_valeur;
@@ -439,7 +472,7 @@ export function InfosSite() {
                             <span className="font-semibold text-[#111111]">
                               {new Date(v.fait_le).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'long', timeStyle: 'short' })}
                             </span>
-                            <span className="text-[#666666]"> · {v.cle === CLE_SOCIETE ? 'Société' : 'Coordonnées'} · {v.par ?? 'inconnu'}</span>
+                            <span className="text-[#666666]"> · {v.cle === CLE_SOCIETE ? 'Société' : v.cle === CLE_IDENTITE ? 'Logo et icône' : 'Coordonnées'} · {v.par ?? 'inconnu'}</span>
                           </p>
                           {avant && d.length > 0 && (
                             <button type="button" onClick={() => restaurer(v)}
@@ -492,7 +525,9 @@ export function InfosSite() {
       )}
 
       {confirmation && enregistrees && societeEnregistree && (() => {
-        const liste = [...changements(enregistrees, confirmation.coord), ...changementsSociete(societeEnregistree, confirmation.soc)];
+        const liste = confirmation.identite
+          ? changementsIdentite(identite, confirmation.identite)
+          : [...changements(enregistrees, confirmation.coord), ...changementsSociete(societeEnregistree, confirmation.soc)];
         const societeChange = changementsSociete(societeEnregistree, confirmation.soc).length > 0;
         return (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="confirm-titre">
@@ -525,7 +560,7 @@ export function InfosSite() {
                 Annuler
               </button>
               <button type="button" disabled={envoi || liste.length === 0}
-                onClick={() => enregistrer(confirmation.coord, confirmation.soc)}
+                onClick={() => enregistrer(confirmation.coord, confirmation.soc, confirmation.identite)}
                 className="flex-1 rounded-xl bg-[#111111] py-2.5 font-semibold text-white disabled:opacity-50">
                 {envoi ? 'Enregistrement…' : 'Confirmer'}
               </button>

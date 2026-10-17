@@ -9,6 +9,8 @@
  *  - un vrai statut 404 pour les pages et véhicules inexistants.
  * Elle génère aussi /sitemap.xml avec tous les véhicules en vente.
  * La page /equipe suit le réglage « Afficher l'équipe sur le site » de l'admin.
+ * Icônes (onglet, iPhone, Android) et manifeste : ceux choisis dans l'admin
+ * (Infos du site, bloc « Logo et icône »), sinon ceux d'origine.
  *
  * Les textes viennent de src/config/seo.ts (partagé avec le site).
  */
@@ -30,6 +32,8 @@ import {
 import { equipeAffichee, EQUIPE_EN_LIGNE } from '../../src/config/equipe.ts';
 import { COORDONNEES_DEFAUT, normaliserCoordonnees, type Coordonnees } from '../../src/config/coordonnees.ts';
 import { CONTEXTE, SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
+import { balisesIcones, icones, manifeste, URL_MANIFESTE } from '../../src/config/identite.ts';
+import { identite } from '../lib/identite-edge.ts';
 
 const TIMEOUT_MS = 2500;
 
@@ -125,6 +129,11 @@ export default async function seo(request: Request, context: Context) {
   const path = brut === '/index.html' ? '/' : brut;
 
   if (path === '/sitemap.xml') return sitemap();
+  if (path === URL_MANIFESTE) {
+    return new Response(JSON.stringify(manifeste(await identite())), {
+      headers: { 'content-type': 'application/manifest+json; charset=utf-8', 'cache-control': 'public, max-age=300' },
+    });
+  }
   if (request.method !== 'GET' && request.method !== 'HEAD') return;
 
   let meta: SeoMeta;
@@ -144,7 +153,8 @@ export default async function seo(request: Request, context: Context) {
   }
 
   // Accueil et Contact : fiche concession (téléphone, adresse, horaires) et description à jour
-  if (path === '/' || path === '/contact') meta = avecCoordonnees(meta, await coordonnees());
+  const id = await identite();
+  if (path === '/' || path === '/contact') meta = avecCoordonnees(meta, await coordonnees(), icones(id).icon_512);
 
   const res = await context.next();
   if (!(res.headers.get('content-type') ?? '').includes('text/html')) return res;
@@ -156,7 +166,10 @@ export default async function seo(request: Request, context: Context) {
   if (meta.noindex) headers.set('x-robots-tag', 'noindex');
   // Lien de signature personnel : jamais transmis à un autre site
   if (meta === signatureSeo) headers.set('referrer-policy', 'no-referrer');
-  return new Response(injectSeo(html, meta), { status: meta.status ?? res.status, headers });
+  let page = injectSeo(html, meta);
+  // Icônes choisies dans l'admin
+  if (id.icone) page = page.replace(/<!--icones-->[\s\S]*?<!--\/icones-->/, `<!--icones-->\n    ${balisesIcones(id)}\n    <!--/icones-->`);
+  return new Response(page, { status: meta.status ?? res.status, headers });
 }
 
 export const config: Config = {

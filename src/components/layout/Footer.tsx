@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useEquipe } from '../../lib/equipe';
 import { useCoordonnees } from '../../lib/coordonnees';
+import { useIdentite } from '../../lib/identite';
+import { icones } from '../../config/identite';
 import { adresseComplete, lienInstagram, lienMaps, lienTelephone, lignesHoraires } from '../../config/coordonnees';
 import { Mail, Phone, Instagram, MapPin } from 'lucide-react';
 import { siteConfig } from '../../config/site';
@@ -10,6 +12,7 @@ export function Footer() {
   const equipe = useEquipe();
   // Coordonnées modifiables dans l'admin, onglet « Infos du site »
   const c = useCoordonnees();
+  const logo = icones(useIdentite()).logo;
   const currentYear = new Date().getFullYear();
 
   return (
@@ -19,7 +22,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           <div>
             <Link to="/" className="inline-flex items-center gap-3 mb-4 rounded-lg">
-              <img src="/logo-header.webp" alt="" width={44} height={44} className="w-11 h-11 rounded-full ring-1 ring-or/60" />
+              <img src={logo} alt="" width={44} height={44} className="w-11 h-11 rounded-full ring-1 ring-or/60" />
               <span className="text-2xl font-bold">{siteConfig.name}</span>
             </Link>
             <p className="text-[#AAAAAA] text-sm leading-relaxed mb-4">
