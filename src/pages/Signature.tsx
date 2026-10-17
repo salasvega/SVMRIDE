@@ -231,8 +231,8 @@ export function Signature() {
                   target="_blank"
                   rel="noreferrer"
                   onClick={lire}
-                  className={`inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3.5 text-base font-semibold rounded-xl border-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bleu-vif ${
-                    lu ? 'bg-white text-noir border-or hover:bg-fond' : 'bg-bleu text-white border-transparent hover:bg-bleu-hover'
+                  className={`inline-flex w-full sm:w-auto items-center justify-center gap-2 px-6 py-3.5 text-base font-semibold rounded-bouton border-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bleu-vif ${
+                    lu ? 'bg-surface text-noir border-or hover:bg-fond' : 'bg-bleu text-sur-bouton border-transparent hover:bg-bleu-hover'
                   }`}
                 >
                   <FileText className="w-4 h-4" aria-hidden="true" /> {lu ? 'Relire le contrat (PDF)' : 'Lire le contrat complet (PDF)'}
@@ -241,12 +241,12 @@ export function Signature() {
 
                 <div className="mt-6 space-y-4">
                   <label className="flex items-start gap-3 text-sm text-noir leading-relaxed">
-                    <input type="checkbox" checked={accord} onChange={(e) => setAccord(e.target.checked)} className="mt-1 w-5 h-5 flex-shrink-0 accent-[#254893]" />
+                    <input type="checkbox" checked={accord} onChange={(e) => setAccord(e.target.checked)} className="mt-1 w-5 h-5 flex-shrink-0 accent-bleu" />
                     <span>J'ai lu l'intégralité du {mandat ? 'contrat' : "de l'avenant"} et j'en accepte les termes.</span>
                   </label>
                   {mandat && (
                     <label className="flex items-start gap-3 text-sm text-noir leading-relaxed">
-                      <input type="checkbox" checked={renonciation} onChange={(e) => setRenonciation(e.target.checked)} className="mt-1 w-5 h-5 flex-shrink-0 accent-[#254893]" />
+                      <input type="checkbox" checked={renonciation} onChange={(e) => setRenonciation(e.target.checked)} className="mt-1 w-5 h-5 flex-shrink-0 accent-bleu" />
                       <span>
                         Je demande l'exécution immédiate du mandat (mise en vente dès aujourd'hui) et je renonce expressément au délai de
                         rétractation, dans la mesure où il s'appliquerait.
@@ -256,9 +256,9 @@ export function Signature() {
                 </div>
               </div>
 
-              <form onSubmit={signer} className="carte p-5 md:p-6 space-y-4" aria-labelledby="t-signer">
+              <form data-zone="formulaires" onSubmit={signer} className="carte p-5 md:p-6 space-y-4" aria-labelledby="t-signer">
                 <h2 id="t-signer" className="text-lg font-semibold flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-bleu" aria-hidden="true" /> Signer
+                  <ShieldCheck className="w-5 h-5 text-lien" aria-hidden="true" /> Signer
                 </h2>
                 <p className="text-sm text-gris">
                   Pour signer, nous vous envoyons un code à 6 chiffres à {contrat.email_masque}. Ce code vaut signature : ne le communiquez à personne.
@@ -280,7 +280,7 @@ export function Signature() {
                         maxLength={7}
                         value={code}
                         onChange={(e) => setCode(e.target.value.replace(/[^\d]/g, '').slice(0, 6))}
-                        className="w-full sm:w-56 px-4 py-3 bg-white text-noir border-[1.5px] border-champ rounded-xl text-2xl tracking-[0.4em] tabular-nums focus:outline-none focus:border-bleu focus:ring-4 focus:ring-bleu/15"
+                        className="w-full sm:w-56 px-4 py-3 bg-surface text-noir border-[1.5px] border-champ rounded-xl text-2xl tracking-[0.4em] tabular-nums focus:outline-none focus:border-lien focus:ring-4 focus:ring-lien/15"
                       />
                       <p className="text-xs text-gris mt-1">Valable 10 minutes. Pensez à regarder dans vos courriers indésirables.</p>
                     </div>

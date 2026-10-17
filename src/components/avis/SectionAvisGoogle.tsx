@@ -51,13 +51,13 @@ export function SectionAvisGoogle() {
   if (charge && !avecAvis && !liensAffiches && !demo) return null;
 
   const bouton =
-    'inline-flex items-center justify-center gap-2 rounded-xl border-2 px-[22px] py-[13px] text-[15px] md:text-base font-semibold transition-[background-color,border-color,box-shadow,color] duration-180 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bleu-vif';
+    'inline-flex items-center justify-center gap-2 rounded-bouton border-2 px-[22px] py-[13px] text-[15px] md:text-base font-semibold transition-[background-color,border-color,box-shadow,color] duration-180 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bleu-vif';
 
   return (
-    <Section background="gray" className={compact ? '!py-12 md:!py-16' : ''}>
+    <Section zone="avis" background="gray" className={compact ? '!py-12 md:!py-16' : ''}>
       <Container>
         {demo && (
-          <p className="mb-8 rounded-xl border border-or/50 bg-[#FBF6E9] px-4 py-3 text-sm text-noir">
+          <p className="mb-8 rounded-xl border border-or/50 bg-or-voile px-4 py-3 text-sm text-noir">
             <strong className="font-semibold">Démonstration :</strong> avis fictifs affichés uniquement en aperçu, en
             attendant la connexion à Google. Sur svmride.com, aucun avis fictif n'est publié.
           </p>
@@ -119,12 +119,12 @@ export function SectionAvisGoogle() {
           <div className={`${compact ? 'mt-8' : 'mt-10'} flex flex-col justify-center gap-3 sm:flex-row`}>
             {liensAffiches ? (
               <>
-                <a href={liens!.voirTous} target="_blank" rel="noopener noreferrer" className={`${bouton} border-transparent bg-bleu text-white shadow-bleu hover:bg-bleu-hover hover:shadow-bleu-fort`}>
+                <a href={liens!.voirTous} target="_blank" rel="noopener noreferrer" className={`${bouton} border-transparent bg-bleu text-sur-bouton shadow-bleu hover:bg-bleu-hover hover:shadow-bleu-fort`}>
                   Voir tous les avis sur Google
                   <ExternalLink className="h-4 w-4" aria-hidden="true" />
                   <span className="sr-only">(nouvel onglet)</span>
                 </a>
-                <a href={liens!.donnerAvis} target="_blank" rel="noopener noreferrer" className={`${bouton} border-or bg-white text-noir hover:bg-fond hover:border-or-clair`}>
+                <a href={liens!.donnerAvis} target="_blank" rel="noopener noreferrer" className={`${bouton} border-or bg-surface text-noir hover:bg-fond hover:border-or-clair`}>
                   <PenLine className="h-4 w-4" aria-hidden="true" />
                   Donner mon avis
                   <span className="sr-only">(nouvel onglet)</span>

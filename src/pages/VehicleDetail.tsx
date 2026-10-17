@@ -66,7 +66,7 @@ export function VehicleDetail() {
     <>
       <SEOHead meta={vehicleSeo(vehicle)} />
 
-      <Section background="gray" className="!py-5">
+      <Section zone="fiche" background="gray" className="!py-5">
         <Container>
           <Link
             to="/vehicules"
@@ -78,7 +78,7 @@ export function VehicleDetail() {
         </Container>
       </Section>
 
-      <Section background="white" className="!pt-2 !pb-12 md:!py-10">
+      <Section zone="fiche" background="white" className="!pt-2 !pb-12 md:!py-10">
         <Container>
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
             {/* --- Colonne gauche : galerie photos --- */}
@@ -103,7 +103,7 @@ export function VehicleDetail() {
                   <>
                     <button
                       onClick={handlePrevImage}
-                      className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-white p-2.5 md:p-3 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
+                      className="absolute left-3 md:left-4 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-inverse p-2.5 md:p-3 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
                       aria-label="Image précédente"
                     >
                       <ChevronLeft className="w-6 h-6" />
@@ -111,7 +111,7 @@ export function VehicleDetail() {
 
                     <button
                       onClick={handleNextImage}
-                      className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-white p-2.5 md:p-3 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
+                      className="absolute right-3 md:right-4 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-inverse p-2.5 md:p-3 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
                       aria-label="Image suivante"
                     >
                       <ChevronRight className="w-6 h-6" />
@@ -166,7 +166,7 @@ export function VehicleDetail() {
                 {vehicle.brand} {vehicle.model}
               </h1>
 
-              <p className="inline-flex items-center bg-white border-[1.5px] border-or rounded-full px-5 py-1.5 font-display font-semibold text-[26px] md:text-[28px] leading-tight text-noir mb-6">
+              <p className="inline-flex items-center bg-surface border-[1.5px] border-or rounded-full px-5 py-1.5 font-display font-semibold text-[26px] md:text-[28px] leading-tight text-noir mb-6">
                 {formatPrice(vehicle.price)}
               </p>
 
@@ -174,7 +174,7 @@ export function VehicleDetail() {
                 <div className="flex items-center gap-3">
                   <IconeOr icon={Calendar} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-[#5E5E5E]">Année</p>
+                    <p className="text-xs uppercase tracking-wide text-doux-68">Année</p>
                     <p className="font-semibold text-noir">{vehicle.year}</p>
                   </div>
                 </div>
@@ -182,7 +182,7 @@ export function VehicleDetail() {
                 <div className="flex items-center gap-3">
                   <IconeOr icon={Gauge} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-[#5E5E5E]">Cylindrée</p>
+                    <p className="text-xs uppercase tracking-wide text-doux-68">Cylindrée</p>
                     <p className="font-semibold text-noir">
                       {vehicle.displacement} cc
                     </p>
@@ -192,7 +192,7 @@ export function VehicleDetail() {
                 <div className="flex items-center gap-3">
                   <IconeOr icon={Route} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-[#5E5E5E]">Kilométrage</p>
+                    <p className="text-xs uppercase tracking-wide text-doux-68">Kilométrage</p>
                     <p className="font-semibold text-noir">
                       {formatMileage(vehicle.mileage)}
                     </p>
@@ -202,7 +202,7 @@ export function VehicleDetail() {
                 <div className="flex items-center gap-3">
                   <IconeOr icon={Shield} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-[#5E5E5E]">Type</p>
+                    <p className="text-xs uppercase tracking-wide text-doux-68">Type</p>
                     <p className="font-semibold text-noir capitalize">
                       {vehicle.type}
                     </p>
@@ -230,7 +230,7 @@ export function VehicleDetail() {
               </div>
 
               {/* Garantie */}
-              <div className="p-4 md:p-5 bg-white border border-bordure border-l-[3px] border-l-or rounded-xl mb-8">
+              <div className="p-4 md:p-5 bg-surface border border-bordure border-l-[3px] border-l-or rounded-xl mb-8">
                 <div className="flex items-center gap-2 text-noir mb-1">
                   <IconeOr icon={Shield} className="w-5 h-5" />
                   <span className="font-semibold">Garantie</span>

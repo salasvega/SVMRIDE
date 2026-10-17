@@ -140,7 +140,7 @@ export function CarrouselAvis({ avis, demo = false }: { avis: Avis[]; demo?: boo
   }, [enLecture]);
 
   const bouton =
-    'inline-flex h-10 w-10 items-center justify-center rounded-full border border-champ bg-white text-noir transition-colors duration-180 hover:border-or hover:text-or-texte';
+    'inline-flex h-10 w-10 items-center justify-center rounded-full border border-champ bg-surface text-noir transition-colors duration-180 hover:border-or hover:text-or-texte';
 
   return (
     <div
@@ -240,7 +240,7 @@ export function CarrouselAvis({ avis, demo = false }: { avis: Avis[]; demo?: boo
         onClose={() => setEnLecture(null)}
         onClick={(e) => { if (e.target === e.currentTarget) setEnLecture(null); }}
         aria-labelledby="avis-lecture-titre"
-        className="w-[min(92vw,560px)] rounded-2xl border border-bordure bg-white p-0 text-left shadow-vehicule backdrop:bg-noir-profond/60"
+        className="w-[min(92vw,560px)] rounded-2xl border border-bordure bg-surface p-0 text-left shadow-vehicule backdrop:bg-noir-profond/60"
       >
         {enLecture && (
           <div className="p-6 md:p-8">

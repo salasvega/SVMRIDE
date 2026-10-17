@@ -227,7 +227,7 @@ export function VendreMaMoto() {
                 </Button>
               </a>
             </div>
-            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-or/50 bg-white p-5 shadow-carte sm:flex-row sm:items-center md:p-6">
+            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-or/50 bg-surface p-5 shadow-carte sm:flex-row sm:items-center md:p-6">
               <IconeOr icon={Eye} className="hidden h-10 w-10 flex-shrink-0 sm:block" />
               <div className="flex-1">
                 <h2 className="text-lg md:text-xl font-semibold text-noir">Votre moto est déjà chez nous ?</h2>
@@ -267,18 +267,18 @@ export function VendreMaMoto() {
           <h2 className="titre-section filet-avant mb-8">Pourquoi confier votre moto à SVM Ride ?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {AVANTAGES.map((a) => (
-              <div key={a.titre} className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 md:p-6">
+              <div key={a.titre} className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-5 md:p-6">
                 <IconeOr icon={a.icon} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-white mb-1.5">{a.titre}</h3>
-                <p className="text-sm text-[#BDBDBD] leading-relaxed">{a.texte}</p>
+                <h3 className="font-semibold text-inverse mb-1.5">{a.titre}</h3>
+                <p className="text-sm text-inverse-74 leading-relaxed">{a.texte}</p>
               </div>
             ))}
           </div>
-          <div className="mt-6 rounded-2xl border border-or/40 bg-white/[0.04] p-5 md:p-6 flex gap-4 items-start">
+          <div className="mt-6 rounded-2xl border border-or/40 bg-inverse/[0.04] p-5 md:p-6 flex gap-4 items-start">
             <IconeOr icon={BadgeEuro} className="w-7 h-7 flex-shrink-0" />
             <div>
-              <h3 className="font-semibold text-white mb-1">Un net vendeur écrit noir sur blanc</h3>
-              <p className="text-sm text-[#D6D6D6] leading-relaxed">
+              <h3 className="font-semibold text-inverse mb-1">Un net vendeur écrit noir sur blanc</h3>
+              <p className="text-sm text-inverse-84 leading-relaxed">
                 Vous savez dès la signature ce que vous recevrez : le net vendeur est écrit dans le mandat, et vous êtes payé
                 par virement sous 48 h après la vente. Pas de frais cachés.
               </p>
@@ -316,7 +316,7 @@ export function VendreMaMoto() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={envoyer} noValidate className="bg-fond border border-bordure rounded-2xl p-5 sm:p-8">
+              <form data-zone="formulaires" onSubmit={envoyer} noValidate className="bg-fond border border-bordure rounded-2xl p-5 sm:p-8">
                 <h2 className="text-[26px] md:text-[30px] filet-apres mb-2">Demander une estimation</h2>
                 <p className="text-sm text-gris mb-6">Gratuit et sans engagement. Réponse sous 48 h ouvrées.</p>
 
@@ -461,16 +461,16 @@ export function VendreMaMoto() {
                       required
                       checked={consentement}
                       onChange={(e) => setConsentement(e.target.checked)}
-                      className="mt-1 w-4 h-4 flex-shrink-0 rounded accent-[#254893]"
+                      className="mt-1 w-4 h-4 flex-shrink-0 rounded accent-bleu"
                     />
                     <label htmlFor="consentement" className="text-sm text-gris leading-relaxed">
                       J’accepte que SVM Ride utilise ces informations pour étudier ma demande et me recontacter. Elles
                       sont conservées au plus 3 ans (12 mois pour les photos) et je peux en demander la suppression à
                       tout moment. Voir la{' '}
-                      <Link to="/politique-confidentialite" className="text-bleu underline underline-offset-2 hover:decoration-2">
+                      <Link to="/politique-confidentialite" className="text-lien underline underline-offset-2 hover:decoration-2">
                         politique de confidentialité
                       </Link>
-                      . <span className="text-bleu" aria-hidden="true">*</span>
+                      . <span className="text-lien" aria-hidden="true">*</span>
                     </label>
                   </div>
                 </fieldset>

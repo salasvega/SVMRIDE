@@ -17,13 +17,13 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {label && (
           <label htmlFor={selectId} className="block text-sm font-medium text-noir mb-2">
             {props.required ? label.replace(/\s*\*$/, '') : label}
-            {props.required && <span className="text-bleu ml-1" aria-hidden="true">*</span>}
+            {props.required && <span className="text-lien ml-1" aria-hidden="true">*</span>}
           </label>
         )}
         <select
           ref={ref}
           id={selectId}
-          className={`${widthClass} px-4 py-3 bg-white text-noir border-[1.5px] rounded-xl placeholder:text-[#767676] focus:outline-none focus:border-bleu focus:ring-4 focus:ring-bleu/15 transition-[border-color,box-shadow] duration-150 appearance-none champ-select ${error ? 'border-red-600' : 'border-champ'} ${className}`}
+          className={`${widthClass} px-4 py-3 bg-surface text-noir border-[1.5px] rounded-xl placeholder:text-doux-58 focus:outline-none focus:border-lien focus:ring-4 focus:ring-lien/15 transition-[border-color,box-shadow] duration-150 appearance-none champ-select ${error ? 'border-red-600' : 'border-champ'} ${className}`}
           {...props}
         >
           {children}

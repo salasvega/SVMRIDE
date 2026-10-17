@@ -82,7 +82,7 @@ export function LegalNotice() {
             <h2 className="text-[22px] md:text-2xl mb-4 mt-8">Cookies</h2>
             <p className="text-gris mb-6 leading-relaxed">
               Le site utilise des cookies pour améliorer l'expérience utilisateur. Pour plus d'informations, consultez notre{' '}
-              <a href="/politique-cookies" className="text-bleu underline underline-offset-2 hover:decoration-2">
+              <a href="/politique-cookies" className="text-lien underline underline-offset-2 hover:decoration-2">
                 politique des cookies
               </a>
               .

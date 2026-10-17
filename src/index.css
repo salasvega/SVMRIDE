@@ -2,38 +2,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== Direction artistique « premium sobre » — design tokens =====
-   Toutes les couleurs du site se règlent ici. Chaque couleur existe en
-   hexadécimal (pour le CSS) et en canaux R G B (pour Tailwind : text-noir,
-   bg-fond, border-or, bg-bleu/15…). Voir tailwind.config.js. */
+/* ===== Direction artistique — design tokens (thème SVM Signature) =====
+   Toutes les couleurs du site public se règlent par ces variables. Chaque
+   couleur existe en hexadécimal (pour le CSS) et en canaux R G B (pour
+   Tailwind : text-noir, bg-fond, border-or, bg-bleu/15…). Voir tailwind.config.js.
+   Le Studio Design (admin) publie d'autres valeurs : la fonction Netlify « seo »
+   les injecte sur .site. Ces valeurs-ci restent le thème de secours et doivent
+   rester identiques à THEME_SIGNATURE (src/config/design.ts). */
 :root {
-  --noir: #111111;          /* titres */
-  --noir-profond: #0E0E10;  /* sections sombres, pied de page */
-  --gris-texte: #4A4A4A;    /* paragraphes */
-  --bleu: #254893;          /* bleu saphir : couleur d'action principale */
-  --bleu-vif: #1A8CFF;      /* petits accents, focus, liens sur fond sombre */
-  --bleu-hover: #2F5BB3;    /* survol des boutons : un cran plus clair (6,4:1 avec le texte blanc) */
-  --or: #B8902F;
-  --or-texte: #8A6A1F;      /* or foncé, seul or autorisé en texte sur fond clair */
-  --or-clair: #D9B965;
-  --fond: #F6F5F2;          /* gris chaud des sections alternées */
-  --bordure: #ECE9E0;
-  --champ: #E3E0D6;         /* bordure des champs de saisie */
-  --degrade-or: linear-gradient(90deg, #2A2112, #B8902F 55%, #D9B965); /* repris du logo */
+  /* Les 10 couleurs globales */
+  --noir-profond: #0E0E10;  /* primaire : sections sombres, pied de page */
+  --or-clair: #D9B965;      /* secondaire : détails sur fond sombre */
+  --or: #B8902F;            /* accent */
+  --fond: #F6F5F2;          /* arrière-plan : gris chaud des sections alternées */
+  --surface: #FFFFFF;       /* surfaces et cartes */
+  --noir: #111111;          /* texte principal, titres */
+  --gris-texte: #4A4A4A;    /* texte secondaire, paragraphes */
+  --bordure: #ECE9E0;       /* bordures */
+  --bleu: #254893;          /* boutons : bleu saphir */
+  --lien: #254893;          /* liens et éléments interactifs */
 
-  --noir-rgb: 17 17 17;
+  /* Nuances dérivées */
+  --bleu-hover: #2F5BB3;    /* survol des boutons (6,4:1 avec le texte blanc) */
+  --bleu-clair: #6395F8;
+  --sur-bouton: #FFFFFF;    /* texte des boutons */
+  --bleu-vif: #1A8CFF;      /* focus, liens sur fond sombre */
+  --or-texte: #8A6A1F;      /* or foncé, seul or autorisé en texte sur fond clair */
+  --or-voile: #FBF6E9;      /* encadrés teintés d'or */
+  --or-voile-leger: #FBF7EE;
+  --degrade-debut: #2A2112;
+  --degrade-debut-sombre: #6E5418;
+  --champ: #E3E0D6;         /* bordure des champs de saisie */
+  --doux-68: #5E5E5E;       /* textes atténués sur fond clair */
+  --doux-64: #666666;
+  --doux-62: #6B6B6B;
+  --doux-58: #767676;
+  --inverse: #FFFFFF;       /* texte sur fond sombre */
+  --inverse-91: #E8E8E8;    /* textes atténués sur fond sombre */
+  --inverse-88: #E0E0E0;
+  --inverse-84: #D6D6D6;
+  --inverse-74: #BDBDBD;
+  --inverse-66: #AAAAAA;
+  --inverse-53: #8A8A8A;
+  --inverse-52: #888888;
+
   --noir-profond-rgb: 14 14 16;
+  --or-clair-rgb: 217 185 101;
+  --or-rgb: 184 144 47;
+  --fond-rgb: 246 245 242;
+  --surface-rgb: 255 255 255;
+  --noir-rgb: 17 17 17;
   --gris-texte-rgb: 74 74 74;
+  --bordure-rgb: 236 233 224;
   --bleu-rgb: 37 72 147;
-  --bleu-vif-rgb: 26 140 255;
+  --lien-rgb: 37 72 147;
   --bleu-hover-rgb: 47 91 179;
   --bleu-clair-rgb: 99 149 248;
-  --or-rgb: 184 144 47;
+  --sur-bouton-rgb: 255 255 255;
+  --bleu-vif-rgb: 26 140 255;
   --or-texte-rgb: 138 106 31;
-  --or-clair-rgb: 217 185 101;
-  --fond-rgb: 246 245 242;
-  --bordure-rgb: 236 233 224;
+  --or-voile-rgb: 251 246 233;
+  --or-voile-leger-rgb: 251 247 238;
+  --degrade-debut-rgb: 42 33 18;
+  --degrade-debut-sombre-rgb: 110 84 24;
   --champ-rgb: 227 224 214;
+  --doux-68-rgb: 94 94 94;
+  --doux-64-rgb: 102 102 102;
+  --doux-62-rgb: 107 107 107;
+  --doux-58-rgb: 118 118 118;
+  --inverse-rgb: 255 255 255;
+  --inverse-91-rgb: 232 232 232;
+  --inverse-88-rgb: 224 224 224;
+  --inverse-84-rgb: 214 214 214;
+  --inverse-74-rgb: 189 189 189;
+  --inverse-66-rgb: 170 170 170;
+  --inverse-53-rgb: 138 138 138;
+  --inverse-52-rgb: 136 136 136;
+
+  /* Dégradés or (repris du logo) */
+  --degrade-or: linear-gradient(90deg, #2A2112, #B8902F 55%, #D9B965);
+  --degrade-or-sombre: linear-gradient(90deg, #6E5418, #B8902F 55%, #D9B965); /* sur fond sombre */
+
+  /* Style */
+  --rayon-bouton: 12px;
+  --rayon-carte: 16px;
+  --rayon-carte-moto: 18px;
+  --ombre-carte: 0 1px 2px rgba(17, 17, 17, 0.04), 0 4px 14px rgba(17, 17, 17, 0.04);
+  --ombre-vehicule: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --ombre-vehicule-fort: 0 14px 32px rgba(0, 0, 0, 0.12);
+  --ombre-bleu: 0 6px 16px rgba(37, 72, 147, 1);
+  --ombre-bleu-fort: 0 8px 22px rgba(37, 72, 147, 0.4);
 }
 
 @layer base {
@@ -97,7 +155,7 @@
 @media (min-width: 1024px) { .site h1 { font-size: 52px; } }
 
 /* Titre principal du hero (photo plein cadre) */
-.site h1.titre-hero { font-size: 40px; color: #fff; }
+.site h1.titre-hero { font-size: 40px; color: var(--inverse); }
 @media (min-width: 768px) { .site h1.titre-hero { font-size: 56px; } }
 @media (min-width: 1024px) { .site h1.titre-hero { font-size: 66px; } }
 
@@ -109,7 +167,7 @@
 .site .sur-sombre h1,
 .site .sur-sombre h2,
 .site .sur-sombre .titre-display {
-  color: #fff;
+  color: var(--inverse);
 }
 
 @layer components {
@@ -143,17 +201,17 @@
 
   /* Carte claire standard */
   .carte {
-    @apply bg-white rounded-2xl border border-bordure shadow-carte;
+    @apply bg-surface rounded-carte border border-bordure shadow-carte;
   }
 
   /* Pastille numérotée des étapes (noir et or) */
   .pastille-etape {
-    @apply flex-shrink-0 rounded-full bg-noir-profond text-white border border-or flex items-center justify-center font-display font-semibold;
+    @apply flex-shrink-0 rounded-full bg-noir-profond text-inverse border border-or flex items-center justify-center font-display font-semibold;
   }
 
   /* Lien texte bleu */
   .lien {
-    @apply text-bleu font-semibold underline-offset-4 decoration-2 hover:underline transition-colors duration-150;
+    @apply text-lien font-semibold underline-offset-4 decoration-2 hover:underline transition-colors duration-150;
   }
 }
 
@@ -199,7 +257,7 @@ input[type="range"].range-slider::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--bleu);
   cursor: pointer;
-  border: 3px solid #fff;
+  border: 3px solid var(--surface);
   box-shadow: 0 0 0 1px var(--or), 0 2px 6px rgba(0, 0, 0, 0.3);
   transition: background 0.18s ease, transform 0.18s ease;
 }
@@ -216,7 +274,7 @@ input[type="range"].range-slider::-moz-range-thumb {
   border-radius: 50%;
   background: var(--bleu);
   cursor: pointer;
-  border: 3px solid #fff;
+  border: 3px solid var(--surface);
   box-shadow: 0 0 0 1px var(--or), 0 2px 6px rgba(0, 0, 0, 0.3);
   transition: background 0.18s ease, transform 0.18s ease;
 }
@@ -251,5 +309,5 @@ input[type="range"].range-slider::-moz-range-thumb:hover {
 .sur-sombre .filet-apres::after,
 .sur-sombre .filet-avant::before,
 .sur-sombre .filet-or {
-  background: linear-gradient(90deg, #6E5418, #B8902F 55%, #D9B965);
+  background: var(--degrade-or-sombre);
 }

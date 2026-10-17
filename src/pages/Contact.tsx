@@ -156,7 +156,7 @@ export function Contact() {
               </h2>
 
               {/* Carte de visite du responsable commercial */}
-              <div className="sur-sombre relative overflow-hidden rounded-2xl bg-noir-profond text-white shadow-vehicule mb-6">
+              <div className="sur-sombre relative overflow-hidden rounded-2xl bg-noir-profond text-inverse shadow-vehicule mb-6">
                 <div className="liseret-or" aria-hidden="true" />
                 <div className="flex flex-col sm:flex-row sm:items-center gap-5 p-5 md:p-6">
                   <div className="flex items-center gap-4 sm:block flex-shrink-0">
@@ -176,7 +176,7 @@ export function Contact() {
                     </div>
                   </div>
 
-                  <div className="flex-1 min-w-0 sm:border-l sm:border-white/15 sm:pl-5">
+                  <div className="flex-1 min-w-0 sm:border-l sm:border-inverse/15 sm:pl-5">
                     <div className="hidden sm:block mb-3">
                       <p className="titre-display text-[26px] leading-none">{responsable.prenom}</p>
                       <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-or-clair">
@@ -186,14 +186,14 @@ export function Contact() {
                     <div className="space-y-1">
                       <a
                         href={lienTelephone(c.telephone)}
-                        className="flex items-center gap-2.5 rounded-lg py-1.5 text-[#E8E8E8] hover:text-white transition-colors duration-180"
+                        className="flex items-center gap-2.5 rounded-lg py-1.5 text-inverse-91 hover:text-inverse transition-colors duration-180"
                       >
                         <Phone className="w-[18px] h-[18px] text-or-clair flex-shrink-0" strokeWidth={1.8} aria-hidden="true" />
                         <span className="font-medium">{c.telephone}</span>
                       </a>
                       <a
                         href={`mailto:${c.email}`}
-                        className="flex items-center gap-2.5 rounded-lg py-1.5 text-[#E8E8E8] hover:text-white transition-colors duration-180 break-all"
+                        className="flex items-center gap-2.5 rounded-lg py-1.5 text-inverse-91 hover:text-inverse transition-colors duration-180 break-all"
                       >
                         <Mail className="w-[18px] h-[18px] text-or-clair flex-shrink-0" strokeWidth={1.8} aria-hidden="true" />
                         <span>{c.email}</span>
@@ -243,25 +243,25 @@ export function Contact() {
                       href={lienMaps(c)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-start gap-3 p-4 bg-white rounded-lg hover:shadow-md transition-all border border-bordure hover:border-brand group"
+                      className="flex items-start gap-3 p-4 bg-surface rounded-lg hover:shadow-md transition-all border border-bordure hover:border-lien group"
                     >
                       <MapPin
                         className="w-5 h-5 text-or-texte flex-shrink-0 mt-0.5 group-hover:scale-110 transition-transform"
                         aria-hidden="true"
                       />
                       <div className="flex-1">
-                        <div className="font-semibold text-noir mb-1 group-hover:text-bleu transition-colors duration-180">
+                        <div className="font-semibold text-noir mb-1 group-hover:text-lien transition-colors duration-180">
                           {showroom.nom}
                         </div>
                         <div className="text-sm text-gris mb-1">
                           {adresseComplete(c)}
                         </div>
                         {showroom.note && (
-                          <div className="text-xs text-[#666666] italic">
+                          <div className="text-xs text-doux-64 italic">
                             ({showroom.note})
                           </div>
                         )}
-                        <div className="text-xs text-brand font-medium mt-2 flex items-center gap-1">
+                        <div className="text-xs text-lien font-medium mt-2 flex items-center gap-1">
                           <span>Voir sur Google Maps</span>
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -272,7 +272,7 @@ export function Contact() {
                   ))}
                 </div>
 
-                <div className="bg-white p-4 rounded-lg border border-bordure">
+                <div className="bg-surface p-4 rounded-lg border border-bordure">
                   <div className="flex items-start gap-3 mb-2">
                     <Clock
                       className="w-5 h-5 text-or-texte flex-shrink-0 mt-0.5"
@@ -284,7 +284,7 @@ export function Contact() {
                     {lignesHoraires(c.horaires).map((l) => <div key={l}>{l}</div>)}
                   </div>
                   {c.horaires_note && (
-                    <div className="pl-8 text-xs text-[#666666] mt-3 italic">
+                    <div className="pl-8 text-xs text-doux-64 mt-3 italic">
                       {c.horaires_note}
                     </div>
                   )}
@@ -307,7 +307,7 @@ export function Contact() {
                   </p>
                 </div>
               ) : (
-                <form
+                <form data-zone="formulaires"
                   onSubmit={handleSubmit}
                   className="space-y-6 bg-fond p-8 rounded-xl"
                 >
@@ -369,7 +369,7 @@ export function Contact() {
                       required
                       checked={formData.consent}
                       onChange={handleChange}
-                      className="mt-1 w-4 h-4 text-brand focus:ring-bleu/30 rounded"
+                      className="mt-1 w-4 h-4 text-lien focus:ring-lien/30 rounded"
                     />
                     <label
                       htmlFor="consent"
@@ -380,12 +380,12 @@ export function Contact() {
                       conformément à la{' '}
                       <a
                         href="/politique-confidentialite"
-                        className="text-bleu underline underline-offset-2 hover:decoration-2"
+                        className="text-lien underline underline-offset-2 hover:decoration-2"
                       >
                         politique de confidentialité
                       </a>
                       .{' '}
-                      <span className="text-brand">
+                      <span className="text-lien">
                         *
                       </span>
                     </label>
@@ -399,7 +399,7 @@ export function Contact() {
 
                   {/* Indicateur visuel pendant l'envoi des pièces jointes */}
                   {uploadingFiles && (
-                    <div className="text-sm text-gris bg-white/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
+                    <div className="text-sm text-gris bg-surface/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
                       Téléversement des documents...
                     </div>
                   )}

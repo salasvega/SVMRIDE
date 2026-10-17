@@ -48,7 +48,7 @@ export function ChoixSource({
     ref.current?.click();
   };
 
-  const bouton = `inline-flex items-center justify-center gap-2 rounded-lg border border-champ bg-white font-medium text-noir transition-colors hover:border-bleu hover:text-bleu disabled:opacity-50 ${
+  const bouton = `inline-flex items-center justify-center gap-2 rounded-lg border border-champ bg-surface font-medium text-noir transition-colors hover:border-lien hover:text-lien disabled:opacity-50 ${
     taille === 'petite' ? 'px-3 py-1.5 text-sm' : 'px-4 py-2.5 text-sm'
   }`;
 

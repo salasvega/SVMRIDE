@@ -65,8 +65,9 @@ export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = t
 
   const content = (
     <article
+      data-zone="cartes"
       {...(glissementPhotos ? glisse.ecouteurs : {})}
-      className={`bg-white rounded-[18px] overflow-hidden shadow-vehicule transition-[box-shadow,transform] duration-200 ease-out hover:shadow-vehicule-fort hover:-translate-y-1 group relative h-full flex flex-col ${hasMultipleImages && glissementPhotos ? 'touch-pan-y' : ''}`}
+      className={`bg-surface rounded-carte-moto overflow-hidden shadow-vehicule transition-[box-shadow,transform] duration-200 ease-out hover:shadow-vehicule-fort hover:-translate-y-1 group relative h-full flex flex-col ${hasMultipleImages && glissementPhotos ? 'touch-pan-y' : ''}`}
     >
       {/* Photos : glisser au doigt (ou à la souris) en plus des flèches */}
       <div ref={glisse.zoneRef} className="relative aspect-[4/3] overflow-hidden bg-fond">
@@ -84,7 +85,7 @@ export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = t
           <>
             <button
               onClick={handlePrevImage}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-white p-2 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-inverse p-2 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
               aria-label="Image précédente"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -92,7 +93,7 @@ export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = t
 
             <button
               onClick={handleNextImage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-white p-2 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-noir-profond/55 hover:bg-noir-profond/80 backdrop-blur-sm text-inverse p-2 rounded-full transition-[opacity,background-color] duration-180 opacity-100 md:opacity-0 md:group-hover:opacity-100 focus-visible:opacity-100 z-10"
               aria-label="Image suivante"
             >
               <ChevronRight className="w-5 h-5" />
@@ -120,13 +121,13 @@ export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = t
         )}
 
         {statusInfo.label && (
-          <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-noir-profond text-white border border-or px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-[0_2px_8px_rgba(0,0,0,0.25)] z-10">
+          <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-noir-profond text-inverse border border-or px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-[0_2px_8px_rgba(0,0,0,0.25)] z-10">
             <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} aria-hidden="true" />
             {statusInfo.label}
           </div>
         )}
 
-        <div className="absolute top-3 right-3 bg-white border-[1.5px] border-or px-3 py-1 rounded-full text-sm font-bold text-noir shadow-[0_2px_8px_rgba(0,0,0,0.15)] z-10">
+        <div className="absolute top-3 right-3 bg-surface border-[1.5px] border-or px-3 py-1 rounded-full text-sm font-bold text-noir shadow-[0_2px_8px_rgba(0,0,0,0.15)] z-10">
           {formatPrice(vehicle.price)}
         </div>
       </div>

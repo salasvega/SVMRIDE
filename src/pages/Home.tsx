@@ -16,7 +16,7 @@ export function Home() {
     <>
       <SEOHead meta={pageSeo['/']} />
 
-      <Section background="dark" className="relative !py-0 overflow-hidden">
+      <Section zone="hero" background="dark" className="relative !py-0 overflow-hidden">
         {/* Mobile et tablette : cadrage sur les motos. Ordinateur : photo large
             avec le panneau SVM RIDE, rognée sous les roues et calée en bas à gauche. */}
         <div
@@ -26,7 +26,7 @@ export function Home() {
         {/* Voile sombre pour la lisibilité du titre ; sur ordinateur, allégé en
             haut pour laisser ressortir le panneau SVM RIDE (bas inchangé). */}
         <div
-          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(14,14,16,.35),rgba(14,14,16,.88))] lg:bg-[linear-gradient(180deg,rgba(14,14,16,.08)_0%,rgba(14,14,16,.30)_38%,rgba(14,14,16,.88)_100%)]"
+          className="absolute inset-0 bg-[linear-gradient(180deg,rgb(var(--noir-profond-rgb)/.35),rgb(var(--noir-profond-rgb)/.88))] lg:bg-[linear-gradient(180deg,rgb(var(--noir-profond-rgb)/.08)_0%,rgb(var(--noir-profond-rgb)/.30)_38%,rgb(var(--noir-profond-rgb)/.88)_100%)]"
           aria-hidden="true"
         />
         <Container className="relative z-10 flex flex-col justify-end min-h-[440px] md:min-h-[520px] lg:min-h-[clamp(420px,26vw,540px)] py-14 md:py-20 lg:py-12">
@@ -35,7 +35,7 @@ export function Home() {
             <h1 className="titre-hero mb-4 md:mb-5 drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
               Bienvenue chez SVM Ride
             </h1>
-            <p className="text-[17px] md:text-xl text-[#E8E8E8] mb-8 leading-relaxed">
+            <p className="text-[17px] md:text-xl text-inverse-91 mb-8 leading-relaxed">
               Votre spécialiste du deux-roues basé en Île-de-France.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
@@ -112,13 +112,13 @@ export function Home() {
               <h2 className="titre-section filet-avant mb-5">
                 Reprise de votre véhicule
               </h2>
-              <p className="text-base md:text-lg text-[#D6D6D6] mb-8 leading-relaxed">
+              <p className="text-base md:text-lg text-inverse-84 mb-8 leading-relaxed">
                 Faites reprendre votre deux-roues rapidement et au meilleur prix. Notre équipe vous propose une expertise rapide, une offre attractive, un virement immédiat et des démarches simplifiées.
               </p>
               <Link to="/reprises" tabIndex={-1}>
                 <Button>Demande de reprise</Button>
               </Link>
-              <p className="mt-6 text-sm text-[#D6D6D6]">
+              <p className="mt-6 text-sm text-inverse-84">
                 Vous préférez vendre au meilleur prix ?{' '}
                 <Link to="/vendre-ma-moto" className="text-or-clair underline underline-offset-4 hover:decoration-2">
                   Confiez-nous votre moto en dépôt-vente
@@ -126,25 +126,25 @@ export function Home() {
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 md:p-6">
+              <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
                 <IconeOr icon={Clock} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-white mb-1.5 text-[15px] md:text-base">Expertise rapide</h3>
-                <p className="text-sm text-[#BDBDBD]">Évaluation en moins de 24h</p>
+                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">Expertise rapide</h3>
+                <p className="text-sm text-inverse-74">Évaluation en moins de 24h</p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 md:p-6">
+              <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
                 <IconeOr icon={Award} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-white mb-1.5 text-[15px] md:text-base">Offre attractive</h3>
-                <p className="text-sm text-[#BDBDBD]">Prix juste et compétitif</p>
+                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">Offre attractive</h3>
+                <p className="text-sm text-inverse-74">Prix juste et compétitif</p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 md:p-6">
+              <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
                 <IconeOr icon={CheckCircle} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-white mb-1.5 text-[15px] md:text-base">Virement immédiat</h3>
-                <p className="text-sm text-[#BDBDBD]">Paiement sécurisé rapide</p>
+                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">Virement immédiat</h3>
+                <p className="text-sm text-inverse-74">Paiement sécurisé rapide</p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 md:p-6">
+              <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
                 <IconeOr icon={Shield} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-white mb-1.5 text-[15px] md:text-base">Sans contrainte</h3>
-                <p className="text-sm text-[#BDBDBD]">Démarches simplifiées</p>
+                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">Sans contrainte</h3>
+                <p className="text-sm text-inverse-74">Démarches simplifiées</p>
               </div>
             </div>
           </div>
@@ -197,7 +197,7 @@ export function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-white rounded-full mb-5 border border-or/50 shadow-carte">
+              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
                 <IconeOr icon={Star} className="w-8 h-8" />
               </div>
               <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">Expertise & Passion</h3>
@@ -207,7 +207,7 @@ export function Home() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-white rounded-full mb-5 border border-or/50 shadow-carte">
+              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
                 <IconeOr icon={Shield} className="w-8 h-8" />
               </div>
               <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">Qualité & Fiabilité</h3>
@@ -217,7 +217,7 @@ export function Home() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-white rounded-full mb-5 border border-or/50 shadow-carte">
+              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
                 <IconeOr icon={Users} className="w-8 h-8" />
               </div>
               <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">Satisfaction Client</h3>
@@ -236,7 +236,7 @@ export function Home() {
       <Section background="dark">
         <Container className="text-center">
           <h2 className="titre-section filet-avant mb-5">Prêt à trouver votre deux-roues ?</h2>
-          <p className="text-base md:text-xl text-[#D6D6D6] mb-8 max-w-2xl mx-auto">
+          <p className="text-base md:text-xl text-inverse-84 mb-8 max-w-2xl mx-auto">
             Contactez-nous dès maintenant pour discuter de votre projet ou visiter notre showroom.
           </p>
           <Link to="/contact" tabIndex={-1}>

@@ -204,13 +204,13 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number,
         e-mail de votre contrat : nous vous envoyons un code, sans mot de passe.
       </p>
       {etape === 'email' ? (
-        <form onSubmit={demander} className="carte p-5 md:p-6 space-y-4">
+        <form data-zone="formulaires" onSubmit={demander} className="carte p-5 md:p-6 space-y-4">
           <Input label="Votre e-mail" type="email" name="email" autoComplete="email" required maxLength={254} value={email} onChange={(e) => setEmail(e.target.value)} />
           <Button type="submit" size="lg" disabled={envoi || !email} fullWidth>{envoi ? 'Envoi…' : 'Recevoir mon code'}</Button>
           {erreur && <p role="alert" className="text-sm text-red-700">{erreur}</p>}
         </form>
       ) : (
-        <form onSubmit={connecter} className="carte p-5 md:p-6 space-y-4">
+        <form data-zone="formulaires" onSubmit={connecter} className="carte p-5 md:p-6 space-y-4">
           <p className="text-sm text-noir" role="status">{info}</p>
           <div>
             <label htmlFor="code-suivi" className="block text-sm font-medium text-noir mb-2">Code reçu par e-mail</label>
@@ -222,12 +222,12 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number,
               maxLength={6}
               value={code}
               onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-              className="w-full px-4 py-3 bg-white text-noir border-[1.5px] border-champ rounded-xl text-2xl tracking-[0.4em] tabular-nums focus:outline-none focus:border-bleu focus:ring-4 focus:ring-bleu/15"
+              className="w-full px-4 py-3 bg-surface text-noir border-[1.5px] border-champ rounded-xl text-2xl tracking-[0.4em] tabular-nums focus:outline-none focus:border-lien focus:ring-4 focus:ring-lien/15"
             />
             <p className="text-xs text-gris mt-1">Valable 10 minutes. Pensez à vos courriers indésirables.</p>
           </div>
           <label className="flex items-start gap-3 text-sm text-noir">
-            <input type="checkbox" checked={rester} onChange={(e) => setRester(e.target.checked)} className="mt-0.5 w-5 h-5 flex-shrink-0 accent-[#254893]" />
+            <input type="checkbox" checked={rester} onChange={(e) => setRester(e.target.checked)} className="mt-0.5 w-5 h-5 flex-shrink-0 accent-bleu" />
             <span>
               Rester connecté sur cet appareil pendant 30 jours
               <span className="block text-xs text-gris">Décochez si vous utilisez un ordinateur partagé.</span>
@@ -278,7 +278,7 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
           <h2 id={`t-${d.id}`} className="text-xl font-semibold text-noir">
             {d.marque} {d.modele}{d.version ? ` ${d.version}` : ''}{d.annee ? ` · ${d.annee}` : ''}
           </h2>
-          <p className="mt-1 inline-flex px-2.5 py-1 rounded-full bg-bleu/10 text-bleu text-xs font-semibold">{MANDAT_PROPRIETAIRE[d.statut_mandat]}</p>
+          <p className="mt-1 inline-flex px-2.5 py-1 rounded-full bg-lien/10 text-lien text-xs font-semibold">{MANDAT_PROPRIETAIRE[d.statut_mandat]}</p>
           <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
             <div><dt className="text-gris">Prix affiché</dt><dd className="text-noir font-semibold">{euros(d.prix_affiche)}</dd></div>
             <div><dt className="text-gris">Vous percevez</dt><dd className="text-noir font-semibold">{euros(d.net_vendeur)}</dd></div>
@@ -310,7 +310,7 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
             {liste.map((e, i) => (
               <li key={e.libelle} aria-current={i === derniere ? 'step' : undefined}
                 className={`rounded-xl border px-2 py-2 text-xs text-center ${
-                  e.fait ? (i === derniere ? 'bg-bleu text-white border-bleu font-semibold' : 'bg-green-50 border-green-200 text-green-900') : 'bg-white border-bordure text-gris'
+                  e.fait ? (i === derniere ? 'bg-bleu text-sur-bouton border-bleu font-semibold' : 'bg-green-50 border-green-200 text-green-900') : 'bg-surface border-bordure text-gris'
                 }`}>
                 {e.fait && i !== derniere && <Check className="w-3.5 h-3.5 mx-auto mb-0.5" aria-hidden="true" />}
                 {e.libelle}
@@ -348,7 +348,7 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
             <ul className="space-y-2">
               {d.documents.map((doc) => (
                 <li key={doc.chemin}>
-                  <button type="button" onClick={() => telecharger(doc.chemin)} className="inline-flex items-center gap-2 text-sm text-bleu hover:underline text-left">
+                  <button type="button" onClick={() => telecharger(doc.chemin)} className="inline-flex items-center gap-2 text-sm text-lien hover:underline text-left">
                     <Download className="w-4 h-4 flex-shrink-0" aria-hidden="true" /> {doc.nom}
                   </button>
                 </li>
@@ -407,13 +407,13 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
       <div className="flex flex-wrap gap-2" role="group" aria-label="Type de demande">
         {types.map((t) => (
           <button key={t} type="button" onClick={() => { setType(t === type ? null : t); setRetour({ texte: '' }); }} aria-pressed={type === t}
-            className={`px-3 py-2 rounded-xl text-sm font-medium border-[1.5px] ${type === t ? 'bg-noir text-white border-noir' : 'bg-white border-champ text-noir hover:border-noir'}`}>
+            className={`px-3 py-2 rounded-xl text-sm font-medium border-[1.5px] ${type === t ? 'bg-noir text-inverse border-noir' : 'bg-surface border-champ text-noir hover:border-noir'}`}>
             {DEMANDES_PROPRIETAIRE[t]}
           </button>
         ))}
       </div>
       {type && (
-        <form onSubmit={envoyer} className="mt-4 space-y-3">
+        <form data-zone="formulaires" onSubmit={envoyer} className="mt-4 space-y-3">
           <p className="text-sm text-gris">{textes[type]}</p>
           <Textarea
             label={messageRequis ? 'Votre message' : 'Message (facultatif)'}

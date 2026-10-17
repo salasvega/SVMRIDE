@@ -55,7 +55,7 @@ export function Sitemap() {
                     <li key={linkIndex}>
                       <Link
                         to={link.href}
-                        className="text-lg text-brand hover:underline flex items-center gap-2"
+                        className="text-lg text-lien hover:underline flex items-center gap-2"
                       >
                         <span className="w-1.5 h-1.5 bg-or rounded-full" aria-hidden="true"></span>
                         {link.label}

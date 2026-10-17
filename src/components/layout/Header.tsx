@@ -34,7 +34,7 @@ export function Header() {
     <>
     <FondMenu ouvert={mobileMenuOpen} onFermer={() => setMobileMenuOpen(false)} />
     {/* Figé en haut de l'écran, sur ordinateur comme sur téléphone (le menu ouvert se ferme si la page défile) */}
-    <header className="sticky top-0 z-50 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
+    <header data-zone="header" className="sticky top-0 z-50 bg-surface shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Navigation principale">
         {/* Barre du haut */}
         <div className="flex justify-between items-center h-[68px] lg:h-20">
@@ -62,9 +62,9 @@ export function Header() {
                 key={link.href}
                 to={link.href}
                 aria-current={isActive(link.href) ? 'page' : undefined}
-                className={`relative py-2 text-sm font-medium whitespace-nowrap transition-colors duration-180 hover:text-bleu after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-[2px] after:rounded-full after:bg-degrade-or after:transition-opacity after:duration-180 ${
+                className={`relative py-2 text-sm font-medium whitespace-nowrap transition-colors duration-180 hover:text-lien after:absolute after:left-0 after:right-0 after:-bottom-0.5 after:h-[2px] after:rounded-full after:bg-degrade-or after:transition-opacity after:duration-180 ${
                   isActive(link.href)
-                    ? 'text-bleu after:opacity-100'
+                    ? 'text-lien after:opacity-100'
                     : 'text-gris after:opacity-0'
                 }`}
               >
@@ -96,7 +96,7 @@ export function Header() {
         {/* Menu mobile déroulant, posé par-dessus la page sous la barre figée */}
         <div
           className={`
-            xl:hidden absolute inset-x-0 top-full bg-white px-4 sm:px-6 lg:px-8 border-t border-bordure
+            xl:hidden absolute inset-x-0 top-full bg-surface px-4 sm:px-6 lg:px-8 border-t border-bordure
             shadow-[0_12px_24px_rgba(17,17,17,0.08)] transition-all duration-300 ease-out
             ${mobileMenuOpen
               ? 'max-h-[calc(100dvh-5.5rem)] overflow-y-auto overscroll-contain opacity-100 translate-y-0 pointer-events-auto pt-3 pb-6'
@@ -112,7 +112,7 @@ export function Header() {
                 aria-current={isActive(link.href) ? 'page' : undefined}
                 className={`px-4 py-3 text-base rounded-r-xl border-l-[3px] transition-all duration-300 ease-out ${
                   isActive(link.href)
-                    ? 'bg-fond text-bleu font-bold border-or'
+                    ? 'bg-fond text-lien font-bold border-or'
                     : 'text-noir font-medium border-transparent hover:bg-fond'
                 } ${
                   mobileMenuOpen

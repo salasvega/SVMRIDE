@@ -240,7 +240,7 @@ export function FileUpload({
         <button
           type="button"
           onClick={() => openLightbox(doc.previewUrl)}
-          className="w-10 h-10 rounded-md overflow-hidden border border-bordure flex-shrink-0 focus:ring-2 focus:ring-bleu/30"
+          className="w-10 h-10 rounded-md overflow-hidden border border-bordure flex-shrink-0 focus:ring-2 focus:ring-lien/30"
           title="Aperçu"
         >
           <img
@@ -253,7 +253,7 @@ export function FileUpload({
     }
 
     return (
-      <div className="bg-fond text-[#666666] rounded-md p-2 flex items-center justify-center w-10 h-10 flex-shrink-0">
+      <div className="bg-fond text-doux-64 rounded-md p-2 flex items-center justify-center w-10 h-10 flex-shrink-0">
         <FileText className="w-5 h-5" />
       </div>
     );
@@ -277,7 +277,7 @@ export function FileUpload({
           className={`cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
             dragOver
               ? 'border-brand bg-brand/5'
-              : 'border-champ bg-white hover:border-brand hover:bg-brand/5'
+              : 'border-champ bg-surface hover:border-lien hover:bg-lien/5'
           }`}
           onClick={handleClickBrowse}
           onDragOver={handleDragOver}
@@ -295,18 +295,18 @@ export function FileUpload({
           />
 
           <div className="flex flex-col items-center justify-center text-gris">
-            <UploadIcon className="w-8 h-8 text-[#6B6B6B] mb-2 pointer-events-none" />
+            <UploadIcon className="w-8 h-8 text-doux-62 mb-2 pointer-events-none" />
 
             <p className={`text-sm leading-snug text-center ${SOURIS_SEULEMENT}`}>
               Glissez-déposez vos {elements}
               <br />
-              <span className="text-[#666666]">
+              <span className="text-doux-64">
                 ou cliquez pour parcourir
               </span>
             </p>
             <ChoixSource onFichiers={addFiles} accept={accept} className="mt-1" />
 
-            <p className="text-[11px] text-[#6B6B6B] mt-2 leading-snug">
+            <p className="text-[11px] text-doux-62 mt-2 leading-snug">
               {value.length}/{maxFiles} fichier(s) ajouté(s)
               <br />
               Max {maxSizeMB} Mo / fichier
@@ -320,7 +320,7 @@ export function FileUpload({
             {value.map((doc, index) => (
               <li
                 key={index}
-                className="flex items-start justify-between bg-white border border-bordure rounded-lg p-3 text-sm"
+                className="flex items-start justify-between bg-surface border border-bordure rounded-lg p-3 text-sm"
               >
                 <div className="flex items-start gap-3">
                   {/* vignette (image cliquable pour aperçu / icône sinon) */}
@@ -333,12 +333,12 @@ export function FileUpload({
                     </div>
 
                     {/* taille du fichier */}
-                    <div className="text-[11px] text-[#666666]">
+                    <div className="text-[11px] text-doux-64">
                       {(doc.file.size / (1024 * 1024)).toFixed(2)} Mo
                     </div>
 
                     {/* type court */}
-                    <div className="text-[11px] text-[#6B6B6B] uppercase">
+                    <div className="text-[11px] text-doux-62 uppercase">
                       {getShortType(doc.file)}
                     </div>
 
@@ -357,7 +357,7 @@ export function FileUpload({
                 {/* bouton supprimer */}
                 <button
                   type="button"
-                  className="text-[#6B6B6B] hover:text-brand ml-4"
+                  className="text-doux-62 hover:text-lien ml-4"
                   onClick={() => removeFile(index)}
                   aria-label={`Supprimer ${doc.file.name}`}
                 >
@@ -375,7 +375,7 @@ export function FileUpload({
           </div>
         )}
 
-        {aide && <p className="text-[11px] text-[#6B6B6B] leading-snug">{aide}</p>}
+        {aide && <p className="text-[11px] text-doux-62 leading-snug">{aide}</p>}
       </div>
 
       {/* Lightbox plein écran pour prévisualiser une image */}
@@ -393,7 +393,7 @@ export function FileUpload({
             {/* bouton fermer */}
             <button
               type="button"
-              className="absolute -top-4 -right-4 bg-white text-noir rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
+              className="absolute -top-4 -right-4 bg-surface text-noir rounded-full shadow-lg p-2 hover:bg-noir hover:text-inverse transition-colors"
               onClick={closeLightbox}
               aria-label="Fermer l’aperçu"
             >
@@ -403,7 +403,7 @@ export function FileUpload({
             <img
               src={previewImageUrl}
               alt="Aperçu du fichier"
-              className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-2xl object-contain bg-[#111111]"
+              className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-2xl object-contain bg-noir"
             />
           </div>
         </div>

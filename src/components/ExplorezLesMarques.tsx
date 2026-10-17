@@ -274,7 +274,7 @@ export function ExplorezLesMarques() {
       draggable={false}
       className="group/marque block rounded-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-bleu-vif/60 select-none"
     >
-      <span className="flex h-[92px] md:h-[100px] flex-col items-center justify-center rounded-2xl border border-bordure bg-white px-4 shadow-carte transition-[transform,box-shadow,border-color] duration-200 group-hover/marque:-translate-y-1 group-hover/marque:border-or/60 group-hover/marque:shadow-vehicule group-focus-visible/marque:border-or/60 motion-reduce:transition-none motion-reduce:group-hover/marque:translate-y-0">
+      <span className="flex h-[92px] md:h-[100px] flex-col items-center justify-center rounded-2xl border border-bordure bg-surface px-4 shadow-carte transition-[transform,box-shadow,border-color] duration-200 group-hover/marque:-translate-y-1 group-hover/marque:border-or/60 group-hover/marque:shadow-vehicule group-focus-visible/marque:border-or/60 motion-reduce:transition-none motion-reduce:group-hover/marque:translate-y-0">
         {el.logo ? (
           <img src={el.logo} alt={el.nom} className="max-h-10 max-w-[120px] object-contain" loading="lazy" draggable={false} />
         ) : (
@@ -285,7 +285,7 @@ export function ExplorezLesMarques() {
       </span>
       <span className="flex h-8 items-end justify-center">
         {el.enStock && (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-or bg-noir-profond px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-white">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-or bg-noir-profond px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-inverse">
             <span className="h-1.5 w-1.5 rounded-full bg-or-clair" aria-hidden="true" />
             En stock
           </span>
@@ -309,7 +309,7 @@ export function ExplorezLesMarques() {
   };
 
   return (
-    <Section background="gray" className="!py-12 md:!py-16 overflow-clip">
+    <Section zone="marques" background="gray" className="!py-12 md:!py-16 overflow-clip">
       <Container>
         <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">

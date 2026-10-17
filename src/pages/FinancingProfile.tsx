@@ -417,7 +417,7 @@ export function FinancingProfile() {
                     role="tab"
                     aria-selected={!creation}
                     onClick={() => { setModeAcces('code'); setErreurAcces(''); }}
-                    className={`py-2.5 rounded-lg text-sm font-semibold transition-colors duration-180 ${!creation ? 'bg-white text-noir shadow-carte' : 'text-gris hover:text-noir'}`}
+                    className={`py-2.5 rounded-lg text-sm font-semibold transition-colors duration-180 ${!creation ? 'bg-surface text-noir shadow-carte' : 'text-gris hover:text-noir'}`}
                   >
                     J'ai déjà un dossier
                   </button>
@@ -426,7 +426,7 @@ export function FinancingProfile() {
                     role="tab"
                     aria-selected={creation}
                     onClick={() => { setModeAcces('creation'); setErreurAcces(''); }}
-                    className={`py-2.5 rounded-lg text-sm font-semibold transition-colors duration-180 ${creation ? 'bg-white text-noir shadow-carte' : 'text-gris hover:text-noir'}`}
+                    className={`py-2.5 rounded-lg text-sm font-semibold transition-colors duration-180 ${creation ? 'bg-surface text-noir shadow-carte' : 'text-gris hover:text-noir'}`}
                   >
                     Nouveau dossier
                   </button>
@@ -438,7 +438,7 @@ export function FinancingProfile() {
                     : "Saisissez l'adresse e-mail de votre dossier et le code d'accès qui vous a été donné à sa création."}
                 </p>
 
-                <form onSubmit={handleEmailSubmit} className="space-y-4" noValidate>
+                <form data-zone="formulaires" onSubmit={handleEmailSubmit} className="space-y-4" noValidate>
                   <Input
                     label="Adresse e-mail"
                     type="email"
@@ -483,9 +483,9 @@ export function FinancingProfile() {
                 </form>
 
                 {!creation && (
-                  <p className="mt-6 text-xs text-[#5E5E5E]">
+                  <p className="mt-6 text-xs text-doux-68">
                     Code perdu ? Appelez-nous au{' '}
-                    <a href={lienTelephone(c.telephone)} className="text-bleu underline underline-offset-2">{c.telephone}</a>{' '}
+                    <a href={lienTelephone(c.telephone)} className="text-lien underline underline-offset-2">{c.telephone}</a>{' '}
                     : nous vous en donnerons un nouveau après vérification.
                   </p>
                 )}
@@ -560,7 +560,7 @@ export function FinancingProfile() {
       <Section className="py-8 bg-fond">
         <Container>
           <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-md p-8">
+            <div className="bg-surface rounded-lg shadow-md p-8">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h1 className="text-3xl font-bold text-noir">Mon Dossier Financement</h1>
@@ -580,7 +580,7 @@ export function FinancingProfile() {
               </div>
 
               {codeCree && (
-                <div role="status" className="mb-8 rounded-2xl border border-or bg-[#FBF7EE] p-5">
+                <div role="status" className="mb-8 rounded-2xl border border-or bg-or-voile-leger p-5">
                   <div className="flex items-start gap-3">
                     <KeyRound className="w-6 h-6 text-or-texte flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="min-w-0">
@@ -589,7 +589,7 @@ export function FinancingProfile() {
                         Notez-le précieusement : il vous sera demandé pour revenir sur votre dossier. Pour votre sécurité, il ne sera plus affiché.
                       </p>
                       <div className="flex flex-wrap items-center gap-3 mt-3">
-                        <span className="font-mono text-2xl font-bold tracking-[0.2em] text-noir bg-white border border-bordure rounded-lg px-4 py-2 select-all">
+                        <span className="font-mono text-2xl font-bold tracking-[0.2em] text-noir bg-surface border border-bordure rounded-lg px-4 py-2 select-all">
                           {codeCree}
                         </span>
                         <Button type="button" size="sm" variant="secondary" onClick={copierCode}>
@@ -602,7 +602,7 @@ export function FinancingProfile() {
                 </div>
               )}
 
-              <form className="space-y-8">
+              <form data-zone="formulaires" className="space-y-8">
                 <div>
                   <h2 className="text-xl font-semibold text-noir mb-4">Informations Personnelles</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -984,7 +984,7 @@ export function FinancingProfile() {
                         disabled={submitting || !isFormValid()}
                         className={`border-2 font-semibold ${
                           !isFormValid()
-                            ? 'bg-gray-300 border-champ text-[#6B6B6B] cursor-not-allowed opacity-50'
+                            ? 'bg-gray-300 border-champ text-doux-62 cursor-not-allowed opacity-50'
                             : 'bg-green-600 hover:bg-green-700 text-white border-green-600'
                         }`}
                       >
@@ -998,7 +998,7 @@ export function FinancingProfile() {
                       type="button"
                       onClick={handleReopen}
                       variant="secondary"
-                      className="bg-bleu text-white hover:bg-bleu-hover border-2 border-bleu font-semibold"
+                      className="bg-bleu text-sur-bouton hover:bg-bleu-hover border-2 border-bleu font-semibold"
                     >
                       <Edit className="w-4 h-4 mr-2" />
                       Modifier le dossier

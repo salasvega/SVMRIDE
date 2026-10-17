@@ -143,7 +143,7 @@ export function SingleFileUpload({
         <button
           type="button"
           onClick={() => setPreviewImageUrl(previewUrl)}
-          className="w-10 h-10 rounded-md overflow-hidden border border-bordure flex-shrink-0 focus:ring-2 focus:ring-bleu/30"
+          className="w-10 h-10 rounded-md overflow-hidden border border-bordure flex-shrink-0 focus:ring-2 focus:ring-lien/30"
           title="Aperçu"
         >
           <img
@@ -156,7 +156,7 @@ export function SingleFileUpload({
     }
 
     return (
-      <div className="bg-fond text-[#666666] rounded-md p-2 flex items-center justify-center w-10 h-10 flex-shrink-0">
+      <div className="bg-fond text-doux-64 rounded-md p-2 flex items-center justify-center w-10 h-10 flex-shrink-0">
         <FileText className="w-5 h-5" />
       </div>
     );
@@ -173,7 +173,7 @@ export function SingleFileUpload({
         )}
 
         {value || previewUrl ? (
-          <div className="flex items-start justify-between bg-white border border-bordure rounded-lg p-3 text-sm">
+          <div className="flex items-start justify-between bg-surface border border-bordure rounded-lg p-3 text-sm">
             <div className="flex items-start gap-3">
               {renderPreviewThumb()}
 
@@ -183,13 +183,13 @@ export function SingleFileUpload({
                 </div>
 
                 {fileInfo && fileInfo.size > 0 && (
-                  <div className="text-[11px] text-[#666666]">
+                  <div className="text-[11px] text-doux-64">
                     {(fileInfo.size / (1024 * 1024)).toFixed(2)} Mo
                   </div>
                 )}
 
                 {fileInfo && (
-                  <div className="text-[11px] text-[#6B6B6B] uppercase">
+                  <div className="text-[11px] text-doux-62 uppercase">
                     {getShortType()}
                   </div>
                 )}
@@ -209,7 +209,7 @@ export function SingleFileUpload({
               <button
                 type="button"
                 onClick={handleDelete}
-                className="text-[#6B6B6B] hover:text-brand ml-4"
+                className="text-doux-62 hover:text-lien ml-4"
                 title="Supprimer"
               >
                 <X className="w-4 h-4" />
@@ -231,9 +231,9 @@ export function SingleFileUpload({
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={disabled}
-              className={`w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-champ rounded-lg hover:border-brand hover:bg-brand/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${SOURIS_SEULEMENT}`}
+              className={`w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-champ rounded-lg hover:border-lien hover:bg-lien/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${SOURIS_SEULEMENT}`}
             >
-              <Upload className="w-5 h-5 text-[#6B6B6B]" />
+              <Upload className="w-5 h-5 text-doux-62" />
               <span className="text-sm text-gris">
                 Cliquer pour choisir un fichier
               </span>
@@ -266,7 +266,7 @@ export function SingleFileUpload({
           >
             <button
               type="button"
-              className="absolute -top-4 -right-4 bg-white text-noir rounded-full shadow-lg p-2 hover:bg-[#111111] hover:text-white transition-colors"
+              className="absolute -top-4 -right-4 bg-surface text-noir rounded-full shadow-lg p-2 hover:bg-noir hover:text-inverse transition-colors"
               onClick={() => setPreviewImageUrl(null)}
               aria-label="Fermer l'aperçu"
             >
@@ -276,7 +276,7 @@ export function SingleFileUpload({
             <img
               src={previewImageUrl}
               alt="Aperçu du fichier"
-              className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-2xl object-contain bg-[#111111]"
+              className="max-w-[90vw] max-h-[80vh] rounded-lg shadow-2xl object-contain bg-noir"
             />
           </div>
         </div>

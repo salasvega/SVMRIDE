@@ -36,7 +36,7 @@ export function Equipe() {
       <Section background="gray" className="!pt-8 md:!pt-12 !pb-10 md:!pb-14">
         <Container>
           {masquee && admin && (
-            <p className="mb-6 flex items-start gap-2.5 rounded-xl border border-or/50 bg-[#FBF6E9] px-4 py-3 text-sm text-noir" role="note">
+            <p className="mb-6 flex items-start gap-2.5 rounded-xl border border-or/50 bg-or-voile px-4 py-3 text-sm text-noir" role="note">
               <EyeOff className="mt-0.5 h-4 w-4 shrink-0 text-or-texte" aria-hidden="true" />
               <span>
                 <strong className="font-semibold">Aperçu administrateur :</strong> l'équipe est masquée sur le site (onglet Équipe de
@@ -53,7 +53,7 @@ export function Equipe() {
       </Section>
 
       {membres === null && (
-        <Section background="white" className="!py-10 md:!py-14">
+        <Section zone="equipe" background="white" className="!py-10 md:!py-14">
           <Container>
             <div className="h-[380px] animate-pulse rounded-2xl bg-fond motion-reduce:animate-none" aria-label="Chargement de l'équipe" role="status" />
           </Container>
@@ -61,10 +61,10 @@ export function Equipe() {
       )}
 
       {responsable && (
-        <Section background="white" className="!py-10 md:!py-14">
+        <Section zone="equipe" background="white" className="!py-10 md:!py-14">
           <Container>
             <article
-              className="sur-sombre relative overflow-hidden rounded-2xl bg-noir-profond text-white shadow-vehicule"
+              className="sur-sombre relative overflow-hidden rounded-2xl bg-noir-profond text-inverse shadow-vehicule"
               aria-labelledby="equipe-responsable"
             >
               <div className="liseret-or" aria-hidden="true" />
@@ -79,17 +79,17 @@ export function Equipe() {
                   </p>
                 </div>
 
-                <div className="flex flex-col justify-center md:border-l md:border-white/15 md:pl-10">
-                  <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[#BDBDBD]">
+                <div className="flex flex-col justify-center md:border-l md:border-inverse/15 md:pl-10">
+                  <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-inverse-74">
                     Sa vision de l'accompagnement
                   </p>
-                  <div className="space-y-4 text-base md:text-[17px] leading-relaxed text-[#E0E0E0]">
+                  <div className="space-y-4 text-base md:text-[17px] leading-relaxed text-inverse-88">
                     {responsable.presentation?.map((p, i) => <p key={i}>{p}</p>)}
                   </div>
                   {responsable.citation && (
-                    <blockquote className="mt-8 flex gap-3 border-t border-white/10 pt-6">
+                    <blockquote className="mt-8 flex gap-3 border-t border-inverse/10 pt-6">
                       <Quote className="h-6 w-6 shrink-0 text-or-clair" aria-hidden="true" />
-                      <p className="titre-display text-[20px] md:text-[22px] leading-snug tracking-[0.02em] text-white">
+                      <p className="titre-display text-[20px] md:text-[22px] leading-snug tracking-[0.02em] text-inverse">
                         « {responsable.citation} »
                       </p>
                     </blockquote>
@@ -102,7 +102,7 @@ export function Equipe() {
       )}
 
       {collaborateurs.length > 0 && (
-        <Section background="white" className="!pt-0 !pb-12 md:!pb-16">
+        <Section zone="equipe" background="white" className="!pt-0 !pb-12 md:!pb-16">
           <Container>
             <h2 className="titre-section filet-apres mb-8">À vos côtés au quotidien</h2>
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
@@ -130,7 +130,7 @@ export function Equipe() {
       <Section background="dark" className="!py-12 md:!py-16">
         <Container className="text-center">
           <h2 className="titre-section filet-avant mb-5">Un projet moto ? Parlons-en</h2>
-          <p className="mx-auto mb-8 max-w-2xl text-base md:text-lg text-[#D6D6D6]">
+          <p className="mx-auto mb-8 max-w-2xl text-base md:text-lg text-inverse-84">
             Achat, reprise, dépôt-vente ou financement : l'équipe vous répond et vous accueille au showroom.
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">

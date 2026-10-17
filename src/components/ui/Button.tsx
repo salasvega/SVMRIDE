@@ -15,19 +15,19 @@ export function Button({
   children,
   ...props
 }: ButtonProps) {
-  // Rayon 12 px, bordure de 2 px sur tous les boutons pour que principal et
+  // Rayon réglable (12 px par défaut), bordure de 2 px sur tous les boutons pour que principal et
   // secondaire aient exactement la même hauteur côte à côte.
   const baseClasses =
-    'font-semibold rounded-xl border-2 transition-[background-color,border-color,box-shadow,color] duration-180 ease-out ' +
+    'font-semibold rounded-bouton border-2 transition-[background-color,border-color,box-shadow,color] duration-180 ease-out ' +
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bleu-vif ' +
     'disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none';
 
   // Secondaire : fond blanc, bordure or, texte noir (aussi utilisé sur fond sombre).
-  const secondaire = 'bg-white text-noir border-or hover:bg-fond hover:border-or-clair';
+  const secondaire = 'bg-surface text-noir border-or hover:bg-fond hover:border-or-clair';
 
   const variantClasses = {
     // Principal : un seul par écran
-    primary: 'bg-bleu text-white border-transparent shadow-bleu hover:bg-bleu-hover hover:shadow-bleu-fort',
+    primary: 'bg-bleu text-sur-bouton border-transparent shadow-bleu hover:bg-bleu-hover hover:shadow-bleu-fort',
     secondary: secondaire,
     outline: secondaire,
     light: secondaire,

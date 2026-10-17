@@ -231,7 +231,7 @@ export function CustomSearch() {
                   </p>
                 </div>
               ) : (
-                <form
+                <form data-zone="formulaires"
                   onSubmit={handleSubmit}
                   className="space-y-6 bg-fond p-8 rounded-xl lg:-mt-8"
                 >
@@ -376,7 +376,7 @@ export function CustomSearch() {
                       required
                       checked={formData.consent}
                       onChange={handleChange}
-                      className="mt-1 w-4 h-4 text-brand focus:ring-bleu/30 rounded"
+                      className="mt-1 w-4 h-4 text-lien focus:ring-lien/30 rounded"
                     />
                     <label
                       htmlFor="consent"
@@ -387,12 +387,12 @@ export function CustomSearch() {
                       la{' '}
                       <a
                         href="/politique-confidentialite"
-                        className="text-bleu underline underline-offset-2 hover:decoration-2"
+                        className="text-lien underline underline-offset-2 hover:decoration-2"
                       >
                         politique de confidentialité
                       </a>
                       .{' '}
-                      <span className="text-brand">
+                      <span className="text-lien">
                         *
                       </span>
                     </label>
@@ -406,7 +406,7 @@ export function CustomSearch() {
 
                   {/* Indicateur visuel pendant upload */}
                   {uploadingFiles && (
-                    <div className="text-sm text-gris bg-white/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
+                    <div className="text-sm text-gris bg-surface/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
                       Téléversement des documents...
                     </div>
                   )}

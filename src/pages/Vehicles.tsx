@@ -165,7 +165,7 @@ export function Vehicles() {
     <>
       <SEOHead meta={pageSeo['/vehicules']} />
 
-      <Section background="gray" className="!pt-8 md:!pt-12">
+      <Section zone="catalogue" background="gray" className="!pt-8 md:!pt-12">
         <Container>
           <h1 className="filet-apres mb-4">
             Nos Véhicules d'Occasion
@@ -183,23 +183,23 @@ export function Vehicles() {
                 aria-label="Rechercher une marque ou un modèle"
                 value={searchQuery}
                 onChange={(e) => updateSearch(e.target.value)}
-                className="w-full pl-12 pr-4 py-[15px] bg-white border-[1.5px] border-champ rounded-xl text-noir placeholder:text-[#767676] focus:border-bleu focus:outline-none focus:ring-4 focus:ring-bleu/15 transition-[border-color,box-shadow] duration-150"
+                className="w-full pl-12 pr-4 py-[15px] bg-surface border-[1.5px] border-champ rounded-xl text-noir placeholder:text-doux-58 focus:border-lien focus:outline-none focus:ring-4 focus:ring-lien/15 transition-[border-color,box-shadow] duration-150"
               />
             </div>
 
-            <div className="bg-white border-[1.5px] border-champ rounded-xl overflow-hidden">
+            <div className="bg-surface border-[1.5px] border-champ rounded-xl overflow-hidden">
               <button
                 onClick={() => setFiltersOpen(!filtersOpen)}
                 aria-expanded={filtersOpen}
                 className="w-full px-5 md:px-6 py-4 flex items-center justify-between rounded-xl hover:bg-fond transition-colors duration-180 focus-visible:outline-offset-[-2px]"
               >
                 <div className="flex items-center gap-3">
-                  <SlidersHorizontal className="w-5 h-5 text-bleu" aria-hidden="true" />
+                  <SlidersHorizontal className="w-5 h-5 text-lien" aria-hidden="true" />
                   <span className="font-semibold text-noir">
                     Filtres avancés
                   </span>
                   {activeFiltersCount > 0 && (
-                    <span className="min-w-[22px] px-2 py-0.5 bg-bleu text-white text-xs font-semibold rounded-full text-center">
+                    <span className="min-w-[22px] px-2 py-0.5 bg-bleu text-sur-bouton text-xs font-semibold rounded-full text-center">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -307,12 +307,12 @@ export function Vehicles() {
                       aria-label={`Retirer le filtre ${libelle}`}
                       className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-colors duration-180 group ${
                         key === 'brand'
-                          ? 'bg-noir-profond text-white border border-or hover:bg-noir font-semibold'
-                          : 'bg-white hover:bg-bordure border border-champ text-noir'
+                          ? 'bg-noir-profond text-inverse border border-or hover:bg-noir font-semibold'
+                          : 'bg-surface hover:bg-bordure border border-champ text-noir'
                       }`}
                     >
                       <span>{libelle}</span>
-                      <X className={`w-3.5 h-3.5 ${key === 'brand' ? 'text-or-clair' : 'text-gris group-hover:text-bleu'}`} aria-hidden="true" />
+                      <X className={`w-3.5 h-3.5 ${key === 'brand' ? 'text-or-clair' : 'text-gris group-hover:text-lien'}`} aria-hidden="true" />
                     </button>
                   );
                 })}

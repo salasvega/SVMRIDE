@@ -18,7 +18,7 @@ const MAX_APERCU = 6;
 
 export function SectionEquipe() {
   const equipe = useEquipe();
-  if (equipe === null) return <div className="min-h-[560px] bg-white" aria-hidden="true" />;
+  if (equipe === null) return <div className="min-h-[560px] bg-surface" aria-hidden="true" />;
   // Masquée depuis l'admin (onglet Équipe, « Afficher l'équipe sur le site » = Non)
   if (!equipe.affichee) return null;
   const membres = equipe.membres;
@@ -30,7 +30,7 @@ export function SectionEquipe() {
   const colonnes = apercu.length === 1 ? 'grid-cols-1' : apercu.length === 2 || apercu.length === 4 ? 'grid-cols-2' : 'grid-cols-3';
 
   return (
-    <Section background="white">
+    <Section zone="equipe" background="white">
       <Container>
         <div className="text-center mb-10 md:mb-12">
           <h2 className="titre-section filet-apres mb-5">Des passionnés à votre service</h2>
@@ -42,7 +42,7 @@ export function SectionEquipe() {
 
         <div className={`grid gap-5 md:gap-6 lg:items-stretch ${responsable && apercu.length > 0 ? 'lg:grid-cols-12' : 'max-w-3xl mx-auto'}`}>
           {responsable && (
-            <article className="sur-sombre relative overflow-hidden rounded-2xl bg-noir-profond text-white shadow-vehicule lg:col-span-5">
+            <article className="sur-sombre relative overflow-hidden rounded-2xl bg-noir-profond text-inverse shadow-vehicule lg:col-span-5">
               <div className="liseret-or" aria-hidden="true" />
               <div className="flex h-full flex-col items-center p-6 text-center sm:flex-row sm:items-start sm:gap-6 sm:text-left md:p-8 lg:flex-col lg:items-center lg:text-center">
                 <Portrait membre={responsable} taille={132} anneauOr surSombre />
@@ -52,7 +52,7 @@ export function SectionEquipe() {
                     {responsable.fonction}
                   </p>
                   {responsable.presentation?.[0] && (
-                    <p className="mt-4 text-[15px] leading-relaxed text-[#D6D6D6]">{responsable.presentation[0]}</p>
+                    <p className="mt-4 text-[15px] leading-relaxed text-inverse-84">{responsable.presentation[0]}</p>
                   )}
                 </div>
               </div>

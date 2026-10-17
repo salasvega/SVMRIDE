@@ -144,7 +144,7 @@ export function Financing() {
       <Section background="white" className="!py-8">
         <Container size="md">
           {/* Bloc simulateur */}
-          <div className="sur-sombre relative bg-noir-profond text-white p-6 md:p-12 rounded-2xl mb-12 overflow-hidden border border-or/30 shadow-vehicule">
+          <div className="sur-sombre relative bg-noir-profond text-inverse p-6 md:p-12 rounded-2xl mb-12 overflow-hidden border border-or/30 shadow-vehicule">
             <div className="absolute inset-0 opacity-20">
               <img
                 src="/simulateur-fond.webp"
@@ -180,7 +180,7 @@ export function Financing() {
                     onChange={(e) =>
                       handleSimulatorAmountChange(Number(e.target.value))
                     }
-                    className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
+                    className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
                   />
                 </div>
 
@@ -199,7 +199,7 @@ export function Financing() {
                     onChange={(e) =>
                       handleSimulatorDurationChange(Number(e.target.value))
                     }
-                    className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
+                    className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
                   />
                   
                 </div>
@@ -225,12 +225,12 @@ export function Financing() {
                         rate: Number(e.target.value),
                       }))
                     }
-                    className="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer range-slider"
+                    className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
                   />
                 </div>*/}
 
                 {/* Estimation */}
-                <div className="bg-white/[0.06] backdrop-blur-sm p-6 rounded-xl mt-8 border border-white/15">
+                <div className="bg-inverse/[0.06] backdrop-blur-sm p-6 rounded-xl mt-8 border border-inverse/15">
                   <p className="text-sm mb-2">Mensualité estimée</p>
                   <p className="font-display font-semibold text-[40px] leading-tight">{calculateMonthlyPayment()} €</p>
                   <p className="text-sm mt-2 opacity-90">
@@ -284,7 +284,7 @@ export function Financing() {
     {/* Paiement en plusieurs fois via Alma */}
 <div className="flex gap-4 p-4 bg-fond rounded-lg">
   <CheckCircle
-    className="w-6 h-6 text-brand flex-shrink-0"
+    className="w-6 h-6 text-lien flex-shrink-0"
     aria-hidden="true"
   />
   <div>
@@ -298,7 +298,7 @@ export function Financing() {
         href="https://almapay.com/fr-FR"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-bleu font-medium underline underline-offset-2 hover:decoration-2"
+        className="text-lien font-medium underline underline-offset-2 hover:decoration-2"
       >
         Alma
       </a>
@@ -319,7 +319,7 @@ export function Financing() {
       />
     </a>
 
-    <p className="text-[11px] text-[#5E5E5E] mt-2">
+    <p className="text-[11px] text-doux-68 mt-2">
       Offre de financement soumise à conditions, proposée par Alma.
     </p>
   </div>
@@ -364,7 +364,7 @@ export function Financing() {
                 </div>
               ) : (
                 <>
-                  <form
+                  <form data-zone="formulaires"
                     onSubmit={handleSubmit}
                     className="space-y-6 bg-fond p-8 rounded-xl"
                     style={{ display: 'none' }}
@@ -467,7 +467,7 @@ export function Financing() {
 
                     <Link
                       to={`/financement/dossier?vehicle=${encodeURIComponent(vehicleFromURL)}&price=${priceFromURL || ''}&duration=${formData.duration}`}
-                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand hover:bg-bleu-hover text-white font-semibold rounded-lg transition-colors"
+                      className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand hover:bg-bleu-hover text-sur-bouton font-semibold rounded-lg transition-colors"
                     >
                       <FileText className="w-5 h-5" />
                       Mon Dossier de Financement
