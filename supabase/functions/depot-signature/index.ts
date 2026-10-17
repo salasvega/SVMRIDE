@@ -146,7 +146,7 @@ Deno.serve(async (req: Request) => {
           signataire: `${i.deposant.prenom} ${i.deposant.nom}`, email: i.deposant.email, signe_le: signeLe,
           ip: trace.ip, navigateur: trace.navigateur, code_envoye_le: c.code_envoye_le,
           renonciation: c.type === "mandat" ? true : null, ouvert_le: ouverture?.fait_le ?? null, modele_version: c.modele_version,
-        });
+        }, i);
         const hashSigne = await sha256(signe);
         const chemin = c.pdf_chemin.replace(/\.pdf$/, "-signe.pdf");
         const { error: eu } = await db.storage.from(BUCKET_DOCS).upload(chemin, signe, { contentType: "application/pdf", upsert: false });

@@ -11,10 +11,17 @@
  * 2 et 3 roues d'occasion ») – page 1 parties, véhicule, conditions financières ;
  * page 2 engagements du garage, état des lieux, signatures ; puis conditions
  * générales en deux colonnes. Le texte des articles est inchangé.
+ *
+ * Signatures (17/10/2026, demande de Mattia) : tampon SVM RIDE dans le cadre du
+ * garage ; une fois le contrat signé, nom du déposant en écriture manuscrite
+ * (police libre Architects Daughter) avec la date et l'heure de la signature, dans
+ * les cadres du contrat et sur le certificat. Le PDF présenté à la signature reste
+ * conservé tel quel : son empreinte figure sur le certificat.
  */
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage, type PDFPage, type RGB } from "npm:pdf-lib@1.17.1";
+import fontkit from "npm:@pdf-lib/fontkit@1.1.1";
 
-export const MODELE_VERSION = "mandat-depot-vente-2026-10-17d";
+export const MODELE_VERSION = "mandat-depot-vente-2026-10-17e";
 
 export const SOCIETE = {
   nom: "SVM RIDE",
@@ -47,6 +54,8 @@ export interface Instantane {
     gardiennage_delai_jours: number; reversement_heures: number; conservation_annees: number;
   };
   etat_des_lieux: { fait_le?: string; heure?: string; kilometrage?: number; etat?: string; accessoires?: string; cles?: string; remarques?: string } | null;
+  /** Emplacements de la signature du déposant dans le PDF (renseignés par genererPdf) */
+  cadres_deposant?: Cadre[];
   avenant?: { mandat_reference: string; ancienne_date_fin: string; nouvelle_date_fin: string; prix_modifie: boolean };
 }
 
@@ -86,6 +95,10 @@ export function construireInstantane(d: Record<string, any>, p: Record<string, a
       : {}),
   };
 }
+
+export interface Cadre { page: number; x: number; y: number; l: number; h: number }
+/** Signature réalisée : nom à écrire à la main et date de signature */
+export interface SignatureFaite { nom: string; signe_le: string }
 
 // --- Texte ---
 const eur = (n: number) => `${Math.round(n).toLocaleString("fr-FR").replace(/[  ]/g, " ")} €`;
@@ -199,23 +212,45 @@ const GRIS = rgb(0.4, 0.4, 0.4);
 const GRIS_CLAIR = rgb(0.8, 0.8, 0.8);
 const FOND = rgb(0.955, 0.955, 0.955);
 
-/** Logo de l'en-tête : public/logo-contrat.jpg du site, gardé en mémoire une fois lu (sans logo si le site ne répond pas) */
+/**
+ * Fichiers lus sur le site (dossier public/) et gardés en mémoire une fois lus :
+ * logo de l'en-tête, tampon SVM RIDE, police manuscrite. Si le site ne répond pas,
+ * le document est produit sans eux (et ils sont redemandés la fois suivante).
+ */
 export const URL_LOGO = "https://svmride.com/logo-contrat.jpg";
-let logoCache: Uint8Array | null = null;
-async function logoJpg(): Promise<Uint8Array | null> {
-  if (logoCache) return logoCache;
+const RESSOURCES = {
+  logo: URL_LOGO,
+  tampon: "https://svmride.com/contrat/tampon-svm-ride.png",
+  ecriture: "https://svmride.com/contrat/ecriture.ttf",
+};
+type NomRessource = keyof typeof RESSOURCES;
+const cache: Partial<Record<NomRessource, Uint8Array>> = {};
+async function ressource(nom: NomRessource): Promise<Uint8Array | null> {
+  if (cache[nom]) return cache[nom]!;
   try {
-    const r = await fetch(URL_LOGO, { signal: AbortSignal.timeout(4000) });
-    if (r.ok) logoCache = new Uint8Array(await r.arrayBuffer());
+    const r = await fetch(RESSOURCES[nom], { signal: AbortSignal.timeout(4000) });
+    if (r.ok) cache[nom] = new Uint8Array(await r.arrayBuffer());
   } catch (_) {
-    // sans logo cette fois-ci
+    // sans ce fichier cette fois-ci
   }
-  return logoCache;
+  return cache[nom] ?? null;
 }
-/** Pour les tests : logo fourni directement */
+/** Pour les tests : fichiers fournis directement */
+export function definirRessources(f: Partial<Record<NomRessource, Uint8Array>>) {
+  Object.assign(cache, f);
+}
 export function definirLogo(octets: Uint8Array | null) {
-  logoCache = octets;
+  if (octets) cache.logo = octets;
 }
+
+const quandParis = (iso: string) => {
+  const d = new Date(iso);
+  const jourTxt = d.toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "long", year: "numeric" });
+  const h = d.toLocaleTimeString("fr-FR", { timeZone: "Europe/Paris", hour: "2-digit", minute: "2-digit" }).replace(":", " h ");
+  return `${jourTxt} à ${h}`;
+};
+/** Nom écrit à la main, comme sur le modèle de Mattia : « NOM PRÉNOM » */
+const nomManuscrit = (i: Instantane) => `${i.deposant.nom} ${i.deposant.prenom}`.toUpperCase();
 
 // A4, marges du modèle de Mattia
 const L = 595.28, H = 841.89, M = 56, LARG = L - 2 * M, BAS = 60;
@@ -235,6 +270,7 @@ class Mise {
   constructor(
     public doc: PDFDocument, public f: PDFFont, public fb: PDFFont, public fi: PDFFont,
     public logo: PDFImage | null, public pied: string,
+    public tampon: PDFImage | null = null, public fe: PDFFont | null = null,
   ) {
     this.nouvelle();
   }
@@ -243,9 +279,15 @@ class Mise {
     const [f, fb, fi] = await Promise.all([
       doc.embedFont(StandardFonts.Helvetica), doc.embedFont(StandardFonts.HelveticaBold), doc.embedFont(StandardFonts.HelveticaOblique),
     ]);
-    const octets = await logoJpg();
-    const logo = octets ? await doc.embedJpg(octets).catch(() => null) : null;
-    return new Mise(doc, f, fb, fi, logo, pied);
+    const [o1, o2, o3] = await Promise.all([ressource("logo"), ressource("tampon"), ressource("ecriture")]);
+    const logo = o1 ? await doc.embedJpg(o1).catch(() => null) : null;
+    const tampon = o2 ? await doc.embedPng(o2).catch(() => null) : null;
+    let fe: PDFFont | null = null;
+    if (o3) {
+      doc.registerFontkit(fontkit);
+      fe = await doc.embedFont(o3, { subset: true }).catch(() => null);
+    }
+    return new Mise(doc, f, fb, fi, logo, pied, tampon, fe);
   }
 
   nouvelle() {
@@ -422,27 +464,54 @@ class Mise {
     this.y = bas;
   }
 
-  /** Cadres de signature : le Déposant à gauche, SVM RIDE à droite */
-  signatures(i: Instantane, titre?: string) {
-    const h = 74;
-    this.place(h + (titre ? 26 : 12));
-    if (titre) this.texte(titre, { gras: true, taille: 9, apres: 6 });
+  /** Cadres de signature : le Déposant à gauche, SVM RIDE à droite (tampon). */
+  signatures(i: Instantane, titre?: string, faite?: SignatureFaite) {
+    const h = 90;
+    this.place(h + (titre ? 24 : 12));
+    if (titre) this.texte(titre, { gras: true, taille: 9, apres: 5 });
     const larg = (LARG - 30) / 2, haut = this.y;
-    const cadre = (x: number, titreCadre: string, sous: string, lignes: string[]) => {
-      this.page.drawRectangle({ x, y: haut - h, width: larg, height: h, color: FOND });
-      let y = haut - 12;
-      y -= this.bloc(titreCadre, x + 12, y, larg - 24, { gras: true, taille: 9 });
-      y -= this.bloc(sous, x + 12, y, larg - 24, { italique: true, taille: 7.5, couleur: GRIS }) + 6;
-      for (const l of lignes) y -= this.bloc(l, x + 12, y, larg - 24, { taille: 7.5 }) + 2;
-    };
-    cadre(M, "Le Déposant", nomComplet(i), [
-      "Signature électronique du Déposant : voir le certificat de signature joint à la version signée de ce document.",
-    ]);
-    cadre(M + larg + 30, `Le Garage – ${SOCIETE.nom}`, "Lu et approuvé · Bon pour dépôt", [
-      `Pour ${SOCIETE.nom} : ${i.representant}.`,
-      `Fait à Chaville, le ${dateParis(i.genere_le)}.`,
-    ]);
+    const fond = (x: number) => this.page.drawRectangle({ x, y: haut - h, width: larg, height: h, color: FOND });
+    const filet = (x: number) => this.page.drawLine({ start: { x: x + 12, y: haut - h + 20 }, end: { x: x + larg - 12, y: haut - h + 20 }, thickness: 0.6, color: NOIR });
+
+    // Déposant
+    fond(M);
+    this.bloc("Le Déposant", M + 12, haut - 12, larg - 24, { gras: true, taille: 9 });
+    this.bloc(nomComplet(i), M + 12, haut - 25, larg - 24, { italique: true, taille: 7.5, couleur: GRIS });
+    filet(M);
+    this.bloc("Signature électronique · voir le certificat de signature", M + 12, haut - h + 15, larg - 24, { taille: 6.5, couleur: GRIS });
+    const cadre: Cadre = { page: this.doc.getPages().indexOf(this.page), x: M + 12, y: haut - h + 22, l: larg - 24, h: 44 };
+    (i.cadres_deposant ??= []).push(cadre);
+    if (faite) this.signer(this.page, cadre, faite);
+
+    // Garage
+    const xg = M + larg + 30;
+    fond(xg);
+    this.bloc(`Le Garage – ${SOCIETE.nom}`, xg + 12, haut - 12, larg - 24, { gras: true, taille: 9 });
+    this.bloc("Lu et approuvé · Bon pour dépôt", xg + 12, haut - 25, larg - 24, { italique: true, taille: 7.5, couleur: GRIS });
+    // Signataire et date à gauche, tampon à droite (il déborde sur le trait, comme sur le modèle de Mattia)
+    const lt = 118, largTexte = larg - 24 - (this.tampon ? lt - 10 : 0);
+    let yt = haut - 37;
+    yt -= this.bloc(`Pour ${SOCIETE.nom} :`, xg + 12, yt, largTexte, { taille: 7.5 });
+    yt -= this.bloc(i.representant, xg + 12, yt, largTexte, { taille: 7.5, gras: true });
+    this.bloc(`Chaville, ${new Date(i.genere_le).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris" })}`, xg + 12, yt, largTexte, { taille: 7.5, couleur: GRIS });
+    filet(xg);
+    this.bloc("Signature et cachet", xg + 12, haut - h + 15, largTexte, { taille: 6.5, couleur: GRIS });
+    if (this.tampon) {
+      const ht = lt * this.tampon.height / this.tampon.width;
+      this.page.drawImage(this.tampon, { x: xg + larg - lt - 4, y: haut - h - 4, width: lt, height: ht });
+    }
     this.y = haut - h - 10;
+  }
+
+  /** Nom en écriture manuscrite + date et heure, dans un cadre de signature */
+  signer(page: PDFPage, c: Cadre, faite: SignatureFaite) {
+    const police = this.fe ?? this.fi;
+    const nom = propre(faite.nom);
+    let taille = 20;
+    while (police.widthOfTextAtSize(nom, taille) > c.l && taille > 9) taille -= 1;
+    page.drawText(nom, { x: c.x + 2, y: c.y + 18, size: taille, font: police, color: rgb(0.08, 0.13, 0.33) });
+    const mention = propre(`Signé électroniquement le ${quandParis(faite.signe_le)}`);
+    page.drawText(mention, { x: c.x + 2, y: c.y + 5, size: 6.5, font: this.f, color: GRIS });
   }
 
   /** Pied de page : société au centre, n° de page à droite, référence du document dessous */
@@ -513,6 +582,7 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
   doc.setCreator("svmride.com");
   const m = await Mise.creer(doc, `${titre} ${i.reference} – modèle ${i.modele_version}`);
   const v = i.vehicule, c = i.conditions, e = i.etat_des_lieux ?? {};
+  i.cadres_deposant = []; // renseignés par m.signatures(), gardés avec les données du contrat
 
   if (i.type === "mandat") {
     const art = articlesMandat(i);
@@ -611,18 +681,18 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
     m.texte("Conditions générales du contrat de dépôt-vente", { gras: true, taille: 12, centre: true, apres: 6 });
     m.trait();
     m.y -= 10;
-    const optTitre: Opt = { gras: true, taille: 7.4, interligne: 1.3, apres: 1 };
-    const optTexte: Opt = { taille: 7, interligne: 1.24, justifie: true, apres: 1.2 };
+    const optTitre: Opt = { gras: true, taille: 7.2, interligne: 1.25, apres: 0.8 };
+    const optTexte: Opt = { taille: 6.9, interligne: 1.2, justifie: true, apres: 1 };
     const lc = m.largeurColonne;
     const total = art.reduce((h, b) =>
-      h + (b.titre ? m.hauteur(titreCG(b.titre), lc, optTitre) + 1 : 0) +
-      b.texte.reduce((s, t) => s + m.hauteur(t, lc, optTexte) + 1.2, 0) + 3, 0);
+      h + (b.titre ? m.hauteur(titreCG(b.titre), lc, optTitre) + 0.8 : 0) +
+      b.texte.reduce((s, t) => s + m.hauteur(t, lc, optTexte) + 1, 0) + 2.5, 0);
     m.colonnes(total);
     for (const b of art) {
       m.place(24);
       if (b.titre) m.texte(titreCG(b.titre), optTitre);
       for (const t of b.texte) m.texte(t, optTexte);
-      m.y -= 3;
+      m.y -= 2.5;
     }
     m.finColonnes();
     m.y -= 2;
@@ -654,21 +724,33 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
   return await doc.save({ useObjectStreams: false });
 }
 
-/** Ajoute le certificat de signature (dernière page) au PDF d'origine. */
+/**
+ * Version signée : le PDF présenté à la signature, avec le nom du déposant en
+ * écriture manuscrite et la date de signature dans ses cadres, puis le certificat
+ * de signature (dernière page). Le PDF présenté reste conservé tel quel ; son
+ * empreinte figure sur le certificat.
+ */
 export async function pdfSigne(original: Uint8Array, preuve: {
   reference: string; titre: string; empreinte_original: string; signataire: string; email: string;
   signe_le: string; ip: string; navigateur: string; code_envoye_le: string | null; renonciation: boolean | null;
   ouvert_le: string | null; modele_version: string;
-}): Promise<Uint8Array> {
+}, instantane?: Instantane): Promise<Uint8Array> {
   const doc = await PDFDocument.load(original);
   const m = await Mise.creer(doc, `Certificat de signature ${preuve.reference}`);
+  const faite: SignatureFaite | null = instantane ? { nom: nomManuscrit(instantane), signe_le: preuve.signe_le } : null;
+  const pages = doc.getPages();
+  if (faite) {
+    for (const c of instantane!.cadres_deposant ?? []) {
+      if (pages[c.page] && pages[c.page] !== m.page) m.signer(pages[c.page], c, faite);
+    }
+  }
   const heure = (iso: string | null) => (iso ? new Date(iso).toLocaleString("fr-FR", { timeZone: "Europe/Paris" }) + " (heure de Paris)" : "—");
   m.texte("CERTIFICAT DE SIGNATURE ÉLECTRONIQUE", { taille: 14, gras: true, centre: true, apres: 10 });
   m.trait();
   m.y -= 12;
   const lignes: [string, string][] = [
     ["Document", `${preuve.titre} ${preuve.reference} (modèle ${preuve.modele_version})`],
-    ["Empreinte SHA-256 du document signé (pages précédentes)", preuve.empreinte_original],
+    ["Empreinte SHA-256 du document présenté à la signature", preuve.empreinte_original],
     ["Signataire", `${preuve.signataire} – ${preuve.email}`],
     ["Document ouvert le", heure(preuve.ouvert_le)],
     ["Code à usage unique envoyé à", `${preuve.email}, le ${heure(preuve.code_envoye_le)}`],
@@ -682,7 +764,13 @@ export async function pdfSigne(original: Uint8Array, preuve: {
   }
   m.paires(lignes.map(([l, v]) => ({ l, v })), 1);
   m.y -= 10;
-  m.texte("Ce certificat est généré automatiquement par svmride.com au moment de la signature. Le dossier de preuve complet (journal horodaté des étapes) est conservé par SVM RIDE. Toute modification des pages précédentes change leur empreinte SHA-256 et peut être détectée en la recalculant sur le document d'origine.", { taille: 8, couleur: GRIS, justifie: true });
+  m.texte("Ce certificat est généré automatiquement par svmride.com au moment de la signature. Le nom du signataire en écriture manuscrite, la date de signature et le tampon de SVM RIDE sont des mentions visuelles ; la signature repose sur le code à usage unique et sur le dossier de preuve (journal horodaté des étapes), conservé par SVM RIDE avec le document présenté à la signature. Toute modification de ce document change son empreinte SHA-256 ci-dessus et peut être détectée en la recalculant.", { taille: 8, couleur: GRIS, justifie: true });
+  if (instantane && faite) {
+    m.y -= 8;
+    const cadres = instantane.cadres_deposant;
+    m.signatures({ ...instantane, cadres_deposant: [] }, "Signatures", faite);
+    instantane.cadres_deposant = cadres;
+  }
   m.piedDePage(m.page, "Certificat de signature");
   return await doc.save({ useObjectStreams: false });
 }
