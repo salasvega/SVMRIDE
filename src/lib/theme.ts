@@ -80,21 +80,25 @@ export function demarrerApercu() {
     } else if (m?.type === 'svm-apercu-repere') {
       // Entoure le texte en cours de modification et le montre
       document.querySelectorAll('[data-repere-texte]').forEach((el) => el.removeAttribute('data-repere-texte'));
-      const cherche = typeof m.texte === 'string' ? m.texte.trim().slice(0, 60) : '';
+      const net = (s: string) => s.replace(/\s+/g, ' ').trim();
+      const cherche = typeof m.texte === 'string' ? net(m.texte).slice(0, 60) : '';
       if (cherche) {
         window.setTimeout(() => {
-          const marcheur = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-          for (let n = marcheur.nextNode(); n; n = marcheur.nextNode()) {
-            const parent = n.parentElement;
-            if (parent && !parent.closest('script,style') && (parent.textContent ?? '').includes(cherche)) {
-              parent.setAttribute('data-repere-texte', '');
-              parent.scrollIntoView({ block: 'center', behavior: 'smooth' });
-              break;
-            }
+          const contient = (el: Element) => !el.closest('script,style,noscript') && net(el.textContent ?? '').includes(cherche);
+          if (!contient(document.body)) return;
+          // L'élément le plus précis qui contient tout le texte cherché
+          let el: Element = document.body;
+          for (let suivant = Array.from(el.children).find(contient); suivant; suivant = Array.from(el.children).find(contient)) el = suivant;
+          if (el === document.body) return;
+          el.setAttribute('data-repere-texte', '');
+          // Défilement dans l'aperçu seulement (pas de la page de l'admin autour)
+          const r = el.getBoundingClientRect();
+          if (r.top < 60 || r.bottom > window.innerHeight - 20) {
+            window.scrollTo({ top: Math.max(0, window.scrollY + r.top - window.innerHeight / 2 + r.height / 2), behavior: 'smooth' });
           }
         }, 60);
       }
-      poserStyle('theme-repere-texte', '[data-repere-texte]{outline:3px dashed #E11D48 !important;outline-offset:4px;border-radius:4px}');
+      poserStyle('theme-repere-texte', '[data-repere-texte]{outline:4px dashed #E11D48 !important;outline-offset:5px;border-radius:4px}');
     } else if (m?.type === 'svm-apercu-zone') {
       const zone = m.zone && /^[a-z]+$/.test(m.zone) ? m.zone : null;
       poserStyle(

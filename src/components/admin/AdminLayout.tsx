@@ -1,6 +1,6 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
-import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Menu, Palette, Store, Users, X } from 'lucide-react';
+import { Home, Crown, Mail, FileText, FolderOpen, Handshake, LogOut, Menu, Palette, Store, Type, Users, X } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { FondMenu } from '../layout/FondMenu';
@@ -65,6 +65,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const contenuSite: Lien[] = [
     { to: '/admin/equipe', libelle: 'Équipe', icone: <Users className="w-4 h-4" aria-hidden="true" /> },
     { to: '/admin/infos-site', libelle: 'Infos du site', icone: <Store className="w-4 h-4" aria-hidden="true" /> },
+    { to: '/admin/textes', libelle: 'Textes du site', icone: <Type className="w-4 h-4" aria-hidden="true" /> },
     { to: '/admin/studio-design', libelle: 'Studio Design', icone: <Palette className="w-4 h-4" aria-hidden="true" /> },
   ];
 
