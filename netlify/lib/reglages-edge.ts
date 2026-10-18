@@ -5,7 +5,7 @@
  * Gardés 60 s en mémoire ; en cas d'erreur : textes et image d'origine.
  */
 import { normaliserTextes, type Textes } from '../../src/config/textes.ts';
-import { normaliserFondAccueil, type FondAccueil } from '../../src/config/medias.ts';
+import { FOND_ACCUEIL_ORIGINE, normaliserFondAccueil, type FondAccueil } from '../../src/config/medias.ts';
 import { SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
 
 export interface ReglagesPage {
@@ -38,5 +38,14 @@ export async function reglagesPage(): Promise<ReglagesPage> {
 /** Bloc JSON lu par le site au démarrage (src/lib/textes.ts, src/lib/medias.ts) */
 export function injecterReglages(html: string, r: ReglagesPage): string {
   const json = JSON.stringify(r).replace(/</g, '\\u003c');
-  return html.replace('</head>', `  <script id="reglages-svm" type="application/json">${json}</script>\n  </head>`);
+  let page = html;
+  // Image d'accueil choisie dans l'admin : préchargée à la place de celle d'origine
+  const fond = r.fond_accueil;
+  if (fond) {
+    const attr = (u: string) => u.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    page = page
+      .replace(`href="${FOND_ACCUEIL_ORIGINE.mobile}"`, () => `href="${attr(fond.mobile)}"`)
+      .replace(`href="${FOND_ACCUEIL_ORIGINE.ordinateur}"`, () => `href="${attr(fond.ordinateur)}"`);
+  }
+  return page.replace('</head>', `  <script id="reglages-svm" type="application/json">${json}</script>\n  </head>`);
 }

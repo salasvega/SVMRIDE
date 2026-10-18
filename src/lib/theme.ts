@@ -11,6 +11,8 @@
  */
 import { cssAdmin, cssDuTheme, themeValide, urlPolices, type CleSection, type ThemeConfig } from '../config/design';
 import { apercuTextes } from './textes';
+import { apercuFondAccueil } from './medias';
+import type { FondAccueil } from '../config/medias';
 
 export const ID_THEME = 'theme-svm';
 const ID_APERCU = 'theme-apercu';
@@ -21,6 +23,7 @@ export type MessageApercu =
   | { type: 'svm-apercu-zone'; zone: CleSection | null }
   | { type: 'svm-apercu-textes'; textes: Record<string, string> | null }
   | { type: 'svm-apercu-repere'; texte: string | null }
+  | { type: 'svm-apercu-fond'; fond: FondAccueil | null | undefined }
   | { type: 'svm-apercu-pret'; chemin: string };
 
 function poserStyle(id: string, css: string | null) {
@@ -75,6 +78,8 @@ export function demarrerApercu() {
       const valide = m.config && themeValide(m.config) ? m.config : null;
       poserPolices(`${ID_APERCU}-polices`, valide ? urlPolices(valide) : null);
       poserStyle(ID_APERCU, valide ? cssDuTheme(valide) : null);
+    } else if (m?.type === 'svm-apercu-fond') {
+      apercuFondAccueil(m.fond && typeof m.fond === 'object' ? m.fond : m.fond === null ? null : undefined);
     } else if (m?.type === 'svm-apercu-textes') {
       apercuTextes(m.textes && typeof m.textes === 'object' ? m.textes : null);
     } else if (m?.type === 'svm-apercu-repere') {

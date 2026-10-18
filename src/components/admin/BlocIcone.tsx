@@ -15,7 +15,7 @@ import { ChoixSource, SOURIS_SEULEMENT } from '../ui/ChoixSource';
 
 
 /** Aperçu : onglet de navigateur, barre du site, écran d'accueil du téléphone */
-function Apercus({ x, titre }: { x: Omit<Icone, 'version'>; titre: string }) {
+function Apercus({ x, titre, nom }: { x: Omit<Icone, 'version'>; titre: string; nom: string }) {
   return (
     <div>
       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#666666]">{titre}</p>
@@ -23,12 +23,12 @@ function Apercus({ x, titre }: { x: Omit<Icone, 'version'>; titre: string }) {
         <div className="w-48 rounded-t-lg border border-b-0 border-[#D1D5DB] bg-[#F5F5F5] px-3 py-2">
           <div className="flex items-center gap-2">
             <img src={x.favicon_32} alt="" width={16} height={16} className="h-4 w-4" />
-            <span className="truncate text-xs text-[#333333]">SVM Ride – Motos et sc…</span>
+            <span className="truncate text-xs text-[#333333]">{nom} – Motos et scooters d’occasion</span>
           </div>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-[#E5E5E5] bg-white px-3 py-2">
           <img src={x.logo} alt="" width={36} height={36} className="h-9 w-9 object-contain" />
-          <span className="text-base font-bold text-[#111111]">SVM Ride</span>
+          <span className="text-base font-bold text-[#111111]">{nom}</span>
         </div>
         <div className="flex flex-col items-center gap-1">
           <img src={x.apple_180} alt="" width={56} height={56} className="h-14 w-14 rounded-[14px] shadow-md" />
@@ -39,7 +39,7 @@ function Apercus({ x, titre }: { x: Omit<Icone, 'version'>; titre: string }) {
   );
 }
 
-export function BlocIcone({ identite, onEnregistre }: { identite: Identite; onEnregistre: (message: string) => void }) {
+export function BlocIcone({ identite, nom = 'SVM Ride', onEnregistre }: { identite: Identite; nom?: string; onEnregistre: (message: string) => void }) {
   const [aRecadrer, setARecadrer] = useState<File | null>(null);
   const [nouvelle, setNouvelle] = useState<Declinaison[] | null>(null);
   const [erreur, setErreur] = useState('');
@@ -106,11 +106,11 @@ export function BlocIcone({ identite, onEnregistre }: { identite: Identite; onEn
 
   return (
     <div className="space-y-5">
-      <Apercus x={icones(identite)} titre={identite.icone ? 'Icône actuelle' : "Icône actuelle (logo d'origine)"} />
+      <Apercus nom={nom} x={icones(identite)} titre={identite.icone ? 'Icône actuelle' : "Icône actuelle (logo d'origine)"} />
 
       {apercuNouvelle ? (
         <div className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4">
-          <Apercus x={apercuNouvelle} titre="Nouvelle icône : aperçu" />
+          <Apercus nom={nom} x={apercuNouvelle} titre="Nouvelle icône : aperçu" />
           <p className="mt-3 text-xs text-[#5E5E5E]">
             Elle remplacera le logo de la barre du haut et du pied de page, l'icône de l'onglet, celle des téléphones
             (écran d'accueil) et le logo transmis à Google. Les navigateurs gardent parfois l'ancienne icône d'onglet

@@ -10,14 +10,25 @@
  *
  * Bloc Société (mentions légales et contrats) : réglage « societe »
  * (src/config/societe.ts). Chaque nouveau contrat de dépôt-vente en garde une copie.
+ *
+ * Bloc Identité du site : nom du site et phrase d'accroche (textes « site.nom »
+ * et « site.accroche » du réglage « textes », aussi modifiables dans Textes du
+ * site), logo et icône (réglage « identite »), image de la page d'accueil
+ * (réglage « fond_accueil »).
  */
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Building2, Image as ImageIcon, Clock, ExternalLink, History, Mail, MapPin, Phone, Plus, RotateCcw, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { AlertTriangle, Building2, Clock, ExternalLink, Fingerprint, History, Mail, MapPin, Phone, Plus, RotateCcw, X } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { appliquerCoordonnees } from '../../lib/coordonnees';
 import { appliquerSociete } from '../../lib/societe';
 import { BlocIcone } from '../../components/admin/BlocIcone';
+import { BlocFondAccueil } from '../../components/admin/BlocFondAccueil';
+import { appliquerTextes } from '../../lib/textes';
+import { appliquerFondAccueil } from '../../lib/medias';
+import { CLE_TEXTES, normaliserTextes, TEXTES, texte, type Textes } from '../../config/textes';
+import { CLE_FOND_ACCUEIL, normaliserFondAccueil, type FondAccueil } from '../../config/medias';
 import { enregistrerIdentite } from '../../lib/identite';
 import { CLE_IDENTITE, IDENTITE_DEFAUT, normaliserIdentite, type Identite } from '../../config/identite';
 import {
@@ -61,6 +72,25 @@ function changementsIdentite(a: Identite, b: Identite) {
   const avant = decrireIdentite(a), apres = decrireIdentite(b);
   return avant === apres && a.icone?.version === b.icone?.version ? [] : [{ champ: 'Logo et icône', avant, apres }];
 }
+
+/** Nom et accroche du site (textes) */
+interface NomAccroche { nom: string; accroche: string }
+const lireNomAccroche = (t: Textes): NomAccroche => ({ nom: texte(t, 'site.nom'), accroche: texte(t, 'site.accroche') });
+function changementsNom(a: NomAccroche, b: NomAccroche) {
+  return ([['Nom du site', 'nom'], ["Phrase d'accroche", 'accroche']] as const)
+    .map(([champ, k]) => ({ champ, avant: a[k], apres: b[k].trim() || TEXTES[k === 'nom' ? 'site.nom' : 'site.accroche'].defaut }))
+    .filter((x) => x.avant !== x.apres);
+}
+
+/** Image d'accueil (historique) */
+const decrireFond = (f: FondAccueil | null) => (f ? `Image personnalisée${/^\d{8}/.test(f.version) ? ` (${f.version.slice(6, 8)}/${f.version.slice(4, 6)}/${f.version.slice(0, 4)})` : ''}` : "Image d'origine");
+function changementsFond(a: FondAccueil | null, b: FondAccueil | null) {
+  return a?.version === b?.version && !!a === !!b ? [] : [{ champ: "Image d'accueil", avant: decrireFond(a), apres: decrireFond(b) }];
+}
+
+const LIBELLES_CLE: Record<string, string> = {
+  [CLE_SOCIETE]: 'Société', [CLE_IDENTITE]: 'Logo et icône', [CLE_FOND_ACCUEIL]: "Image d'accueil", [CLE_COORDONNEES]: 'Coordonnées',
+};
 
 /** Changements du bloc Société */
 function changementsSociete(a: Societe, b: Societe): { champ: string; avant: string; apres: string }[] {
@@ -157,9 +187,13 @@ function Champ({
   );
 }
 
-function Bloc({ icone, titre, sousTitre, children }: { icone: React.ReactNode; titre: string; sousTitre: string; children: React.ReactNode }) {
+const RUBRIQUES = [
+  ['identite', 'Identité du site'], ['contact', 'Contact'], ['showroom', 'Showroom'], ['horaires', 'Horaires'], ['societe', 'Société'], ['historique', 'Historique'],
+] as const;
+
+function Bloc({ id, icone, titre, sousTitre, children }: { id: string; icone: React.ReactNode; titre: string; sousTitre: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-xl border-2 border-[#D1D5DB] bg-white p-4 md:p-6">
+    <section id={id} className="scroll-mt-32 rounded-xl border-2 border-[#D1D5DB] bg-white p-4 md:p-6">
       <div className="mb-5 flex items-start gap-3">
         <span className="mt-0.5 text-[#111111]" aria-hidden="true">{icone}</span>
         <div>
@@ -184,20 +218,27 @@ export function InfosSite() {
   const [societeEnregistree, setSocieteEnregistree] = useState<Societe | null>(null);
   const [soc, setSoc] = useState<Societe>(SOCIETE_DEFAUT);
   const [identite, setIdentite] = useState<Identite>(IDENTITE_DEFAUT);
+  const [nomEnregistre, setNomEnregistre] = useState<NomAccroche | null>(null);
+  const [na, setNa] = useState<NomAccroche>({ nom: '', accroche: '' });
+  const [fond, setFond] = useState<FondAccueil | null>(null);
   const [historique, setHistorique] = useState<Version[]>([]);
   const [erreur, setErreur] = useState('');
   const [message, setMessage] = useState('');
   const [tentative, setTentative] = useState(false);
-  const [confirmation, setConfirmation] = useState<{ coord: Coordonnees; soc: Societe; titre: string; identite?: Identite } | null>(null);
+  const [confirmation, setConfirmation] = useState<{
+    coord: Coordonnees; soc: Societe; titre: string; nom?: NomAccroche; identite?: Identite; fond?: { valeur: FondAccueil | null };
+  } | null>(null);
   const [envoi, setEnvoi] = useState(false);
 
   const charger = async () => {
-    const [{ data, error }, { data: ds }, { data: di }, { data: h }] = await Promise.all([
+    const [{ data, error }, { data: ds }, { data: di }, { data: dt }, { data: df }, { data: h }] = await Promise.all([
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_COORDONNEES).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_SOCIETE).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_IDENTITE).maybeSingle(),
+      supabase.from('site_reglages').select('valeur').eq('cle', CLE_TEXTES).maybeSingle(),
+      supabase.from('site_reglages').select('valeur').eq('cle', CLE_FOND_ACCUEIL).maybeSingle(),
       supabase.from('site_reglages_historique').select('id, cle, ancienne_valeur, nouvelle_valeur, par, fait_le')
-        .in('cle', [CLE_COORDONNEES, CLE_SOCIETE, CLE_IDENTITE]).order('fait_le', { ascending: false }).limit(15),
+        .in('cle', [CLE_COORDONNEES, CLE_SOCIETE, CLE_IDENTITE, CLE_FOND_ACCUEIL]).order('fait_le', { ascending: false }).limit(15),
     ]);
     if (error) {
       setErreur("Impossible de charger les informations. Vérifiez que vous êtes connecté avec un compte administrateur.");
@@ -210,6 +251,10 @@ export function InfosSite() {
     setSocieteEnregistree(vs);
     setSoc(vs);
     setIdentite(normaliserIdentite(di?.valeur));
+    const n = lireNomAccroche(normaliserTextes(dt?.valeur));
+    setNomEnregistre(n);
+    setNa(n);
+    setFond(normaliserFondAccueil(df?.valeur));
     setHistorique((h as Version[]) ?? []);
   };
 
@@ -217,16 +262,23 @@ export function InfosSite() {
     charger();
   }, []);
 
-  const erreurs = useMemo(() => ({ ...verifier(c), ...verifierSociete(soc) }), [c, soc]);
+  const erreurs = useMemo(() => {
+    const e: Erreurs = { ...verifier(c), ...verifierSociete(soc) };
+    if (!na.nom.trim()) e.nom_site = 'Obligatoire.';
+    if (!na.accroche.trim()) e.accroche = 'Obligatoire.';
+    return e;
+  }, [c, soc, na]);
+  const diffNom = useMemo(() => (nomEnregistre ? changementsNom(nomEnregistre, na) : []), [nomEnregistre, na]);
   const propre = useMemo(() => nettoyer(c), [c]);
   const propreSoc = useMemo(() => normaliserSociete({ ...soc, siret: formaterSiret(soc.siret) }), [soc]);
   const diff = useMemo(
     () => (enregistrees && societeEnregistree
-      ? [...changements(enregistrees, propre), ...changementsSociete(societeEnregistree, propreSoc)]
+      ? [...diffNom, ...changements(enregistrees, propre), ...changementsSociete(societeEnregistree, propreSoc)]
       : []),
-    [enregistrees, propre, societeEnregistree, propreSoc],
+    [enregistrees, propre, societeEnregistree, propreSoc, diffNom],
   );
-  const modifie = !!enregistrees && (JSON.stringify(c) !== JSON.stringify(enregistrees) || JSON.stringify(soc) !== JSON.stringify(societeEnregistree));
+  const modifie = !!enregistrees && (JSON.stringify(c) !== JSON.stringify(enregistrees) || JSON.stringify(soc) !== JSON.stringify(societeEnregistree)
+    || JSON.stringify(na) !== JSON.stringify(nomEnregistre));
   const montrer = (cle: string) => (tentative ? erreurs[cle] : undefined);
 
   const maj = (p: Partial<Coordonnees>) => setC((x) => ({ ...x, ...p }));
@@ -242,12 +294,22 @@ export function InfosSite() {
       return;
     }
     setErreur('');
-    setConfirmation({ coord: propre, soc: propreSoc, titre: 'Enregistrer ces modifications ?' });
+    setConfirmation({ coord: propre, soc: propreSoc, nom: { nom: na.nom.trim(), accroche: na.accroche.trim() }, titre: 'Enregistrer ces modifications ?' });
   };
 
-  const enregistrer = async (coord: Coordonnees, societe: Societe, nouvelleIdentite?: Identite) => {
-    if (!enregistrees || !societeEnregistree) return;
+  const enregistrer = async (coord: Coordonnees, societe: Societe, nouvelleIdentite?: Identite, nom?: NomAccroche, nouveauFond?: { valeur: FondAccueil | null }) => {
+    if (!enregistrees || !societeEnregistree || !nomEnregistre) return;
     setEnvoi(true);
+    if (nouveauFond) {
+      const { error } = await supabase.from('site_reglages').upsert({ cle: CLE_FOND_ACCUEIL, valeur: nouveauFond.valeur ?? { origine: true } });
+      setEnvoi(false);
+      setConfirmation(null);
+      if (error) return setErreur("L'enregistrement n'a pas fonctionné. Réessayez.");
+      appliquerFondAccueil(nouveauFond.valeur);
+      setMessage("Image d'accueil rétablie.");
+      await charger();
+      return;
+    }
     if (nouvelleIdentite) {
       const ok = await enregistrerIdentite(nouvelleIdentite);
       setEnvoi(false);
@@ -257,10 +319,22 @@ export function InfosSite() {
       await charger();
       return;
     }
-    const lignes = [
+    const lignes: { cle: string; valeur: unknown }[] = [
       ...(changements(enregistrees, coord).length ? [{ cle: CLE_COORDONNEES, valeur: coord }] : []),
       ...(changementsSociete(societeEnregistree, societe).length ? [{ cle: CLE_SOCIETE, valeur: societe }] : []),
     ];
+    // Nom et accroche : fusionnés dans les textes du site tels qu'ils sont enregistrés à cet instant
+    let textes: Textes | null = null;
+    if (nom && changementsNom(nomEnregistre, nom).length) {
+      const { data, error: e } = await supabase.from('site_reglages').select('valeur').eq('cle', CLE_TEXTES).maybeSingle();
+      if (e) {
+        setEnvoi(false);
+        setConfirmation(null);
+        return setErreur("L'enregistrement n'a pas fonctionné. Réessayez.");
+      }
+      textes = normaliserTextes({ ...normaliserTextes(data?.valeur), 'site.nom': nom.nom, 'site.accroche': nom.accroche });
+      lignes.push({ cle: CLE_TEXTES, valeur: textes });
+    }
     const { error } = await supabase.from('site_reglages').upsert(lignes);
     setEnvoi(false);
     setConfirmation(null);
@@ -270,6 +344,7 @@ export function InfosSite() {
     }
     appliquerCoordonnees(coord);
     appliquerSociete(societe);
+    if (textes) appliquerTextes(textes);
     setTentative(false);
     setMessage("Enregistré : le site, les informations pour Google et les e-mails utilisent maintenant ces coordonnées.");
     await charger();
@@ -277,6 +352,11 @@ export function InfosSite() {
 
   const restaurer = (v: Version) => {
     if (!enregistrees || !societeEnregistree) return;
+    if (v.cle === CLE_FOND_ACCUEIL) {
+      setMessage('');
+      setConfirmation({ coord: enregistrees, soc: societeEnregistree, fond: { valeur: normaliserFondAccueil(v.ancienne_valeur) }, titre: "Revenir à l'image d'accueil d'avant ?" });
+      return;
+    }
     if (v.cle === CLE_IDENTITE) {
       setMessage('');
       setConfirmation({ coord: enregistrees, soc: societeEnregistree, identite: normaliserIdentite(v.ancienne_valeur), titre: 'Revenir au logo et à l\'icône d\'avant ?' });
@@ -296,11 +376,18 @@ export function InfosSite() {
         <div>
           <h1 className="text-3xl font-bold text-[#111111]">Infos du site</h1>
           <p className="mt-1 max-w-3xl text-[#666666]">
-            Coordonnées affichées sur tout le site (page Contact, pied de page, mentions légales, Dépôt-vente…), envoyées à Google
-            et reprises dans les e-mails automatiques, et informations légales de la société (mentions légales, contrats).
-            Les changements s'appliquent dès l'enregistrement.
+            L'identité du site (nom, logo, image d'accueil), les coordonnées affichées partout et envoyées à Google, et les
+            informations légales de la société (mentions légales, contrats). Les changements s'appliquent dès l'enregistrement.
           </p>
         </div>
+
+        {enregistrees && (
+          <nav aria-label="Rubriques" className="sticky top-[4.25rem] z-20 -mx-4 flex gap-1.5 overflow-x-auto border-b border-[#E5E5E5] bg-[#F9FAFB]/95 px-4 py-2 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:px-2">
+            {RUBRIQUES.map(([id, libelle]) => (
+              <a key={id} href={`#${id}`} className="shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium text-[#444444] hover:bg-white hover:text-[#111111]">{libelle}</a>
+            ))}
+          </nav>
+        )}
 
         {message && <p className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900" role="status">{message}</p>}
         {erreur && <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">{erreur}</p>}
@@ -309,7 +396,38 @@ export function InfosSite() {
           <p className="text-[#666666]">Chargement…</p>
         ) : enregistrees && (
           <>
-            <Bloc icone={<Phone className="h-5 w-5" />} titre="Contact" sousTitre="Comment les clients vous joignent.">
+            <Bloc id="identite" icone={<Fingerprint className="h-5 w-5" />} titre="Identité du site" sousTitre="Ce qui fait reconnaître le site : son nom, sa phrase d'accroche, son logo et l'image de la page d'accueil.">
+              <div className="grid gap-4 md:grid-cols-2">
+                <Champ id="n-nom" label="Nom du site" valeur={na.nom} onChange={(v) => setNa((x) => ({ ...x, nom: v.slice(0, 40) }))} err={montrer('nom_site')}
+                  aide="Barre du haut, pied de page, onglet du navigateur, résultats Google. Peut différer de la raison sociale." />
+                <div>
+                  <label htmlFor="n-accroche" className="mb-1.5 block text-sm font-medium text-noir">Phrase d'accroche</label>
+                  <textarea id="n-accroche" rows={2} value={na.accroche} onChange={(e) => setNa((x) => ({ ...x, accroche: e.target.value.replace(/\n/g, ' ').slice(0, 160) }))}
+                    aria-invalid={!!montrer('accroche')} aria-describedby="n-accroche-aide" className={`${classeChamp(montrer('accroche'))} resize-none`} />
+                  <p id="n-accroche-aide" className={`mt-1 flex justify-between gap-3 text-xs ${montrer('accroche') ? 'text-red-700' : 'text-[#5E5E5E]'}`}>
+                    <span>{montrer('accroche') ?? "Sous le titre de la page d'accueil."}</span><span>{na.accroche.length}/160</span>
+                  </p>
+                </div>
+              </div>
+              <p className="mt-3 text-xs text-[#5E5E5E]">
+                Le nom remplace aussi « {'{nom}'} » dans les textes du site. Tous les autres textes (titres, boutons, pages) se modifient dans{' '}
+                <Link to="/admin/textes" className="font-semibold text-[#111111] underline underline-offset-2">Textes du site</Link>.
+              </p>
+
+              <div className="mt-6 border-t border-[#E5E5E5] pt-5">
+                <h3 className="font-semibold text-[#111111]">Logo et icône</h3>
+                <p className="mb-4 text-sm text-[#666666]">Logo de la barre du haut et du pied de page, icône de l'onglet, des téléphones et de Google.</p>
+                <BlocIcone identite={identite} nom={nomEnregistre?.nom} onEnregistre={(m) => { setMessage(m); setErreur(''); charger(); }} />
+              </div>
+
+              <div className="mt-6 border-t border-[#E5E5E5] pt-5">
+                <h3 className="font-semibold text-[#111111]">Image de la page d'accueil</h3>
+                <p className="mb-4 text-sm text-[#666666]">La grande photo en haut de la page d'accueil, derrière le titre.</p>
+                <BlocFondAccueil fond={fond} onEnregistre={(m) => { setMessage(m); setErreur(''); charger(); }} />
+              </div>
+            </Bloc>
+
+            <Bloc id="contact" icone={<Phone className="h-5 w-5" />} titre="Contact" sousTitre="Comment les clients vous joignent.">
               <div className="grid gap-4 md:grid-cols-2">
                 <Champ id="i-tel" label="Téléphone" type="tel" valeur={c.telephone} onChange={(v) => maj({ telephone: v })}
                   onBlur={() => chiffresTelephone(c.telephone) && maj({ telephone: formaterTelephone(c.telephone) })}
@@ -327,7 +445,7 @@ export function InfosSite() {
               </p>
             </Bloc>
 
-            <Bloc icone={<MapPin className="h-5 w-5" />} titre="Showroom" sousTitre="Adresse affichée, lien Google Maps et informations pour Google.">
+            <Bloc id="showroom" icone={<MapPin className="h-5 w-5" />} titre="Showroom" sousTitre="Adresse affichée, lien Google Maps et informations pour Google.">
               <div className="grid gap-4 md:grid-cols-6">
                 <Champ className="md:col-span-2" id="i-nom" label="Nom du showroom" valeur={c.showroom.nom} onChange={(v) => majShowroom({ nom: v })} err={montrer('nom')} aide="Ex. : Chaville" />
                 <Champ className="md:col-span-4" id="i-adr" label="Adresse" valeur={c.showroom.adresse} onChange={(v) => majShowroom({ adresse: v })} err={montrer('adresse')} placeholder="310 Avenue Roger Salengro" />
@@ -345,7 +463,7 @@ export function InfosSite() {
               </a>
             </Bloc>
 
-            <Bloc icone={<Clock className="h-5 w-5" />} titre="Horaires" sousTitre="Jour par jour ; le texte affiché sur le site et les horaires pour Google en sont tirés.">
+            <Bloc id="horaires" icone={<Clock className="h-5 w-5" />} titre="Horaires" sousTitre="Jour par jour ; le texte affiché sur le site et les horaires pour Google en sont tirés.">
               <ul className="divide-y divide-[#E5E5E5]">
                 {c.horaires.map((j, i) => (
                   <li key={JOURS[i]} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:gap-4">
@@ -405,7 +523,7 @@ export function InfosSite() {
               </div>
             </Bloc>
 
-            <Bloc icone={<Building2 className="h-5 w-5" />} titre="Société" sousTitre="Mentions légales du site et parties des contrats de dépôt-vente.">
+            <Bloc id="societe" icone={<Building2 className="h-5 w-5" />} titre="Société" sousTitre="Mentions légales du site et parties des contrats de dépôt-vente.">
               <p className="mb-5 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
                 <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                 <span>
@@ -442,11 +560,7 @@ export function InfosSite() {
               </div>
             </Bloc>
 
-            <Bloc icone={<ImageIcon className="h-5 w-5" />} titre="Logo et icône" sousTitre="Logo de la barre du haut et du pied de page, icône de l'onglet, des téléphones et de Google.">
-              <BlocIcone identite={identite} onEnregistre={(m) => { setMessage(m); setErreur(''); charger(); }} />
-            </Bloc>
-
-            <section className="rounded-xl border-2 border-[#D1D5DB] bg-white p-4 md:p-6" aria-labelledby="historique-titre">
+            <section id="historique" className="scroll-mt-32 rounded-xl border-2 border-[#D1D5DB] bg-white p-4 md:p-6" aria-labelledby="historique-titre">
               <div className="mb-4 flex items-start gap-3">
                 <History className="mt-0.5 h-5 w-5 text-[#111111]" aria-hidden="true" />
                 <div>
@@ -459,7 +573,9 @@ export function InfosSite() {
               ) : (
                 <ul className="space-y-3">
                   {historique.map((v) => {
-                    const d = !v.ancienne_valeur ? [] : v.cle === CLE_IDENTITE
+                    const d = !v.ancienne_valeur ? [] : v.cle === CLE_FOND_ACCUEIL
+                      ? changementsFond(normaliserFondAccueil(v.ancienne_valeur), normaliserFondAccueil(v.nouvelle_valeur))
+                      : v.cle === CLE_IDENTITE
                       ? changementsIdentite(normaliserIdentite(v.ancienne_valeur), normaliserIdentite(v.nouvelle_valeur))
                       : v.cle === CLE_SOCIETE
                       ? changementsSociete(normaliserSociete(v.ancienne_valeur), normaliserSociete(v.nouvelle_valeur))
@@ -472,7 +588,7 @@ export function InfosSite() {
                             <span className="font-semibold text-[#111111]">
                               {new Date(v.fait_le).toLocaleString('fr-FR', { timeZone: 'Europe/Paris', dateStyle: 'long', timeStyle: 'short' })}
                             </span>
-                            <span className="text-[#666666]"> · {v.cle === CLE_SOCIETE ? 'Société' : v.cle === CLE_IDENTITE ? 'Logo et icône' : 'Coordonnées'} · {v.par ?? 'inconnu'}</span>
+                            <span className="text-[#666666]"> · {LIBELLES_CLE[v.cle] ?? 'Coordonnées'} · {v.par ?? 'inconnu'}</span>
                           </p>
                           {avant && d.length > 0 && (
                             <button type="button" onClick={() => restaurer(v)}
@@ -512,7 +628,7 @@ export function InfosSite() {
                 : <strong className="text-[#111111]">Modification en cours</strong>}
             </p>
             <div className="flex gap-2">
-              <button type="button" onClick={() => { setC(enregistrees); if (societeEnregistree) setSoc(societeEnregistree); setTentative(false); setErreur(''); }}
+              <button type="button" onClick={() => { setC(enregistrees); if (societeEnregistree) setSoc(societeEnregistree); if (nomEnregistre) setNa(nomEnregistre); setTentative(false); setErreur(''); }}
                 className="rounded-xl border border-[#D1D5DB] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111] hover:border-[#111111]">
                 Annuler
               </button>
@@ -524,10 +640,15 @@ export function InfosSite() {
         </div>
       )}
 
-      {confirmation && enregistrees && societeEnregistree && (() => {
-        const liste = confirmation.identite
+      {confirmation && enregistrees && societeEnregistree && nomEnregistre && (() => {
+        const liste = confirmation.fond
+          ? changementsFond(fond, confirmation.fond.valeur)
+          : confirmation.identite
           ? changementsIdentite(identite, confirmation.identite)
-          : [...changements(enregistrees, confirmation.coord), ...changementsSociete(societeEnregistree, confirmation.soc)];
+          : [
+            ...(confirmation.nom ? changementsNom(nomEnregistre, confirmation.nom) : []),
+            ...changements(enregistrees, confirmation.coord), ...changementsSociete(societeEnregistree, confirmation.soc),
+          ];
         const societeChange = changementsSociete(societeEnregistree, confirmation.soc).length > 0;
         return (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="confirm-titre">
@@ -560,7 +681,7 @@ export function InfosSite() {
                 Annuler
               </button>
               <button type="button" disabled={envoi || liste.length === 0}
-                onClick={() => enregistrer(confirmation.coord, confirmation.soc, confirmation.identite)}
+                onClick={() => enregistrer(confirmation.coord, confirmation.soc, confirmation.identite, confirmation.nom, confirmation.fond)}
                 className="flex-1 rounded-xl bg-[#111111] py-2.5 font-semibold text-white disabled:opacity-50">
                 {envoi ? 'Enregistrement…' : 'Confirmer'}
               </button>

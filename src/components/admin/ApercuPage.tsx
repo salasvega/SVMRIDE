@@ -6,14 +6,24 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Monitor, Smartphone } from 'lucide-react';
 import type { MessageApercu } from '../../lib/theme';
+import type { FondAccueil } from '../../config/medias';
 
-export function ApercuPage({ chemin, textes, repere }: { chemin: string; textes: Record<string, string>; repere: string | null }) {
+export function ApercuPage({ chemin, textes, repere = null, fond, legende = 'Les changements apparaissent ici tout de suite ; les visiteurs les verront après « Enregistrer ».', hauteurMax = 720 }: {
+  chemin: string;
+  /** Textes à montrer (absent : textes du site) */
+  textes?: Record<string, string>;
+  repere?: string | null;
+  /** Fond de l'accueil à montrer (absent : celui du site ; null : image d'origine) */
+  fond?: FondAccueil | null;
+  legende?: string;
+  hauteurMax?: number;
+}) {
   const boite = useRef<HTMLDivElement>(null);
   const cadre = useRef<HTMLIFrameElement>(null);
   const [place, setPlace] = useState(400);
   const [appareil, setAppareil] = useState<'ordinateur' | 'mobile'>('ordinateur');
   const largeur = appareil === 'ordinateur' ? 1280 : 390;
-  const hauteur = Math.round(Math.min(720, Math.max(420, window.innerHeight - 250)));
+  const hauteur = Math.round(Math.min(hauteurMax, Math.max(380, window.innerHeight - 250)));
 
   useEffect(() => {
     const el = boite.current;
@@ -26,9 +36,10 @@ export function ApercuPage({ chemin, textes, repere }: { chemin: string; textes:
   const envoyer = useCallback(() => {
     const w = cadre.current?.contentWindow;
     if (!w) return;
-    w.postMessage({ type: 'svm-apercu-textes', textes } satisfies MessageApercu, window.location.origin);
+    if (textes) w.postMessage({ type: 'svm-apercu-textes', textes } satisfies MessageApercu, window.location.origin);
+    if (fond !== undefined) w.postMessage({ type: 'svm-apercu-fond', fond } satisfies MessageApercu, window.location.origin);
     w.postMessage({ type: 'svm-apercu-repere', texte: repere } satisfies MessageApercu, window.location.origin);
-  }, [textes, repere]);
+  }, [textes, repere, fond]);
 
   useEffect(() => {
     envoyer();
@@ -67,7 +78,7 @@ export function ApercuPage({ chemin, textes, repere }: { chemin: string; textes:
           />
         </div>
       </div>
-      <p className="text-xs text-[#666666]">Les changements apparaissent ici tout de suite ; les visiteurs les verront après « Enregistrer ».</p>
+      {legende && <p className="text-xs text-[#666666]">{legende}</p>}
     </div>
   );
 }

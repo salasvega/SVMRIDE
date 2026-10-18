@@ -24,6 +24,8 @@ function initial(): FondAccueil | null {
 }
 
 let courant: FondAccueil | null = initial();
+/** Aperçu de l'admin : undefined = pas d'aperçu, null = image d'origine */
+let apercu: FondAccueil | null | undefined;
 let lu = false;
 const abonnes = new Set<() => void>();
 
@@ -59,7 +61,16 @@ const sAbonner = (f: () => void) => {
   charger();
   return () => abonnes.delete(f);
 };
-const lire = () => courant;
+/** Aperçu de l'admin (undefined : fin de l'aperçu) */
+export function apercuFondAccueil(f: FondAccueil | null | undefined) {
+  // Images pas encore envoyées : adresses « blob: » de la page de l'admin (même site)
+  const blob = (u: unknown) => typeof u === 'string' && u.startsWith(`blob:${window.location.origin}/`) && !/["'()\\\s]/.test(u);
+  if (f && blob(f.ordinateur) && blob(f.mobile)) apercu = { version: 'apercu', ordinateur: f.ordinateur, mobile: f.mobile };
+  else apercu = f === undefined ? undefined : normaliserFondAccueil(f);
+  abonnes.forEach((x) => x());
+}
+
+const lire = () => (apercu === undefined ? courant : apercu);
 
 export function useFondAccueil(): FondAccueil | null {
   return useSyncExternalStore(sAbonner, lire, lire);
