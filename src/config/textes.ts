@@ -23,6 +23,7 @@ import { PAGES_EQUIPE } from './textes-pages/equipe.ts';
 import { PAGES_SUIVRE } from './textes-pages/suivre.ts';
 import { PAGES_COMMUN } from './textes-pages/commun.ts';
 import { PAGES_SEO } from './textes-pages/seo.ts';
+import { cleOrdre, ID_AJOUTE, LISTES, lireOrdre, NOMS_ICONES } from './textes-listes.ts';
 
 /** Pages de l'admin « Textes du site », dans l'ordre du menu */
 export const PAGES_TEXTES: PageTextes[] = [
@@ -53,12 +54,49 @@ const LIEN = /^(\/[^\s]*|https:\/\/[^\s]+)$/;
 export function normaliserTextes(brut: unknown): Textes {
   const sortie: Textes = {};
   if (!brut || typeof brut !== 'object' || Array.isArray(brut)) return sortie;
-  for (const [cle, v] of Object.entries(brut as Record<string, unknown>)) {
+  const entree = brut as Record<string, unknown>;
+  for (const [cle, v] of Object.entries(entree)) {
+    if (typeof v !== 'string') continue;
     const def = TEXTES[cle];
-    if (!def || typeof v !== 'string') continue;
-    const propre = nettoyer(v, def.max ?? 420);
-    if (def.type === 'lien' && propre && !LIEN.test(propre)) continue;
-    if (propre !== def.defaut) sortie[cle] = propre;
+    if (def) {
+      const propre = nettoyer(v, def.max ?? 420);
+      if (def.type === 'lien' && propre && !LIEN.test(propre)) continue;
+      if (propre !== def.defaut) sortie[cle] = propre;
+      continue;
+    }
+    // Listes modulables : ordre, icônes, textes des éléments ajoutés
+    for (const l of LISTES) {
+      if (!cle.startsWith(`${l.id}.`)) continue;
+      if (cle === cleOrdre(l)) {
+        const ids = lireOrdre(l, v);
+        if (ids && ids.join(',') !== l.ids.join(',')) sortie[cle] = ids.join(',');
+        break;
+      }
+      const [id, champ, ...reste] = cle.slice(l.id.length + 1).split('.');
+      if (reste.length || !id || !champ) break;
+      const connu = l.ids.includes(id) || ID_AJOUTE.test(id);
+      if (champ === 'icone') {
+        const origine = l.icones?.[id] ?? l.iconeNouveau;
+        if (connu && l.icones && (NOMS_ICONES as readonly string[]).includes(v) && v !== origine) sortie[cle] = v;
+        break;
+      }
+      const c = l.champs.find((x) => x.nom === champ);
+      if (c && ID_AJOUTE.test(id)) {
+        const propre = nettoyer(v, c.max);
+        if (c.type === 'lien' && propre && !LIEN.test(propre)) break;
+        sortie[cle] = propre;
+      }
+      break;
+    }
+  }
+  // Textes et icônes d'éléments ajoutés puis supprimés : retirés
+  for (const l of LISTES) {
+    const ids = new Set(lireOrdre(l, sortie[cleOrdre(l)]) ?? l.ids);
+    for (const cle of Object.keys(sortie)) {
+      if (!cle.startsWith(`${l.id}.`) || cle === cleOrdre(l)) continue;
+      const id = cle.slice(l.id.length + 1).split('.')[0];
+      if (ID_AJOUTE.test(id) && !ids.has(id)) delete sortie[cle];
+    }
   }
   return sortie;
 }

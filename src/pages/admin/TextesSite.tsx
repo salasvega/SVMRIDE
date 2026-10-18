@@ -10,12 +10,17 @@
  * (seuls les textes modifiés y sont gardés).
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Eye, History, List, Loader2, MousePointerClick, RotateCcw, Search, Type, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Eye, History, List, Loader2, MousePointerClick, Plus, RotateCcw, Search, Trash2, Type, X } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { ApercuPage } from '../../components/admin/ApercuPage';
 import { supabase } from '../../lib/supabase';
 import { appliquerTextes } from '../../lib/textes';
 import { CLE_TEXTES, normaliserTextes, PAGES_TEXTES, SEO_PAGES, texte, TEXTES, type DefTexte, type PageTextes, type Textes } from '../../config/textes';
+import {
+  cleElement, cleIcone, cleOrdre, elementDeCle, LISTES, LISTES_PAR_ID, lireOrdre, NOMS_ICONES, nouvelId, type ListeDef,
+} from '../../config/textes-listes';
+import { ICONES, NOMS_FR } from '../../config/icones';
+import type { ActionListe } from '../../lib/edition';
 
 interface Version {
   id: number;
@@ -29,6 +34,27 @@ const PAGES = PAGES_TEXTES;
 /** Où se trouve chaque texte (première page qui le contient) */
 const OU: Record<string, { page: PageTextes; section: string }> = {};
 for (const p of PAGES) for (const s of p.sections) for (const t of s.textes) OU[t.cle] ??= { page: p, section: s.titre };
+/** Définition d'un texte, y compris ceux des éléments ajoutés aux listes */
+function defDe(cle: string): DefTexte | undefined {
+  if (TEXTES[cle]) return TEXTES[cle];
+  const e = elementDeCle(cle);
+  return e ? { cle, libelle: e.champ.libelle, defaut: e.champ.nouveau, type: e.champ.type, max: e.champ.max } : undefined;
+}
+/** Page et section d'un texte (éléments ajoutés : ceux de leur liste) */
+function ouDe(cle: string): { page: PageTextes; section: string } | undefined {
+  if (OU[cle]) return OU[cle];
+  const e = elementDeCle(cle) ?? (() => {
+    const l = LISTES.find((x) => cle.startsWith(`${x.id}.`));
+    return l ? { liste: l } : null;
+  })();
+  const page = e && PAGES.find((p) => p.cle === e.liste.page);
+  return page && e ? { page, section: e.liste.section } : undefined;
+}
+const majuscule = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const pluriel = (l: ListeDef) => (l.element.endsWith('s') ? l.element : `${l.element}s`);
+/** Liste modulable d'une section du registre */
+const listeDe = (page: string, section: string) => LISTES.find((l) => l.page === page && l.section === section);
+
 /** Textes présents sur toutes les pages (pas une page à ouvrir dans l'aperçu) */
 const COMMUNES = new Set(['identite', 'annonce', 'navigation', 'pied', 'cookies', 'avis', 'fichiers']);
 /** Pages du site qu'on peut ouvrir dans « Modifier sur la page » */
@@ -73,15 +99,39 @@ const date = (iso: string) => new Date(iso).toLocaleString('fr-FR', { day: '2-di
 function differences(a: Textes, b: Textes): { cle: string; libelle: string; avant: string; apres: string }[] {
   const cles = new Set([...Object.keys(a), ...Object.keys(b)]);
   return [...cles]
-    .filter((k) => texte(a, k) !== texte(b, k) || (a[k] ?? '') !== (b[k] ?? ''))
-    .map((k) => ({ cle: k, libelle: libelleComplet(k), avant: texte(a, k), apres: texte(b, k) }))
+    .filter((k) => afficher(a, k) !== afficher(b, k))
+    .map((k) => ({ cle: k, libelle: libelleComplet(k), avant: afficher(a, k), apres: afficher(b, k) }))
     .filter((d) => d.avant !== d.apres);
+}
+
+/** Valeur lisible d'une clé : texte, liste des éléments (ordre) ou nom d'icône */
+function afficher(t: Textes, cle: string): string {
+  const l = LISTES.find((x) => cle === cleOrdre(x));
+  if (l) {
+    const ids = lireOrdre(l, t[cle]) ?? l.ids;
+    return `${ids.length} ${pluriel(l)} : ${ids.map((id, i) => `${i + 1}. ${texte(t, cleElement(l, id, l.champs[0].nom)) || '(sans titre)'}`).join(' · ')}`;
+  }
+  if (cle.endsWith('.icone')) {
+    const li = LISTES.find((x) => cle.startsWith(`${x.id}.`));
+    const id = li ? cle.slice(li.id.length + 1).split('.')[0] : '';
+    const nom = t[cle] ?? li?.icones?.[id] ?? li?.iconeNouveau ?? '';
+    return NOMS_FR[nom] ?? nom;
+  }
+  return texte(t, cle);
 }
 
 function libelleComplet(cle: string): string {
   for (const p of PAGES) for (const s of p.sections) {
     const t = s.textes.find((x) => x.cle === cle);
     if (t) return `${p.libelle} › ${s.titre} › ${t.libelle}`;
+  }
+  const l = LISTES.find((x) => cle.startsWith(`${x.id}.`));
+  const ou = ouDe(cle);
+  if (l && ou) {
+    if (cle === cleOrdre(l)) return `${ou.page.libelle} › ${ou.section} › Liste des ${pluriel(l)}`;
+    const e = elementDeCle(cle);
+    if (cle.endsWith('.icone')) return `${ou.page.libelle} › ${ou.section} › ${majuscule(l.element)} : icône`;
+    if (e) return `${ou.page.libelle} › ${ou.section} › ${majuscule(l.element)} ${l.feminin ? 'ajoutée' : 'ajouté'} : ${e.champ.libelle.toLowerCase()}`;
   }
   return cle;
 }
@@ -140,12 +190,133 @@ function ApercuGoogle({ titre, description, chemin }: { titre: string; descripti
   );
 }
 
+/** Choix de l'icône d'une carte (bulle ou liste) */
+function ChoixIcone({ valeur, onChoix }: { valeur: string; onChoix: (nom: string) => void }) {
+  return (
+    <div className="grid grid-cols-7 gap-1" role="radiogroup" aria-label="Icône">
+      {NOMS_ICONES.map((nom) => {
+        const Icone = ICONES[nom];
+        const actif = nom === valeur;
+        return (
+          <button key={nom} type="button" role="radio" aria-checked={actif} title={NOMS_FR[nom]} aria-label={NOMS_FR[nom]} onClick={() => onChoix(nom)}
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-lg border ${actif ? 'border-[#111111] bg-[#111111] text-white' : 'border-transparent text-[#444444] hover:border-[#D1D5DB] hover:bg-[#F5F5F5]'}`}>
+            <Icone className="h-[18px] w-[18px]" strokeWidth={1.8} aria-hidden="true" />
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Bulle des outils d'un élément de liste (choix de l'icône, confirmation de suppression) */
+function BulleOutil({ type, liste, nom, icone, onIcone, onSupprimer, onFermer }: {
+  type: 'icone' | 'supprimer'; liste: ListeDef; nom: string; icone: string;
+  onIcone: (nom: string) => void; onSupprimer: () => void; onFermer: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#D1D5DB] bg-white p-3 shadow-[0_12px_40px_rgba(0,0,0,0.22)]" role="dialog"
+      aria-label={type === 'icone' ? 'Choisir l’icône' : 'Supprimer'} onKeyDown={(e) => { if (e.key === 'Escape') onFermer(); }}>
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <p className="text-sm font-semibold text-[#111111]">{type === 'icone' ? `Icône : ${nom}` : `Supprimer ${liste.feminin ? 'cette' : 'cet'} ${liste.element} ?`}</p>
+        <button type="button" onClick={onFermer} className="rounded-full p-1 text-[#666666] hover:bg-[#F5F5F5]" aria-label="Fermer (Échap)"><X className="h-4 w-4" /></button>
+      </div>
+      {type === 'icone' ? (
+        <ChoixIcone valeur={icone} onChoix={(n) => { onIcone(n); onFermer(); }} />
+      ) : (
+        <>
+          <p className="text-sm text-[#444444]">« {nom} » sera retiré{liste.feminin ? 'e' : ''} de la page après « Enregistrer ». Vous pourrez revenir en arrière depuis l’historique.</p>
+          <div className="mt-3 flex justify-end gap-2">
+            <button type="button" onClick={onFermer} className="rounded-lg border border-[#D1D5DB] px-3 py-1.5 text-xs font-semibold text-[#111111]">Annuler</button>
+            <button type="button" autoFocus onClick={onSupprimer} className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700">Supprimer</button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Liste modulable dans la vue Liste : éléments, ordre, icônes, ajout et suppression */
+function EditeurListe({ liste: l, ids, valeur, textesSection, onChange, onFocus, onAction, onIcone, onOrigine, modifiee }: {
+  liste: ListeDef; ids: string[]; valeur: (cle: string) => string; textesSection: DefTexte[];
+  onChange: (cle: string, v: string) => void; onFocus: (cle: string) => void;
+  onAction: (action: ActionListe, id: string) => void; onIcone: (id: string, nom: string) => void; onOrigine: () => void; modifiee: boolean;
+}) {
+  const [aSupprimer, setASupprimer] = useState<string | null>(null);
+  const [iconeOuverte, setIconeOuverte] = useState<string | null>(null);
+  const bouton = 'inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#D1D5DB] text-[#111111] hover:border-[#111111] disabled:cursor-not-allowed disabled:opacity-30';
+  return (
+    <div className="space-y-3 pb-4">
+      {ids.map((id, i) => {
+        const special = !!l.speciaux?.includes(id);
+        const champs: DefTexte[] = special
+          ? textesSection.filter((t) => t.cle.startsWith(`${l.id}.${id}.`))
+          : l.champs.map((c) => defDe(cleElement(l, id, c.nom))).filter((d): d is DefTexte => !!d);
+        const nom = valeur(cleElement(l, id, l.champs[0].nom)) || `${majuscule(l.element)} ${i + 1}`;
+        const icone = valeur(cleIcone(l, id)) || l.icones?.[id] || l.iconeNouveau || 'Star';
+        const Icone = ICONES[icone as keyof typeof ICONES] ?? ICONES.Star;
+        return (
+          <div key={id} className="rounded-xl border border-[#E5E5E5] bg-[#FAFAFA] px-3 pt-2.5 md:px-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="flex items-center gap-2 text-sm font-bold text-[#111111]">
+                {l.icones && !special && <Icone className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />}
+                {majuscule(l.element)} {i + 1}
+                {special && <span className="rounded-full bg-[#EEF2FF] px-2 py-0.5 text-[10px] font-semibold text-[#3730A3]">présentation particulière</span>}
+              </p>
+              <div className="flex items-center gap-1">
+                <button type="button" className={bouton} disabled={i === 0} onClick={() => onAction('monter', id)} aria-label={`Monter ${l.element} ${i + 1}`} title="Monter"><ArrowUp className="h-4 w-4" /></button>
+                <button type="button" className={bouton} disabled={i === ids.length - 1} onClick={() => onAction('descendre', id)} aria-label={`Descendre ${l.element} ${i + 1}`} title="Descendre"><ArrowDown className="h-4 w-4" /></button>
+                {l.icones && !special && (
+                  <button type="button" className={`${bouton} w-auto px-2 text-xs font-semibold`} onClick={() => setIconeOuverte(iconeOuverte === id ? null : id)} aria-expanded={iconeOuverte === id}>Icône</button>
+                )}
+                {aSupprimer === id ? (
+                  <span className="ml-1 inline-flex items-center gap-1 text-xs">
+                    <button type="button" onClick={() => { setASupprimer(null); onAction('supprimer', id); }} className="rounded-lg bg-red-600 px-2.5 py-1.5 font-semibold text-white">Supprimer</button>
+                    <button type="button" onClick={() => setASupprimer(null)} className="rounded-lg border border-[#D1D5DB] bg-white px-2.5 py-1.5 font-semibold">Annuler</button>
+                  </span>
+                ) : (
+                  <button type="button" className={`${bouton} hover:border-red-600 hover:text-red-700`} disabled={ids.length <= l.min} onClick={() => setASupprimer(id)}
+                    aria-label={`Supprimer ${l.element} ${i + 1}`} title={ids.length <= l.min ? `Au moins ${l.min} ${l.min > 1 ? pluriel(l) : l.element}` : 'Supprimer'}>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+            {iconeOuverte === id && (
+              <div className="mt-2 rounded-xl border border-[#E5E5E5] bg-white p-2">
+                <ChoixIcone valeur={icone} onChoix={(n) => { onIcone(id, n); setIconeOuverte(null); }} />
+              </div>
+            )}
+            <div className="divide-y divide-[#EEEEEE]">
+              {champs.map((d) => (
+                <Champ key={d.cle} def={d} valeur={valeur(d.cle)} onChange={(v) => onChange(d.cle, v)} onFocus={() => onFocus(d.cle)} />
+              ))}
+            </div>
+            {aSupprimer === id && <p className="pb-2 text-xs text-red-700">« {nom} » sera retiré{l.feminin ? 'e' : ''} après « Enregistrer ».</p>}
+          </div>
+        );
+      })}
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={() => onAction('ajouter', ids[ids.length - 1])} disabled={ids.length >= l.max}
+          className="inline-flex items-center gap-1.5 rounded-xl border-2 border-dashed border-[#9CA3AF] px-3 py-2 text-sm font-semibold text-[#111111] hover:border-[#111111] disabled:cursor-not-allowed disabled:opacity-40">
+          <Plus className="h-4 w-4" aria-hidden="true" /> Ajouter {l.feminin ? 'une' : 'un'} {l.element}
+        </button>
+        <span className="text-xs text-[#666666]">{ids.length} {ids.length > 1 ? pluriel(l) : l.element} · de {l.min} à {l.max}</span>
+        {modifiee && (
+          <button type="button" onClick={onOrigine} className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-[#444444] hover:text-[#111111]">
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" /> Revenir à la liste d’origine
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /** Bulle d'édition posée à côté du texte cliqué (« Modifier sur la page ») */
 function BulleTexte({ def, valeur, onChange, onFermer, onListe }: {
   def: DefTexte; valeur: string; onChange: (v: string) => void; onFermer: () => void; onListe: () => void;
 }) {
   const champ = useRef<HTMLTextAreaElement>(null);
-  const ou = OU[def.cle];
+  const ou = ouDe(def.cle);
   const max = def.max ?? 420;
   const modifie = valeur !== def.defaut;
   useEffect(() => {
@@ -216,6 +387,7 @@ export function TextesSite() {
   const [utiliser, setUtiliser] = useState(false);
   const [slugVehicule, setSlugVehicule] = useState<string | null>(null);
   const [aFocaliser, setAFocaliser] = useState<string | null>(null);
+  const [outil, setOutil] = useState<{ type: 'icone' | 'supprimer'; liste: string; id: string } | null>(null);
   const navPages = useRef<HTMLElement>(null);
   const [historique, setHistorique] = useState<Version[]>([]);
   const [erreur, setErreur] = useState('');
@@ -270,6 +442,44 @@ export function TextesSite() {
     setModifs((m) => ({ ...m, [cle]: v }));
     setActif(cle);
   };
+
+  // Listes modulables : ordre, ajout, suppression, icônes (enregistrés avec les textes)
+  const ordreDe = (l: ListeDef) => lireOrdre(l, valeur(cleOrdre(l))) ?? l.ids;
+  const actionListe = (action: ActionListe, listeId: string, id: string) => {
+    const l = LISTES_PAR_ID[listeId];
+    if (!l) return;
+    const ids = [...ordreDe(l)];
+    const i = ids.indexOf(id);
+    if (i < 0) return;
+    if (action === 'icone' || (action === 'supprimer' && vue === 'page' && outil?.type !== 'supprimer')) {
+      setActif(null);
+      setOutil({ type: action, liste: listeId, id });
+      return;
+    }
+    if (action === 'monter' && i > 0) [ids[i - 1], ids[i]] = [ids[i], ids[i - 1]];
+    else if (action === 'descendre' && i < ids.length - 1) [ids[i + 1], ids[i]] = [ids[i], ids[i + 1]];
+    else if (action === 'supprimer' && ids.length > l.min) ids.splice(i, 1);
+    else if (action === 'ajouter' && ids.length < l.max) {
+      let nid = nouvelId();
+      while (ids.includes(nid)) nid = nouvelId();
+      ids.splice(i + 1, 0, nid);
+      setModifs((m) => ({ ...m, [cleOrdre(l)]: ids.join(','), ...Object.fromEntries(l.champs.map((c) => [cleElement(l, nid, c.nom), c.nouveau])) }));
+      setOutil(null);
+      const premier = cleElement(l, nid, l.champs[0].nom);
+      setActif(premier);
+      if (vue === 'liste') setAFocaliser(premier);
+      return;
+    } else return;
+    setOutil(null);
+    setModifs((m) => ({ ...m, [cleOrdre(l)]: ids.join(',') }));
+  };
+  const changerIcone = (l: ListeDef, id: string, nom: string) => setModifs((m) => ({ ...m, [cleIcone(l, id)]: nom }));
+  const origineListe = (l: ListeDef) => setModifs((m) => ({
+    ...m,
+    [cleOrdre(l)]: l.ids.join(','),
+    ...Object.fromEntries(l.ids.filter((id) => l.icones?.[id]).map((id) => [cleIcone(l, id), l.icones![id]])),
+  }));
+  const listeModifiee = (l: ListeDef) => ordreDe(l).join(',') !== l.ids.join(',') || l.ids.some((id) => l.icones && valeur(cleIcone(l, id)) && valeur(cleIcone(l, id)) !== l.icones[id]);
 
   const page = PAGES.find((p) => p.cle === pageCle) ?? PAGES[0];
   const q = sansAccent(recherche.trim());
@@ -434,11 +644,19 @@ export function TextesSite() {
               textes={courants}
               hauteurMax={1400}
               onNavigation={surNavigation}
-              edition={{ actif, tous, utiliser, onClic: (cle) => setActif(cle) }}
+              edition={{ actif, tous, utiliser, onClic: (cle) => { setOutil(null); setActif(cle); }, onListe: actionListe }}
               legende="Un clic sur le texte d’un lien ou d’un bouton le modifie : pour changer de page ou avancer dans un formulaire, utilisez la liste « Page » ou « Utiliser la page ». Les visiteurs verront les changements après « Enregistrer »."
-              bulle={actif && TEXTES[actif] ? (
-                <BulleTexte def={TEXTES[actif]} valeur={valeur(actif)} onChange={(v) => maj(actif, v)} onFermer={() => setActif(null)}
-                  onListe={() => { const ou = OU[actif]; if (ou) setPageCle(ou.page.cle); setVue('liste'); setAFocaliser(actif); }} />
+              bulle={outil && LISTES_PAR_ID[outil.liste] ? (() => {
+                const l = LISTES_PAR_ID[outil.liste];
+                const n = ordreDe(l).indexOf(outil.id) + 1;
+                return (
+                  <BulleOutil type={outil.type} liste={l} nom={valeur(cleElement(l, outil.id, l.champs[0].nom)) || `${majuscule(l.element)} ${n}`}
+                    icone={valeur(cleIcone(l, outil.id)) || l.icones?.[outil.id] || l.iconeNouveau || 'Star'}
+                    onIcone={(nom) => changerIcone(l, outil.id, nom)} onSupprimer={() => actionListe('supprimer', outil.liste, outil.id)} onFermer={() => setOutil(null)} />
+                );
+              })() : actif && defDe(actif) ? (
+                <BulleTexte def={defDe(actif)!} valeur={valeur(actif)} onChange={(v) => maj(actif, v)} onFermer={() => setActif(null)}
+                  onListe={() => { const ou = ouDe(actif); if (ou) setPageCle(ou.page.cle); setVue('liste'); setAFocaliser(actif); }} />
               ) : null}
             />
           </div>
@@ -468,11 +686,24 @@ export function TextesSite() {
                   <section key={`${p.cle}-${s.titre}`} className="rounded-xl border-2 border-[#D1D5DB] bg-white px-4 pt-3 md:px-5">
                     <h2 className="text-lg font-bold text-[#111111]">{q ? `${p.libelle} › ${s.titre}` : s.titre}</h2>
                     {s.aide && <p className="text-sm text-[#666666]">{s.aide}</p>}
-                    <div className="divide-y divide-[#EEEEEE]">
-                      {s.textes.map((t) => (
-                        <Champ key={t.cle} def={t} valeur={valeur(t.cle)} onChange={(v) => maj(t.cle, v)} onFocus={() => { if (p.chemin && !COMMUNES.has(p.cle)) setPageCle(p.cle); else if (p.chemin && p.cle !== pageCle) setPageCle(p.cle); setActif(t.cle); setMontrer((n) => n + 1); }} />
-                      ))}
-                    </div>
+                    {(() => {
+                      const l = !q ? listeDe(p.cle, s.titre) : undefined;
+                      const focus = (cle: string) => { if (p.chemin && p.cle !== pageCle) setPageCle(p.cle); setActif(cle); setMontrer((n) => n + 1); };
+                      const dansListe = (cle: string) => !!l && (elementDeCle(cle)?.liste.id === l.id || l.ids.some((id) => cle.startsWith(`${l.id}.${id}.`)));
+                      return (
+                        <>
+                          <div className="divide-y divide-[#EEEEEE]">
+                            {s.textes.filter((t) => !dansListe(t.cle)).map((t) => (
+                              <Champ key={t.cle} def={t} valeur={valeur(t.cle)} onChange={(v) => maj(t.cle, v)} onFocus={() => focus(t.cle)} />
+                            ))}
+                          </div>
+                          {l && (
+                            <EditeurListe liste={l} ids={ordreDe(l)} valeur={valeur} textesSection={s.textes} onChange={maj} onFocus={focus}
+                              onAction={(a, id) => actionListe(a, l.id, id)} onIcone={(id, nom) => changerIcone(l, id, nom)} onOrigine={() => origineListe(l)} modifiee={listeModifiee(l)} />
+                          )}
+                        </>
+                      );
+                    })()}
                     {p.cle === 'seo' && (() => {
                       const slug = s.textes[0].cle.split('.')[1];
                       return (
@@ -518,7 +749,7 @@ export function TextesSite() {
             {/* Aperçu */}
             <aside className="hidden xl:block xl:sticky xl:top-24 xl:self-start">
               {page.chemin || q ? (
-                <ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp }}
+                <ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp, onListe: actionListe }}
                   legende="Cliquez sur un texte de l’aperçu pour aller à son champ. Les visiteurs verront les changements après « Enregistrer »." />
               ) : (
                 <p className="rounded-xl border-2 border-dashed border-[#D1D5DB] p-4 text-sm text-[#666666]">Aperçu des résultats Google sous chaque page, à gauche.</p>
@@ -533,7 +764,7 @@ export function TextesSite() {
               className="inline-flex items-center gap-2 rounded-xl border-2 border-[#111111] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111]">
               <Eye className="h-4 w-4" aria-hidden="true" /> {apercuMobile ? 'Masquer l’aperçu' : 'Voir l’aperçu de la page'}
             </button>
-            {apercuMobile && <div className="mt-3"><ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp }} /></div>}
+            {apercuMobile && <div className="mt-3"><ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp, onListe: actionListe }} /></div>}
           </div>
         )}
       </div>

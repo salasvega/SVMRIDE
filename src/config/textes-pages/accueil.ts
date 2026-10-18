@@ -2,7 +2,7 @@
  * Textes du site : Accueil, nom du site et bandeau d'annonce.
  * Registre : voir src/config/textes-outils.ts (conventions) et src/config/textes.ts.
  */
-import { L, P, atouts, type PageTextes } from '../textes-outils.ts';
+import { L, P, U, atouts, type PageTextes } from '../textes-outils.ts';
 
 export const PAGES_ACCUEIL: PageTextes[] = [
   {
@@ -101,12 +101,15 @@ export const PAGES_ACCUEIL: PageTextes[] = [
         L('accueil.service1.titre', 'Service 1 : titre', 'Personnalisation', undefined, 40),
         P('accueil.service1.texte', 'Service 1 : texte', 'Transformez votre deux-roues selon vos envies. Échappements, kits esthétiques, selles confort et bien plus encore.', undefined, 240),
         L('accueil.service1.lien', 'Service 1 : lien', 'En savoir plus →', undefined, 30),
+        U('accueil.service1.adresse', 'Service 1 : adresse du lien', '/contact', 'Une page du site (ex. /contact) ou une adresse complète (https://…).'),
         L('accueil.service2.titre', 'Service 2 : titre', 'Accessoires', undefined, 40),
         P('accueil.service2.texte', 'Service 2 : texte', 'Large gamme d\'accessoires et d\'équipements pour votre sécurité et votre confort. Casques, gants, bagagerie et plus.', undefined, 240),
         L('accueil.service2.lien', 'Service 2 : lien', 'En savoir plus →', undefined, 30),
+        U('accueil.service2.adresse', 'Service 2 : adresse du lien', '/contact', 'Une page du site (ex. /contact) ou une adresse complète (https://…).'),
         L('accueil.service3.titre', 'Service 3 : titre', 'Entretien & Réparation', undefined, 40),
         P('accueil.service3.texte', 'Service 3 : texte', 'Service d\'entretien et de réparation pour tous types de deux-roues. Prenez rendez-vous par téléphone ou par notre formulaire de contact.', undefined, 240),
         L('accueil.service3.lien', 'Service 3 : lien', 'Prendre rendez-vous →', undefined, 30),
+        U('accueil.service3.adresse', 'Service 3 : adresse du lien', '/contact', 'Une page du site (ex. /contact) ou une adresse complète (https://…).'),
       ],
     },
     {

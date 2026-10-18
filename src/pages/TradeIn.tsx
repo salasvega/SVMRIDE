@@ -13,9 +13,11 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 import { compresserImage, extensionDe } from '../lib/compressionImage';
 import { useTexte } from '../lib/textes';
+import { useListe } from '../lib/listes';
 
 export function TradeIn() {
   const t = useTexte();
+  const etapes = useListe('reprises.etapes');
   // Données du formulaire de reprise
   const [formData, setFormData] = useState({
     name: '',
@@ -146,61 +148,21 @@ export function TradeIn() {
               </h2>
 
               <div className="space-y-6">
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
-                    1
+                {etapes.ids.map((id, i) => (
+                  <div key={id} {...etapes.attrs(id)} className="flex gap-4">
+                    <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
+                      {i + 1}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-noir mb-2">
+                        {t(etapes.cle(id, 'titre'))}
+                      </h3>
+                      <p className="text-gris leading-relaxed">
+                        {t(etapes.cle(id, 'texte'))}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-noir mb-2">
-                      {t('reprises.etapes.1.titre')}
-                    </h3>
-                    <p className="text-gris leading-relaxed">
-                      {t('reprises.etapes.1.texte')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
-                    2
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-noir mb-2">
-                      {t('reprises.etapes.2.titre')}
-                    </h3>
-                    <p className="text-gris leading-relaxed">
-                      {t('reprises.etapes.2.texte')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
-                    3
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-noir mb-2">
-                      {t('reprises.etapes.3.titre')}
-                    </h3>
-                    <p className="text-gris leading-relaxed">
-                      {t('reprises.etapes.3.texte')}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
-                    4
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-noir mb-2">
-                      {t('reprises.etapes.4.titre')}
-                    </h3>
-                    <p className="text-gris leading-relaxed">
-                      {t('reprises.etapes.4.texte')}
-                    </p>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
 

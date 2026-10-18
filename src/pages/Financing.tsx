@@ -11,9 +11,11 @@ import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { useTexte } from '../lib/textes';
+import { useListe } from '../lib/listes';
 
 export function Financing() {
   const t = useTexte();
+  const avantages = useListe('financement.avantages');
   // Lecture des paramètres passés depuis la fiche véhicule
   // ex: /financement?vehicle=Yamaha%20MT-07%202021&price=6500&slug=yamaha-mt07-2021
   const [searchParams] = useSearchParams();
@@ -262,28 +264,9 @@ export function Financing() {
   </h2>
 
   <div className="space-y-4">
-    <div className="flex gap-4 p-4 bg-fond rounded-lg">
-      <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
-      <div>
-        <h3 className="font-semibold text-noir mb-1">{t('financement.avantages.1.titre')}</h3>
-        <p className="text-sm text-gris">
-          {t('financement.avantages.1.texte')}
-        </p>
-      </div>
-    </div>
-
-    <div className="flex gap-4 p-4 bg-fond rounded-lg">
-      <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
-      <div>
-        <h3 className="font-semibold text-noir mb-1">{t('financement.avantages.2.titre')}</h3>
-        <p className="text-sm text-gris">
-          {t('financement.avantages.2.texte')}
-        </p>
-      </div>
-    </div>
-
-    {/* Paiement en plusieurs fois via Alma */}
-<div className="flex gap-4 p-4 bg-fond rounded-lg">
+    {avantages.ids.map((id) => avantages.special(id) ? (
+      /* Paiement en plusieurs fois via Alma */
+<div key={id} {...avantages.attrs(id)} className="flex gap-4 p-4 bg-fond rounded-lg">
   <CheckCircle
     className="w-6 h-6 text-lien flex-shrink-0"
     aria-hidden="true"
@@ -324,27 +307,17 @@ export function Financing() {
     </p>
   </div>
 </div>
-
-
-    <div className="flex gap-4 p-4 bg-fond rounded-lg">
-      <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
-      <div>
-        <h3 className="font-semibold text-noir mb-1">{t('financement.avantages.4.titre')}</h3>
-        <p className="text-sm text-gris">
-          {t('financement.avantages.4.texte')}
-        </p>
+    ) : (
+      <div key={id} {...avantages.attrs(id)} className="flex gap-4 p-4 bg-fond rounded-lg">
+        <IconeOr icon={avantages.icone(id)} className="w-6 h-6 flex-shrink-0" />
+        <div>
+          <h3 className="font-semibold text-noir mb-1">{t(avantages.cle(id, 'titre'))}</h3>
+          <p className="text-sm text-gris">
+            {t(avantages.cle(id, 'texte'))}
+          </p>
+        </div>
       </div>
-    </div>
-
-    <div className="flex gap-4 p-4 bg-fond rounded-lg">
-      <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
-      <div>
-        <h3 className="font-semibold text-noir mb-1">{t('financement.avantages.5.titre')}</h3>
-        <p className="text-sm text-gris">
-          {t('financement.avantages.5.texte')}
-        </p>
-      </div>
-    </div>
+    ))}
   </div>
 </div>
 

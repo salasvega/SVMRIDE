@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { CheckCircle, Shield, Clock, Award, Star, Users } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
+import { colonnes, useListe } from '../lib/listes';
 import { DerniersArrivages } from '../components/DerniersArrivages';
 import { ExplorezLesMarques } from '../components/ExplorezLesMarques';
 import { SectionEquipe } from '../components/equipe/SectionEquipe';
@@ -18,6 +18,11 @@ import type { CSSProperties } from 'react';
 export function Home() {
   const t = useTexte();
   const fond = useFondAccueil();
+  // Listes modulables (admin, « Textes du site ») : éléments et ordre
+  const vente = useListe('accueil.vente');
+  const reprise = useListe('accueil.reprise');
+  const services = useListe('accueil.services');
+  const pourquoi = useListe('accueil.pourquoi');
   const styleFond = {
     '--fond-mobile': `url('${fond?.mobile ?? FOND_ACCUEIL_ORIGINE.mobile}')`,
     '--fond-ordinateur': `url('${fond?.ordinateur ?? FOND_ACCUEIL_ORIGINE.ordinateur}')`,
@@ -75,22 +80,25 @@ export function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {[Shield, Users, Award, CheckCircle].map((icon, i) => ({
-              icon,
-              title: t(`accueil.vente.atout${i + 1}.titre`),
-              description: t(`accueil.vente.atout${i + 1}.texte`),
-            })).map((feature, index) => (
+          <div className={colonnes(vente.ids.length, { n: 4, classes: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6' }, {
+            1: 'grid grid-cols-1 gap-4 md:gap-6 max-w-md mx-auto',
+            2: 'grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto',
+            0: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6',
+            7: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6',
+            8: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6',
+          })}>
+            {vente.ids.map((id) => (
               <div
-                key={index}
+                key={id}
+                {...vente.attrs(id)}
                 className="carte p-6 md:p-7 flex gap-4 sm:flex-col sm:gap-0 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule"
               >
                 <div className="flex-shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-fond border border-bordure sm:mb-5">
-                  <IconeOr icon={feature.icon} />
+                  <IconeOr icon={vente.icone(id)} />
                 </div>
                 <div>
-                  <h3 className="text-base md:text-lg font-semibold text-noir mb-1.5">{feature.title}</h3>
-                  <p className="text-sm text-gris leading-relaxed">{feature.description}</p>
+                  <h3 className="text-base md:text-lg font-semibold text-noir mb-1.5">{t(vente.cle(id, 'titre'))}</h3>
+                  <p className="text-sm text-gris leading-relaxed">{t(vente.cle(id, 'texte'))}</p>
                 </div>
               </div>
             ))}
@@ -123,26 +131,13 @@ export function Home() {
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
-                <IconeOr icon={Clock} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t('accueil.reprise.atout1.titre')}</h3>
-                <p className="text-sm text-inverse-74">{t('accueil.reprise.atout1.texte')}</p>
-              </div>
-              <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
-                <IconeOr icon={Award} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t('accueil.reprise.atout2.titre')}</h3>
-                <p className="text-sm text-inverse-74">{t('accueil.reprise.atout2.texte')}</p>
-              </div>
-              <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
-                <IconeOr icon={CheckCircle} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t('accueil.reprise.atout3.titre')}</h3>
-                <p className="text-sm text-inverse-74">{t('accueil.reprise.atout3.texte')}</p>
-              </div>
-              <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
-                <IconeOr icon={Shield} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t('accueil.reprise.atout4.titre')}</h3>
-                <p className="text-sm text-inverse-74">{t('accueil.reprise.atout4.texte')}</p>
-              </div>
+              {reprise.ids.map((id) => (
+                <div key={id} {...reprise.attrs(id)} className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
+                  <IconeOr icon={reprise.icone(id)} className="w-7 h-7 mb-3" />
+                  <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t(reprise.cle(id, 'titre'))}</h3>
+                  <p className="text-sm text-inverse-74">{t(reprise.cle(id, 'texte'))}</p>
+                </div>
+              ))}
             </div>
           </div>
         </Container>
@@ -150,36 +145,33 @@ export function Home() {
 
       <Section background="white">
         <Container>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-            <div className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
-              <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t('accueil.service1.titre')}</h3>
-              <p className="text-gris mb-6 leading-relaxed flex-1">
-                {t('accueil.service1.texte')}
-              </p>
-              <Link to="/contact" className="lien self-start">
-                {t('accueil.service1.lien')}
-              </Link>
-            </div>
-
-            <div className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
-              <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t('accueil.service2.titre')}</h3>
-              <p className="text-gris mb-6 leading-relaxed flex-1">
-                {t('accueil.service2.texte')}
-              </p>
-              <Link to="/contact" className="lien self-start">
-                {t('accueil.service2.lien')}
-              </Link>
-            </div>
-
-            <div className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
-              <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t('accueil.service3.titre')}</h3>
-              <p className="text-gris mb-6 leading-relaxed flex-1">
-                {t('accueil.service3.texte')}
-              </p>
-              <Link to="/contact" className="lien self-start">
-                {t('accueil.service3.lien')}
-              </Link>
-            </div>
+          <div className={colonnes(services.ids.length, { n: 3, classes: 'grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6' }, {
+            1: 'grid grid-cols-1 gap-4 md:gap-6 max-w-2xl mx-auto',
+            2: 'grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6',
+            0: 'grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6',
+            4: 'grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6',
+          })}>
+            {services.ids.map((id) => {
+              const adresse = t(services.cle(id, 'adresse')).trim() || '/contact';
+              const classeLien = 'lien self-start';
+              return (
+                <div key={id} {...services.attrs(id)} className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
+                  <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t(services.cle(id, 'titre'))}</h3>
+                  <p className="text-gris mb-6 leading-relaxed flex-1">
+                    {t(services.cle(id, 'texte'))}
+                  </p>
+                  {adresse.startsWith('/') ? (
+                    <Link to={adresse} className={classeLien}>
+                      {t(services.cle(id, 'lien'))}
+                    </Link>
+                  ) : (
+                    <a href={adresse} target="_blank" rel="noopener noreferrer" className={classeLien}>
+                      {t(services.cle(id, 'lien'))}
+                    </a>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </Container>
       </Section>
@@ -192,36 +184,23 @@ export function Home() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
-                <IconeOr icon={Star} className="w-8 h-8" />
+          <div className={colonnes(pourquoi.ids.length, { n: 3, classes: 'grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12' }, {
+            1: 'grid grid-cols-1 gap-10 md:gap-12',
+            2: 'grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 max-w-3xl mx-auto',
+            0: 'grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12',
+            4: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12',
+          })}>
+            {pourquoi.ids.map((id) => (
+              <div key={id} {...pourquoi.attrs(id)} className="text-center">
+                <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
+                  <IconeOr icon={pourquoi.icone(id)} className="w-8 h-8" />
+                </div>
+                <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t(pourquoi.cle(id, 'titre'))}</h3>
+                <p className="text-gris leading-relaxed max-w-xs mx-auto">
+                  {t(pourquoi.cle(id, 'texte'))}
+                </p>
               </div>
-              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t('accueil.pourquoi.point1.titre')}</h3>
-              <p className="text-gris leading-relaxed max-w-xs mx-auto">
-                {t('accueil.pourquoi.point1.texte')}
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
-                <IconeOr icon={Shield} className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t('accueil.pourquoi.point2.titre')}</h3>
-              <p className="text-gris leading-relaxed max-w-xs mx-auto">
-                {t('accueil.pourquoi.point2.texte')}
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
-                <IconeOr icon={Users} className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t('accueil.pourquoi.point3.titre')}</h3>
-              <p className="text-gris leading-relaxed max-w-xs mx-auto">
-                {t('accueil.pourquoi.point3.texte')}
-              </p>
-            </div>
+            ))}
           </div>
         </Container>
       </Section>

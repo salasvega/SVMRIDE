@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Monitor, Smartphone } from 'lucide-react';
 import type { MessageApercu } from '../../lib/theme';
-import type { MessageEdition, Rect } from '../../lib/edition';
+import type { ActionListe, MessageEdition, Rect } from '../../lib/edition';
 import type { FondAccueil } from '../../config/medias';
 
 export interface OptionsEdition {
@@ -22,6 +22,8 @@ export interface OptionsEdition {
   /** La page réagit normalement aux clics (boutons « Suivant »…), sans édition */
   utiliser?: boolean;
   onClic?: (cle: string) => void;
+  /** Bouton de la barre d'outils d'un élément de liste (monter, ajouter, supprimer…) */
+  onListe?: (action: ActionListe, liste: string, id: string) => void;
 }
 
 export function ApercuPage({
@@ -89,6 +91,7 @@ export function ApercuPage({
   }, [montrer]);
 
   const onClic = edition?.onClic;
+  const onListe = edition?.onListe;
   useEffect(() => {
     const ecouter = (e: MessageEvent<MessageApercu | MessageEdition>) => {
       if (e.origin !== window.location.origin || e.source !== cadre.current?.contentWindow) return;
@@ -101,18 +104,22 @@ export function ApercuPage({
         setPosition({ boite: m.boite, vue: 0 });
       } else if (m?.type === 'svm-edition-position') {
         setPosition({ boite: m.boite, vue: m.hauteurVue });
+      } else if (m?.type === 'svm-liste') {
+        setPosition({ boite: m.boite, vue: 0 });
+        onListe?.(m.action, m.liste, m.id);
       }
     };
     window.addEventListener('message', ecouter);
     return () => window.removeEventListener('message', ecouter);
-  }, [envoyer, onClic, onNavigation]);
+  }, [envoyer, onClic, onListe, onNavigation]);
 
+  const avecBulle = !!bulle;
   useEffect(() => {
-    if (!actif) setPosition(null);
-  }, [actif]);
+    if (!avecBulle) setPosition(null);
+  }, [avecBulle]);
 
   // La bulle qui s'ouvre reste dans la fenêtre (au-dessus de la barre d'enregistrement)
-  const ouverte = !!(bulle && actif && position?.boite);
+  const ouverte = !!(bulle && position?.boite);
   useEffect(() => {
     if (ouverte) window.setTimeout(() => refBulle.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 30);
   }, [ouverte, actif]);
@@ -124,7 +131,7 @@ export function ApercuPage({
 
   // Bulle : sous le texte en cours, au-dessus s'il est en bas de l'aperçu
   const b = position?.boite;
-  const visible = !!(bulle && actif && !utiliser && b && b.y + b.h > 0 && b.y < hauteur / echelle);
+  const visible = !!(bulle && !utiliser && b && b.y + b.h > 0 && b.y < hauteur / echelle);
   const bas = b ? (b.y + b.h) * echelle : 0;
   const auDessus = !!b && bas > hauteur * 0.62;
   const styleBulle = b ? {

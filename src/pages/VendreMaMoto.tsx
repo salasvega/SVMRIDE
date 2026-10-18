@@ -2,15 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   BadgeEuro,
-  CalendarCheck,
   CheckCircle2,
-  ClipboardCheck,
   Eye,
-  FileSignature,
-  Handshake,
   Phone,
-  ShieldCheck,
-  Store,
 } from 'lucide-react';
 import { SEOHead } from '../components/layout/SEOHead';
 import { pageSeo } from '../config/seo';
@@ -26,16 +20,11 @@ import { DonneesDemande, ErreurDemande, envoyerDemande } from '../lib/depotDeman
 import { useCoordonnees } from '../lib/coordonnees';
 import { lienTelephone } from '../config/coordonnees';
 import { useTexte } from '../lib/textes';
+import { colonnes, useListe } from '../lib/listes';
 import { demo } from '../lib/apercuDemo';
 
-// Textes réglables dans l'admin (« Textes du site », page Dépôt-vente) : vendre.etapes.<n>.*
-const ETAPES_PARCOURS = [ClipboardCheck, Phone, FileSignature, Store, Handshake];
-
-// vendre.avantages.<n>.*
-const AVANTAGES = [BadgeEuro, CalendarCheck, ShieldCheck, Eye];
-
-// vendre.faq.<n>.question / reponse
-const NB_QUESTIONS = 7;
+// Étapes, avantages et questions fréquentes : listes modulables, réglables dans
+// l'admin (« Textes du site », page Dépôt-vente) : vendre.etapes, vendre.avantages, vendre.faq
 
 const VIDE: DonneesDemande = {
   prenom: '',
@@ -59,6 +48,9 @@ const MAX_PHOTOS = 10;
 
 export function VendreMaMoto() {
   const t = useTexte();
+  const parcours = useListe('vendre.etapes');
+  const avantages = useListe('vendre.avantages');
+  const faq = useListe('vendre.faq');
   const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const [donnees, setDonnees] = useState<DonneesDemande>(VIDE);
   const [photos, setPhotos] = useState<UploadedDoc[]>([]);
@@ -179,15 +171,21 @@ export function VendreMaMoto() {
       <Section background="white" className="!py-10 md:!py-14">
         <Container>
           <h2 className="titre-section filet-apres mb-8">{t('vendre.etapes.titre')}</h2>
-          <ol className="grid gap-4 md:gap-5 md:grid-cols-5">
-            {ETAPES_PARCOURS.map((_, i) => (
-              <li key={i} className="carte p-5 md:p-6 flex md:flex-col gap-4 md:gap-0">
+          <ol className={colonnes(parcours.ids.length, { n: 5, classes: 'grid gap-4 md:gap-5 md:grid-cols-5' }, {
+            2: 'grid gap-4 md:gap-5 md:grid-cols-2',
+            3: 'grid gap-4 md:gap-5 md:grid-cols-3',
+            4: 'grid gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-4',
+            6: 'grid gap-4 md:gap-5 md:grid-cols-3',
+            0: 'grid gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-4',
+          })}>
+            {parcours.ids.map((id, i) => (
+              <li key={id} {...parcours.attrs(id)} className="carte p-5 md:p-6 flex md:flex-col gap-4 md:gap-0">
                 <div className="flex-shrink-0 pastille-etape w-11 h-11 text-base md:mb-4" aria-hidden="true">
                   {i + 1}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-noir mb-1.5">{t(`vendre.etapes.${i + 1}.titre`)}</h3>
-                  <p className="text-sm text-gris leading-relaxed">{t(`vendre.etapes.${i + 1}.texte`)}</p>
+                  <h3 className="font-semibold text-noir mb-1.5">{t(parcours.cle(id, 'titre'))}</h3>
+                  <p className="text-sm text-gris leading-relaxed">{t(parcours.cle(id, 'texte'))}</p>
                 </div>
               </li>
             ))}
@@ -198,12 +196,18 @@ export function VendreMaMoto() {
       <Section background="dark" className="!py-10 md:!py-14">
         <Container>
           <h2 className="titre-section filet-avant mb-8">{t('vendre.avantages.titre')}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
-            {AVANTAGES.map((icone, i) => (
-              <div key={i} className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-5 md:p-6">
-                <IconeOr icon={icone} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5">{t(`vendre.avantages.${i + 1}.titre`)}</h3>
-                <p className="text-sm text-inverse-74 leading-relaxed">{t(`vendre.avantages.${i + 1}.texte`)}</p>
+          <div className={colonnes(avantages.ids.length, { n: 4, classes: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4' }, {
+            1: 'grid grid-cols-1 gap-3 md:gap-4',
+            2: 'grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4',
+            0: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4',
+            7: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4',
+            8: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4',
+          })}>
+            {avantages.ids.map((id) => (
+              <div key={id} {...avantages.attrs(id)} className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-5 md:p-6">
+                <IconeOr icon={avantages.icone(id)} className="w-7 h-7 mb-3" />
+                <h3 className="font-semibold text-inverse mb-1.5">{t(avantages.cle(id, 'titre'))}</h3>
+                <p className="text-sm text-inverse-74 leading-relaxed">{t(avantages.cle(id, 'texte'))}</p>
               </div>
             ))}
           </div>
@@ -439,15 +443,15 @@ export function VendreMaMoto() {
         <Container size="md">
           <h2 className="titre-section filet-apres mb-6">{t('vendre.faq.titre')}</h2>
           <div className="space-y-3">
-            {Array.from({ length: NB_QUESTIONS }, (_, i) => (
-              <details key={i} className="group carte px-5 py-4">
+            {faq.ids.map((id) => (
+              <details key={id} {...faq.attrs(id)} className="group carte px-5 py-4">
                 <summary className="cursor-pointer list-none flex items-center justify-between gap-4 font-semibold text-noir">
-                  {t(`vendre.faq.${i + 1}.question`)}
+                  {t(faq.cle(id, 'question'))}
                   <span className="text-or-texte text-xl leading-none transition-transform duration-180 group-open:rotate-45" aria-hidden="true">
                     +
                   </span>
                 </summary>
-                <p className="mt-3 text-gris leading-relaxed">{t(`vendre.faq.${i + 1}.reponse`)}</p>
+                <p className="mt-3 text-gris leading-relaxed">{t(faq.cle(id, 'reponse'))}</p>
               </details>
             ))}
           </div>

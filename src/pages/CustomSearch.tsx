@@ -13,9 +13,11 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 import { compresserImage, extensionDe } from '../lib/compressionImage';
 import { useTexte } from '../lib/textes';
+import { useListe } from '../lib/listes';
 
 export function CustomSearch() {
   const t = useTexte();
+  const etapes = useListe('recherche.etapes');
   // Données du formulaire "je cherche un véhicule précis"
   const [formData, setFormData] = useState({
     name: '',
@@ -159,53 +161,19 @@ export function CustomSearch() {
               </p>
 
               <div className="space-y-4">
-                <div className="bg-fond p-6 rounded-xl">
-                  <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
-                    <span className="pastille-etape w-8 h-8 text-sm">
-                      1
-                    </span>
-                    {t('recherche.etapes.1.titre')}
-                  </h3>
-                  <p className="text-sm text-gris ml-10">
-                    {t('recherche.etapes.1.texte')}
-                  </p>
-                </div>
-
-                <div className="bg-fond p-6 rounded-xl">
-                  <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
-                    <span className="pastille-etape w-8 h-8 text-sm">
-                      2
-                    </span>
-                    {t('recherche.etapes.2.titre')}
-                  </h3>
-                  <p className="text-sm text-gris ml-10">
-                    {t('recherche.etapes.2.texte')}
-                  </p>
-                </div>
-
-                <div className="bg-fond p-6 rounded-xl">
-                  <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
-                    <span className="pastille-etape w-8 h-8 text-sm">
-                      3
-                    </span>
-                    {t('recherche.etapes.3.titre')}
-                  </h3>
-                  <p className="text-sm text-gris ml-10">
-                    {t('recherche.etapes.3.texte')}
-                  </p>
-                </div>
-
-                <div className="bg-fond p-6 rounded-xl">
-                  <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
-                    <span className="pastille-etape w-8 h-8 text-sm">
-                      4
-                    </span>
-                    {t('recherche.etapes.4.titre')}
-                  </h3>
-                  <p className="text-sm text-gris ml-10">
-                    {t('recherche.etapes.4.texte')}
-                  </p>
-                </div>
+                {etapes.ids.map((id, i) => (
+                  <div key={id} {...etapes.attrs(id)} className="bg-fond p-6 rounded-xl">
+                    <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
+                      <span className="pastille-etape w-8 h-8 text-sm">
+                        {i + 1}
+                      </span>
+                      {t(etapes.cle(id, 'titre'))}
+                    </h3>
+                    <p className="text-sm text-gris ml-10">
+                      {t(etapes.cle(id, 'texte'))}
+                    </p>
+                  </div>
+                ))}
               </div>
 
             </div>
