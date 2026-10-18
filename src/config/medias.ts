@@ -1,5 +1,5 @@
 /**
- * Images du site réglées dans l'admin (Infos du site) — module pur, aussi
+ * Images du site réglées dans l'admin (Édition du site) — module pur, aussi
  * utilisé par la fonction Netlify « seo » :
  *  - fond de la page d'accueil (réglage « fond_accueil ») : une image pour
  *    ordinateur (format large) et une pour téléphone et tablette ;

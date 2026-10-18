@@ -32,7 +32,7 @@ export function Contact() {
   const location = useLocation();
   // Carte du responsable : fiche « responsable » de l'admin (onglet Équipe)
   const equipe = useEquipe();
-  // Coordonnées modifiables dans l'admin, onglet « Infos du site »
+  // Coordonnées modifiables dans l'admin, onglet « Édition du site »
   const c = useCoordonnees();
   const responsable = (equipe?.membres ?? MEMBRES).find((m) => m.responsable) ?? MEMBRES[0];
   const vehicleRef =

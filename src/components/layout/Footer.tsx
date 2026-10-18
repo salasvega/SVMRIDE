@@ -11,7 +11,7 @@ export function Footer() {
   const t = useTexte();
   // Lien « Notre équipe » : seulement si l'équipe est affichée (réglage de l'admin)
   const equipe = useEquipe();
-  // Coordonnées modifiables dans l'admin, onglet « Infos du site »
+  // Coordonnées modifiables dans l'admin, onglet « Édition du site »
   const c = useCoordonnees();
   const logo = icones(useIdentite()).logo;
   const currentYear = new Date().getFullYear();

@@ -1,7 +1,7 @@
 /**
  * Coordonnées de SVM Ride : contact, showroom et horaires.
  *
- * Modifiables dans l'admin, onglet « Infos du site » (depuis le 17/10/2026) :
+ * Modifiables dans l'admin, onglet « Édition du site » (depuis le 17/10/2026) :
  * elles sont enregistrées dans la table Supabase `site_reglages` (clé
  * « coordonnees ») et lues par le site (src/lib/coordonnees.ts), par la fonction
  * Netlify « seo » (données pour Google) et par les fonctions Supabase qui

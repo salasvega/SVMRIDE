@@ -1,5 +1,5 @@
 /**
- * Fond de la page d'accueil choisi dans l'admin (Infos du site). Il arrive
+ * Fond de la page d'accueil choisi dans l'admin (Édition du site). Il arrive
  * déjà dans la page (bloc JSON de la fonction « seo ») : affiché dès le premier
  * rendu ; relu une fois par visite et remplacé tout de suite après un
  * enregistrement dans l'admin.

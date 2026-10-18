@@ -1,5 +1,5 @@
 /**
- * Admin — Infos du site › Identité du site › « Image de la page d'accueil ».
+ * Admin — Édition du site › Identité du site › « Image de la page d'accueil ».
  *
  * Une photo choisie est cadrée deux fois : format large pour les ordinateurs
  * (2400 × 760) et format pour téléphones et tablettes (1600 × 1000, avec le

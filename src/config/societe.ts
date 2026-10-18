@@ -1,7 +1,7 @@
 /**
  * Informations légales de la société (mentions légales et contrats de dépôt-vente).
  *
- * Modifiables dans l'admin, onglet « Infos du site », bloc « Société » : réglage
+ * Modifiables dans l'admin, onglet « Édition du site », bloc « Société » : réglage
  * « societe » de la table site_reglages. Chaque nouveau contrat en garde une copie
  * (les contrats déjà créés ou signés ne changent jamais). Le même format est repris
  * dans supabase/functions/_shared/depot-contrat.ts (societeContrat).

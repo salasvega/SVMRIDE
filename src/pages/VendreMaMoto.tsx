@@ -130,7 +130,7 @@ const TITRES_ETAPES = ['Vous', 'Votre moto', 'Photos et prix'];
 
 export function VendreMaMoto() {
   const t = useTexte();
-  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const [donnees, setDonnees] = useState<DonneesDemande>(VIDE);
   const [photos, setPhotos] = useState<UploadedDoc[]>([]);
   const [consentement, setConsentement] = useState(false);

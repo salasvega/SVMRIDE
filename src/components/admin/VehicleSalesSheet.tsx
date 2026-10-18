@@ -24,7 +24,7 @@ interface VehicleSalesSheetProps {
 }
 
 export function VehicleSalesSheet({ vehicle }: VehicleSalesSheetProps) {
-  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const [showModal, setShowModal] = useState(false);
 
   const conditionLabels: Record<string, string> = {

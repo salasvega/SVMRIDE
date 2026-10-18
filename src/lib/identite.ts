@@ -1,5 +1,5 @@
 /**
- * Logo et icône du site (admin, « Infos du site ») lus une fois par visite.
+ * Logo et icône du site (admin, « Édition du site ») lus une fois par visite.
  * La dernière valeur est gardée dans le navigateur pour un affichage immédiat.
  * Les balises d'icônes du <head> sont posées par la fonction Netlify « seo » ;
  * appliquerIconesPage() les met aussi à jour dans la page ouverte (aperçu,

@@ -1,5 +1,5 @@
 /**
- * Admin — Infos du site : coordonnées affichées partout (en-tête de contact,
+ * Admin — Édition du site (anciennement « Infos du site ») : coordonnées affichées partout (en-tête de contact,
  * pied de page, page Contact, pages légales, Dépôt-vente…), envoyées à Google
  * (fiche concession) et utilisées dans les e-mails automatiques.
  *
@@ -404,7 +404,7 @@ export function InfosSite() {
     <AdminLayout>
       <div className="space-y-6 pb-24">
         <div>
-          <h1 className="text-3xl font-bold text-[#111111]">Infos du site</h1>
+          <h1 className="text-3xl font-bold text-[#111111]">Édition du site</h1>
           <p className="mt-1 max-w-3xl text-[#666666]">
             L'identité du site (nom, logo, image d'accueil), les coordonnées affichées partout et envoyées à Google, et les
             informations légales de la société (mentions légales, contrats). Les changements s'appliquent dès l'enregistrement.

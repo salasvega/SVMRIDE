@@ -1,5 +1,5 @@
 /**
- * Logo et icône du site (admin, « Infos du site », bloc « Logo et icône »).
+ * Logo et icône du site (admin, « Édition du site », bloc « Logo et icône »).
  *
  * Une image carrée envoyée dans l'admin est déclinée dans le navigateur en
  * plusieurs tailles (bucket public « site-images ») : logo de la barre du haut

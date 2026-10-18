@@ -38,7 +38,7 @@ interface Resume {
 }
 
 export function Signature() {
-  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const { jeton = '' } = useParams();
   const [etat, setEtat] = useState<'chargement' | 'erreur' | 'pret' | 'signe'>('chargement');
   const [erreur, setErreur] = useState('');

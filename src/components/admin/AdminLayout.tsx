@@ -64,7 +64,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   ];
   const contenuSite: Lien[] = [
     { to: '/admin/equipe', libelle: 'Équipe', icone: <Users className="w-4 h-4" aria-hidden="true" /> },
-    { to: '/admin/infos-site', libelle: 'Infos du site', icone: <Store className="w-4 h-4" aria-hidden="true" /> },
+    { to: '/admin/edition-site', libelle: 'Édition du site', icone: <Store className="w-4 h-4" aria-hidden="true" /> },
     { to: '/admin/textes', libelle: 'Textes du site', icone: <Type className="w-4 h-4" aria-hidden="true" /> },
     { to: '/admin/studio-design', libelle: 'Studio Design', icone: <Palette className="w-4 h-4" aria-hidden="true" /> },
   ];

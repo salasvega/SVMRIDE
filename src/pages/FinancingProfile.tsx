@@ -59,7 +59,7 @@ interface FinancingProfile {
 }
 
 export function FinancingProfile() {
-  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 

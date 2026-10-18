@@ -1,5 +1,5 @@
 /**
- * Informations légales de la société (admin, « Infos du site », bloc Société),
+ * Informations légales de la société (admin, « Édition du site », bloc Société),
  * lues une fois par visite ; valeurs de secours (src/config/societe.ts) le temps
  * de la lecture ou si la base ne répond pas.
  */

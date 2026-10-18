@@ -31,7 +31,7 @@ export function Home() {
       <Section zone="hero" background="dark" className="relative !py-0 overflow-hidden">
         {/* Mobile et tablette : cadrage sur les motos. Ordinateur : photo large
             avec le panneau SVM RIDE, rognée sous les roues et calée en bas à gauche.
-            Image choisie dans l'admin (Infos du site) : cadrée pour chaque format, centrée. */}
+            Image choisie dans l'admin (Édition du site) : cadrée pour chaque format, centrée. */}
         <div
           className="absolute inset-0 bg-cover bg-[image:var(--fond-mobile)] bg-[position:var(--position-mobile)] lg:bg-[image:var(--fond-ordinateur)] lg:bg-[position:var(--position-ordinateur)]"
           style={styleFond}

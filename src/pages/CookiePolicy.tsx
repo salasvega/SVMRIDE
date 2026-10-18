@@ -5,7 +5,7 @@ import { Container } from '../components/ui/Container';
 import { useCoordonnees } from '../lib/coordonnees';
 
 export function CookiePolicy() {
-  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   return (
     <>
       <SEOHead meta={pageSeo['/politique-cookies']} />

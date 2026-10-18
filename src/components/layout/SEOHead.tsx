@@ -17,8 +17,8 @@ interface SEOHeadProps {
  * fonction Netlify `seo` (rendu serveur) ; ce composant garde le même contenu.
  */
 export function SEOHead({ meta: brut }: SEOHeadProps) {
-  // Fiche concession et description de Contact avec les coordonnées à jour (admin, « Infos du site »)
-  // Titres Google et nom du site modifiés dans l'admin (Textes du site, Infos du site)
+  // Fiche concession et description de Contact avec les coordonnées à jour (admin, « Édition du site »)
+  // Titres Google et nom du site modifiés dans l'admin (Textes du site, Édition du site)
   const meta = avecTextes(avecCoordonnees(brut, useCoordonnees(), icones(useIdentite()).icon_512), useTextes());
   const url = canonicalUrl(meta);
   const image = meta.image

@@ -13,7 +13,7 @@ export function Header() {
   const t = useTexte();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
-  // Logo choisi dans l'admin (Infos du site, bloc « Logo et icône »)
+  // Logo choisi dans l'admin (Édition du site, bloc « Logo et icône »)
   const logo = icones(useIdentite()).logo;
   // Menu fermé au changement de page et avec Échap (le clic en dehors : voir FondMenu)
   useEffect(() => setMobileMenuOpen(false), [location.pathname]);

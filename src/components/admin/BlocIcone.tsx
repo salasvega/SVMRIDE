@@ -1,5 +1,5 @@
 /**
- * Admin — Infos du site, bloc « Logo et icône » : une image carrée (idéalement
+ * Admin — Édition du site, bloc « Logo et icône » : une image carrée (idéalement
  * un PNG transparent d'au moins 512 px) devient le logo de la barre du haut et
  * du pied de page, l'icône de l'onglet, l'icône iPhone / Android et le logo
  * transmis à Google. Cadrage, aperçu avant validation, retour au logo d'origine.

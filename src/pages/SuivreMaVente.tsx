@@ -251,7 +251,7 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number,
 }
 
 function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; session: string; onMaj: () => void }) {
-  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const liste = etapes(d);
   const derniere = liste.reduce((n, e, i) => (e.fait ? i : n), -1);
   const j = d.statut_mandat === 'actif' ? joursRestants(d.date_fin) : null;
@@ -367,7 +367,7 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
 }
 
 function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; session: string; onMaj: () => void }) {
-  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
+  const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const [type, setType] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [envoi, setEnvoi] = useState(false);

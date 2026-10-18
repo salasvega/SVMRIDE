@@ -42,7 +42,7 @@ export interface SeoMeta {
   schema?: object | object[];
   /** Statut HTTP renvoyé par le rendu serveur (404 pour une page inexistante) */
   status?: number;
-  /** Nom du site (admin, Infos du site) ; sinon celui d'origine */
+  /** Nom du site (admin, Édition du site) ; sinon celui d'origine */
   nomSite?: string;
 }
 

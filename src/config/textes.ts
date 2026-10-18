@@ -1,6 +1,6 @@
 /**
  * Textes du site modifiables dans l'admin (page « Textes du site », et le nom
- * et l'accroche dans « Infos du site »). Module pur, partagé avec la fonction
+ * et l'accroche dans « Édition du site »). Module pur, partagé avec la fonction
  * Netlify « seo » (titres Google, nom du site).
  *
  * Chaque texte a une valeur d'origine (celle du site) ; seuls les textes
@@ -100,7 +100,7 @@ export const PAGES_TEXTES: PageTextes[] = [
         titre: 'Bandeau principal',
         textes: [
           L('accueil.hero.titre', 'Titre', 'Bienvenue chez {nom}', undefined, 60),
-          P('site.accroche', 'Phrase d’accroche', 'Votre spécialiste du deux-roues basé en Île-de-France.', 'Aussi modifiable dans Infos du site.', 160),
+          P('site.accroche', 'Phrase d’accroche', 'Votre spécialiste du deux-roues basé en Île-de-France.', 'Aussi modifiable dans Édition du site.', 160),
           L('accueil.hero.bouton1', 'Bouton principal', 'Voir nos véhicules', undefined, 30),
           L('accueil.hero.bouton2', 'Bouton secondaire', 'Nous contacter', undefined, 30),
         ],
@@ -229,7 +229,7 @@ export const PAGES_TEXTES: PageTextes[] = [
       seo('Dépôt-vente', 'vendre', 'Vendre ma moto en dépôt-vente | {nom}', 'Confiez votre moto à {nom} : réponse sous 48 h ouvrées, nous gérons l\'annonce, les visites et la vente, vous êtes payé sous 48 h. Chaville (92).'),
       seo('Financement', 'financement', 'Financement moto et scooter d\'occasion | {nom}', 'Financez votre moto ou scooter d\'occasion : simulation gratuite, réponse rapide, paiement en 3x, 4x ou 10x par carte avec Alma. {nom}, Chaville (92).'),
       seo('Recherche personnalisée', 'recherche', 'Recherche personnalisée de moto ou scooter | {nom}', 'Vous cherchez un modèle précis ? Confiez-nous votre recherche : nous trouvons la moto ou le scooter qui vous correspond, selon vos critères et votre budget.'),
-      seo('Contact', 'contact', 'Contact et showroom à Chaville | {nom}', '', 'Vide : description automatique avec l’adresse, le téléphone et les horaires (Infos du site).'),
+      seo('Contact', 'contact', 'Contact et showroom à Chaville | {nom}', '', 'Vide : description automatique avec l’adresse, le téléphone et les horaires (Édition du site).'),
       seo('Équipe', 'equipe', 'Notre équipe : des passionnés de moto à Chaville | {nom}', 'Rencontrez l\'équipe {nom} : Mattia et des passionnés de deux-roues pour vous conseiller dans l\'achat, la reprise ou le dépôt-vente de votre moto.'),
     ],
   },

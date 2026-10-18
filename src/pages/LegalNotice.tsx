@@ -8,7 +8,7 @@ import { useSociete } from '../lib/societe';
 import { siren, texteMediateur } from '../config/societe';
 
 export function LegalNotice() {
-  // Modifiables dans l'admin, onglet « Infos du site » (blocs Contact, Showroom et Société)
+  // Modifiables dans l'admin, onglet « Édition du site » (blocs Contact, Showroom et Société)
   const c = useCoordonnees();
   const s = useSociete();
   const mediateur = texteMediateur(s);

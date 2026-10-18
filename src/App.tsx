@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/admin/ProtectedRoute';
 import { ScrollToTop } from './components/ScrollToTop';
@@ -128,8 +128,10 @@ function App() {
               </ProtectedRoute>
             }
           />
+          {/* Ancienne adresse de la page (« Infos du site ») */}
+          <Route path="/admin/infos-site" element={<Navigate to="/admin/edition-site" replace />} />
           <Route
-            path="/admin/infos-site"
+            path="/admin/edition-site"
             element={
               <ProtectedRoute>
                 <InfosSite />

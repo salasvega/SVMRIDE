@@ -1,5 +1,5 @@
 /**
- * Admin — Infos du site › « Tampon et documents » : tampon / signature du
+ * Admin — Édition du site › « Tampon et documents » : tampon / signature du
  * garage et logo imprimés sur les contrats de dépôt-vente, les avenants et les
  * certificats de signature.
  *
