@@ -32,7 +32,7 @@ export function OngletHistorique({ publications, versionEnLigne, onPrevisualiser
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-[#111111]">
                   {p.theme_nom}{' '}
-                  {enLigne && <span className="ml-1 rounded-full bg-gradient-to-r from-[#8A6A1F] to-[#D9B965] px-2 py-0.5 text-xs font-bold text-white">En ligne</span>}
+                  {enLigne && <span className="ml-1 rounded-full bg-gradient-to-r from-or-texte to-or-clair px-2 py-0.5 text-xs font-bold text-white">En ligne</span>}
                 </p>
                 <p className="text-xs text-[#666666]">
                   {p.type === 'installation' ? 'Installation du Studio Design' : p.type === 'restauration' ? `Restauration de la V${p.restaure_version}` : 'Publication'}

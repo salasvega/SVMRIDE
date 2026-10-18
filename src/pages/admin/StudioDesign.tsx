@@ -252,7 +252,7 @@ export function StudioDesign() {
           {ONGLETS.map((o) => (
             <button key={o.cle} type="button" role="tab" aria-selected={onglet === o.cle}
               onClick={() => { if (o.cle === 'apercu') { setApercu(null); setZone(null); } allerA(o.cle); }}
-              className={`-mb-0.5 inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-semibold transition-colors ${onglet === o.cle ? 'border-[#B8902F] text-[#111111]' : 'border-transparent text-[#666666] hover:text-[#111111]'}`}>
+              className={`-mb-0.5 inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-semibold transition-colors ${onglet === o.cle ? 'border-or text-[#111111]' : 'border-transparent text-[#666666] hover:text-[#111111]'}`}>
               <o.icone className="h-4 w-4" aria-hidden="true" /> <span className="hidden sm:inline">{o.libelle}</span><span className="sm:hidden">{o.court}</span>
               {o.cle === 'personnaliser' && modifie && <span className="h-2 w-2 rounded-full bg-amber-500" aria-label="modifications non enregistrées" />}
             </button>
@@ -410,7 +410,7 @@ function Modales({ modale, occupe, enLigne, themes, actifId, onFermer, onPublier
         </>}>
           <p>
             Il remplacera <strong className="text-[#111111]">{enLigne?.nom ?? 'le thème actuel'}</strong> sur tout le site public et sera visible par les visiteurs d'ici une minute.
-            L'administration ne change pas. Vous pourrez revenir en arrière depuis l'Historique.
+            L'administration prend aussi ses accents et ses polices, et les e-mails aux clients ses couleurs. Vous pourrez revenir en arrière depuis l'Historique.
           </p>
           {ko.length === 0 && grand.length === 0 ? (
             <p className="rounded-lg bg-green-50 px-3 py-2 text-green-900">Lisibilité : tous les contrôles sont réussis.</p>

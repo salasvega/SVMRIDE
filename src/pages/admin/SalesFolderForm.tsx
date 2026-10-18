@@ -446,7 +446,7 @@ export function SalesFolderForm() {
         <div className="mb-6">
           <button
             onClick={() => navigate('/admin/sales-folders')}
-            className="flex items-center gap-2 text-[#666666] hover:text-[#FF5C00] mb-4"
+            className="flex items-center gap-2 text-[#666666] hover:text-or-texte mb-4"
           >
             <ArrowLeft className="w-5 h-5" />
             Retour aux dossiers

@@ -31,7 +31,7 @@ export function AdminLogin() {
   };
 
   return (
-    <Section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#111111] to-[#1a1a1a]">
+    <Section className="admin min-h-screen flex items-center justify-center bg-gradient-to-br from-[#111111] to-[#1a1a1a]">
       <Container className="max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl p-8 relative">
           <button

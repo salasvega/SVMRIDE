@@ -13,7 +13,7 @@
  */
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {
-  admin, base, bouton, BUCKET_DOCS, cors, dateFr, echapper, empreinte, envoyer, Erreur, euros, gabarit,
+  admin, base, bouton, BUCKET_DOCS, C, cors, dateFr, echapper, empreinte, envoyer, Erreur, euros, gabarit,
   jetonAleatoire, reponse, sha256, SITE,
 } from "../_shared/depot-commun.ts";
 import { construireInstantane, genererPdf, MODELE_VERSION, societeContrat } from "../_shared/depot-contrat.ts";
@@ -62,7 +62,7 @@ function courrielInvitation(d: Record<string, any>, type: string, url: string, e
 <p>Prix de vente affiché : <strong>${euros(d.prix_affiche)}</strong><br>Net vendeur (ce que vous percevez) : <strong>${euros(d.net_vendeur)}</strong></p>
 <p>Lisez le contrat puis signez-le en ligne : un code de confirmation vous sera envoyé par e-mail au moment de signer.</p>
 ${bouton(url, "Lire et signer le contrat")}
-<p style="font-size:13px;color:#5E5E5E">Ce lien est personnel et valable jusqu'au ${dateFr(expire)}. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.</p>`),
+<p style="font-size:13px;color:${C.gris}">Ce lien est personnel et valable jusqu'au ${dateFr(expire)}. Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.</p>`),
     reply_to: "contact@svmride.com",
     sansCopie: true,
   };

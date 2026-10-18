@@ -539,6 +539,35 @@ export function cssDuTheme(t: ThemeConfig, selecteur = '.site'): string {
   return css;
 }
 
+/**
+ * Bloc CSS de l'administration : seulement les accents (boutons et liens de
+ * l'admin, focus, or, liseré) et les polices. Les fonds et textes de l'admin
+ * restent neutres, et les accents sont foncés si besoin pour rester lisibles
+ * sur fond blanc (texte blanc sur les boutons, liens sur les pages).
+ */
+export function cssAdmin(t: ThemeConfig, selecteur = '.admin'): string {
+  const globales = variablesDuTheme(t);
+  const g = { ...globales, ...variablesSection(t, 'boutons', globales) };
+  const lisible = (v: string, seuil: number) => (contraste(v, '#FFFFFF') >= seuil ? v : ajusterContraste(v, '#FFFFFF', seuil));
+  const couleurs: Record<string, string> = {
+    bleu: lisible(g.bleu, 4.5),
+    'bleu-hover': lisible(g['bleu-hover'], 4.5),
+    'bleu-clair': g['bleu-clair'],
+    'bleu-vif': lisible(g['bleu-vif'], 3),
+    lien: lisible(g.lien, 4.5),
+    or: g.or,
+    'or-texte': lisible(g['or-texte'], 4.5),
+    'or-clair': g['or-clair'],
+  };
+  const vars: Record<string, string> = {};
+  for (const [k, v] of Object.entries(couleurs)) {
+    vars[k] = v;
+    vars[`${k}-rgb`] = canaux(v);
+  }
+  for (const k of ['degrade-debut', 'degrade-or', 'police-texte', 'police-titres']) vars[k] = g[k];
+  return `${selecteur}{${declarations(vars)}}`;
+}
+
 /** Forme complète et ordonnée d'un thème (enregistrement et comparaison) */
 export function themeComplet(t: ThemeConfig): ThemeConfig {
   const couleurs = couleursDuTheme(t);

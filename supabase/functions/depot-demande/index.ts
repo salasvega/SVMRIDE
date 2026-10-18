@@ -16,6 +16,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
 import { ADRESSE, coordonnees, EMAIL_AFFICHE, RECEPTION, remplir, TEL } from "../_shared/coordonnees.ts";
+import { C, colorier, themeMail } from "../_shared/theme-mail.ts";
 
 const BUCKET = "depot-photos";
 const MAX_PHOTOS = 10;
@@ -150,12 +151,12 @@ const euros = (n: number | null) => (n == null ? "Non précisé" : `${n.toLocale
 const km = (n: number) => `${n.toLocaleString("fr-FR")} km`;
 
 function gabarit(contenu: string): string {
-  return `<!doctype html><html lang="fr"><body style="margin:0;background:#F6F5F2;font-family:Arial,Helvetica,sans-serif;color:#111111">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6F5F2;padding:24px 12px"><tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #ECE9E0;border-radius:12px">
-<tr><td style="padding:20px 24px;border-bottom:3px solid #B8902F;font-size:20px;font-weight:bold;letter-spacing:.5px">SVM RIDE</td></tr>
+  return `<!doctype html><html lang="fr"><body style="margin:0;background:${C.fond};font-family:Arial,Helvetica,sans-serif;color:${C.texte}">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.fond};padding:24px 12px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:${C.carte};border:1px solid ${C.bordure};border-radius:12px">
+<tr><td style="padding:20px 24px;border-bottom:3px solid ${C.accent};font-size:20px;font-weight:bold;letter-spacing:.5px">SVM RIDE</td></tr>
 <tr><td style="padding:24px;font-size:15px;line-height:1.6">${contenu}</td></tr>
-<tr><td style="padding:16px 24px;border-top:1px solid #ECE9E0;font-size:12px;color:#5E5E5E">SVM Ride · ${ADRESSE} · ${TELEPHONE} · svmride.com</td></tr>
+<tr><td style="padding:16px 24px;border-top:1px solid ${C.bordure};font-size:12px;color:${C.gris}">SVM Ride · ${ADRESSE} · ${TELEPHONE} · svmride.com</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
@@ -177,14 +178,14 @@ pour en parler avec vous. Il n'y a pas d'estimation automatique : le prix de ven
 conditions du dépôt-vente vous sont présentés de vive voix, avant tout engagement.</p>
 <p>Une question en attendant ? Répondez simplement à cet e-mail ou appelez-nous au ${TELEPHONE}.</p>
 <p style="margin-top:24px">À très vite,<br>L'équipe SVM Ride</p>
-<p style="margin-top:24px;font-size:12px;color:#5E5E5E">Vos informations servent uniquement à traiter votre demande. Elles sont conservées
+<p style="margin-top:24px;font-size:12px;color:${C.gris}">Vos informations servent uniquement à traiter votre demande. Elles sont conservées
 au plus 3 ans si votre moto n'est pas confiée à SVM Ride, et vos photos 12 mois au plus. Vous pouvez à tout moment
 demander à les consulter ou à les supprimer en écrivant à ${EMAIL_AFFICHE}.</p>`);
 }
 
 function alerteHtml(d: Demande): string {
   const ligne = (l: string, v: string) =>
-    `<tr><td style="padding:4px 12px 4px 0;color:#5E5E5E;vertical-align:top;white-space:nowrap">${l}</td><td style="padding:4px 0">${v}</td></tr>`;
+    `<tr><td style="padding:4px 12px 4px 0;color:${C.gris};vertical-align:top;white-space:nowrap">${l}</td><td style="padding:4px 0">${v}</td></tr>`;
   return gabarit(`
 <p style="margin-top:0"><strong>Nouvelle demande de dépôt-vente ${echapper(d.reference)}</strong></p>
 <table role="presentation" cellpadding="0" cellspacing="0" style="font-size:14px">
@@ -202,14 +203,14 @@ ${ligne("Photos", `${d.photos.length} (dans l'admin)`)}
 </table>
 ${d.commentaire ? `<p><strong>Commentaire</strong><br>${echapper(d.commentaire).replace(/\n/g, "<br>")}</p>` : ""}
 <p style="margin-top:20px"><a href="${URL_ADMIN}?demande=${d.id}" style="display:inline-block;background:#111111;color:#ffffff;text-decoration:none;padding:10px 18px;border-radius:10px;font-weight:bold">Ouvrir la demande dans l'admin</a></p>
-<p style="font-size:13px;color:#5E5E5E">Délai de réponse annoncé au propriétaire : 48 h ouvrées. Répondre à cet e-mail écrit directement au propriétaire.</p>`);
+<p style="font-size:13px;color:${C.gris}">Délai de réponse annoncé au propriétaire : 48 h ouvrées. Répondre à cet e-mail écrit directement au propriétaire.</p>`);
 }
 
 async function envoyerEmail(message: Record<string, unknown>): Promise<void> {
   const cleResend = Deno.env.get("RESEND_API_KEY");
   if (!cleResend) throw new Error("RESEND_API_KEY manquante");
-  await coordonnees();
-  const rempli = Object.fromEntries(Object.entries(message).map(([k, v]) => [k, typeof v === "string" ? remplir(v, k === "html") : v]));
+  await Promise.all([coordonnees(), themeMail()]);
+  const rempli = Object.fromEntries(Object.entries(message).map(([k, v]) => [k, typeof v === "string" ? (k === "html" ? colorier(remplir(v, true)) : remplir(v)) : v]));
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${cleResend}` },

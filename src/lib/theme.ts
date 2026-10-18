@@ -9,7 +9,7 @@
  *   l'admin, sur le même site, peut le faire ; un visiteur qui ouvrirait
  *   /?apercu=1 verrait le site normal. Rien n'est enregistré.
  */
-import { cssDuTheme, themeValide, urlPolices, type CleSection, type ThemeConfig } from '../config/design';
+import { cssAdmin, cssDuTheme, themeValide, urlPolices, type CleSection, type ThemeConfig } from '../config/design';
 
 export const ID_THEME = 'theme-svm';
 const ID_APERCU = 'theme-apercu';
@@ -53,7 +53,7 @@ function poserPolices(id: string, url: string | null) {
 export function appliquerThemePublie(config: ThemeConfig) {
   if (!themeValide(config)) return;
   poserPolices(`${ID_THEME}-polices`, urlPolices(config));
-  poserStyle(ID_THEME, cssDuTheme(config));
+  poserStyle(ID_THEME, cssDuTheme(config) + cssAdmin(config));
 }
 
 /** Échantillons des polices dans l'éditeur du Studio */

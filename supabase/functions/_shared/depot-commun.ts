@@ -4,6 +4,10 @@
  */
 import { createClient, type SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
 import { ADRESSE, coordonnees, EMAIL_AFFICHE, RECEPTION, remplir, TEL } from "./coordonnees.ts";
+import { C, colorier, themeMail } from "./theme-mail.ts";
+
+/** Repères de couleur des e-mails (thème publié dans le Studio Design) */
+export { C };
 
 // E-mails (domaine svmride.com vérifié chez Resend)
 export const EXPEDITEUR = "SVM Ride <contact@svmride.com>";
@@ -143,17 +147,17 @@ export const dateFr = (iso: string | null | undefined) =>
   iso ? new Date(iso.length === 10 ? `${iso}T12:00:00Z` : iso).toLocaleDateString("fr-FR", { timeZone: "Europe/Paris", day: "numeric", month: "long", year: "numeric" }) : "—";
 
 export function gabarit(contenu: string): string {
-  return `<!doctype html><html lang="fr"><body style="margin:0;background:#F6F5F2;font-family:Arial,Helvetica,sans-serif;color:#111111">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6F5F2;padding:24px 12px"><tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #ECE9E0;border-radius:12px">
-<tr><td style="padding:20px 24px;border-bottom:3px solid #B8902F;font-size:20px;font-weight:bold;letter-spacing:.5px">SVM RIDE</td></tr>
+  return `<!doctype html><html lang="fr"><body style="margin:0;background:${C.fond};font-family:Arial,Helvetica,sans-serif;color:${C.texte}">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.fond};padding:24px 12px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:${C.carte};border:1px solid ${C.bordure};border-radius:12px">
+<tr><td style="padding:20px 24px;border-bottom:3px solid ${C.accent};font-size:20px;font-weight:bold;letter-spacing:.5px">SVM RIDE</td></tr>
 <tr><td style="padding:24px;font-size:15px;line-height:1.6">${contenu}</td></tr>
-<tr><td style="padding:16px 24px;border-top:1px solid #ECE9E0;font-size:12px;color:#5E5E5E">SVM Ride · ${ADRESSE} · ${TELEPHONE} · svmride.com</td></tr>
+<tr><td style="padding:16px 24px;border-top:1px solid ${C.bordure};font-size:12px;color:${C.gris}">SVM Ride · ${ADRESSE} · ${TELEPHONE} · svmride.com</td></tr>
 </table></td></tr></table></body></html>`;
 }
 
 export function bouton(url: string, libelle: string): string {
-  return `<p style="margin:24px 0"><a href="${echapper(url)}" style="display:inline-block;background:#254893;color:#ffffff;text-decoration:none;font-weight:bold;padding:13px 22px;border-radius:10px">${echapper(libelle)}</a></p>`;
+  return `<p style="margin:24px 0"><a href="${echapper(url)}" style="display:inline-block;background:${C.bouton};color:${C.bouton_texte};text-decoration:none;font-weight:bold;padding:13px 22px;border-radius:10px">${echapper(libelle)}</a></p>`;
 }
 
 export interface Courriel {
@@ -169,14 +173,14 @@ export interface Courriel {
 export async function envoyer(m: Courriel): Promise<string | null> {
   const cle = Deno.env.get("RESEND_API_KEY");
   if (!cle) throw new Error("RESEND_API_KEY manquante");
-  // Coordonnées à jour dans les destinataires et le texte
-  await coordonnees();
+  // Coordonnées et couleurs du thème à jour dans les destinataires et le texte
+  await Promise.all([coordonnees(), themeMail()]);
   const { sansCopie, ...brut } = m;
   const message = {
     ...brut,
     to: Array.isArray(brut.to) ? brut.to.map((t) => remplir(t)) : remplir(brut.to),
     subject: remplir(brut.subject),
-    html: remplir(brut.html, true),
+    html: colorier(remplir(brut.html, true)),
     ...(brut.reply_to ? { reply_to: remplir(brut.reply_to) } : {}),
   };
   const r = await fetch("https://api.resend.com/emails", {

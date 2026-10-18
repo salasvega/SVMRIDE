@@ -21,7 +21,7 @@ export interface ActionsThemes {
 }
 
 export function Statut({ actif, statut, predefini }: { actif: boolean; statut: ThemeLigne['statut']; predefini?: boolean }) {
-  if (actif) return <span className="rounded-full bg-gradient-to-r from-[#8A6A1F] to-[#D9B965] px-2.5 py-0.5 text-xs font-bold text-white">Actif</span>;
+  if (actif) return <span className="rounded-full bg-gradient-to-r from-or-texte to-or-clair px-2.5 py-0.5 text-xs font-bold text-white">Actif</span>;
   if (statut === 'brouillon') return <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-900">Brouillon</span>;
   if (statut === 'archive') return <span className="rounded-full bg-[#EEEEEE] px-2.5 py-0.5 text-xs font-semibold text-[#555555]">Archivé</span>;
   return <span className="rounded-full bg-[#F1F5F9] px-2.5 py-0.5 text-xs font-semibold text-[#334155]">{predefini ? 'Prédéfini' : 'Enregistré'}</span>;
@@ -96,7 +96,7 @@ export function OngletThemes({ themes, actifId, a }: { themes: ThemeLigne[]; act
           {visibles.map((t) => {
             const actif = t.id === actifId;
             return (
-              <li key={t.id} className={`flex flex-col overflow-hidden rounded-2xl border-2 bg-white ${actif ? 'border-[#B8902F] shadow-[0_0_0_3px_rgba(184,144,47,0.15)]' : 'border-[#D1D5DB]'}`}>
+              <li key={t.id} className={`flex flex-col overflow-hidden rounded-2xl border-2 bg-white ${actif ? 'border-or shadow-[0_0_0_3px_rgb(var(--or-rgb)/0.15)]' : 'border-[#D1D5DB]'}`}>
                 <button type="button" onClick={() => a.onPrevisualiser(t)} className="block text-left" tabIndex={-1} aria-hidden="true">
                   <Miniature config={t.config} petit />
                 </button>

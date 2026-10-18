@@ -96,7 +96,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5]">
+    <div className="admin min-h-screen bg-[#F5F5F5]">
       <FondMenu ouvert={menuOuvert} onFermer={() => setMenuOuvert(false)} z="z-30" />
       {/* Figé en haut de l'écran, sur ordinateur comme sur téléphone (le menu ouvert se ferme si la page défile) */}
       <header className="sticky top-0 z-40 bg-white shadow-[0_1px_0_rgba(17,17,17,0.02),0_6px_18px_rgba(17,17,17,0.05)]">

@@ -147,6 +147,11 @@
   .site { font-size: 16px; }
 }
 
+/* Administration : polices du thème publié (accents : voir cssAdmin dans src/config/design.ts) */
+.admin {
+  font-family: var(--police-texte);
+}
+
 /* Titres : Oswald en majuscules, comme le logo (police, graisse, écriture et
    taille réglables dans le Studio Design ; sans gras simulé si la police n'a
    qu'une graisse) */

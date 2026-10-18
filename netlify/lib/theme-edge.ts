@@ -1,10 +1,11 @@
 /**
  * Thème publié depuis le Studio Design (réglage « theme »), lu par la fonction
- * Netlify « seo » qui l'injecte dans chaque page. Gardé 60 s en mémoire.
+ * Netlify « seo » qui l'injecte dans chaque page (site public, et accents et
+ * polices de l'administration). Gardé 60 s en mémoire.
  * En cas d'erreur ou de configuration invalide : rien n'est injecté et le site
  * garde SVM Signature (variables de src/index.css).
  */
-import { cssDuTheme, couleursDuTheme, themeValide, urlPolices } from '../../src/config/design.ts';
+import { cssAdmin, cssDuTheme, couleursDuTheme, themeValide, urlPolices } from '../../src/config/design.ts';
 import { SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
 
 export interface ThemePublie {
@@ -31,7 +32,7 @@ export async function themePublie(): Promise<ThemePublie | null> {
     const v = rows[0]?.valeur;
     let valeur: ThemePublie | null = null;
     if (v && themeValide(v.config)) {
-      valeur = { version: Number(v.version) || 0, css: cssDuTheme(v.config), primaire: couleursDuTheme(v.config).primaire, polices: urlPolices(v.config) };
+      valeur = { version: Number(v.version) || 0, css: cssDuTheme(v.config) + cssAdmin(v.config), primaire: couleursDuTheme(v.config).primaire, polices: urlPolices(v.config) };
     } else if (v) {
       console.error('thème : configuration invalide, SVM Signature conservé');
     }

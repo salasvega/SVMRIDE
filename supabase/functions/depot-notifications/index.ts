@@ -12,7 +12,7 @@
  */
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import {
-  appelInterne, base, BOITE_SVM, bouton, dateFr, echapper, envoyerUneFois, euros, gabarit, SITE, TELEPHONE, URL_ADMIN,
+  appelInterne, base, BOITE_SVM, bouton, C, dateFr, echapper, envoyerUneFois, euros, gabarit, SITE, TELEPHONE, URL_ADMIN,
 } from "../_shared/depot-commun.ts";
 
 const ESPACE = `${SITE}/suivre-ma-vente`;
@@ -48,7 +48,7 @@ const TYPES_DEMANDE: Record<string, string> = {
   question: "Question",
 };
 
-const signature = `<p style="margin-top:20px">L'équipe SVM Ride<br><span style="color:#5E5E5E">${TELEPHONE}</span></p>`;
+const signature = `<p style="margin-top:20px">L'équipe SVM Ride<br><span style="color:${C.gris}">${TELEPHONE}</span></p>`;
 const lienEspace = bouton(ESPACE, "Suivre ma vente");
 
 Deno.serve(async (req: Request) => {
@@ -103,7 +103,7 @@ ${e.detail ? `<p>${echapper(e.detail).replace(/\n/g, "<br>")}</p>` : ""}
           to: BOITE_SVM,
           subject: `[Dépôt-vente] ${libelle} – ${d.reference} – ${d.prop_prenom} ${d.prop_nom}`,
           html: gabarit(`<p><strong>${echapper(libelle)}</strong> de ${echapper(d.prop_prenom)} ${echapper(d.prop_nom)} (${echapper(d.prop_telephone)}) pour la ${echapper(d.marque)} ${echapper(d.modele)}.</p>
-${q.message ? `<p style="background:#F6F5F2;padding:12px;border-radius:8px">${echapper(q.message).replace(/\n/g, "<br>")}</p>` : ""}
+${q.message ? `<p style="background:${C.fond};padding:12px;border-radius:8px">${echapper(q.message).replace(/\n/g, "<br>")}</p>` : ""}
 ${q.type === "reprise_anticipee" ? `<p>Rappel : frais de reprise anticipée prévus au contrat : ${euros(d.frais_resiliation)}.</p>` : ""}
 ${bouton(`${URL_ADMIN}/${d.id}`, "Ouvrir le dossier")}`),
           reply_to: d.prop_email,

@@ -196,7 +196,7 @@ export function DepotDemandesList() {
                 <button
                   type="button"
                   onClick={() => ouvrir(d.id)}
-                  className="w-full text-left bg-white rounded-xl border-2 border-[#D1D5DB] hover:border-[#111111] p-4 md:p-5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A8CFF]"
+                  className="w-full text-left bg-white rounded-xl border-2 border-[#D1D5DB] hover:border-[#111111] p-4 md:p-5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bleu-vif"
                 >
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mb-2">
                     {!d.lu_le && <span className="w-2.5 h-2.5 rounded-full bg-bleu" aria-label="Non lue" />}

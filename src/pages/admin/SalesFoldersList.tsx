@@ -165,7 +165,7 @@ export function SalesFoldersList() {
           <button
             onClick={() => setStatusFilter('all')}
             className={`bg-white rounded-lg p-4 border-2 text-left transition-all hover:shadow-md ${
-              statusFilter === 'all' ? 'border-[#FF5C00] ring-2 ring-[#FF5C00] ring-opacity-20' : 'border-[#D1D5DB]'
+              statusFilter === 'all' ? 'border-or ring-2 ring-or ring-opacity-20' : 'border-[#D1D5DB]'
             }`}
           >
             <div className="flex items-center justify-between">
@@ -173,7 +173,7 @@ export function SalesFoldersList() {
                 <p className="text-sm text-[#666666]">Total</p>
                 <p className="text-2xl font-bold text-[#111111]">{stats.total}</p>
               </div>
-              <FileText className="w-8 h-8 text-[#FF5C00]" />
+              <FileText className="w-8 h-8 text-or-texte" />
             </div>
           </button>
           <button
@@ -229,7 +229,7 @@ export function SalesFoldersList() {
                 placeholder="Rechercher par numéro, client, véhicule..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#FF5C00] focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-or focus:border-transparent"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -237,7 +237,7 @@ export function SalesFoldersList() {
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="px-4 py-2 border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-[#FF5C00] focus:border-transparent"
+                className="px-4 py-2 border border-[#D1D5DB] rounded-lg focus:ring-2 focus:ring-or focus:border-transparent"
               >
                 <option value="all">Tous les statuts</option>
                 <option value="en_cours">En cours</option>
@@ -298,7 +298,7 @@ export function SalesFoldersList() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="font-mono text-sm text-[#FF5C00] font-semibold">
+                        <span className="font-mono text-sm text-or-texte font-semibold">
                           {folder.folder_number}
                         </span>
                       </td>

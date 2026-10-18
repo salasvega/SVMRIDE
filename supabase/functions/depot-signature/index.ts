@@ -13,7 +13,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
 import {
-  base, BOITE_SVM, BUCKET_DOCS, code6, cors, dateFr, echapper, egal, empreinte, envoyer, Erreur, euros, gabarit,
+  base, BOITE_SVM, BUCKET_DOCS, C, code6, cors, dateFr, echapper, egal, empreinte, envoyer, Erreur, euros, gabarit,
   ip, reponse, sha256, TELEPHONE, URL_ADMIN,
 } from "../_shared/depot-commun.ts";
 import { pdfSigne, type Instantane } from "../_shared/depot-contrat.ts";
@@ -102,7 +102,7 @@ Deno.serve(async (req: Request) => {
 <p>Votre code pour signer le document « ${echapper(titreContrat(c))} » (${echapper(i.reference)}) :</p>
 <p style="font-size:32px;font-weight:bold;letter-spacing:6px;margin:20px 0">${code}</p>
 <p>Il est valable ${CODE_MINUTES} minutes. Ne le communiquez à personne : il vaut signature.</p>
-<p style="font-size:13px;color:#5E5E5E">Si vous n'êtes pas en train de signer un contrat avec SVM Ride, ignorez ce message et prévenez-nous au ${TELEPHONE}.</p>`),
+<p style="font-size:13px;color:${C.gris}">Si vous n'êtes pas en train de signer un contrat avec SVM Ride, ignorez ce message et prévenez-nous au ${TELEPHONE}.</p>`),
           sansCopie: true,
         });
         await preuve("code_envoye", { a: i.deposant.email });

@@ -165,7 +165,7 @@ export function StockageCard() {
             <button
               type="button"
               onClick={lancer}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#111111] text-white text-sm font-semibold hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A8CFF]"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#111111] text-white text-sm font-semibold hover:bg-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bleu-vif"
             >
               <Minimize2 className="w-4 h-4" aria-hidden="true" />
               Compresser les anciennes photos
