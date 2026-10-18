@@ -12,8 +12,10 @@ import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 import { compresserImage, extensionDe } from '../lib/compressionImage';
+import { useTexte } from '../lib/textes';
 
 export function CustomSearch() {
+  const t = useTexte();
   // Données du formulaire "je cherche un véhicule précis"
   const [formData, setFormData] = useState({
     name: '',
@@ -133,11 +135,11 @@ export function CustomSearch() {
               aria-hidden="true"
             />
             <h1 className="filet-apres">
-              Recherche Personnalisée
+              {t('recherche.titre')}
             </h1>
           </div>
           <p className="text-base md:text-lg text-gris mt-2">
-            Nous trouvons le deux-roues de vos rêves
+            {t('recherche.intro')}
           </p>
         </Container>
       </Section>

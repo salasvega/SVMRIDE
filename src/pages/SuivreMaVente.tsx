@@ -21,6 +21,7 @@ import {
 } from '../lib/depot';
 import { useCoordonnees } from '../lib/coordonnees';
 import { lienTelephone } from '../config/coordonnees';
+import { useTexte } from '../lib/textes';
 
 interface DossierProp {
   id: string;
@@ -92,6 +93,7 @@ function etapes(d: DossierProp) {
 }
 
 export function SuivreMaVente() {
+  const t = useTexte();
   const [session, setSession] = useState(lireSession);
   const [dossiers, setDossiers] = useState<DossierProp[] | null>(null);
   const [email, setEmail] = useState('');
@@ -133,7 +135,7 @@ export function SuivreMaVente() {
             <div className="space-y-6">
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
-                  <h1 className="text-[28px] md:text-[34px] filet-apres mb-1">Suivre ma vente</h1>
+                  <h1 className="text-[28px] md:text-[34px] filet-apres mb-1">{t('suivre.titre')}</h1>
                   {email && <p className="text-sm text-gris">Connecté avec {email}</p>}
                 </div>
                 <button type="button" onClick={deconnecter} className="inline-flex items-center gap-2 text-sm text-gris hover:text-noir">
@@ -157,6 +159,7 @@ export function SuivreMaVente() {
 }
 
 function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number, rester: boolean) => void }) {
+  const t = useTexte();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [rester, setRester] = useState(true);
@@ -198,10 +201,9 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number,
 
   return (
     <div className="max-w-lg mx-auto">
-      <h1 className="text-[28px] md:text-[34px] filet-apres mb-3">Suivre ma vente</h1>
+      <h1 className="text-[28px] md:text-[34px] filet-apres mb-3">{t('suivre.titre')}</h1>
       <p className="text-gris mb-6">
-        Vous nous avez confié votre moto en dépôt-vente ? Suivez ici chaque étape de la vente. Connectez-vous avec l'adresse
-        e-mail de votre contrat : nous vous envoyons un code, sans mot de passe.
+        {t('suivre.intro')}
       </p>
       {etape === 'email' ? (
         <form data-zone="formulaires" onSubmit={demander} className="carte p-5 md:p-6 space-y-4">

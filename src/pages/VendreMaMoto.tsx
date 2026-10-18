@@ -25,6 +25,7 @@ import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { DonneesDemande, ErreurDemande, envoyerDemande } from '../lib/depotDemande';
 import { useCoordonnees } from '../lib/coordonnees';
 import { lienTelephone } from '../config/coordonnees';
+import { useTexte } from '../lib/textes';
 
 const ETAPES_PARCOURS = [
   {
@@ -128,6 +129,7 @@ const VIDE: DonneesDemande = {
 const TITRES_ETAPES = ['Vous', 'Votre moto', 'Photos et prix'];
 
 export function VendreMaMoto() {
+  const t = useTexte();
   const c = useCoordonnees(); // modifiables dans l'admin, onglet « Infos du site »
   const [donnees, setDonnees] = useState<DonneesDemande>(VIDE);
   const [photos, setPhotos] = useState<UploadedDoc[]>([]);
@@ -211,10 +213,9 @@ export function VendreMaMoto() {
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-12">
         <Container>
           <div className="max-w-3xl">
-            <h1 className="filet-apres mb-4">Vendre ma moto en dépôt-vente</h1>
+            <h1 className="filet-apres mb-4">{t('vendre.titre')}</h1>
             <p className="text-base md:text-lg text-gris mb-6 leading-relaxed">
-              Confiez-nous votre moto : nous la vendons pour vous, au juste prix, sans les appels, les visites ni les
-              démarches. Estimation gratuite, paiement sous 48 h après la vente.
+              {t('vendre.intro')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <a href="#formulaire" tabIndex={-1}>

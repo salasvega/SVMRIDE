@@ -12,8 +12,10 @@ import { FileUpload, UploadedDoc } from '../components/ui/FileUpload';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 import { compresserImage, extensionDe } from '../lib/compressionImage';
+import { useTexte } from '../lib/textes';
 
 export function TradeIn() {
+  const t = useTexte();
   // Données du formulaire de reprise
   const [formData, setFormData] = useState({
     name: '',
@@ -126,10 +128,10 @@ export function TradeIn() {
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>
           <h1 className="filet-apres mb-4">
-            Reprise de votre véhicule
+            {t('reprises.titre')}
           </h1>
           <p className="text-base md:text-lg text-gris">
-            Obtenez une estimation rapide et au meilleur prix
+            {t('reprises.intro')}
           </p>
         </Container>
       </Section>

@@ -36,7 +36,8 @@ export function appliquerIconesPage(id: Identite) {
   lien('link[rel="icon"][sizes="48x48"]', x.favicon_48);
   lien('link[rel="icon"][sizes="32x32"]', x.favicon_32);
   lien('link[rel="apple-touch-icon"]', x.apple_180);
-  lien('link[rel="manifest"]', id.icone ? URL_MANIFESTE : '/site.webmanifest');
+  // Manifeste personnalisé (icône ou nom du site) : celui posé par la fonction « seo » est gardé
+  if (id.icone) lien('link[rel="manifest"]', URL_MANIFESTE);
 }
 
 function publier(i: Identite) {

@@ -12,6 +12,7 @@
  * Il ne doit donc importer ni React ni aucune bibliothèque du navigateur.
  */
 import { siteConfig } from './site.ts';
+import { avecNom, nomSite, SEO_PAGES, texte, type Textes } from './textes.ts';
 import {
   COORDONNEES_DEFAUT,
   horairesSchema,
@@ -41,6 +42,8 @@ export interface SeoMeta {
   schema?: object | object[];
   /** Statut HTTP renvoyé par le rendu serveur (404 pour une page inexistante) */
   status?: number;
+  /** Nom du site (admin, Infos du site) ; sinon celui d'origine */
+  nomSite?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -350,7 +353,7 @@ export function renderHeadTags(meta: SeoMeta): string {
     `<meta name="description" content="${esc(meta.description)}" />`,
     `<meta name="robots" content="${meta.noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'}" />`,
     meta.noindex ? '' : `<link rel="canonical" href="${esc(url)}" />`,
-    `<meta property="og:site_name" content="${esc(siteConfig.name)}" />`,
+    `<meta property="og:site_name" content="${esc(meta.nomSite ?? siteConfig.name)}" />`,
     `<meta property="og:locale" content="fr_FR" />`,
     `<meta property="og:type" content="${meta.type === 'product' ? 'product' : 'website'}" />`,
     `<meta property="og:title" content="${esc(meta.title)}" />`,
@@ -371,3 +374,27 @@ export function renderHeadTags(meta: SeoMeta): string {
 export function injectSeo(html: string, meta: SeoMeta): string {
   return html.replace(/<!--seo-->[\s\S]*?<!--\/seo-->/, `<!--seo-->\n    ${renderHeadTags(meta)}\n    <!--/seo-->`);
 }
+
+/**
+ * Titres et descriptions modifiés dans l'admin (Textes du site › Référencement
+ * Google) et nom du site : remplace « SVM Ride » dans le titre, la description
+ * et les données structurées. Sans modification, la page est inchangée.
+ */
+export function avecTextes(meta: SeoMeta, t: Textes): SeoMeta {
+  const slug = SEO_PAGES[meta.path];
+  let { title, description } = meta;
+  if (slug) {
+    if (t[`seo.${slug}.titre`]?.trim()) title = texte(t, `seo.${slug}.titre`);
+    if (t[`seo.${slug}.description`]?.trim()) description = texte(t, `seo.${slug}.description`);
+  }
+  const nom = nomSite(t);
+  if (nom === 'SVM Ride' && title === meta.title && description === meta.description) return meta;
+  return {
+    ...meta,
+    title: avecNom(title, t),
+    description: avecNom(description, t),
+    nomSite: nom,
+    schema: meta.schema ? (JSON.parse(avecNom(JSON.stringify(meta.schema), t)) as object | object[]) : undefined,
+  };
+}
+

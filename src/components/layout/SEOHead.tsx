@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { siteConfig } from '../../config/site';
-import { SeoMeta, canonicalUrl, DEFAULT_IMAGE, avecCoordonnees } from '../../config/seo';
+import { SeoMeta, canonicalUrl, DEFAULT_IMAGE, avecCoordonnees, avecTextes } from '../../config/seo';
+import { useTextes } from '../../lib/textes';
 import { useCoordonnees } from '../../lib/coordonnees';
 import { useIdentite } from '../../lib/identite';
 import { icones } from '../../config/identite';
@@ -17,7 +18,8 @@ interface SEOHeadProps {
  */
 export function SEOHead({ meta: brut }: SEOHeadProps) {
   // Fiche concession et description de Contact avec les coordonnées à jour (admin, « Infos du site »)
-  const meta = avecCoordonnees(brut, useCoordonnees(), icones(useIdentite()).icon_512);
+  // Titres Google et nom du site modifiés dans l'admin (Textes du site, Infos du site)
+  const meta = avecTextes(avecCoordonnees(brut, useCoordonnees(), icones(useIdentite()).icon_512), useTextes());
   const url = canonicalUrl(meta);
   const image = meta.image
     ? meta.image.startsWith('http')

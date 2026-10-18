@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
-import { siteConfig, navLinks } from '../../config/site';
+import { navLinks } from '../../config/site';
+import { useTexte } from '../../lib/textes';
 import { Button } from '../ui/Button';
 import { FondMenu } from './FondMenu';
 import { useFermerAuDefilement } from '../../hooks/useFermerAuDefilement';
@@ -9,6 +10,7 @@ import { useIdentite } from '../../lib/identite';
 import { icones } from '../../config/identite';
 
 export function Header() {
+  const t = useTexte();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   // Logo choisi dans l'admin (Infos du site, bloc « Logo et icône »)
@@ -45,13 +47,13 @@ export function Header() {
           >
             <img
               src={logo}
-              alt="SVM Ride Logo"
+              alt={`${t('site.nom')} Logo`}
               className="w-11 h-11 object-contain"
               width={44}
               height={44}
             />
             <span className="text-[22px] font-bold text-noir tracking-tight">
-              {siteConfig.name}
+              {t('site.nom')}
             </span>
           </Link>
 

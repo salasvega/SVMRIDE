@@ -27,6 +27,7 @@ import { useStockMarques } from '../hooks/useStockMarques';
 import { usePrefereMoinsDAnimations } from '../hooks/usePrefereMoinsDAnimations';
 import { Section } from './ui/Section';
 import { Container } from './ui/Container';
+import { useTexte } from '../lib/textes';
 
 const VITESSE = 30; // px par seconde : lent, pour reconnaître chaque marque
 const REPRISE_MS = 2500;
@@ -42,6 +43,7 @@ interface Element {
 const triFr = (a: Element, b: Element) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' });
 
 export function ExplorezLesMarques() {
+  const t = useTexte();
   const { pret, enStock, nomsCatalogue } = useStockMarques();
   const reduit = usePrefereMoinsDAnimations();
 
@@ -313,9 +315,9 @@ export function ExplorezLesMarques() {
       <Container>
         <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <h2 className="titre-section filet-apres mb-5">Explorez les marques</h2>
+            <h2 className="titre-section filet-apres mb-5">{t('accueil.marques.titre')}</h2>
             <p className="text-base md:text-lg text-gris leading-relaxed">
-              Retrouvez les plus grandes marques de motos et découvrez les modèles actuellement disponibles chez SVM Ride.
+              {t('accueil.marques.texte')}
             </p>
           </div>
         </div>

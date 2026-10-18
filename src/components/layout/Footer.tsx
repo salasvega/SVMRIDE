@@ -5,9 +5,10 @@ import { useIdentite } from '../../lib/identite';
 import { icones } from '../../config/identite';
 import { adresseComplete, lienInstagram, lienMaps, lienTelephone, lignesHoraires } from '../../config/coordonnees';
 import { Mail, Phone, Instagram, MapPin } from 'lucide-react';
-import { siteConfig } from '../../config/site';
+import { useTexte } from '../../lib/textes';
 
 export function Footer() {
+  const t = useTexte();
   // Lien « Notre équipe » : seulement si l'équipe est affichée (réglage de l'admin)
   const equipe = useEquipe();
   // Coordonnées modifiables dans l'admin, onglet « Infos du site »
@@ -23,10 +24,10 @@ export function Footer() {
           <div>
             <Link to="/" className="inline-flex items-center gap-3 mb-4 rounded-lg">
               <img src={logo} alt="" width={44} height={44} className="w-11 h-11 rounded-full ring-1 ring-or/60" />
-              <span className="text-2xl font-bold">{siteConfig.name}</span>
+              <span className="text-2xl font-bold">{t('site.nom')}</span>
             </Link>
             <p className="text-inverse-66 text-sm leading-relaxed mb-4">
-              {siteConfig.description}
+              {t('pied.description')}
             </p>
 
             <div className="space-y-3">
@@ -134,7 +135,7 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-inverse/10">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-sm text-inverse-66">
-              © {currentYear} {siteConfig.name}. Tous droits réservés.
+              © {currentYear} {t('site.nom')}. Tous droits réservés.
             </p>
             <Link
               to="/admin/login"

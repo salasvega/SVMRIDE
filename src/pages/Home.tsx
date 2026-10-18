@@ -10,17 +10,31 @@ import { DerniersArrivages } from '../components/DerniersArrivages';
 import { ExplorezLesMarques } from '../components/ExplorezLesMarques';
 import { SectionEquipe } from '../components/equipe/SectionEquipe';
 import { SectionAvisGoogle } from '../components/avis/SectionAvisGoogle';
+import { useTexte } from '../lib/textes';
+import { useFondAccueil } from '../lib/medias';
+import { FOND_ACCUEIL_ORIGINE } from '../config/medias';
+import type { CSSProperties } from 'react';
 
 export function Home() {
+  const t = useTexte();
+  const fond = useFondAccueil();
+  const styleFond = {
+    '--fond-mobile': `url('${fond?.mobile ?? FOND_ACCUEIL_ORIGINE.mobile}')`,
+    '--fond-ordinateur': `url('${fond?.ordinateur ?? FOND_ACCUEIL_ORIGINE.ordinateur}')`,
+    '--position-mobile': fond ? '50% 50%' : '50% 40%',
+    '--position-ordinateur': fond ? '50% 50%' : '0% 100%',
+  } as CSSProperties;
   return (
     <>
       <SEOHead meta={pageSeo['/']} />
 
       <Section zone="hero" background="dark" className="relative !py-0 overflow-hidden">
         {/* Mobile et tablette : cadrage sur les motos. Ordinateur : photo large
-            avec le panneau SVM RIDE, rognée sous les roues et calée en bas à gauche. */}
+            avec le panneau SVM RIDE, rognée sous les roues et calée en bas à gauche.
+            Image choisie dans l'admin (Infos du site) : cadrée pour chaque format, centrée. */}
         <div
-          className="absolute inset-0 bg-cover bg-[url('/accueil-showroom.webp')] bg-[position:50%_40%] lg:bg-[url('/accueil-showroom-logo.webp')] lg:bg-[position:0%_100%]"
+          className="absolute inset-0 bg-cover bg-[image:var(--fond-mobile)] bg-[position:var(--position-mobile)] lg:bg-[image:var(--fond-ordinateur)] lg:bg-[position:var(--position-ordinateur)]"
+          style={styleFond}
           aria-hidden="true"
         />
         {/* Voile sombre pour la lisibilité du titre ; sur ordinateur, allégé en
@@ -33,17 +47,17 @@ export function Home() {
           <div className="max-w-3xl">
             <span className="filet-or mb-5" aria-hidden="true" />
             <h1 className="titre-hero mb-4 md:mb-5 drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]">
-              Bienvenue chez SVM Ride
+              {t('accueil.hero.titre')}
             </h1>
             <p className="text-[17px] md:text-xl text-inverse-91 mb-8 leading-relaxed">
-              Votre spécialiste du deux-roues basé en Île-de-France.
+              {t('site.accroche')}
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link to="/vehicules" tabIndex={-1}>
-                <Button size="lg" fullWidth className="sm:w-auto">Voir nos véhicules</Button>
+                <Button size="lg" fullWidth className="sm:w-auto">{t('accueil.hero.bouton1')}</Button>
               </Link>
               <Link to="/contact" tabIndex={-1}>
-                <Button size="lg" variant="secondary" fullWidth className="sm:w-auto">Nous contacter</Button>
+                <Button size="lg" variant="secondary" fullWidth className="sm:w-auto">{t('accueil.hero.bouton2')}</Button>
               </Link>
             </div>
           </div>
@@ -54,36 +68,19 @@ export function Home() {
         <Container>
           <div className="text-center mb-10 md:mb-12">
             <h2 className="titre-section filet-apres mb-5">
-              Vente de véhicules d'occasion
+              {t('accueil.vente.titre')}
             </h2>
             <p className="text-base md:text-lg text-gris max-w-2xl mx-auto">
-              Découvrez notre sélection de motos et scooters d'occasion de qualité
+              {t('accueil.vente.texte')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-            {[
-              {
-                icon: Shield,
-                title: 'Sélection vérifiée',
-                description: 'Chaque véhicule est rigoureusement contrôlé et garanti',
-              },
-              {
-                icon: Users,
-                title: 'Accompagnement',
-                description: 'Conseils personnalisés pour trouver le deux-roues idéal',
-              },
-              {
-                icon: Award,
-                title: 'Financement',
-                description: 'Solutions de financement adaptées à votre budget',
-              },
-              {
-                icon: CheckCircle,
-                title: 'Démarches simplifiées',
-                description: 'Nous gérons toute la paperasse pour vous',
-              },
-            ].map((feature, index) => (
+            {[Shield, Users, Award, CheckCircle].map((icon, i) => ({
+              icon,
+              title: t(`accueil.vente.atout${i + 1}.titre`),
+              description: t(`accueil.vente.atout${i + 1}.texte`),
+            })).map((feature, index) => (
               <div
                 key={index}
                 className="carte p-6 md:p-7 flex gap-4 sm:flex-col sm:gap-0 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule"
@@ -110,41 +107,41 @@ export function Home() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
             <div>
               <h2 className="titre-section filet-avant mb-5">
-                Reprise de votre véhicule
+                {t('accueil.reprise.titre')}
               </h2>
               <p className="text-base md:text-lg text-inverse-84 mb-8 leading-relaxed">
-                Faites reprendre votre deux-roues rapidement et au meilleur prix. Notre équipe vous propose une expertise rapide, une offre attractive, un virement immédiat et des démarches simplifiées.
+                {t('accueil.reprise.texte')}
               </p>
               <Link to="/reprises" tabIndex={-1}>
-                <Button>Demande de reprise</Button>
+                <Button>{t('accueil.reprise.bouton')}</Button>
               </Link>
               <p className="mt-6 text-sm text-inverse-84">
-                Vous préférez vendre au meilleur prix ?{' '}
+                {t('accueil.reprise.depot')}{' '}
                 <Link to="/vendre-ma-moto" className="text-or-clair underline underline-offset-4 hover:decoration-2">
-                  Confiez-nous votre moto en dépôt-vente
+                  {t('accueil.reprise.depot_lien')}
                 </Link>
               </p>
             </div>
             <div className="grid grid-cols-2 gap-3 md:gap-4">
               <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
                 <IconeOr icon={Clock} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">Expertise rapide</h3>
-                <p className="text-sm text-inverse-74">Évaluation en moins de 24h</p>
+                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t('accueil.reprise.atout1.titre')}</h3>
+                <p className="text-sm text-inverse-74">{t('accueil.reprise.atout1.texte')}</p>
               </div>
               <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
                 <IconeOr icon={Award} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">Offre attractive</h3>
-                <p className="text-sm text-inverse-74">Prix juste et compétitif</p>
+                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t('accueil.reprise.atout2.titre')}</h3>
+                <p className="text-sm text-inverse-74">{t('accueil.reprise.atout2.texte')}</p>
               </div>
               <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
                 <IconeOr icon={CheckCircle} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">Virement immédiat</h3>
-                <p className="text-sm text-inverse-74">Paiement sécurisé rapide</p>
+                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t('accueil.reprise.atout3.titre')}</h3>
+                <p className="text-sm text-inverse-74">{t('accueil.reprise.atout3.texte')}</p>
               </div>
               <div className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
                 <IconeOr icon={Shield} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">Sans contrainte</h3>
-                <p className="text-sm text-inverse-74">Démarches simplifiées</p>
+                <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t('accueil.reprise.atout4.titre')}</h3>
+                <p className="text-sm text-inverse-74">{t('accueil.reprise.atout4.texte')}</p>
               </div>
             </div>
           </div>
@@ -155,32 +152,32 @@ export function Home() {
         <Container>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
             <div className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
-              <h3 className="titre-display text-[22px] md:text-2xl mb-3">Personnalisation</h3>
+              <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t('accueil.service1.titre')}</h3>
               <p className="text-gris mb-6 leading-relaxed flex-1">
-                Transformez votre deux-roues selon vos envies. Échappements, kits esthétiques, selles confort et bien plus encore.
+                {t('accueil.service1.texte')}
               </p>
               <Link to="/contact" className="lien self-start">
-                En savoir plus →
+                {t('accueil.service1.lien')}
               </Link>
             </div>
 
             <div className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
-              <h3 className="titre-display text-[22px] md:text-2xl mb-3">Accessoires</h3>
+              <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t('accueil.service2.titre')}</h3>
               <p className="text-gris mb-6 leading-relaxed flex-1">
-                Large gamme d'accessoires et d'équipements pour votre sécurité et votre confort. Casques, gants, bagagerie et plus.
+                {t('accueil.service2.texte')}
               </p>
               <Link to="/contact" className="lien self-start">
-                En savoir plus →
+                {t('accueil.service2.lien')}
               </Link>
             </div>
 
             <div className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
-              <h3 className="titre-display text-[22px] md:text-2xl mb-3">Entretien & Réparation</h3>
+              <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t('accueil.service3.titre')}</h3>
               <p className="text-gris mb-6 leading-relaxed flex-1">
-                Service d'entretien et de réparation pour tous types de deux-roues. Prenez rendez-vous par téléphone ou par notre formulaire de contact.
+                {t('accueil.service3.texte')}
               </p>
               <Link to="/contact" className="lien self-start">
-                Prendre rendez-vous →
+                {t('accueil.service3.lien')}
               </Link>
             </div>
           </div>
@@ -191,7 +188,7 @@ export function Home() {
         <Container>
           <div className="text-center mb-10 md:mb-12">
             <h2 className="titre-section filet-apres">
-              Pourquoi nous choisir ?
+              {t('accueil.pourquoi.titre')}
             </h2>
           </div>
 
@@ -200,9 +197,9 @@ export function Home() {
               <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
                 <IconeOr icon={Star} className="w-8 h-8" />
               </div>
-              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">Expertise & Passion</h3>
+              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t('accueil.pourquoi.point1.titre')}</h3>
               <p className="text-gris leading-relaxed max-w-xs mx-auto">
-                Une équipe de passionnés à votre service, avec des années d'expérience dans le deux-roues.
+                {t('accueil.pourquoi.point1.texte')}
               </p>
             </div>
 
@@ -210,9 +207,9 @@ export function Home() {
               <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
                 <IconeOr icon={Shield} className="w-8 h-8" />
               </div>
-              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">Qualité & Fiabilité</h3>
+              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t('accueil.pourquoi.point2.titre')}</h3>
               <p className="text-gris leading-relaxed max-w-xs mx-auto">
-                Des véhicules soigneusement sélectionnés et vérifiés pour votre tranquillité d'esprit.
+                {t('accueil.pourquoi.point2.texte')}
               </p>
             </div>
 
@@ -220,9 +217,9 @@ export function Home() {
               <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
                 <IconeOr icon={Users} className="w-8 h-8" />
               </div>
-              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">Satisfaction Client</h3>
+              <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t('accueil.pourquoi.point3.titre')}</h3>
               <p className="text-gris leading-relaxed max-w-xs mx-auto">
-                Votre satisfaction est notre priorité. Service personnalisé et suivi après-vente.
+                {t('accueil.pourquoi.point3.texte')}
               </p>
             </div>
           </div>
@@ -235,12 +232,12 @@ export function Home() {
 
       <Section background="dark">
         <Container className="text-center">
-          <h2 className="titre-section filet-avant mb-5">Prêt à trouver votre deux-roues ?</h2>
+          <h2 className="titre-section filet-avant mb-5">{t('accueil.final.titre')}</h2>
           <p className="text-base md:text-xl text-inverse-84 mb-8 max-w-2xl mx-auto">
-            Contactez-nous dès maintenant pour discuter de votre projet ou visiter notre showroom.
+            {t('accueil.final.texte')}
           </p>
           <Link to="/contact" tabIndex={-1}>
-            <Button size="lg">Nous contacter</Button>
+            <Button size="lg">{t('accueil.final.bouton')}</Button>
           </Link>
         </Container>
       </Section>

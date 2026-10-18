@@ -12,8 +12,10 @@ import { cleMarque, nomMarque } from '../config/marques';
 import { Button } from '../components/ui/Button';
 import { VehicleFilters, VehicleStatus } from '../types/vehicle';
 import { useVehicles } from '../hooks/useVehicles';
+import { useTexte } from '../lib/textes';
 
 export function Vehicles() {
+  const t = useTexte();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -168,7 +170,7 @@ export function Vehicles() {
       <Section zone="catalogue" background="gray" className="!pt-8 md:!pt-12">
         <Container>
           <h1 className="filet-apres mb-4">
-            Nos Véhicules d'Occasion
+            {t('vehicules.titre')}
           </h1>
           <p className="text-base md:text-lg text-gris mb-6" aria-live="polite">
             {loading ? 'Chargement...' : compteur}

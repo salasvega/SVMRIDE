@@ -24,8 +24,10 @@ import { MEMBRES } from '../config/equipe';
 import { Portrait } from '../components/equipe/Portrait';
 import { useCoordonnees } from '../lib/coordonnees';
 import { adresseComplete, lienInstagram, lienMaps, lienTelephone, lignesHoraires } from '../config/coordonnees';
+import { useTexte } from '../lib/textes';
 
 export function Contact() {
+  const t = useTexte();
   // Si on arrive depuis une fiche véhicule, on a passé `state={{ vehicle: "Yamaha MT-07 2021" }}`
   const location = useLocation();
   // Carte du responsable : fiche « responsable » de l'admin (onglet Équipe)
@@ -138,10 +140,10 @@ export function Contact() {
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>
           <h1 className="filet-apres mb-4">
-            Contactez-nous
+            {t('contact.titre')}
           </h1>
           <p className="text-base md:text-lg text-gris">
-            Nous sommes à votre écoute
+            {t('contact.intro')}
           </p>
         </Container>
       </Section>

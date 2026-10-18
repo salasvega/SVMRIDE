@@ -10,8 +10,10 @@ import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
 import { useFormSubmit } from '../hooks/useFormSubmit';
+import { useTexte } from '../lib/textes';
 
 export function Financing() {
+  const t = useTexte();
   // Lecture des paramètres passés depuis la fiche véhicule
   // ex: /financement?vehicle=Yamaha%20MT-07%202021&price=6500&slug=yamaha-mt07-2021
   const [searchParams] = useSearchParams();
@@ -131,10 +133,10 @@ export function Financing() {
         <Container>
           <div>
             <h1 className="filet-apres mb-4">
-              Solutions de Financement
+              {t('financement.titre')}
             </h1>
             <p className="text-base md:text-lg text-gris">
-              Financez votre deux-roues en toute simplicité
+              {t('financement.intro')}
             </p>
           </div>
         </Container>

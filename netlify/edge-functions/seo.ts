@@ -11,6 +11,8 @@
  * La page /equipe suit le réglage « Afficher l'équipe sur le site » de l'admin.
  * Icônes (onglet, iPhone, Android) et manifeste : ceux choisis dans l'admin
  * (Infos du site, bloc « Logo et icône »), sinon ceux d'origine.
+ * Textes : titres Google et nom du site modifiés dans l'admin ; les textes et le
+ * fond de l'accueil sont posés dans la page (bloc JSON) pour le premier affichage.
  * Couleurs : le thème publié dans le Studio Design est ajouté dans le <head>
  * (sinon, ou en cas d'erreur, SVM Signature de src/index.css).
  *
@@ -19,6 +21,7 @@
 import type { Config, Context } from '@netlify/edge-functions';
 import {
   avecCoordonnees,
+  avecTextes,
   injectSeo,
   notFoundSeo,
   pageSeo,
@@ -37,6 +40,8 @@ import { CONTEXTE, SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-conf
 import { balisesIcones, icones, manifeste, URL_MANIFESTE } from '../../src/config/identite.ts';
 import { identite } from '../lib/identite-edge.ts';
 import { injecterTheme, themePublie } from '../lib/theme-edge.ts';
+import { injecterReglages, reglagesPage } from '../lib/reglages-edge.ts';
+import { nomSite } from '../../src/config/textes.ts';
 
 const TIMEOUT_MS = 2500;
 
@@ -133,7 +138,8 @@ export default async function seo(request: Request, context: Context) {
 
   if (path === '/sitemap.xml') return sitemap();
   if (path === URL_MANIFESTE) {
-    return new Response(JSON.stringify(manifeste(await identite())), {
+    const [idm, rm] = await Promise.all([identite(), reglagesPage()]);
+    return new Response(JSON.stringify(manifeste(idm, nomSite(rm.textes))), {
       headers: { 'content-type': 'application/manifest+json; charset=utf-8', 'cache-control': 'public, max-age=300' },
     });
   }
@@ -156,8 +162,10 @@ export default async function seo(request: Request, context: Context) {
   }
 
   // Accueil et Contact : fiche concession (téléphone, adresse, horaires) et description à jour
-  const [id, theme] = await Promise.all([identite(), themePublie()]);
+  const [id, theme, reglages] = await Promise.all([identite(), themePublie(), reglagesPage()]);
   if (path === '/' || path === '/contact') meta = avecCoordonnees(meta, await coordonnees(), icones(id).icon_512);
+  // Titres Google et nom du site modifiés dans l'admin
+  meta = avecTextes(meta, reglages.textes);
 
   const res = await context.next();
   if (!(res.headers.get('content-type') ?? '').includes('text/html')) return res;
@@ -169,9 +177,10 @@ export default async function seo(request: Request, context: Context) {
   if (meta.noindex) headers.set('x-robots-tag', 'noindex');
   // Lien de signature personnel : jamais transmis à un autre site
   if (meta === signatureSeo) headers.set('referrer-policy', 'no-referrer');
-  let page = injecterTheme(injectSeo(html, meta), theme);
+  let page = injecterReglages(injecterTheme(injectSeo(html, meta), theme), reglages);
   // Icônes choisies dans l'admin
-  if (id.icone) page = page.replace(/<!--icones-->[\s\S]*?<!--\/icones-->/, `<!--icones-->\n    ${balisesIcones(id)}\n    <!--/icones-->`);
+  const nomPerso = nomSite(reglages.textes) !== 'SVM Ride';
+  if (id.icone || nomPerso) page = page.replace(/<!--icones-->[\s\S]*?<!--\/icones-->/, `<!--icones-->\n    ${balisesIcones(id, nomPerso)}\n    <!--/icones-->`);
   return new Response(page, { status: meta.status ?? res.status, headers });
 }
 

@@ -12,10 +12,12 @@ import { Section } from './ui/Section';
 import { Container } from './ui/Container';
 import { Button } from './ui/Button';
 import { CarrouselCartes } from './ui/CarrouselCartes';
+import { useTexte } from '../lib/textes';
 
 const NOMBRE = 3;
 
 export function DerniersArrivages() {
+  const t = useTexte();
   const { vehicles, loading, error } = useVehicles();
   const enVente = vehicles.filter((v) => (v as { status?: string }).status !== 'sold');
 
@@ -25,10 +27,10 @@ export function DerniersArrivages() {
     <Section background="white" className="!py-12 md:!py-16">
       <Container>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-          <h2 className="titre-section filet-apres">Derniers arrivages</h2>
+          <h2 className="titre-section filet-apres">{t('accueil.arrivages.titre')}</h2>
           {!loading && (
             <Link to="/vehicules" className="lien self-start sm:self-auto whitespace-nowrap">
-              Voir toutes nos motos ({enVente.length}) →
+              {t('accueil.arrivages.lien')} ({enVente.length}) →
             </Link>
           )}
         </div>
@@ -49,7 +51,7 @@ export function DerniersArrivages() {
         {!loading && enVente.length > NOMBRE && (
           <div className="mt-8 text-center">
             <Link to="/vehicules" tabIndex={-1}>
-              <Button variant="outline">Voir toutes nos motos</Button>
+              <Button variant="outline">{t('accueil.arrivages.lien')}</Button>
             </Link>
           </div>
         )}

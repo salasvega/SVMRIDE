@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/admin/ProtectedRoute';
 import { ScrollToTop } from './components/ScrollToTop';
 import { Header } from './components/layout/Header';
+import { AnnonceSite } from './components/layout/AnnonceSite';
 import { Footer } from './components/layout/Footer';
 import { CookieBanner } from './components/CookieBanner';
 import { DegradeOrDefs } from './components/ui/DegradeOrDefs';
@@ -187,6 +188,7 @@ function App() {
             element={
               <div className="site min-h-screen flex flex-col">
                 <DegradeOrDefs />
+                <AnnonceSite />
                 <Header />
                 <main className="flex-1">
                   <Routes>

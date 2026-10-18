@@ -19,8 +19,10 @@ import { Container } from '../ui/Container';
 import { CarrouselAvis } from './CarrouselAvis';
 import { Etoiles } from './Etoiles';
 import { LogoGoogle } from './LogoGoogle';
+import { useTexte } from '../../lib/textes';
 
 export function SectionAvisGoogle() {
+  const t = useTexte();
   const demo = modeDemo();
   const selection = modeSelection();
   const sourceAttendue = demo || selection || AVIS_GOOGLE.actif;
@@ -71,9 +73,9 @@ export function SectionAvisGoogle() {
           }
         >
           <div className={compact ? 'mx-auto max-w-2xl' : 'max-w-2xl'}>
-            <h2 className="titre-section filet-apres mb-5">Votre confiance, notre plus belle récompense</h2>
+            <h2 className="titre-section filet-apres mb-5">{t('accueil.avis.titre')}</h2>
             <p className="text-base md:text-lg text-gris leading-relaxed">
-              Découvrez ce que nos clients pensent de leur expérience chez SVM Ride.
+              {t('accueil.avis.texte')}
             </p>
           </div>
 

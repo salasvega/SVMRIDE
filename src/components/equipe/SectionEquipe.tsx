@@ -13,11 +13,13 @@ import { Section } from '../ui/Section';
 import { Container } from '../ui/Container';
 import { Button } from '../ui/Button';
 import { Portrait } from './Portrait';
+import { useTexte } from '../../lib/textes';
 
 const MAX_APERCU = 6;
 
 export function SectionEquipe() {
   const equipe = useEquipe();
+  const t = useTexte();
   if (equipe === null) return <div className="min-h-[560px] bg-surface" aria-hidden="true" />;
   // Masquée depuis l'admin (onglet Équipe, « Afficher l'équipe sur le site » = Non)
   if (!equipe.affichee) return null;
@@ -33,10 +35,9 @@ export function SectionEquipe() {
     <Section zone="equipe" background="white">
       <Container>
         <div className="text-center mb-10 md:mb-12">
-          <h2 className="titre-section filet-apres mb-5">Des passionnés à votre service</h2>
+          <h2 className="titre-section filet-apres mb-5">{t('accueil.equipe.titre')}</h2>
           <p className="text-base md:text-lg text-gris max-w-2xl mx-auto leading-relaxed">
-            Derrière chaque moto, il y a une équipe de passionnés à votre écoute pour vous conseiller et vous
-            accompagner dans votre projet.
+            {t('accueil.equipe.texte')}
           </p>
         </div>
 
@@ -77,7 +78,7 @@ export function SectionEquipe() {
 
         <div className="mt-10 text-center">
           <Link to="/equipe" tabIndex={-1}>
-            <Button size="lg">Découvrir notre équipe</Button>
+            <Button size="lg">{t('accueil.equipe.bouton')}</Button>
           </Link>
         </div>
       </Container>

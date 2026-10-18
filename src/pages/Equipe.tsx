@@ -16,8 +16,10 @@ import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { Portrait } from '../components/equipe/Portrait';
 import { NotFound } from './NotFound';
+import { useTexte } from '../lib/textes';
 
 export function Equipe() {
+  const t = useTexte();
   const equipe = useEquipe();
   const masquee = equipe !== null && !equipe.affichee;
   // Page masquée depuis l'admin : 404 pour le public, aperçu pour les administrateurs
@@ -44,10 +46,9 @@ export function Equipe() {
               </span>
             </p>
           )}
-          <h1 className="filet-apres mb-5">Rencontrez l'équipe SVM Ride</h1>
+          <h1 className="filet-apres mb-5">{t('equipe.titre')}</h1>
           <p className="max-w-3xl text-base md:text-lg text-gris leading-relaxed">
-            Chez SVM Ride, la passion de la moto se partage au quotidien. Découvrez les femmes et les hommes qui
-            mettent leur expérience et leur savoir-faire au service de votre prochain projet moto.
+            {t('equipe.intro')}
           </p>
         </Container>
       </Section>

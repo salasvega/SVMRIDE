@@ -71,7 +71,7 @@ export const URL_MANIFESTE = '/manifeste-site';
 const attr = (s: string) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
 /** Balises <link> des icônes pour le <head> de chaque page */
-export function balisesIcones(id: Identite): string {
+export function balisesIcones(id: Identite, nomPerso = false): string {
   const x = icones(id);
   const perso = !!id.icone;
   return [
@@ -80,16 +80,16 @@ export function balisesIcones(id: Identite): string {
       : `<link rel="icon" href="${attr(x.favicon_48)}" sizes="48x48" />`,
     `<link rel="icon" type="image/png" sizes="32x32" href="${attr(x.favicon_32)}" />`,
     `<link rel="apple-touch-icon" href="${attr(x.apple_180)}" />`,
-    `<link rel="manifest" href="${perso ? URL_MANIFESTE : '/site.webmanifest'}" />`,
+    `<link rel="manifest" href="${perso || nomPerso ? URL_MANIFESTE : '/site.webmanifest'}" />`,
   ].join('\n    ');
 }
 
 /** Manifeste de l'application (écran d'accueil Android) avec les icônes en cours */
-export function manifeste(id: Identite) {
+export function manifeste(id: Identite, nom = 'SVM Ride') {
   const x = icones(id);
   return {
-    name: "SVM Ride – Motos et scooters d'occasion",
-    short_name: 'SVM Ride',
+    name: `${nom} – Motos et scooters d'occasion`,
+    short_name: nom,
     description: "Motos et scooters d'occasion contrôlés et garantis à Chaville (92), Île-de-France.",
     lang: 'fr',
     start_url: '/',
