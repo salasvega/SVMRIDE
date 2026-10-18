@@ -15,6 +15,7 @@ import { Button } from '../components/ui/Button';
 import { appelSignature, ErreurDepot, euros, jour, messageErreur } from '../lib/depot';
 import { useCoordonnees } from '../lib/coordonnees';
 import { useTexte } from '../lib/textes';
+import { demo } from '../lib/apercuDemo';
 
 interface Resume {
   titre: string;
@@ -73,7 +74,11 @@ export function Signature() {
         setContrat(r.contrat);
         setPdf(r.pdf);
         setCodeEnvoye(r.contrat.code_envoye);
-        setEtat('pret');
+        // Aperçu de l'admin : contrat d'exemple déjà signé (?demo=signe)
+        if (demo() === 'signe') {
+          setSigne({ pdf: null, le: new Date().toISOString() });
+          setEtat('signe');
+        } else setEtat('pret');
       })
       .catch((e) => {
         setErreur(messageErreur(e));

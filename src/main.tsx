@@ -4,8 +4,10 @@ import App from './App.tsx';
 import './index.css';
 import { demarrerApercu } from './lib/theme';
 import { surveillerNouvelleVersion } from './lib/nouvelleVersion';
+import { demarrerDemo } from './lib/apercuDemo';
 
-// Aperçu du Studio Design (site affiché dans un cadre de l'admin)
+// Aperçus de l'admin (site affiché dans un cadre) : rien n'est envoyé, pages d'exemple
+demarrerDemo();
 demarrerApercu();
 // Onglet resté ouvert pendant une mise en ligne : rechargé une fois
 surveillerNouvelleVersion();

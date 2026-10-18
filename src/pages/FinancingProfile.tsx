@@ -16,6 +16,7 @@ import { Save, Send, Trash2, CheckCircle, Edit, KeyRound, Copy } from 'lucide-re
 import { useCoordonnees } from '../lib/coordonnees';
 import { lienTelephone } from '../config/coordonnees';
 import { useTexte } from '../lib/textes';
+import { demo } from '../lib/apercuDemo';
 
 interface FinancingProfile {
   id?: string;
@@ -77,13 +78,14 @@ export function FinancingProfile() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   // Accès sécurisé : e-mail + code personnel, puis jeton de session (2 h)
-  const [session, setSession] = useState('');
-  const [showEmailModal, setShowEmailModal] = useState(true);
+  // Aperçu de l'admin : dossier d'exemple déjà ouvert (?demo=ouvert, ?demo=envoye)
+  const [session, setSession] = useState(() => (demo() ? 'apercu' : ''));
+  const [showEmailModal, setShowEmailModal] = useState(() => !demo());
   const [modeAcces, setModeAcces] = useState<'code' | 'creation'>('code');
   const [emailInput, setEmailInput] = useState('');
   const [codeInput, setCodeInput] = useState('');
   const [erreurAcces, setErreurAcces] = useState('');
-  const [codeCree, setCodeCree] = useState('');
+  const [codeCree, setCodeCree] = useState(() => (demo() === 'ouvert' ? 'K7P2QX' : ''));
   const [codeCopie, setCodeCopie] = useState(false);
   const [fileUrls, setFileUrls] = useState<Record<string, string>>({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -123,7 +125,7 @@ export function FinancingProfile() {
     rib: '',
     hosting_certificate: '',
     host_id_card: '',
-    status: 'draft',
+    status: demo() === 'envoye' ? 'submitted' : 'draft',
     is_complete: false,
   });
 

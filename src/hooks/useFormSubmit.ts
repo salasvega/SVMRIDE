@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { demo } from '../lib/apercuDemo';
 
 interface UseFormSubmitOptions {
   onSuccess?: () => void;
@@ -8,7 +9,8 @@ interface UseFormSubmitOptions {
 export function useFormSubmit(options: UseFormSubmitOptions = {}) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  // Aperçu de l'admin : message après envoi affiché directement (?demo=envoye)
+  const [success, setSuccess] = useState(() => demo() === 'envoye');
 
   const submit = async (endpoint: string, data: Record<string, any>) => {
     setIsSubmitting(true);

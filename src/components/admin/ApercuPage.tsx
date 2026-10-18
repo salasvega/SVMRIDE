@@ -19,6 +19,8 @@ export interface OptionsEdition {
   montrer?: number;
   /** Contours de tous les textes modifiables */
   tous?: boolean;
+  /** La page réagit normalement aux clics (boutons « Suivant »…), sans édition */
+  utiliser?: boolean;
   onClic?: (cle: string) => void;
 }
 
@@ -65,14 +67,15 @@ export function ApercuPage({
   const avecEdition = !!edition;
   const actif = edition?.actif ?? null;
   const tous = !!edition?.tous;
+  const utiliser = !!edition?.utiliser;
   const envoyer = useCallback(() => {
     if (textes) poster({ type: 'svm-apercu-textes', textes });
     if (fond !== undefined) poster({ type: 'svm-apercu-fond', fond });
     if (avecEdition) {
-      poster({ type: 'svm-edition', actif: true, tous });
+      poster({ type: 'svm-edition', actif: true, tous, utiliser });
       poster({ type: 'svm-edition-actif', cle: actif });
     }
-  }, [textes, fond, avecEdition, tous, actif, poster]);
+  }, [textes, fond, avecEdition, tous, utiliser, actif, poster]);
 
   useEffect(() => {
     envoyer();
@@ -121,7 +124,7 @@ export function ApercuPage({
 
   // Bulle : sous le texte en cours, au-dessus s'il est en bas de l'aperçu
   const b = position?.boite;
-  const visible = !!(bulle && actif && b && b.y + b.h > 0 && b.y < hauteur / echelle);
+  const visible = !!(bulle && actif && !utiliser && b && b.y + b.h > 0 && b.y < hauteur / echelle);
   const bas = b ? (b.y + b.h) * echelle : 0;
   const auDessus = !!b && bas > hauteur * 0.62;
   const styleBulle = b ? {
@@ -132,7 +135,7 @@ export function ApercuPage({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-semibold text-[#111111]">{plein ? 'Cliquez sur un texte pour le modifier' : 'Aperçu en direct'}</p>
+        <p className="text-sm font-semibold text-[#111111]">{plein ? (utiliser ? 'La page fonctionne normalement' : 'Cliquez sur un texte pour le modifier') : 'Aperçu en direct'}</p>
         <div className="flex gap-1" role="group" aria-label="Appareil">
           <button type="button" onClick={() => setAppareil('ordinateur')} className={bouton(appareil === 'ordinateur')} aria-pressed={appareil === 'ordinateur'}>
             <Monitor className="h-3.5 w-3.5" aria-hidden="true" /> Ordinateur
@@ -149,7 +152,7 @@ export function ApercuPage({
               key={`${chemin}-${largeur}`}
               ref={cadre}
               title="Aperçu de la page avec les textes en cours"
-              src={`${chemin}?apercu=1`}
+              src={`${chemin}${chemin.includes('?') ? '&' : '?'}apercu=1`}
               onLoad={envoyer}
               style={{ width: largeur, height: hauteur / echelle, transform: `scale(${echelle})`, transformOrigin: '0 0', border: 0 }}
             />

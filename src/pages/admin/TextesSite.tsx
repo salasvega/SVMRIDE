@@ -33,6 +33,32 @@ for (const p of PAGES) for (const s of p.sections) for (const t of s.textes) OU[
 const COMMUNES = new Set(['identite', 'annonce', 'navigation', 'pied', 'cookies', 'avis', 'fichiers']);
 /** Pages du site qu'on peut ouvrir dans « Modifier sur la page » */
 const PAGES_SITE = PAGES.filter((p) => p.chemin && !COMMUNES.has(p.cle));
+/**
+ * États d'exemple des pages (aperçu seulement, rien n'est envoyé) : messages
+ * après envoi, espaces connectés, contrat à signer… pour en modifier les textes.
+ */
+const VARIANTES: Record<string, { libelle: string; chemin: string }[]> = {
+  reprises: [{ libelle: 'après l’envoi', chemin: '/reprises?demo=envoye' }],
+  vendre: [{ libelle: 'après l’envoi', chemin: '/vendre-ma-moto?demo=envoye' }],
+  dossier: [
+    { libelle: 'dossier ouvert (exemple)', chemin: '/financement/dossier?demo=ouvert' },
+    { libelle: 'dossier envoyé (exemple)', chemin: '/financement/dossier?demo=envoye' },
+  ],
+  recherche: [{ libelle: 'après l’envoi', chemin: '/recherche-personnalisee?demo=envoye' }],
+  contact: [{ libelle: 'après l’envoi', chemin: '/contact?demo=envoye' }],
+  suivre: [{ libelle: 'espace propriétaire (exemple)', chemin: '/suivre-ma-vente?demo=connecte' }],
+  signature: [
+    { libelle: 'code envoyé', chemin: '/signature/apercu-code' },
+    { libelle: 'avenant', chemin: '/signature/apercu-avenant-code' },
+    { libelle: 'contrat signé', chemin: '/signature/apercu?demo=signe' },
+  ],
+};
+/** Choix de la liste « Page » : chaque page, puis ses états d'exemple */
+const CHOIX_PAGES = PAGES_SITE.flatMap((p) => [
+  { id: p.cle, cle: p.cle, libelle: p.libelle, chemin: p.chemin as string },
+  ...(VARIANTES[p.cle] ?? []).map((v, i) => ({ id: `${p.cle}:${i}`, cle: p.cle, libelle: `${p.libelle} — ${v.libelle}`, chemin: v.chemin })),
+]);
+
 /** Page du registre qui correspond à une adresse du site */
 function pageDuChemin(chemin: string): PageTextes | undefined {
   return PAGES_SITE.find((p) => p.chemin === chemin)
@@ -186,6 +212,8 @@ export function TextesSite() {
   const [tous, setTous] = useState(false);
   const [cheminCadre, setCheminCadre] = useState('/');
   const [cheminVu, setCheminVu] = useState('/');
+  const [choix, setChoix] = useState('accueil');
+  const [utiliser, setUtiliser] = useState(false);
   const [slugVehicule, setSlugVehicule] = useState<string | null>(null);
   const [aFocaliser, setAFocaliser] = useState<string | null>(null);
   const navPages = useRef<HTMLElement>(null);
@@ -274,18 +302,29 @@ export function TextesSite() {
     setAFocaliser(null);
   }, [aFocaliser, pageCle, vue]);
 
-  const ouvrirPage = (cle: string) => {
-    const p = PAGES.find((x) => x.cle === cle);
-    if (!p?.chemin) return;
-    const c = resoudre(p.chemin);
+  const ouvrirPage = (id: string) => {
+    const o = CHOIX_PAGES.find((x) => x.id === id);
+    if (!o) return;
+    const c = resoudre(o.chemin);
+    setChoix(id);
     setCheminCadre(c);
-    setCheminVu(c);
+    setCheminVu(c.split('?')[0]);
     setActif(null);
   };
+  // Navigation dans le cadre (mode « Utiliser la page ») : la liste suit
+  const surNavigation = useCallback((chemin: string) => {
+    setCheminVu(chemin);
+    setChoix((id) => {
+      const o = CHOIX_PAGES.find((x) => x.id === id);
+      if (o && pageDuChemin(o.chemin.split('?')[0])?.cle === pageDuChemin(chemin)?.cle) return id;
+      return pageDuChemin(chemin)?.cle ?? '';
+    });
+  }, []);
   const passerEnVue = (v: 'liste' | 'page') => {
     setVue(v);
     if (v === 'page') {
       const c = page.chemin && !COMMUNES.has(page.cle) ? resoudre(page.chemin) : '/';
+      setChoix(page.chemin && !COMMUNES.has(page.cle) ? page.cle : 'accueil');
       setCheminCadre(c);
       setCheminVu(c);
       window.setTimeout(() => document.getElementById('barre-edition')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 60);
@@ -365,18 +404,28 @@ export function TextesSite() {
             <div id="barre-edition" className="flex scroll-mt-20 flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border-2 border-[#D1D5DB] bg-white px-3 py-2">
               <label className="flex items-center gap-2 text-sm font-semibold text-[#111111]">
                 Page
-                <select value={pageVue?.cle ?? ''} onChange={(e) => ouvrirPage(e.target.value)}
+                <select value={choix} onChange={(e) => ouvrirPage(e.target.value)}
                   className="rounded-lg border-2 border-[#D1D5DB] bg-white px-2 py-1.5 text-sm font-medium focus:border-[#111111] focus:outline-none">
-                  {!pageVue && <option value="">{cheminVu}</option>}
-                  {PAGES_SITE.map((p) => <option key={p.cle} value={p.cle}>{p.libelle}</option>)}
+                  {!choix && <option value="">{pageVue?.libelle ?? cheminVu}</option>}
+                  {CHOIX_PAGES.map((o) => <option key={o.id} value={o.id}>{o.libelle}</option>)}
                 </select>
               </label>
-              <label className="flex items-center gap-2 text-sm text-[#444444]">
-                <input type="checkbox" checked={tous} onChange={(e) => setTous(e.target.checked)} className="h-4 w-4 accent-[#111111]" />
-                Montrer tous les textes modifiables
-              </label>
+              <div className="inline-flex rounded-lg border-2 border-[#D1D5DB] p-0.5 text-sm" role="group" aria-label="Un clic dans la page sert à">
+                <button type="button" onClick={() => setUtiliser(false)} aria-pressed={!utiliser}
+                  className={`rounded-md px-2.5 py-1 font-semibold ${!utiliser ? 'bg-[#111111] text-white' : 'text-[#444444] hover:bg-[#F5F5F5]'}`}>Modifier les textes</button>
+                <button type="button" onClick={() => { setUtiliser(true); setActif(null); }} aria-pressed={utiliser}
+                  className={`rounded-md px-2.5 py-1 font-semibold ${utiliser ? 'bg-[#111111] text-white' : 'text-[#444444] hover:bg-[#F5F5F5]'}`}>Utiliser la page</button>
+              </div>
+              {!utiliser && (
+                <label className="flex items-center gap-2 text-sm text-[#444444]">
+                  <input type="checkbox" checked={tous} onChange={(e) => setTous(e.target.checked)} className="h-4 w-4 accent-[#111111]" />
+                  Montrer tous les textes modifiables
+                </label>
+              )}
               <p className="text-xs text-[#666666] lg:ml-auto">
-                Survolez un texte puis cliquez pour le modifier. Les textes communs (menu, pied de page) se modifient sur n’importe quelle page.
+                {utiliser
+                  ? 'La page fonctionne normalement (boutons « Suivant », onglets…) ; rien n’est envoyé depuis l’aperçu. Revenez à « Modifier les textes » pour cliquer sur un texte.'
+                  : 'Survolez un texte puis cliquez pour le modifier. Les textes communs (menu, pied de page) se modifient sur n’importe quelle page.'}
               </p>
             </div>
             <ApercuPage
@@ -384,9 +433,9 @@ export function TextesSite() {
               chemin={cheminCadre}
               textes={courants}
               hauteurMax={1400}
-              onNavigation={setCheminVu}
-              edition={{ actif, tous, onClic: (cle) => setActif(cle) }}
-              legende="Les liens et boutons ne s’ouvrent pas en cliquant sur leur texte : changez de page avec la liste « Page ». Les visiteurs verront les changements après « Enregistrer »."
+              onNavigation={surNavigation}
+              edition={{ actif, tous, utiliser, onClic: (cle) => setActif(cle) }}
+              legende="Un clic sur le texte d’un lien ou d’un bouton le modifie : pour changer de page ou avancer dans un formulaire, utilisez la liste « Page » ou « Utiliser la page ». Les visiteurs verront les changements après « Enregistrer »."
               bulle={actif && TEXTES[actif] ? (
                 <BulleTexte def={TEXTES[actif]} valeur={valeur(actif)} onChange={(v) => maj(actif, v)} onFermer={() => setActif(null)}
                   onListe={() => { const ou = OU[actif]; if (ou) setPageCle(ou.page.cle); setVue('liste'); setAFocaliser(actif); }} />

@@ -48,7 +48,7 @@ export interface Rect { x: number; y: number; l: number; h: number }
 interface Zone { cle: string; rects: Rect[]; boite: Rect; /** Zone de clic (l'élément entier s'il ne contient que ce texte) */ clic: Rect[] }
 
 export type MessageEdition =
-  | { type: 'svm-edition'; actif: boolean; tous?: boolean }
+  | { type: 'svm-edition'; actif: boolean; tous?: boolean; utiliser?: boolean }
   | { type: 'svm-edition-actif'; cle: string | null; montrer?: boolean }
   | { type: 'svm-edition-clic'; cle: string; boite: Rect }
   | { type: 'svm-edition-position'; cle: string; boite: Rect | null; hauteurVue: number };
@@ -107,7 +107,7 @@ function relever(): Zone[] {
 
 /** Démarre l'édition sur la page (appelé une fois, dans le cadre d'aperçu) */
 export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
-  let actif = false, tous = false, survol: string | null = null, courant: string | null = null;
+  let actif = false, tous = false, utiliser = false, survol: string | null = null, courant: string | null = null;
   let zones: Zone[] = [];
   let calque: HTMLDivElement | null = null;
   let prevu = 0;
@@ -135,6 +135,7 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
     const morceaux: string[] = [];
     const boite = (r: Rect, c: string) => morceaux.push(`<div class="z ${c}" style="left:${r.x - 2}px;top:${r.y - 1}px;width:${r.l + 4}px;height:${r.h + 2}px"></div>`);
     for (const z of zones) {
+      if (utiliser) break;
       const c = z.cle === courant ? 'a' : z.cle === survol ? 's' : tous ? 't' : '';
       if (c) boite(z.boite, c);
     }
@@ -166,7 +167,7 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
   };
 
   const surMouvement = (e: MouseEvent) => {
-    if (!actif) return;
+    if (!actif || utiliser) return;
     const z = sous(e.clientX, e.clientY);
     const cle = z?.cle ?? null;
     document.documentElement.classList.toggle('svm-edition-survol', !!cle);
@@ -176,7 +177,7 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
     }
   };
   const surClic = (e: MouseEvent) => {
-    if (!actif) return;
+    if (!actif || utiliser) return;
     const z = sous(e.clientX, e.clientY);
     if (!z) return;
     e.preventDefault();
@@ -188,7 +189,7 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
   };
   // Les textes des boutons et liens s'éditent : pas d'action au clic ni au toucher
   const bloquer = (e: Event) => {
-    if (!actif) return;
+    if (!actif || utiliser) return;
     const p = e as PointerEvent;
     if (sous(p.clientX, p.clientY)) {
       e.preventDefault();
@@ -223,6 +224,11 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
         }
       }
       tous = !!m.tous;
+      if (utiliser !== !!m.utiliser) {
+        utiliser = !!m.utiliser;
+        survol = null;
+        document.documentElement.classList.remove('svm-edition-survol');
+      }
       planifier();
     } else if (m?.type === 'svm-edition-actif') {
       courant = m.cle;

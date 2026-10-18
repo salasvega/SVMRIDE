@@ -26,6 +26,7 @@ import { DonneesDemande, ErreurDemande, envoyerDemande } from '../lib/depotDeman
 import { useCoordonnees } from '../lib/coordonnees';
 import { lienTelephone } from '../config/coordonnees';
 import { useTexte } from '../lib/textes';
+import { demo } from '../lib/apercuDemo';
 
 // Textes réglables dans l'admin (« Textes du site », page Dépôt-vente) : vendre.etapes.<n>.*
 const ETAPES_PARCOURS = [ClipboardCheck, Phone, FileSignature, Store, Handshake];
@@ -66,7 +67,8 @@ export function VendreMaMoto() {
   const [etape, setEtape] = useState(0);
   const [envoi, setEnvoi] = useState<string | null>(null);
   const [erreur, setErreur] = useState('');
-  const [resultat, setResultat] = useState<{ reference: string | null; photosRefusees: string[] } | null>(null);
+  // Aperçu de l'admin : message après envoi affiché directement (?demo=envoye)
+  const [resultat, setResultat] = useState<{ reference: string | null; photosRefusees: string[] } | null>(() => (demo() === 'envoye' ? { reference: 'DV-2026-0042', photosRefusees: [] } : null));
 
   const debut = useRef(Date.now());
   const etapes = useRef<(HTMLFieldSetElement | null)[]>([]);
