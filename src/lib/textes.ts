@@ -88,8 +88,9 @@ export function useTextes(): Textes {
   return useSyncExternalStore(sAbonner, lire, lire);
 }
 
-/** Fonction t(cle) : le texte à afficher */
-export function useTexte(): (cle: string) => string {
+/** Fonction t(cle, variables?) : le texte à afficher */
+export type FonctionTexte = (cle: string, variables?: Record<string, string | number>) => string;
+export function useTexte(): FonctionTexte {
   const t = useTextes();
-  return (cle: string) => texte(t, cle);
+  return (cle, variables) => texte(t, cle, variables);
 }
