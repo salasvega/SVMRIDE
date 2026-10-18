@@ -67,7 +67,7 @@ export const PAGES_TEXTES: PageTextes[] = [
       {
         titre: 'Identité',
         textes: [
-          L('site.nom', 'Nom du site', 'SVM Ride', 'Affiché dans la barre du haut, le pied de page, les titres Google et les e-mails. Peut différer de la raison sociale.', 40),
+          L('site.nom', 'Nom du site', 'SVM Ride', 'Affiché dans la barre du haut, le pied de page, l’onglet du navigateur et les résultats Google. Peut différer de la raison sociale.', 40),
           P('site.accroche', 'Phrase d’accroche', 'Votre spécialiste du deux-roues basé en Île-de-France.', 'Sous le titre de la page d’accueil.', 160),
         ],
       },
