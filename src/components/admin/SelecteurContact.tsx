@@ -38,10 +38,10 @@ export function SelecteurContact({ valeur, onChange, lignes, telephone, email, i
   );
 
   return (
-    <div className="mt-6 border-t border-[#E5E5E5] pt-5">
+    <div className="mb-6 border-b border-[#E5E5E5] pb-6">
       <h3 className="font-semibold text-[#111111]">Contact principal</h3>
       <p className="mb-4 text-sm text-[#666666]">
-        La carte affichée dans « Nos coordonnées » sur la page Contact, avec le téléphone, l'e-mail et l'Instagram ci-dessus.
+        La carte affichée dans « Nos coordonnées » sur la page Contact, avec le téléphone, l'e-mail et l'Instagram ci-dessous.
       </p>
 
       {lignes.length === 0 ? (

@@ -469,14 +469,16 @@ export function InfosSite() {
             </Bloc>
 
             <Bloc id="contact" icone={<Phone className="h-5 w-5" />} titre="Contact" sousTitre="Comment les clients vous joignent.">
+              <SelecteurContact valeur={c.contact_membre} onChange={(id) => maj({ contact_membre: id })} lignes={membres}
+                telephone={chiffresTelephone(c.telephone) ? formaterTelephone(c.telephone) : c.telephone} email={c.email} instagram={pseudoInstagram(c.instagram)} />
               <div className="grid gap-4 md:grid-cols-2">
                 <Champ id="i-tel" label="Téléphone" type="tel" valeur={c.telephone} onChange={(v) => maj({ telephone: v })}
                   onBlur={() => chiffresTelephone(c.telephone) && maj({ telephone: formaterTelephone(c.telephone) })}
                   err={montrer('telephone')} aide="Affiché et cliquable (appel) sur le site." />
-                <Champ id="i-insta" label="Instagram (facultatif)" valeur={c.instagram} onChange={(v) => maj({ instagram: v })}
-                  err={montrer('instagram')} placeholder="svm_ride" aide="Pseudo ou lien du compte. Vide : Instagram n'est plus affiché." />
                 <Champ id="i-mail" label="E-mail affiché" type="email" valeur={c.email} onChange={(v) => maj({ email: v })}
                   err={montrer('email')} aide="Visible sur le site et dans les e-mails envoyés aux clients." />
+                <Champ id="i-insta" label="Instagram (facultatif)" valeur={c.instagram} onChange={(v) => maj({ instagram: v })}
+                  err={montrer('instagram')} placeholder="svm_ride" aide="Pseudo ou lien du compte. Vide : Instagram n'est plus affiché." />
                 <Champ id="i-recep" label="E-mail qui reçoit les demandes" type="email" valeur={c.email_reception} onChange={(v) => maj({ email_reception: v })}
                   err={montrer('email_reception')} aide="Messages de contact, reprises, financement, dépôt-vente… et réponses des clients." />
               </div>
@@ -484,8 +486,6 @@ export function InfosSite() {
                 <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 Les e-mails automatiques partent toujours de contact@svmride.com (adresse technique liée au domaine).
               </p>
-              <SelecteurContact valeur={c.contact_membre} onChange={(id) => maj({ contact_membre: id })} lignes={membres}
-                telephone={chiffresTelephone(c.telephone) ? formaterTelephone(c.telephone) : c.telephone} email={c.email} instagram={pseudoInstagram(c.instagram)} />
             </Bloc>
 
             <Bloc id="showroom" icone={<MapPin className="h-5 w-5" />} titre="Showroom" sousTitre="Adresse affichée, lien Google Maps et informations pour Google.">
