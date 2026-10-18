@@ -21,18 +21,19 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { CookiePolicy } from './pages/CookiePolicy';
 import { Sitemap } from './pages/Sitemap';
 import { NotFound } from './pages/NotFound';
+import { importer } from './lib/nouvelleVersion';
 // Espace admin et dossier de financement chargés à la demande : ils ne pèsent
 // plus sur le chargement des pages publiques (vitesse = référencement).
 const nomme = <K extends string>(charger: () => Promise<Record<K, React.ComponentType>>, nom: K) =>
-  lazy(() => charger().then((m) => ({ default: m[nom] })));
+  lazy(() => importer(charger)().then((m) => ({ default: m[nom] })));
 const FinancingProfile = nomme(() => import('./pages/FinancingProfile'), 'FinancingProfile');
 const Equipe = nomme(() => import('./pages/Equipe'), 'Equipe');
 const AdminLogin = nomme(() => import('./pages/admin/AdminLogin'), 'AdminLogin');
 const AdminDashboard = nomme(() => import('./pages/admin/AdminDashboard'), 'AdminDashboard');
 const VehiclesList = nomme(() => import('./pages/admin/VehiclesList'), 'VehiclesList');
 const VehicleForm = nomme(() => import('./pages/admin/VehicleForm'), 'VehicleForm');
-const SubmissionsList = lazy(() => import('./pages/admin/SubmissionsList'));
-const FinancingProfilesList = lazy(() => import('./pages/admin/FinancingProfilesList'));
+const SubmissionsList = lazy(importer(() => import('./pages/admin/SubmissionsList')));
+const FinancingProfilesList = lazy(importer(() => import('./pages/admin/FinancingProfilesList')));
 const SalesFoldersList = nomme(() => import('./pages/admin/SalesFoldersList'), 'SalesFoldersList');
 const SalesFolderForm = nomme(() => import('./pages/admin/SalesFolderForm'), 'SalesFolderForm');
 const DepotDemandesList = nomme(() => import('./pages/admin/DepotDemandesList'), 'DepotDemandesList');
