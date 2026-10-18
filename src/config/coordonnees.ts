@@ -46,6 +46,12 @@ export interface Coordonnees {
   horaires: Jour[];
   /** Précision facultative sous les horaires */
   horaires_note: string;
+  /**
+   * Contact principal (carte « Nos coordonnées » de la page Contact) : fiche de
+   * l'équipe choisie dans l'admin (Édition du site › Contact). null : le membre
+   * mis en avant (onglet Équipe).
+   */
+  contact_membre: string | null;
 }
 
 export const CLE_COORDONNEES = 'coordonnees';
@@ -73,6 +79,7 @@ export const COORDONNEES_DEFAUT: Coordonnees = {
     { mode: 'ferme', plages: [] },
   ],
   horaires_note: 'Sur rendez-vous à notre showroom de Chaville',
+  contact_membre: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -129,6 +136,13 @@ function jourValide(v: unknown, defaut: Jour): Jour {
 }
 
 /** Valeur lue en base → coordonnées complètes (ce qui manque ou est invalide reprend la valeur de secours) */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** Fiche affichée comme contact principal : celle choisie si elle est visible, sinon le membre mis en avant */
+export function membreContact<M extends { id?: string; responsable?: boolean }>(c: Pick<Coordonnees, 'contact_membre'>, membres: M[]): M | undefined {
+  return (c.contact_membre ? membres.find((m) => m.id === c.contact_membre) : undefined) ?? membres.find((m) => m.responsable) ?? membres[0];
+}
+
 export function normaliserCoordonnees(v: unknown): Coordonnees {
   const d = COORDONNEES_DEFAUT;
   if (!v || typeof v !== 'object') return d;
@@ -152,6 +166,7 @@ export function normaliserCoordonnees(v: unknown): Coordonnees {
     },
     horaires: JOURS.map((_, i) => jourValide(Array.isArray(o.horaires) ? o.horaires[i] : null, d.horaires[i])),
     horaires_note: typeof o.horaires_note === 'string' ? texte(o.horaires_note, 160) : d.horaires_note,
+    contact_membre: typeof o.contact_membre === 'string' && UUID.test(o.contact_membre) ? o.contact_membre : null,
   };
 }
 

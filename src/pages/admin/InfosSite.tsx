@@ -29,6 +29,8 @@ import { appliquerSociete } from '../../lib/societe';
 import { BlocIcone } from '../../components/admin/BlocIcone';
 import { BlocFondAccueil } from '../../components/admin/BlocFondAccueil';
 import { BlocDocuments } from '../../components/admin/BlocDocuments';
+import { SelecteurContact } from '../../components/admin/SelecteurContact';
+import type { LigneEquipe } from '../../lib/equipe';
 import { appliquerTextes } from '../../lib/textes';
 import { appliquerFondAccueil } from '../../lib/medias';
 import { CLE_TEXTES, normaliserTextes, TEXTES, texte, type Textes } from '../../config/textes';
@@ -54,6 +56,9 @@ interface Version {
 
 type Erreurs = Partial<Record<string, string>>;
 
+/** Prénoms des fiches de l'équipe, pour décrire le contact principal (changements, historique) */
+let NOMS_MEMBRES: Record<string, string> = {};
+
 /** Libellés des champs, pour la liste des changements et l'historique */
 function changements(a: Coordonnees, b: Coordonnees): { champ: string; avant: string; apres: string }[] {
   const champs: [string, (c: Coordonnees) => string][] = [
@@ -66,6 +71,7 @@ function changements(a: Coordonnees, b: Coordonnees): { champ: string; avant: st
     ["Précision sous l'adresse", (c) => c.showroom.note || '(aucune)'],
     ['Horaires', (c) => lignesHoraires(c.horaires).join(' · ')],
     ['Précision sous les horaires', (c) => c.horaires_note || '(aucune)'],
+    ['Contact principal', (c) => (c.contact_membre ? NOMS_MEMBRES[c.contact_membre] ?? 'fiche supprimée' : 'automatique (membre mis en avant)')],
   ];
   return champs.map(([champ, f]) => ({ champ, avant: f(a), apres: f(b) })).filter((x) => x.avant !== x.apres);
 }
@@ -235,6 +241,7 @@ export function InfosSite() {
   const [na, setNa] = useState<NomAccroche>({ nom: '', accroche: '' });
   const [fond, setFond] = useState<FondAccueil | null>(null);
   const [documents, setDocuments] = useState<Documents>(normaliserDocuments(null));
+  const [membres, setMembres] = useState<LigneEquipe[]>([]);
   const [historique, setHistorique] = useState<Version[]>([]);
   const [erreur, setErreur] = useState('');
   const [message, setMessage] = useState('');
@@ -245,13 +252,14 @@ export function InfosSite() {
   const [envoi, setEnvoi] = useState(false);
 
   const charger = async () => {
-    const [{ data, error }, { data: ds }, { data: di }, { data: dt }, { data: df }, { data: dd }, { data: h }] = await Promise.all([
+    const [{ data, error }, { data: ds }, { data: di }, { data: dt }, { data: df }, { data: dd }, { data: dm }, { data: h }] = await Promise.all([
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_COORDONNEES).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_SOCIETE).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_IDENTITE).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_TEXTES).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_FOND_ACCUEIL).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_DOCUMENTS).maybeSingle(),
+      supabase.from('equipe_membres').select('*').order('ordre').order('created_at'),
       supabase.from('site_reglages_historique').select('id, cle, ancienne_valeur, nouvelle_valeur, par, fait_le')
         .in('cle', [CLE_COORDONNEES, CLE_SOCIETE, CLE_IDENTITE, CLE_FOND_ACCUEIL, CLE_DOCUMENTS]).order('fait_le', { ascending: false }).limit(15),
     ]);
@@ -271,6 +279,9 @@ export function InfosSite() {
     setNa(n);
     setFond(normaliserFondAccueil(df?.valeur));
     setDocuments(normaliserDocuments(dd?.valeur));
+    const m = (dm as LigneEquipe[] | null) ?? [];
+    NOMS_MEMBRES = Object.fromEntries(m.map((x) => [x.id, `${x.prenom}${x.nom ? ` ${x.nom}` : ''}`]));
+    setMembres(m);
     setHistorique((h as Version[]) ?? []);
   };
 
@@ -473,6 +484,8 @@ export function InfosSite() {
                 <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                 Les e-mails automatiques partent toujours de contact@svmride.com (adresse technique liée au domaine).
               </p>
+              <SelecteurContact valeur={c.contact_membre} onChange={(id) => maj({ contact_membre: id })} lignes={membres}
+                telephone={chiffresTelephone(c.telephone) ? formaterTelephone(c.telephone) : c.telephone} email={c.email} instagram={pseudoInstagram(c.instagram)} />
             </Bloc>
 
             <Bloc id="showroom" icone={<MapPin className="h-5 w-5" />} titre="Showroom" sousTitre="Adresse affichée, lien Google Maps et informations pour Google.">

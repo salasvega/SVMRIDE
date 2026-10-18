@@ -526,7 +526,7 @@ function FormulaireFiche({
           <label className="flex items-start gap-3 text-sm text-[#111111]">
             <input type="checkbox" checked={b.responsable} onChange={(e) => maj({ responsable: e.target.checked })} className="mt-0.5 h-4 w-4 accent-[#111111]" />
             <span>
-              <strong className="font-semibold">Mettre en avant</strong> (grande carte noire sur l'accueil, la page Équipe et la page Contact)
+              <strong className="font-semibold">Mettre en avant</strong> (grande carte noire sur l'accueil et la page Équipe ; aussi contact de la page Contact, sauf autre choix dans Édition du site › Contact)
               {b.responsable && autreResponsable && (
                 <span className="block text-amber-800">{autreResponsable.prenom} ne sera plus mis(e) en avant : une seule personne peut l'être.</span>
               )}
