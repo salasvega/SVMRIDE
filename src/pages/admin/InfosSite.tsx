@@ -15,20 +15,24 @@
  * et « site.accroche » du réglage « textes », aussi modifiables dans Textes du
  * site), logo et icône (réglage « identite »), image de la page d'accueil
  * (réglage « fond_accueil »).
+ *
+ * Bloc Tampon et documents : tampon du garage et logo des contrats (réglage
+ * « documents », lu par les fonctions qui produisent les contrats).
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Building2, Clock, ExternalLink, Fingerprint, History, Mail, MapPin, Phone, Plus, RotateCcw, X } from 'lucide-react';
+import { AlertTriangle, Building2, Clock, FileSignature, ExternalLink, Fingerprint, History, Mail, MapPin, Phone, Plus, RotateCcw, X } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { supabase } from '../../lib/supabase';
 import { appliquerCoordonnees } from '../../lib/coordonnees';
 import { appliquerSociete } from '../../lib/societe';
 import { BlocIcone } from '../../components/admin/BlocIcone';
 import { BlocFondAccueil } from '../../components/admin/BlocFondAccueil';
+import { BlocDocuments } from '../../components/admin/BlocDocuments';
 import { appliquerTextes } from '../../lib/textes';
 import { appliquerFondAccueil } from '../../lib/medias';
 import { CLE_TEXTES, normaliserTextes, TEXTES, texte, type Textes } from '../../config/textes';
-import { CLE_FOND_ACCUEIL, normaliserFondAccueil, type FondAccueil } from '../../config/medias';
+import { CLE_DOCUMENTS, CLE_FOND_ACCUEIL, normaliserDocuments, normaliserFondAccueil, type Documents, type FondAccueil } from '../../config/medias';
 import { enregistrerIdentite } from '../../lib/identite';
 import { CLE_IDENTITE, IDENTITE_DEFAUT, normaliserIdentite, type Identite } from '../../config/identite';
 import {
@@ -88,8 +92,17 @@ function changementsFond(a: FondAccueil | null, b: FondAccueil | null) {
   return a?.version === b?.version && !!a === !!b ? [] : [{ champ: "Image d'accueil", avant: decrireFond(a), apres: decrireFond(b) }];
 }
 
+/** Tampon et logo des documents (historique) */
+const decrireImage = (u: string | null, origine: string) => (u ? `personnalisé${/\/documents\/(\d{8})/.test(u) ? ` (${u.replace(/.*\/documents\/(\d{4})(\d{2})(\d{2}).*/, '$3/$2/$1')})` : ''}` : origine);
+function changementsDocuments(a: Documents, b: Documents) {
+  return [
+    ...(a.tampon !== b.tampon ? [{ champ: 'Tampon', avant: decrireImage(a.tampon, "tampon d'origine"), apres: decrireImage(b.tampon, "tampon d'origine") }] : []),
+    ...(a.logo !== b.logo ? [{ champ: 'Logo des documents', avant: decrireImage(a.logo, "logo d'origine"), apres: decrireImage(b.logo, "logo d'origine") }] : []),
+  ];
+}
+
 const LIBELLES_CLE: Record<string, string> = {
-  [CLE_SOCIETE]: 'Société', [CLE_IDENTITE]: 'Logo et icône', [CLE_FOND_ACCUEIL]: "Image d'accueil", [CLE_COORDONNEES]: 'Coordonnées',
+  [CLE_DOCUMENTS]: 'Tampon et documents', [CLE_SOCIETE]: 'Société', [CLE_IDENTITE]: 'Logo et icône', [CLE_FOND_ACCUEIL]: "Image d'accueil", [CLE_COORDONNEES]: 'Coordonnées',
 };
 
 /** Changements du bloc Société */
@@ -188,7 +201,7 @@ function Champ({
 }
 
 const RUBRIQUES = [
-  ['identite', 'Identité du site'], ['contact', 'Contact'], ['showroom', 'Showroom'], ['horaires', 'Horaires'], ['societe', 'Société'], ['historique', 'Historique'],
+  ['identite', 'Identité du site'], ['contact', 'Contact'], ['showroom', 'Showroom'], ['horaires', 'Horaires'], ['societe', 'Société'], ['documents', 'Tampon et documents'], ['historique', 'Historique'],
 ] as const;
 
 function Bloc({ id, icone, titre, sousTitre, children }: { id: string; icone: React.ReactNode; titre: string; sousTitre: string; children: React.ReactNode }) {
@@ -221,24 +234,26 @@ export function InfosSite() {
   const [nomEnregistre, setNomEnregistre] = useState<NomAccroche | null>(null);
   const [na, setNa] = useState<NomAccroche>({ nom: '', accroche: '' });
   const [fond, setFond] = useState<FondAccueil | null>(null);
+  const [documents, setDocuments] = useState<Documents>(normaliserDocuments(null));
   const [historique, setHistorique] = useState<Version[]>([]);
   const [erreur, setErreur] = useState('');
   const [message, setMessage] = useState('');
   const [tentative, setTentative] = useState(false);
   const [confirmation, setConfirmation] = useState<{
-    coord: Coordonnees; soc: Societe; titre: string; nom?: NomAccroche; identite?: Identite; fond?: { valeur: FondAccueil | null };
+    coord: Coordonnees; soc: Societe; titre: string; nom?: NomAccroche; identite?: Identite; fond?: { valeur: FondAccueil | null }; documents?: Documents;
   } | null>(null);
   const [envoi, setEnvoi] = useState(false);
 
   const charger = async () => {
-    const [{ data, error }, { data: ds }, { data: di }, { data: dt }, { data: df }, { data: h }] = await Promise.all([
+    const [{ data, error }, { data: ds }, { data: di }, { data: dt }, { data: df }, { data: dd }, { data: h }] = await Promise.all([
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_COORDONNEES).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_SOCIETE).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_IDENTITE).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_TEXTES).maybeSingle(),
       supabase.from('site_reglages').select('valeur').eq('cle', CLE_FOND_ACCUEIL).maybeSingle(),
+      supabase.from('site_reglages').select('valeur').eq('cle', CLE_DOCUMENTS).maybeSingle(),
       supabase.from('site_reglages_historique').select('id, cle, ancienne_valeur, nouvelle_valeur, par, fait_le')
-        .in('cle', [CLE_COORDONNEES, CLE_SOCIETE, CLE_IDENTITE, CLE_FOND_ACCUEIL]).order('fait_le', { ascending: false }).limit(15),
+        .in('cle', [CLE_COORDONNEES, CLE_SOCIETE, CLE_IDENTITE, CLE_FOND_ACCUEIL, CLE_DOCUMENTS]).order('fait_le', { ascending: false }).limit(15),
     ]);
     if (error) {
       setErreur("Impossible de charger les informations. Vérifiez que vous êtes connecté avec un compte administrateur.");
@@ -255,6 +270,7 @@ export function InfosSite() {
     setNomEnregistre(n);
     setNa(n);
     setFond(normaliserFondAccueil(df?.valeur));
+    setDocuments(normaliserDocuments(dd?.valeur));
     setHistorique((h as Version[]) ?? []);
   };
 
@@ -297,9 +313,18 @@ export function InfosSite() {
     setConfirmation({ coord: propre, soc: propreSoc, nom: { nom: na.nom.trim(), accroche: na.accroche.trim() }, titre: 'Enregistrer ces modifications ?' });
   };
 
-  const enregistrer = async (coord: Coordonnees, societe: Societe, nouvelleIdentite?: Identite, nom?: NomAccroche, nouveauFond?: { valeur: FondAccueil | null }) => {
+  const enregistrer = async (coord: Coordonnees, societe: Societe, nouvelleIdentite?: Identite, nom?: NomAccroche, nouveauFond?: { valeur: FondAccueil | null }, docs?: Documents) => {
     if (!enregistrees || !societeEnregistree || !nomEnregistre) return;
     setEnvoi(true);
+    if (docs) {
+      const { error } = await supabase.from('site_reglages').upsert({ cle: CLE_DOCUMENTS, valeur: docs });
+      setEnvoi(false);
+      setConfirmation(null);
+      if (error) return setErreur("L'enregistrement n'a pas fonctionné. Réessayez.");
+      setMessage('Tampon et logo des documents rétablis pour les prochains documents.');
+      await charger();
+      return;
+    }
     if (nouveauFond) {
       const { error } = await supabase.from('site_reglages').upsert({ cle: CLE_FOND_ACCUEIL, valeur: nouveauFond.valeur ?? { origine: true } });
       setEnvoi(false);
@@ -352,6 +377,11 @@ export function InfosSite() {
 
   const restaurer = (v: Version) => {
     if (!enregistrees || !societeEnregistree) return;
+    if (v.cle === CLE_DOCUMENTS) {
+      setMessage('');
+      setConfirmation({ coord: enregistrees, soc: societeEnregistree, documents: normaliserDocuments(v.ancienne_valeur), titre: "Revenir au tampon et au logo d'avant ?" });
+      return;
+    }
     if (v.cle === CLE_FOND_ACCUEIL) {
       setMessage('');
       setConfirmation({ coord: enregistrees, soc: societeEnregistree, fond: { valeur: normaliserFondAccueil(v.ancienne_valeur) }, titre: "Revenir à l'image d'accueil d'avant ?" });
@@ -560,6 +590,11 @@ export function InfosSite() {
               </div>
             </Bloc>
 
+            <Bloc id="documents" icone={<FileSignature className="h-5 w-5" />} titre="Tampon et documents" sousTitre="Tampon / signature du garage et logo des contrats de dépôt-vente, avenants et certificats de signature.">
+              <BlocDocuments documents={documents} identite={identite} nom={nomEnregistre?.nom ?? 'SVM Ride'}
+                onEnregistre={(m) => { setMessage(m); setErreur(''); charger(); }} />
+            </Bloc>
+
             <section id="historique" className="scroll-mt-32 rounded-xl border-2 border-[#D1D5DB] bg-white p-4 md:p-6" aria-labelledby="historique-titre">
               <div className="mb-4 flex items-start gap-3">
                 <History className="mt-0.5 h-5 w-5 text-[#111111]" aria-hidden="true" />
@@ -573,7 +608,9 @@ export function InfosSite() {
               ) : (
                 <ul className="space-y-3">
                   {historique.map((v) => {
-                    const d = !v.ancienne_valeur ? [] : v.cle === CLE_FOND_ACCUEIL
+                    const d = !v.ancienne_valeur ? [] : v.cle === CLE_DOCUMENTS
+                      ? changementsDocuments(normaliserDocuments(v.ancienne_valeur), normaliserDocuments(v.nouvelle_valeur))
+                      : v.cle === CLE_FOND_ACCUEIL
                       ? changementsFond(normaliserFondAccueil(v.ancienne_valeur), normaliserFondAccueil(v.nouvelle_valeur))
                       : v.cle === CLE_IDENTITE
                       ? changementsIdentite(normaliserIdentite(v.ancienne_valeur), normaliserIdentite(v.nouvelle_valeur))
@@ -641,7 +678,9 @@ export function InfosSite() {
       )}
 
       {confirmation && enregistrees && societeEnregistree && nomEnregistre && (() => {
-        const liste = confirmation.fond
+        const liste = confirmation.documents
+          ? changementsDocuments(documents, confirmation.documents)
+          : confirmation.fond
           ? changementsFond(fond, confirmation.fond.valeur)
           : confirmation.identite
           ? changementsIdentite(identite, confirmation.identite)
@@ -681,7 +720,7 @@ export function InfosSite() {
                 Annuler
               </button>
               <button type="button" disabled={envoi || liste.length === 0}
-                onClick={() => enregistrer(confirmation.coord, confirmation.soc, confirmation.identite, confirmation.nom, confirmation.fond)}
+                onClick={() => enregistrer(confirmation.coord, confirmation.soc, confirmation.identite, confirmation.nom, confirmation.fond, confirmation.documents)}
                 className="flex-1 rounded-xl bg-[#111111] py-2.5 font-semibold text-white disabled:opacity-50">
                 {envoi ? 'Enregistrement…' : 'Confirmer'}
               </button>

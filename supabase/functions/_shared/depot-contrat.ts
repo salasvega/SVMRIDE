@@ -107,6 +107,8 @@ export interface Instantane {
   etat_des_lieux: { fait_le?: string; heure?: string; kilometrage?: number; etat?: string; accessoires?: string; cles?: string; remarques?: string } | null;
   /** Copie des informations de la société au moment de la création du contrat */
   societe?: SocieteContrat;
+  /** Tampon et logo utilisés à la création (absent : images d'origine) */
+  images?: ImagesDocuments;
   /** Emplacements de la signature du déposant dans le PDF (renseignés par genererPdf) */
   cadres_deposant?: Cadre[];
   avenant?: { mandat_reference: string; ancienne_date_fin: string; nouvelle_date_fin: string; prix_modifie: boolean };
@@ -116,7 +118,7 @@ const PIECES: Record<string, string> = { cni: "Carte d'identité", passeport: "P
 
 export function construireInstantane(d: Record<string, any>, p: Record<string, any>, opts: {
   type: "mandat" | "avenant"; numero: number; representant: string; dateDebut: string; dateFin: string;
-  ancienneDateFin?: string; prixModifie?: boolean; societe?: SocieteContrat;
+  ancienneDateFin?: string; prixModifie?: boolean; societe?: SocieteContrat; images?: ImagesDocuments;
 }): Instantane {
   const prix = Number(d.prix_affiche), net = Number(d.net_vendeur);
   return {
@@ -127,6 +129,7 @@ export function construireInstantane(d: Record<string, any>, p: Record<string, a
     genere_le: new Date().toISOString(),
     representant: opts.representant,
     societe: opts.societe ?? SOCIETE,
+    images: opts.images ?? IMAGES_ORIGINE,
     deposant: {
       civilite: d.prop_civilite, prenom: d.prop_prenom, nom: d.prop_nom, email: d.prop_email, telephone: d.prop_telephone,
       adresse: d.prop_adresse,
@@ -267,35 +270,65 @@ const GRIS_CLAIR = rgb(0.8, 0.8, 0.8);
 const FOND = rgb(0.955, 0.955, 0.955);
 
 /**
- * Fichiers lus sur le site (dossier public/) et gardés en mémoire une fois lus :
- * logo de l'en-tête, tampon SVM RIDE, police manuscrite. Si le site ne répond pas,
- * le document est produit sans eux (et ils sont redemandés la fois suivante).
+ * Fichiers lus sur le site et gardés en mémoire une fois lus : logo de
+ * l'en-tête, tampon du garage, police manuscrite. Si le site ne répond pas, le
+ * document est produit sans eux (et ils sont redemandés la fois suivante).
+ *
+ * Tampon et logo (18/10/2026) : réglables dans l'admin (Infos du site › Tampon
+ * et documents, réglage « documents »). Chaque contrat garde l'adresse des images
+ * utilisées à sa création (Instantane.images) : son certificat de signature
+ * reprend le même tampon, même si celui du site change entre-temps. Les images
+ * de l'admin ont une adresse par version (jamais remplacées).
  */
 export const URL_LOGO = "https://svmride.com/logo-contrat.jpg";
-const RESSOURCES = {
-  logo: URL_LOGO,
-  tampon: "https://svmride.com/contrat/tampon-svm-ride.png",
-  ecriture: "https://svmride.com/contrat/ecriture.ttf",
-};
-type NomRessource = keyof typeof RESSOURCES;
-const cache: Partial<Record<NomRessource, Uint8Array>> = {};
-async function ressource(nom: NomRessource): Promise<Uint8Array | null> {
-  if (cache[nom]) return cache[nom]!;
+const URL_ECRITURE = "https://svmride.com/contrat/ecriture.ttf";
+
+export interface ImagesDocuments {
+  tampon: string;
+  logo: string;
+}
+export const IMAGES_ORIGINE: ImagesDocuments = { tampon: "https://svmride.com/contrat/tampon-svm-ride.png", logo: URL_LOGO };
+
+/** Images du réglage « documents » ; seules les adresses du site et du stockage des images du site sont acceptées */
+export function imagesDocuments(reglage: unknown): ImagesDocuments {
+  const o = (reglage && typeof reglage === "object" ? reglage : {}) as Record<string, unknown>;
+  const stockage = `${(Deno.env.get("SUPABASE_URL") ?? "").replace(/\/$/, "")}/storage/v1/object/public/site-images/`;
+  const ok = (v: unknown): string | null => {
+    if (typeof v !== "string" || /[\s"'<>\\]/.test(v) || v.includes("..")) return null;
+    if (v.startsWith("/")) return `https://svmride.com${v}`;
+    if (v.startsWith("https://svmride.com/") || (stockage.startsWith("https://") && v.startsWith(stockage))) return v;
+    return null;
+  };
+  return { tampon: ok(o.tampon) ?? IMAGES_ORIGINE.tampon, logo: ok(o.logo) ?? IMAGES_ORIGINE.logo };
+}
+
+const cache = new Map<string, Uint8Array>();
+async function ressource(url: string): Promise<Uint8Array | null> {
+  if (cache.has(url)) return cache.get(url)!;
   try {
-    const r = await fetch(RESSOURCES[nom], { signal: AbortSignal.timeout(4000) });
-    if (r.ok) cache[nom] = new Uint8Array(await r.arrayBuffer());
+    const r = await fetch(url, { signal: AbortSignal.timeout(4000) });
+    if (r.ok) {
+      if (cache.size > 20) cache.clear();
+      cache.set(url, new Uint8Array(await r.arrayBuffer()));
+    }
   } catch (_) {
     // sans ce fichier cette fois-ci
   }
-  return cache[nom] ?? null;
+  return cache.get(url) ?? null;
 }
-/** Pour les tests : fichiers fournis directement */
-export function definirRessources(f: Partial<Record<NomRessource, Uint8Array>>) {
-  Object.assign(cache, f);
+/** Pour les tests : fichiers d'origine fournis directement */
+export function definirRessources(f: Partial<Record<"logo" | "tampon" | "ecriture", Uint8Array>>) {
+  if (f.logo) cache.set(IMAGES_ORIGINE.logo, f.logo);
+  if (f.tampon) cache.set(IMAGES_ORIGINE.tampon, f.tampon);
+  if (f.ecriture) cache.set(URL_ECRITURE, f.ecriture);
 }
 export function definirLogo(octets: Uint8Array | null) {
-  if (octets) cache.logo = octets;
+  if (octets) cache.set(IMAGES_ORIGINE.logo, octets);
 }
+/** PNG ou JPEG, d'après les premiers octets */
+const estPng = (o: Uint8Array) => o[0] === 0x89 && o[1] === 0x50 && o[2] === 0x4e && o[3] === 0x47;
+const integrer = (doc: PDFDocument, o: Uint8Array | null) =>
+  o ? (estPng(o) ? doc.embedPng(o) : doc.embedJpg(o)).catch(() => null) : Promise.resolve(null);
 
 const quandParis = (iso: string) => {
   const d = new Date(iso);
@@ -331,13 +364,13 @@ class Mise {
     this.nouvelle();
   }
 
-  static async creer(doc: PDFDocument, pied: string) {
+  static async creer(doc: PDFDocument, pied: string, images: ImagesDocuments = IMAGES_ORIGINE) {
     const [f, fb, fi] = await Promise.all([
       doc.embedFont(StandardFonts.Helvetica), doc.embedFont(StandardFonts.HelveticaBold), doc.embedFont(StandardFonts.HelveticaOblique),
     ]);
-    const [o1, o2, o3] = await Promise.all([ressource("logo"), ressource("tampon"), ressource("ecriture")]);
-    const logo = o1 ? await doc.embedJpg(o1).catch(() => null) : null;
-    const tampon = o2 ? await doc.embedPng(o2).catch(() => null) : null;
+    const [o1, o2, o3] = await Promise.all([ressource(images.logo), ressource(images.tampon), ressource(URL_ECRITURE)]);
+    const logo = await integrer(doc, o1) ?? (images.logo !== IMAGES_ORIGINE.logo ? await integrer(doc, await ressource(IMAGES_ORIGINE.logo)) : null);
+    const tampon = await integrer(doc, o2) ?? (images.tampon !== IMAGES_ORIGINE.tampon ? await integrer(doc, await ressource(IMAGES_ORIGINE.tampon)) : null);
     let fe: PDFFont | null = null;
     if (o3) {
       doc.registerFontkit(fontkit);
@@ -636,7 +669,7 @@ export async function genererPdf(i: Instantane): Promise<Uint8Array> {
   doc.setModificationDate(new Date(i.genere_le));
   doc.setProducer("svmride.com");
   doc.setCreator("svmride.com");
-  const m = await Mise.creer(doc, `${titre} ${i.reference} – modèle ${i.modele_version}`);
+  const m = await Mise.creer(doc, `${titre} ${i.reference} – modèle ${i.modele_version}`, i.images ?? IMAGES_ORIGINE);
   m.soc = soc(i);
   const v = i.vehicule, c = i.conditions, e = i.etat_des_lieux ?? {};
   i.cadres_deposant = []; // renseignés par m.signatures(), gardés avec les données du contrat
@@ -793,7 +826,7 @@ export async function pdfSigne(original: Uint8Array, preuve: {
   ouvert_le: string | null; modele_version: string;
 }, instantane?: Instantane): Promise<Uint8Array> {
   const doc = await PDFDocument.load(original);
-  const m = await Mise.creer(doc, `Certificat de signature ${preuve.reference}`);
+  const m = await Mise.creer(doc, `Certificat de signature ${preuve.reference}`, instantane?.images ?? IMAGES_ORIGINE);
   m.soc = soc(instantane);
   const faite: SignatureFaite | null = instantane ? { nom: nomManuscrit(instantane), signe_le: preuve.signe_le } : null;
   const pages = doc.getPages();

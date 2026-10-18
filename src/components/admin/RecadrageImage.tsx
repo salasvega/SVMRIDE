@@ -28,12 +28,13 @@ export interface Repere {
 /** Poids maximal accepté par le stockage des images du site */
 const POIDS_MAX = 2 * 1024 * 1024;
 
-async function produire(canvas: HTMLCanvasElement, transparent: boolean): Promise<Blob> {
+async function produire(canvas: HTMLCanvasElement, transparent: boolean, pngSeulement: boolean): Promise<Blob> {
   const essai = (type: string, q?: number) => new Promise<Blob | null>((r) => canvas.toBlob(r, type, q));
   if (transparent) {
     const png = await essai('image/png');
     if (!png) throw new Error('Image impossible à produire');
     if (png.size <= POIDS_MAX) return png;
+    if (pngSeulement) throw new Error('Image trop lourde');
     const webp = await essai('image/webp', 0.9);
     if (webp?.type === 'image/webp' && webp.size <= POIDS_MAX) return webp;
     throw new Error('Image trop lourde');
@@ -51,7 +52,7 @@ async function produire(canvas: HTMLCanvasElement, transparent: boolean): Promis
 }
 
 export function RecadrageImage({
-  fichier, largeur, hauteur, titre, etape, consigne, reperes = [], transparent = false, voile, onValider, onAnnuler,
+  fichier, largeur, hauteur, titre, etape, consigne, reperes = [], transparent = false, pngSeulement = false, voile, apres, onValider, onAnnuler,
 }: {
   fichier: File;
   /** Dimensions du résultat, en pixels */
@@ -64,6 +65,10 @@ export function RecadrageImage({
   reperes?: Repere[];
   /** Zoom arrière possible, zones vides transparentes (PNG) */
   transparent?: boolean;
+  /** PNG obligatoire (documents PDF) */
+  pngSeulement?: boolean;
+  /** Retouche du résultat avant l'enregistrement (ex. fond blanc rendu transparent) */
+  apres?: (ctx: CanvasRenderingContext2D, largeur: number, hauteur: number) => void;
   /** Dégradé posé sur l'aperçu (ex. voile sombre du haut de l'accueil) */
   voile?: string;
   onValider: (image: Blob) => void;
@@ -150,8 +155,10 @@ export function RecadrageImage({
     c.width = Math.round(apL * dpr);
     c.height = Math.round(apH * dpr);
     const ctx = c.getContext('2d');
-    if (ctx) dessiner(ctx, c.width, c.height);
-  }, [img, dessiner, apL, apH]);
+    if (!ctx) return;
+    dessiner(ctx, c.width, c.height);
+    apres?.(ctx, c.width, c.height);
+  }, [img, dessiner, apL, apH, apres]);
 
   const changerZoom = (z: number) => {
     const n = Math.min(Math.max(z, zoomMin), 5);
@@ -182,8 +189,10 @@ export function RecadrageImage({
       const c = document.createElement('canvas');
       c.width = largeur;
       c.height = hauteur;
-      dessiner(c.getContext('2d')!, largeur, hauteur);
-      onValider(await produire(c, transparent));
+      const ctx = c.getContext('2d', { willReadFrequently: !!apres })!;
+      dessiner(ctx, largeur, hauteur);
+      apres?.(ctx, largeur, hauteur);
+      onValider(await produire(c, transparent, pngSeulement));
     } catch {
       setErreur("L'image n'a pas pu être préparée. Réessayez avec une autre image.");
       setTravail(false);
