@@ -1,4 +1,5 @@
 import { SelectHTMLAttributes, forwardRef, ReactNode } from 'react';
+import { sansReperes } from '../../lib/edition';
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
@@ -9,14 +10,14 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, fullWidth = true, className = '', id, children, ...props }, ref) => {
-    const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
+    const selectId = id || (label ? sansReperes(label).toLowerCase().replace(/\s+/g, '-') : undefined);
     const widthClass = fullWidth ? 'w-full' : '';
 
     return (
       <div className={widthClass}>
         {label && (
           <label htmlFor={selectId} className="block text-sm font-medium text-noir mb-2">
-            {props.required ? label.replace(/\s*\*$/, '') : label}
+            {props.required ? label.replace(/\s*\*(?=[\u2061-\u2064\u200C\u2060]*$)/, '') : label}
             {props.required && <span className="text-lien ml-1" aria-hidden="true">*</span>}
           </label>
         )}

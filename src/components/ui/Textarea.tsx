@@ -1,4 +1,5 @@
 import { TextareaHTMLAttributes, forwardRef } from 'react';
+import { sansReperes } from '../../lib/edition';
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -8,14 +9,14 @@ interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, fullWidth = true, className = '', id, ...props }, ref) => {
-    const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-');
+    const textareaId = id || (label ? sansReperes(label).toLowerCase().replace(/\s+/g, '-') : undefined);
     const widthClass = fullWidth ? 'w-full' : '';
 
     return (
       <div className={widthClass}>
         {label && (
           <label htmlFor={textareaId} className="block text-sm font-medium text-noir mb-2">
-            {props.required ? label.replace(/\s*\*$/, '') : label}
+            {props.required ? label.replace(/\s*\*(?=[\u2061-\u2064\u200C\u2060]*$)/, '') : label}
             {props.required && <span className="text-lien ml-1" aria-hidden="true">*</span>}
           </label>
         )}

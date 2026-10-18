@@ -3,6 +3,9 @@ import { AlertTriangle, X } from 'lucide-react';
 interface DeleteConfirmModalProps {
   title?: string;
   message?: string;
+  /** Libellés des boutons (textes réglables sur le site public) */
+  annuler?: string;
+  supprimer?: string;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -10,6 +13,8 @@ interface DeleteConfirmModalProps {
 export function DeleteConfirmModal({
   title = 'Confirmer la suppression',
   message = 'Êtes-vous sûr de vouloir supprimer cette demande ? Cette action est irréversible.',
+  annuler = 'Annuler',
+  supprimer = 'Supprimer',
   onConfirm,
   onCancel,
 }: DeleteConfirmModalProps) {
@@ -39,13 +44,13 @@ export function DeleteConfirmModal({
             onClick={onCancel}
             className="flex-1 bg-white hover:bg-[#F9F9F9] text-[#111111] border border-[#E5E5E5] font-semibold py-3 rounded-xl transition-colors"
           >
-            Annuler
+            {annuler}
           </button>
           <button
             onClick={onConfirm}
             className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-xl transition-colors"
           >
-            Supprimer
+            {supprimer}
           </button>
         </div>
       </div>

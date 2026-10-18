@@ -6,6 +6,7 @@ import { Calendar, Gauge, Route, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Vehicle } from '../types/vehicle';
 import { formatPrice, formatMileage } from '../utils/vehicle-filters';
 import { Button } from './ui/Button';
+import { useTexte } from '../lib/textes';
 
 interface VehicleCardProps {
   vehicle: Vehicle & {
@@ -26,20 +27,22 @@ function getAllImages(vehicle: any): string[] {
 }
 
 // Badge de statut : fond noir profond, liseré or, pastille ronde de couleur
+// (cle : texte du badge, page « Nos véhicules » des Textes du site)
 function getStatusBadge(status?: string) {
   switch (status) {
     case 'available':
-      return { label: 'Disponible', dot: 'bg-or-clair' };
+      return { cle: 'vehicules.carte.statut.disponible', dot: 'bg-or-clair' };
     case 'reserved':
-      return { label: 'Réservé', dot: 'bg-[#F0A93B]' };
+      return { cle: 'vehicules.carte.statut.reserve', dot: 'bg-[#F0A93B]' };
     case 'sold':
-      return { label: 'Vendu', dot: 'bg-[#9A9A9A]' };
+      return { cle: 'vehicules.carte.statut.vendu', dot: 'bg-[#9A9A9A]' };
     default:
-      return { label: '', dot: '' };
+      return { cle: '', dot: '' };
   }
 }
 
 export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = true }: VehicleCardProps) {
+  const t = useTexte();
   const images = getAllImages(vehicle);
   const displayImages = images.length > 0 ? images : ['/placeholder.jpg'];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -120,10 +123,10 @@ export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = t
           </>
         )}
 
-        {statusInfo.label && (
+        {statusInfo.cle && (
           <div className="absolute top-3 left-3 inline-flex items-center gap-1.5 bg-noir-profond text-inverse border border-or px-3 py-1 rounded-full text-xs font-semibold tracking-wide shadow-[0_2px_8px_rgba(0,0,0,0.25)] z-10">
             <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} aria-hidden="true" />
-            {statusInfo.label}
+            {t(statusInfo.cle)}
           </div>
         )}
 
@@ -155,7 +158,7 @@ export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = t
           </div>
           <div className="flex items-center gap-1">
             <Gauge className="w-4 h-4 text-or-texte" aria-hidden="true" />
-            <span>{vehicle.displacement} cc</span>
+            <span>{t('vehicules.carte.cylindree', { n: vehicle.displacement })}</span>
           </div>
           <div className="flex items-center gap-1">
             <Route className="w-4 h-4 text-or-texte" aria-hidden="true" />
@@ -166,7 +169,7 @@ export function VehicleCard({ vehicle, disableLink = false, glissementPhotos = t
         {!disableLink && (
           <div className="mt-auto" aria-hidden="true">
             <Button fullWidth tabIndex={-1} type="button">
-              Voir le véhicule
+              {t('vehicules.carte.bouton')}
             </Button>
           </div>
         )}

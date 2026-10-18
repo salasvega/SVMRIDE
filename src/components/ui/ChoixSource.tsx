@@ -12,6 +12,7 @@
 import { useRef } from 'react';
 import type { ChangeEvent, MouseEvent } from 'react';
 import { Camera, Images } from 'lucide-react';
+import { useTexte } from '../../lib/textes';
 
 /** Affiché seulement quand le pointeur principal est le doigt */
 export const TACTILE_SEULEMENT = 'hidden [@media(pointer:coarse)]:flex';
@@ -48,6 +49,7 @@ export function ChoixSource({
     ref.current?.click();
   };
 
+  const t = useTexte();
   const bouton = `inline-flex items-center justify-center gap-2 rounded-lg border border-champ bg-surface font-medium text-noir transition-colors hover:border-lien hover:text-lien disabled:opacity-50 ${
     taille === 'petite' ? 'px-3 py-1.5 text-sm' : 'px-4 py-2.5 text-sm'
   }`;
@@ -58,11 +60,11 @@ export function ChoixSource({
       <input ref={camera} type="file" accept="image/*" capture="environment" className="hidden" tabIndex={-1} onChange={choisi} />
       <button type="button" className={bouton} onClick={ouvrir(bibliotheque)} disabled={disabled}>
         <Images className="h-4 w-4" aria-hidden="true" />
-        {avecFichiers ? 'Photothèque / fichiers' : 'Photothèque'}
+        {avecFichiers ? t('fichiers.mobile.phototheque_fichiers') : t('fichiers.mobile.phototheque')}
       </button>
       <button type="button" className={bouton} onClick={ouvrir(camera)} disabled={disabled}>
         <Camera className="h-4 w-4" aria-hidden="true" />
-        Caméra
+        {t('fichiers.mobile.camera')}
       </button>
     </div>
   );

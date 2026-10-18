@@ -2,11 +2,15 @@
  * Admin — Textes du site : tous les textes modifiables, page par page et
  * section par section, avec l'aperçu en direct du vrai site, la recherche,
  * le retour au texte d'origine et l'historique des enregistrements.
+ *
+ * Deux façons de modifier : la liste des champs (un clic sur un texte de
+ * l'aperçu amène à son champ), ou « Modifier sur la page » : le vrai site en
+ * grand, un clic sur un texte ouvre une bulle d'édition à côté de lui.
  * Registre : src/config/textes.ts ; réglage « textes » de site_reglages
  * (seuls les textes modifiés y sont gardés).
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Eye, History, Loader2, RotateCcw, Search, Type, X } from 'lucide-react';
+import { Eye, History, List, Loader2, MousePointerClick, RotateCcw, Search, Type, X } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import { ApercuPage } from '../../components/admin/ApercuPage';
 import { supabase } from '../../lib/supabase';
@@ -22,6 +26,19 @@ interface Version {
 }
 
 const PAGES = PAGES_TEXTES;
+/** Où se trouve chaque texte (première page qui le contient) */
+const OU: Record<string, { page: PageTextes; section: string }> = {};
+for (const p of PAGES) for (const s of p.sections) for (const t of s.textes) OU[t.cle] ??= { page: p, section: s.titre };
+/** Textes présents sur toutes les pages (pas une page à ouvrir dans l'aperçu) */
+const COMMUNES = new Set(['identite', 'annonce', 'navigation', 'pied', 'cookies', 'avis', 'fichiers']);
+/** Pages du site qu'on peut ouvrir dans « Modifier sur la page » */
+const PAGES_SITE = PAGES.filter((p) => p.chemin && !COMMUNES.has(p.cle));
+/** Page du registre qui correspond à une adresse du site */
+function pageDuChemin(chemin: string): PageTextes | undefined {
+  return PAGES_SITE.find((p) => p.chemin === chemin)
+    ?? (chemin.startsWith('/vehicules/') ? PAGES_SITE.find((p) => p.chemin?.startsWith('/vehicules/:')) : undefined)
+    ?? (chemin.startsWith('/signature/') ? PAGES_SITE.find((p) => p.chemin?.startsWith('/signature/')) : undefined);
+}
 const sansAccent = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 const court = (s: string, n = 90) => (s.length > n ? `${s.slice(0, n - 1)}…` : s || '(vide)');
 const date = (iso: string) => new Date(iso).toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
@@ -97,12 +114,80 @@ function ApercuGoogle({ titre, description, chemin }: { titre: string; descripti
   );
 }
 
+/** Bulle d'édition posée à côté du texte cliqué (« Modifier sur la page ») */
+function BulleTexte({ def, valeur, onChange, onFermer, onListe }: {
+  def: DefTexte; valeur: string; onChange: (v: string) => void; onFermer: () => void; onListe: () => void;
+}) {
+  const champ = useRef<HTMLTextAreaElement>(null);
+  const ou = OU[def.cle];
+  const max = def.max ?? 420;
+  const modifie = valeur !== def.defaut;
+  useEffect(() => {
+    const el = champ.current;
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.setSelectionRange(el.value.length, el.value.length);
+  }, [def.cle]);
+  useEffect(() => {
+    const el = champ.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.min(el.scrollHeight, 220)}px`;
+  }, [valeur, def.cle]);
+  return (
+    <div className="rounded-2xl border border-[#D1D5DB] bg-white p-3 shadow-[0_12px_40px_rgba(0,0,0,0.22)]" role="dialog" aria-label={`Modifier : ${def.libelle}`}
+      onKeyDown={(e) => { if (e.key === 'Escape') { e.preventDefault(); onFermer(); } }}>
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          {ou && <p className="truncate text-[11px] text-[#666666]">{ou.page.libelle} › {ou.section}</p>}
+          <p className="text-sm font-semibold text-[#111111]">
+            {def.libelle}
+            {modifie && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-900">Modifié</span>}
+          </p>
+        </div>
+        <button type="button" onClick={onFermer} className="rounded-full p-1 text-[#666666] hover:bg-[#F5F5F5]" aria-label="Fermer (Échap)">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+      <textarea ref={champ} value={valeur} maxLength={max} rows={1} aria-label={def.libelle}
+        onChange={(e) => onChange(def.type === 'paragraphe' ? e.target.value : e.target.value.replace(/\n/g, ' '))}
+        onKeyDown={(e) => { if (e.key === 'Enter' && def.type !== 'paragraphe') { e.preventDefault(); onFermer(); } }}
+        className={`w-full resize-none rounded-xl border-2 px-3 py-2 text-[15px] leading-relaxed text-[#111111] focus:outline-none ${modifie ? 'border-amber-300 focus:border-[#111111]' : 'border-[#D1D5DB] focus:border-[#111111]'}`} />
+      <div className="mt-1 flex items-start justify-between gap-3 text-[11px] text-[#666666]">
+        <span className="min-w-0">
+          {def.aide && <span className="block">{def.aide}</span>}
+          {modifie && def.defaut && <span className="block truncate">Origine : « {def.defaut} »</span>}
+        </span>
+        <span className={valeur.length > max * 0.9 ? 'font-semibold text-amber-800' : ''}>{valeur.length}/{max}</span>
+      </div>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+        <button type="button" onClick={onListe} className="text-xs font-semibold text-[#444444] underline underline-offset-2 hover:text-[#111111]">Voir dans la liste</button>
+        <div className="flex gap-2">
+          {modifie && (
+            <button type="button" onClick={() => onChange(def.defaut)} className="inline-flex items-center gap-1 rounded-lg border border-[#D1D5DB] px-2.5 py-1.5 text-xs font-semibold text-[#111111] hover:border-[#111111]">
+              <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" /> Texte d'origine
+            </button>
+          )}
+          <button type="button" onClick={onFermer} className="rounded-lg bg-[#111111] px-3 py-1.5 text-xs font-semibold text-white">OK</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function TextesSite() {
   const [enregistres, setEnregistres] = useState<Textes | null>(null);
   const [modifs, setModifs] = useState<Textes>({});
   const [pageCle, setPageCle] = useState('accueil');
   const [recherche, setRecherche] = useState('');
-  const [repere, setRepere] = useState<string | null>(null);
+  const [vue, setVue] = useState<'liste' | 'page'>(() => (new URLSearchParams(window.location.search).get('vue') === 'page' ? 'page' : 'liste'));
+  const [actif, setActif] = useState<string | null>(null);
+  const [montrer, setMontrer] = useState(0);
+  const [tous, setTous] = useState(false);
+  const [cheminCadre, setCheminCadre] = useState('/');
+  const [cheminVu, setCheminVu] = useState('/');
+  const [slugVehicule, setSlugVehicule] = useState<string | null>(null);
+  const [aFocaliser, setAFocaliser] = useState<string | null>(null);
   const navPages = useRef<HTMLElement>(null);
   const [historique, setHistorique] = useState<Version[]>([]);
   const [erreur, setErreur] = useState('');
@@ -124,6 +209,13 @@ export function TextesSite() {
     setHistorique((h as Version[]) ?? []);
   }, []);
   useEffect(() => { charger(); }, [charger]);
+
+  // Fiche véhicule dans l'aperçu : le premier véhicule du catalogue
+  useEffect(() => {
+    supabase.from('vehicles').select('slug').not('slug', 'is', null).order('created_at', { ascending: false }).limit(1)
+      .then(({ data }) => setSlugVehicule((data as { slug: string }[] | null)?.[0]?.slug ?? null));
+  }, []);
+  const resoudre = useCallback((chemin: string) => (chemin.includes(':premier') ? (slugVehicule ? `/vehicules/${slugVehicule}` : '/vehicules') : chemin), [slugVehicule]);
 
   useEffect(() => {
     if (!message) return;
@@ -148,7 +240,7 @@ export function TextesSite() {
 
   const maj = (cle: string, v: string) => {
     setModifs((m) => ({ ...m, [cle]: v }));
-    setRepere(texte({ ...courants, [cle]: v }, cle));
+    setActif(cle);
   };
 
   const page = PAGES.find((p) => p.cle === pageCle) ?? PAGES[0];
@@ -162,7 +254,44 @@ export function TextesSite() {
       })).filter((r) => r.sections.length)
     : [{ page, sections: page.sections }];
   const nbModifies = (p: PageTextes) => new Set(p.sections.flatMap((s) => s.textes).filter((t) => enregistres?.[t.cle] !== undefined).map((t) => t.cle)).size;
-  const cheminApercu = page.chemin ?? '/';
+  const cheminApercu = resoudre(page.chemin ?? '/');
+
+  // Clic sur un texte de l'aperçu (vue liste) : sa page et son champ
+  const allerAuChamp = useCallback((cle: string) => {
+    const ou = OU[cle];
+    if (!ou) return;
+    setRecherche('');
+    if (!COMMUNES.has(ou.page.cle) || !page.chemin) setPageCle(ou.page.cle);
+    setActif(cle);
+    setAFocaliser(cle);
+  }, [page.chemin]);
+  useEffect(() => {
+    if (!aFocaliser) return;
+    const el = document.getElementById(`t-${aFocaliser}`);
+    if (!el) return;
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    el.focus({ preventScroll: true });
+    setAFocaliser(null);
+  }, [aFocaliser, pageCle, vue]);
+
+  const ouvrirPage = (cle: string) => {
+    const p = PAGES.find((x) => x.cle === cle);
+    if (!p?.chemin) return;
+    const c = resoudre(p.chemin);
+    setCheminCadre(c);
+    setCheminVu(c);
+    setActif(null);
+  };
+  const passerEnVue = (v: 'liste' | 'page') => {
+    setVue(v);
+    if (v === 'page') {
+      const c = page.chemin && !COMMUNES.has(page.cle) ? resoudre(page.chemin) : '/';
+      setCheminCadre(c);
+      setCheminVu(c);
+      window.setTimeout(() => document.getElementById('barre-edition')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 60);
+    } else if (actif) setAFocaliser(actif);
+  };
+  const pageVue = pageDuChemin(cheminVu);
 
   const pret = enregistres !== null;
   // Sur mobile, la liste des pages défile : garder la page choisie visible (sans faire défiler la page)
@@ -202,7 +331,18 @@ export function TextesSite() {
               Modifiez les titres, les phrases et les boutons du site, page par page, et voyez le résultat en direct. « {'{nom}'} » est remplacé par le nom du site.
             </p>
           </div>
-          <label className="relative w-full sm:w-80">
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+          <div className="inline-flex rounded-xl border-2 border-[#D1D5DB] bg-white p-1" role="group" aria-label="Façon de modifier">
+            <button type="button" onClick={() => passerEnVue('liste')} aria-pressed={vue === 'liste'}
+              className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold ${vue === 'liste' ? 'bg-[#111111] text-white' : 'text-[#444444] hover:bg-[#F5F5F5]'}`}>
+              <List className="h-4 w-4" aria-hidden="true" /> Liste
+            </button>
+            <button type="button" onClick={() => passerEnVue('page')} aria-pressed={vue === 'page'}
+              className={`inline-flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold ${vue === 'page' ? 'bg-[#111111] text-white' : 'text-[#444444] hover:bg-[#F5F5F5]'}`}>
+              <MousePointerClick className="h-4 w-4" aria-hidden="true" /> Modifier sur la page
+            </button>
+          </div>
+          {vue === 'liste' && <label className="relative w-full sm:w-72">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#888888]" aria-hidden="true" />
             <input value={recherche} onChange={(e) => setRecherche(e.target.value)} placeholder="Rechercher un texte…" aria-label="Rechercher un texte"
               className="w-full rounded-xl border-2 border-[#D1D5DB] bg-white py-2.5 pl-9 pr-9 text-sm focus:border-[#111111] focus:outline-none" />
@@ -211,7 +351,8 @@ export function TextesSite() {
                 <X className="h-4 w-4" />
               </button>
             )}
-          </label>
+          </label>}
+          </div>
         </div>
 
         {message && <p className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900" role="status">{message}</p>}
@@ -219,6 +360,39 @@ export function TextesSite() {
 
         {!enregistres ? (
           !erreur && <p className="flex items-center gap-2 text-[#666666]"><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Chargement…</p>
+        ) : vue === 'page' ? (
+          <div className="space-y-3">
+            <div id="barre-edition" className="flex scroll-mt-20 flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border-2 border-[#D1D5DB] bg-white px-3 py-2">
+              <label className="flex items-center gap-2 text-sm font-semibold text-[#111111]">
+                Page
+                <select value={pageVue?.cle ?? ''} onChange={(e) => ouvrirPage(e.target.value)}
+                  className="rounded-lg border-2 border-[#D1D5DB] bg-white px-2 py-1.5 text-sm font-medium focus:border-[#111111] focus:outline-none">
+                  {!pageVue && <option value="">{cheminVu}</option>}
+                  {PAGES_SITE.map((p) => <option key={p.cle} value={p.cle}>{p.libelle}</option>)}
+                </select>
+              </label>
+              <label className="flex items-center gap-2 text-sm text-[#444444]">
+                <input type="checkbox" checked={tous} onChange={(e) => setTous(e.target.checked)} className="h-4 w-4 accent-[#111111]" />
+                Montrer tous les textes modifiables
+              </label>
+              <p className="text-xs text-[#666666] lg:ml-auto">
+                Survolez un texte puis cliquez pour le modifier. Les textes communs (menu, pied de page) se modifient sur n’importe quelle page.
+              </p>
+            </div>
+            <ApercuPage
+              plein
+              chemin={cheminCadre}
+              textes={courants}
+              hauteurMax={1400}
+              onNavigation={setCheminVu}
+              edition={{ actif, tous, onClic: (cle) => setActif(cle) }}
+              legende="Les liens et boutons ne s’ouvrent pas en cliquant sur leur texte : changez de page avec la liste « Page ». Les visiteurs verront les changements après « Enregistrer »."
+              bulle={actif && TEXTES[actif] ? (
+                <BulleTexte def={TEXTES[actif]} valeur={valeur(actif)} onChange={(v) => maj(actif, v)} onFermer={() => setActif(null)}
+                  onListe={() => { const ou = OU[actif]; if (ou) setPageCle(ou.page.cle); setVue('liste'); setAFocaliser(actif); }} />
+              ) : null}
+            />
+          </div>
         ) : (
           <div className="grid gap-6 lg:grid-cols-[200px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_400px] 2xl:grid-cols-[220px_minmax(0,1fr)_480px]">
             {/* Pages */}
@@ -227,7 +401,7 @@ export function TextesSite() {
                 const n = nbModifies(p);
                 const actif = !q && p.cle === page.cle;
                 return (
-                  <button key={p.cle} type="button" onClick={() => { setRecherche(''); setPageCle(p.cle); setRepere(null); }} aria-current={actif ? 'page' : undefined}
+                  <button key={p.cle} type="button" onClick={() => { setRecherche(''); setPageCle(p.cle); setActif(null); }} aria-current={actif ? 'page' : undefined}
                     className={`flex shrink-0 items-center justify-between gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${actif ? 'bg-[#111111] text-white' : 'text-[#444444] hover:bg-white hover:text-[#111111]'}`}>
                     {p.libelle}
                     {n > 0 && <span className={`rounded-full px-1.5 text-[11px] font-bold ${actif ? 'bg-white/20' : 'bg-amber-100 text-amber-900'}`} title={`${n} texte(s) modifié(s)`}>{n}</span>}
@@ -247,7 +421,7 @@ export function TextesSite() {
                     {s.aide && <p className="text-sm text-[#666666]">{s.aide}</p>}
                     <div className="divide-y divide-[#EEEEEE]">
                       {s.textes.map((t) => (
-                        <Champ key={t.cle} def={t} valeur={valeur(t.cle)} onChange={(v) => maj(t.cle, v)} onFocus={() => { if (p.chemin) setPageCle(p.cle); setRepere(texte(courants, t.cle)); }} />
+                        <Champ key={t.cle} def={t} valeur={valeur(t.cle)} onChange={(v) => maj(t.cle, v)} onFocus={() => { if (p.chemin && !COMMUNES.has(p.cle)) setPageCle(p.cle); else if (p.chemin && p.cle !== pageCle) setPageCle(p.cle); setActif(t.cle); setMontrer((n) => n + 1); }} />
                       ))}
                     </div>
                     {p.cle === 'seo' && (() => {
@@ -295,7 +469,8 @@ export function TextesSite() {
             {/* Aperçu */}
             <aside className="hidden xl:block xl:sticky xl:top-24 xl:self-start">
               {page.chemin || q ? (
-                <ApercuPage chemin={cheminApercu} textes={courants} repere={repere} />
+                <ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp }}
+                  legende="Cliquez sur un texte de l’aperçu pour aller à son champ. Les visiteurs verront les changements après « Enregistrer »." />
               ) : (
                 <p className="rounded-xl border-2 border-dashed border-[#D1D5DB] p-4 text-sm text-[#666666]">Aperçu des résultats Google sous chaque page, à gauche.</p>
               )}
@@ -303,13 +478,13 @@ export function TextesSite() {
           </div>
         )}
 
-        {enregistres && page.chemin && (
+        {enregistres && vue === 'liste' && page.chemin && (
           <div className="xl:hidden">
             <button type="button" onClick={() => setApercuMobile((a) => !a)} aria-expanded={apercuMobile}
               className="inline-flex items-center gap-2 rounded-xl border-2 border-[#111111] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111]">
               <Eye className="h-4 w-4" aria-hidden="true" /> {apercuMobile ? 'Masquer l’aperçu' : 'Voir l’aperçu de la page'}
             </button>
-            {apercuMobile && <div className="mt-3"><ApercuPage chemin={cheminApercu} textes={courants} repere={repere} /></div>}
+            {apercuMobile && <div className="mt-3"><ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp }} /></div>}
           </div>
         )}
       </div>
@@ -323,7 +498,7 @@ export function TextesSite() {
               <p className="text-sm text-[#444444]"><strong className="text-[#111111]">{changements.length} texte{changements.length > 1 ? 's' : ''}</strong> non enregistré{changements.length > 1 ? 's' : ''}</p>
             )}
             <div className="flex gap-2">
-              <button type="button" onClick={() => { setModifs({}); setRepere(null); }} className="rounded-xl border border-[#D1D5DB] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111] hover:border-[#111111]">Annuler</button>
+              <button type="button" onClick={() => { setModifs({}); setActif(null); }} className="rounded-xl border border-[#D1D5DB] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111] hover:border-[#111111]">Annuler</button>
               <button type="button" disabled={lienInvalide} onClick={() => setConfirmation({ cible: courants, titre: 'Enregistrer ces textes ?' })}
                 className="rounded-xl bg-[#111111] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40">Enregistrer</button>
             </div>

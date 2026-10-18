@@ -11,8 +11,10 @@ import { useVehicle } from '../hooks/useVehicles';
 import { vehicleSeo, vehicleNotFoundSeo } from '../config/seo';
 import { PistePhotos } from '../components/PhotosGlissantes';
 import { useGlissementPhotos } from '../hooks/useGlissementPhotos';
+import { useTexte } from '../lib/textes';
 
 export function VehicleDetail() {
+  const t = useTexte();
   const { slug } = useParams<{ slug: string }>();
   const { vehicle, loading, error } = useVehicle(slug || '');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -36,7 +38,7 @@ export function VehicleDetail() {
     return (
       <Section>
         <Container className="text-center py-12">
-          <p className="text-lg text-gris">Chargement...</p>
+          <p className="text-lg text-gris">{t('fiche.chargement')}</p>
         </Container>
       </Section>
     );
@@ -47,9 +49,9 @@ export function VehicleDetail() {
       <Section>
         <SEOHead meta={vehicleNotFoundSeo} />
         <Container className="text-center py-12">
-          <h1 className="filet-apres text-center mb-8">Véhicule non trouvé</h1>
+          <h1 className="filet-apres text-center mb-8">{t('fiche.introuvable.titre')}</h1>
           <Link to="/vehicules">
-            <Button>Retour aux véhicules</Button>
+            <Button>{t('fiche.introuvable.bouton')}</Button>
           </Link>
         </Container>
       </Section>
@@ -73,7 +75,7 @@ export function VehicleDetail() {
             className="lien inline-flex items-center gap-2 text-sm md:text-base"
           >
             <ArrowLeft className="w-4 h-4" />
-            Retour aux véhicules
+            {t('fiche.retour')}
           </Link>
         </Container>
       </Section>
@@ -174,7 +176,7 @@ export function VehicleDetail() {
                 <div className="flex items-center gap-3">
                   <IconeOr icon={Calendar} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-doux-68">Année</p>
+                    <p className="text-xs uppercase tracking-wide text-doux-68">{t('fiche.carac.annee')}</p>
                     <p className="font-semibold text-noir">{vehicle.year}</p>
                   </div>
                 </div>
@@ -182,9 +184,9 @@ export function VehicleDetail() {
                 <div className="flex items-center gap-3">
                   <IconeOr icon={Gauge} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-doux-68">Cylindrée</p>
+                    <p className="text-xs uppercase tracking-wide text-doux-68">{t('fiche.carac.cylindree')}</p>
                     <p className="font-semibold text-noir">
-                      {vehicle.displacement} cc
+                      {t('fiche.carac.cylindree_valeur', { n: vehicle.displacement })}
                     </p>
                   </div>
                 </div>
@@ -192,7 +194,7 @@ export function VehicleDetail() {
                 <div className="flex items-center gap-3">
                   <IconeOr icon={Route} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-doux-68">Kilométrage</p>
+                    <p className="text-xs uppercase tracking-wide text-doux-68">{t('fiche.carac.kilometrage')}</p>
                     <p className="font-semibold text-noir">
                       {formatMileage(vehicle.mileage)}
                     </p>
@@ -202,7 +204,7 @@ export function VehicleDetail() {
                 <div className="flex items-center gap-3">
                   <IconeOr icon={Shield} className="w-6 h-6 flex-shrink-0" />
                   <div>
-                    <p className="text-xs uppercase tracking-wide text-doux-68">Type</p>
+                    <p className="text-xs uppercase tracking-wide text-doux-68">{t('fiche.carac.type')}</p>
                     <p className="font-semibold text-noir capitalize">
                       {vehicle.type}
                     </p>
@@ -212,13 +214,13 @@ export function VehicleDetail() {
 
               {/* Description */}
               <div className="mb-8">
-                <h2 className="text-xl md:text-[22px] filet-apres mb-4">Description</h2>
+                <h2 className="text-xl md:text-[22px] filet-apres mb-4">{t('fiche.description.titre')}</h2>
                 <p className="text-gris leading-relaxed">{vehicle.description}</p>
               </div>
 
               {/* Équipements */}
               <div className="mb-8">
-                <h2 className="text-xl md:text-[22px] filet-apres mb-4">Équipements</h2>
+                <h2 className="text-xl md:text-[22px] filet-apres mb-4">{t('fiche.equipements.titre')}</h2>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
                   {vehicle.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2.5 text-gris">
@@ -233,7 +235,7 @@ export function VehicleDetail() {
               <div className="p-4 md:p-5 bg-surface border border-bordure border-l-[3px] border-l-or rounded-xl mb-8">
                 <div className="flex items-center gap-2 text-noir mb-1">
                   <IconeOr icon={Shield} className="w-5 h-5" />
-                  <span className="font-semibold">Garantie</span>
+                  <span className="font-semibold">{t('fiche.garantie.titre')}</span>
                 </div>
                 <p className="text-gris">{vehicle.warranty}</p>
               </div>
@@ -249,14 +251,14 @@ export function VehicleDetail() {
                 >
                   <Button size="lg" fullWidth>
                     <MessageCircle className="w-5 h-5" aria-hidden="true" />
-                    <span>Demander des informations</span>
+                    <span>{t('fiche.bouton.informations')}</span>
                   </Button>
                 </Link>
 
                 <Link to={financingLink} className="w-full" tabIndex={-1}>
                   <Button size="lg" variant="secondary" fullWidth>
                     <Euro className="w-5 h-5" aria-hidden="true" />
-                    <span>Demander un financement</span>
+                    <span>{t('fiche.bouton.financement')}</span>
                   </Button>
                 </Link>
               </div>

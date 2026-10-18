@@ -65,30 +65,22 @@ const oublierSession = () => {
   }
 };
 
-const MANDAT_PROPRIETAIRE: Record<StatutMandat, string> = {
-  preparation: 'En préparation',
-  a_signer: 'Contrat à signer',
-  actif: 'En vente',
-  vendu: 'Vendue',
-  resilie: 'Mandat terminé (moto reprise)',
-  expire: 'Mandat arrivé à échéance',
-  cloture: 'Dossier terminé',
-};
+// Libellés des statuts du mandat (StatutMandat) : textes « suivre.statut.<statut> »
 
-/** Les étapes vues par le déposant (liste donnée par Mattia) */
+/** Les étapes vues par le déposant (liste donnée par Mattia) ; libellés : textes « suivre.etapes.<n> » */
 function etapes(d: DossierProp) {
   const i = ORDRE_VENTE.indexOf(d.statut_vente);
   const a = (t: string) => d.fil.some((e) => e.type === t);
   return [
-    { libelle: 'Annonce en ligne', fait: i >= 1 },
-    { libelle: 'Visite', fait: a('visite') },
-    { libelle: 'Essai', fait: a('essai') },
-    { libelle: 'Offre reçue', fait: a('offre') },
-    { libelle: 'Réservée', fait: i >= 2 },
-    { libelle: 'Vendue', fait: i >= 3 },
-    { libelle: 'Préparation', fait: i >= 4 },
-    { libelle: 'Livrée', fait: i >= 5 },
-    { libelle: 'Payée', fait: i >= 6 },
+    { n: 1, fait: i >= 1 },
+    { n: 2, fait: a('visite') },
+    { n: 3, fait: a('essai') },
+    { n: 4, fait: a('offre') },
+    { n: 5, fait: i >= 2 },
+    { n: 6, fait: i >= 3 },
+    { n: 7, fait: i >= 4 },
+    { n: 8, fait: i >= 5 },
+    { n: 9, fait: i >= 6 },
   ];
 }
 
@@ -136,17 +128,17 @@ export function SuivreMaVente() {
               <div className="flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <h1 className="text-[28px] md:text-[34px] filet-apres mb-1">{t('suivre.titre')}</h1>
-                  {email && <p className="text-sm text-gris">Connecté avec {email}</p>}
+                  {email && <p className="text-sm text-gris">{t('suivre.espace.connecte', { email })}</p>}
                 </div>
                 <button type="button" onClick={deconnecter} className="inline-flex items-center gap-2 text-sm text-gris hover:text-noir">
-                  <LogOut className="w-4 h-4" aria-hidden="true" /> Se déconnecter
+                  <LogOut className="w-4 h-4" aria-hidden="true" /> {t('suivre.espace.deconnexion')}
                 </button>
               </div>
               {erreur && <div role="alert" className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl text-sm">{erreur}</div>}
               {dossiers === null ? (
-                <p className="text-gris" role="status">Chargement…</p>
+                <p className="text-gris" role="status">{t('suivre.espace.chargement')}</p>
               ) : dossiers.length === 0 ? (
-                <div className="carte p-6 text-gris">Aucun dossier de dépôt-vente en cours pour cette adresse.</div>
+                <div className="carte p-6 text-gris">{t('suivre.espace.vide')}</div>
               ) : (
                 dossiers.map((d) => <CarteDossier key={d.id} dossier={d} session={session.jeton} onMaj={charger} />)
               )}
@@ -207,15 +199,15 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number,
       </p>
       {etape === 'email' ? (
         <form data-zone="formulaires" onSubmit={demander} className="carte p-5 md:p-6 space-y-4">
-          <Input label="Votre e-mail" type="email" name="email" autoComplete="email" required maxLength={254} value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Button type="submit" size="lg" disabled={envoi || !email} fullWidth>{envoi ? 'Envoi…' : 'Recevoir mon code'}</Button>
+          <Input label={t('suivre.connexion.email.champ')} type="email" name="email" autoComplete="email" required maxLength={254} value={email} onChange={(e) => setEmail(e.target.value)} />
+          <Button type="submit" size="lg" disabled={envoi || !email} fullWidth>{envoi ? t('suivre.connexion.email.envoi') : t('suivre.connexion.email.bouton')}</Button>
           {erreur && <p role="alert" className="text-sm text-red-700">{erreur}</p>}
         </form>
       ) : (
         <form data-zone="formulaires" onSubmit={connecter} className="carte p-5 md:p-6 space-y-4">
           <p className="text-sm text-noir" role="status">{info}</p>
           <div>
-            <label htmlFor="code-suivi" className="block text-sm font-medium text-noir mb-2">Code reçu par e-mail</label>
+            <label htmlFor="code-suivi" className="block text-sm font-medium text-noir mb-2">{t('suivre.connexion.code.champ')}</label>
             <input
               ref={champCode}
               id="code-suivi"
@@ -226,31 +218,32 @@ function Connexion({ onConnecte }: { onConnecte: (jeton: string, heures: number,
               onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
               className="w-full px-4 py-3 bg-surface text-noir border-[1.5px] border-champ rounded-xl text-2xl tracking-[0.4em] tabular-nums focus:outline-none focus:border-lien focus:ring-4 focus:ring-lien/15"
             />
-            <p className="text-xs text-gris mt-1">Valable 10 minutes. Pensez à vos courriers indésirables.</p>
+            <p className="text-xs text-gris mt-1">{t('suivre.connexion.code.aide')}</p>
           </div>
           <label className="flex items-start gap-3 text-sm text-noir">
             <input type="checkbox" checked={rester} onChange={(e) => setRester(e.target.checked)} className="mt-0.5 w-5 h-5 flex-shrink-0 accent-bleu" />
             <span>
-              Rester connecté sur cet appareil pendant 30 jours
-              <span className="block text-xs text-gris">Décochez si vous utilisez un ordinateur partagé.</span>
+              {t('suivre.connexion.rester')}
+              <span className="block text-xs text-gris">{t('suivre.connexion.rester_aide')}</span>
             </span>
           </label>
-          <Button type="submit" size="lg" disabled={envoi || code.length !== 6} fullWidth>{envoi ? 'Connexion…' : 'Me connecter'}</Button>
+          <Button type="submit" size="lg" disabled={envoi || code.length !== 6} fullWidth>{envoi ? t('suivre.connexion.code.envoi') : t('suivre.connexion.code.bouton')}</Button>
           <div className="flex justify-between text-sm">
-            <button type="button" className="lien" onClick={() => { setEtape('email'); setCode(''); setErreur(''); }}>Changer d'e-mail</button>
-            <button type="button" className="lien" onClick={() => demander()} disabled={envoi}>Renvoyer le code</button>
+            <button type="button" className="lien" onClick={() => { setEtape('email'); setCode(''); setErreur(''); }}>{t('suivre.connexion.changer')}</button>
+            <button type="button" className="lien" onClick={() => demander()} disabled={envoi}>{t('suivre.connexion.renvoyer')}</button>
           </div>
           {erreur && <p role="alert" className="text-sm text-red-700">{erreur}</p>}
         </form>
       )}
       <p className="mt-6 text-sm text-gris">
-        Pas encore de dossier ? <Link to="/vendre-ma-moto" className="lien">Faites estimer votre moto</Link>.
+        {t('suivre.connexion.pas_dossier')}{' '}<Link to="/vendre-ma-moto" className="lien">{t('suivre.connexion.pas_dossier_lien')}</Link>.
       </p>
     </div>
   );
 }
 
 function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; session: string; onMaj: () => void }) {
+  const t = useTexte();
   const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const liste = etapes(d);
   const derniere = liste.reduce((n, e, i) => (e.fait ? i : n), -1);
@@ -280,56 +273,55 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
           <h2 id={`t-${d.id}`} className="text-xl font-semibold text-noir">
             {d.marque} {d.modele}{d.version ? ` ${d.version}` : ''}{d.annee ? ` · ${d.annee}` : ''}
           </h2>
-          <p className="mt-1 inline-flex px-2.5 py-1 rounded-full bg-lien/10 text-lien text-xs font-semibold">{MANDAT_PROPRIETAIRE[d.statut_mandat]}</p>
+          <p className="mt-1 inline-flex px-2.5 py-1 rounded-full bg-lien/10 text-lien text-xs font-semibold">{t(`suivre.statut.${d.statut_mandat}`)}</p>
           <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-            <div><dt className="text-gris">Prix affiché</dt><dd className="text-noir font-semibold">{euros(d.prix_affiche)}</dd></div>
-            <div><dt className="text-gris">Vous percevez</dt><dd className="text-noir font-semibold">{euros(d.net_vendeur)}</dd></div>
+            <div><dt className="text-gris">{t('suivre.dossier.prix')}</dt><dd className="text-noir font-semibold">{euros(d.prix_affiche)}</dd></div>
+            <div><dt className="text-gris">{t('suivre.dossier.net')}</dt><dd className="text-noir font-semibold">{euros(d.net_vendeur)}</dd></div>
             {d.date_fin && (
               <div className="col-span-2">
-                <dt className="text-gris">Mandat</dt>
+                <dt className="text-gris">{t('suivre.dossier.mandat')}</dt>
                 <dd className="text-noir">
-                  Du {jour(d.date_debut)} au {jour(d.date_fin)}
-                  {j != null && j >= 0 && <span className="text-gris"> · {j === 0 ? "se termine aujourd'hui" : `${j} jour${j > 1 ? 's' : ''} restant${j > 1 ? 's' : ''}`}</span>}
+                  {t('suivre.dossier.periode', { debut: jour(d.date_debut), fin: jour(d.date_fin) })}
+                  {j != null && j >= 0 && <span className="text-gris"> · {j === 0 ? t('suivre.dossier.fin_aujourdhui') : t(j > 1 ? 'suivre.dossier.jours_restants' : 'suivre.dossier.jours_restants_1', { n: j })}</span>}
                 </dd>
               </div>
             )}
           </dl>
-          {d.annonce && <p className="mt-3"><Link to={d.annonce} className="lien text-sm">Voir mon annonce sur svmride.com →</Link></p>}
+          {d.annonce && <p className="mt-3"><Link to={d.annonce} className="lien text-sm">{t('suivre.dossier.annonce')}</Link></p>}
         </div>
       </div>
 
       {d.a_signer && (
         <div className="mx-5 md:mx-6 mb-5 rounded-xl border-2 border-or bg-or/10 p-4 text-sm text-noir">
-          Un document attend votre signature : utilisez le lien reçu par e-mail ou le QR code présenté au showroom. Lien perdu ?
-          Demandez-en un nouveau ci-dessous (« Être rappelé ») ou au {c.telephone}.
+          {t('suivre.dossier.a_signer', { telephone: c.telephone })}
         </div>
       )}
 
       {(enCours || d.statut_mandat === 'cloture') && (
         <div className="px-5 md:px-6 pb-5">
-          <h3 className="font-semibold text-noir mb-3">Avancement</h3>
+          <h3 className="font-semibold text-noir mb-3">{t('suivre.avancement.titre')}</h3>
           <ol className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2">
             {liste.map((e, i) => (
-              <li key={e.libelle} aria-current={i === derniere ? 'step' : undefined}
+              <li key={e.n} aria-current={i === derniere ? 'step' : undefined}
                 className={`rounded-xl border px-2 py-2 text-xs text-center ${
                   e.fait ? (i === derniere ? 'bg-bleu text-sur-bouton border-bleu font-semibold' : 'bg-green-50 border-green-200 text-green-900') : 'bg-surface border-bordure text-gris'
                 }`}>
                 {e.fait && i !== derniere && <Check className="w-3.5 h-3.5 mx-auto mb-0.5" aria-hidden="true" />}
-                {e.libelle}
+                {t(`suivre.etapes.${e.n}`)}
                 <span className="sr-only">{e.fait ? ' : fait' : ' : à venir'}</span>
               </li>
             ))}
           </ol>
-          {d.paye_le && <p className="text-sm text-green-800 mt-3">Virement du net vendeur effectué le {jour(d.paye_le)}.</p>}
-          {d.vendu_le && !d.paye_le && <p className="text-sm text-gris mt-3">Vendue le {jour(d.vendu_le)} : vous êtes payé par virement sous 48 h après l'encaissement.</p>}
+          {d.paye_le && <p className="text-sm text-green-800 mt-3">{t('suivre.avancement.paye', { date: jour(d.paye_le) })}</p>}
+          {d.vendu_le && !d.paye_le && <p className="text-sm text-gris mt-3">{t('suivre.avancement.vendu', { date: jour(d.vendu_le) })}</p>}
         </div>
       )}
 
       <div className="border-t border-bordure grid md:grid-cols-2">
         <div className="p-5 md:p-6 md:border-r border-bordure">
-          <h3 className="font-semibold text-noir mb-3">Actualités</h3>
+          <h3 className="font-semibold text-noir mb-3">{t('suivre.actualites.titre')}</h3>
           {d.fil.length === 0 ? (
-            <p className="text-sm text-gris">Rien pour le moment.</p>
+            <p className="text-sm text-gris">{t('suivre.actualites.vide')}</p>
           ) : (
             <ol className="space-y-3 max-h-80 overflow-y-auto pr-1">
               {d.fil.map((e, i) => (
@@ -343,9 +335,9 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
           )}
         </div>
         <div className="p-5 md:p-6">
-          <h3 className="font-semibold text-noir mb-3">Documents</h3>
+          <h3 className="font-semibold text-noir mb-3">{t('suivre.documents.titre')}</h3>
           {d.documents.length === 0 ? (
-            <p className="text-sm text-gris">Aucun document partagé.</p>
+            <p className="text-sm text-gris">{t('suivre.documents.vide')}</p>
           ) : (
             <ul className="space-y-2">
               {d.documents.map((doc) => (
@@ -367,7 +359,12 @@ function CarteDossier({ dossier: d, session, onMaj }: { dossier: DossierProp; se
 }
 
 function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; session: string; onMaj: () => void }) {
+  const t = useTexte();
   const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
+  // Libellés affichés des types et statuts connus (textes du site), sinon la valeur brute
+  const connu = (liste: Record<string, string>, k: string) => Object.prototype.hasOwnProperty.call(liste, k);
+  const libelleType = (k: string) => (connu(DEMANDES_PROPRIETAIRE, k) ? t(`suivre.demandes.type.${k}`) : k);
+  const libelleStatut = (k: string) => (connu(STATUTS_DEMANDE, k) ? t(`suivre.demandes.statut.${k}`) : k);
   const [type, setType] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [envoi, setEnvoi] = useState(false);
@@ -377,11 +374,11 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
     ? ['rappel', 'baisse_prix', 'prolongation', 'reprise_anticipee', 'question']
     : ['rappel', 'question'];
   const textes: Record<string, string> = {
-    rappel: 'Un conseiller vous rappelle rapidement.',
-    baisse_prix: 'Indiquez le nouveau prix souhaité. Rappel : une baisse du prix affiché réduit d’autant votre net vendeur, sauf accord différent.',
-    prolongation: 'Nous vous préparons un avenant de prolongation, à signer au showroom.',
-    reprise_anticipee: `Avant la fin du mandat, une indemnité de ${euros(d.frais_resiliation)} est prévue par votre contrat. Un conseiller vous recontacte pour organiser la reprise.`,
-    question: 'Posez votre question, nous vous répondons rapidement.',
+    rappel: t('suivre.demandes.aide.rappel'),
+    baisse_prix: t('suivre.demandes.aide.baisse_prix'),
+    prolongation: t('suivre.demandes.aide.prolongation'),
+    reprise_anticipee: t('suivre.demandes.aide.reprise_anticipee', { montant: euros(d.frais_resiliation) }),
+    question: t('suivre.demandes.aide.question'),
   };
   const messageRequis = ['baisse_prix', 'question'].includes(type ?? '');
 
@@ -392,7 +389,7 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
     setRetour({ texte: '' });
     try {
       await appelProprietaire('demande', { dossier_id: d.id, type, message }, session);
-      setRetour({ texte: 'Demande envoyée. Nous revenons vers vous rapidement.' });
+      setRetour({ texte: t('suivre.demandes.succes') });
       setType(null);
       setMessage('');
       onMaj();
@@ -405,12 +402,12 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
 
   return (
     <div className="border-t border-bordure p-5 md:p-6">
-      <h3 className="font-semibold text-noir mb-3 flex items-center gap-2"><MessageSquare className="w-4 h-4" aria-hidden="true" /> Une demande ?</h3>
+      <h3 className="font-semibold text-noir mb-3 flex items-center gap-2"><MessageSquare className="w-4 h-4" aria-hidden="true" /> {t('suivre.demandes.titre')}</h3>
       <div className="flex flex-wrap gap-2" role="group" aria-label="Type de demande">
-        {types.map((t) => (
-          <button key={t} type="button" onClick={() => { setType(t === type ? null : t); setRetour({ texte: '' }); }} aria-pressed={type === t}
-            className={`px-3 py-2 rounded-xl text-sm font-medium border-[1.5px] ${type === t ? 'bg-noir text-inverse border-noir' : 'bg-surface border-champ text-noir hover:border-noir'}`}>
-            {DEMANDES_PROPRIETAIRE[t]}
+        {types.map((k) => (
+          <button key={k} type="button" onClick={() => { setType(k === type ? null : k); setRetour({ texte: '' }); }} aria-pressed={type === k}
+            className={`px-3 py-2 rounded-xl text-sm font-medium border-[1.5px] ${type === k ? 'bg-noir text-inverse border-noir' : 'bg-surface border-champ text-noir hover:border-noir'}`}>
+            {libelleType(k)}
           </button>
         ))}
       </div>
@@ -418,7 +415,7 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
         <form data-zone="formulaires" onSubmit={envoyer} className="mt-4 space-y-3">
           <p className="text-sm text-gris">{textes[type]}</p>
           <Textarea
-            label={messageRequis ? 'Votre message' : 'Message (facultatif)'}
+            label={messageRequis ? t('suivre.demandes.message') : t('suivre.demandes.message_facultatif')}
             name="message"
             rows={3}
             maxLength={2000}
@@ -426,7 +423,7 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <Button type="submit" disabled={envoi || (messageRequis && !message.trim())}>{envoi ? 'Envoi…' : 'Envoyer la demande'}</Button>
+          <Button type="submit" disabled={envoi || (messageRequis && !message.trim())}>{envoi ? t('suivre.demandes.envoi') : t('suivre.demandes.bouton')}</Button>
         </form>
       )}
       {retour.texte && <p role={retour.erreur ? 'alert' : 'status'} className={`mt-3 text-sm ${retour.erreur ? 'text-red-700' : 'text-green-800'}`}>{retour.texte}</p>}
@@ -436,17 +433,17 @@ function Demandes({ dossier: d, session, onMaj }: { dossier: DossierProp; sessio
           {d.demandes.map((x) => (
             <li key={x.id} className="text-sm rounded-xl bg-fond px-4 py-3">
               <p className="text-noir">
-                <strong>{DEMANDES_PROPRIETAIRE[x.type] ?? x.type}</strong> · {dateHeure(x.cree_le)} ·{' '}
-                <span className="text-gris">{STATUTS_DEMANDE[x.statut] ?? x.statut}</span>
+                <strong>{libelleType(x.type)}</strong> · {dateHeure(x.cree_le)} ·{' '}
+                <span className="text-gris">{libelleStatut(x.statut)}</span>
               </p>
               {x.message && <p className="text-gris whitespace-pre-line">« {x.message} »</p>}
-              {x.reponse && <p className="text-noir mt-1">Réponse de SVM Ride : {x.reponse}</p>}
+              {x.reponse && <p className="text-noir mt-1">{t('suivre.demandes.reponse')} {x.reponse}</p>}
             </li>
           ))}
         </ul>
       )}
       <p className="mt-5 text-sm text-gris flex items-center gap-2">
-        <Phone className="w-4 h-4" aria-hidden="true" /> Ou appelez-nous au{' '}
+        <Phone className="w-4 h-4" aria-hidden="true" /> {t('suivre.demandes.appel')}{' '}
         <a href={lienTelephone(c.telephone)} className="lien">{c.telephone}</a>
       </p>
     </div>

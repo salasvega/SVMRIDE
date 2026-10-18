@@ -3,6 +3,7 @@ import type { Avis } from '../../lib/avis/types';
 import { formatDate } from '../../lib/avis/format';
 import { Etoiles } from './Etoiles';
 import { LogoGoogle } from './LogoGoogle';
+import { useTexte } from '../../lib/textes';
 
 
 const initiales = (nom: string) =>
@@ -16,6 +17,7 @@ const initiales = (nom: string) =>
 
 /** Carte d'avis : texte abrégé à 5 lignes, « Lire la suite » quand il est coupé. */
 export function CarteAvis({ avis, onLireLaSuite, demo }: { avis: Avis; onLireLaSuite: (a: Avis) => void; demo?: boolean }) {
+  const t = useTexte();
   const texteRef = useRef<HTMLParagraphElement>(null);
   const [coupe, setCoupe] = useState(false);
 
@@ -60,17 +62,17 @@ export function CarteAvis({ avis, onLireLaSuite, demo }: { avis: Avis; onLireLaS
               className="lien mt-2 self-start text-sm"
               aria-label={`Lire la suite de l'avis de ${avis.auteur}`}
             >
-              Lire la suite
+              {t('avis.carte.lire_suite')}
             </button>
           )}
         </>
       ) : (
-        <p className="mt-3 text-sm italic text-gris/80">Note sans commentaire.</p>
+        <p className="mt-3 text-sm italic text-gris/80">{t('avis.carte.sans_commentaire')}</p>
       )}
 
       <footer className="mt-auto flex items-center gap-1.5 pt-5 text-xs text-gris">
         <LogoGoogle taille={14} decoratif />
-        <span>{demo ? 'Avis de démonstration' : 'Publié sur Google'}</span>
+        <span>{demo ? t('avis.carte.demo') : t('avis.carte.google')}</span>
       </footer>
     </article>
   );

@@ -142,7 +142,7 @@ export function TradeIn() {
             {/* Colonne gauche : explication du process */}
             <div>
               <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
-                Comment ça marche ?
+                {t('reprises.etapes.titre')}
               </h2>
 
               <div className="space-y-6">
@@ -152,12 +152,10 @@ export function TradeIn() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-noir mb-2">
-                      Remplissez le formulaire
+                      {t('reprises.etapes.1.titre')}
                     </h3>
                     <p className="text-gris leading-relaxed">
-                      Décrivez votre véhicule et son état en quelques
-                      clics. Plus vous êtes précis, plus notre
-                      estimation sera juste.
+                      {t('reprises.etapes.1.texte')}
                     </p>
                   </div>
                 </div>
@@ -168,11 +166,10 @@ export function TradeIn() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-noir mb-2">
-                      Recevez une estimation
+                      {t('reprises.etapes.2.titre')}
                     </h3>
                     <p className="text-gris leading-relaxed">
-                      Notre équipe étudie votre demande et vous
-                      contacte sous 24h avec une première estimation.
+                      {t('reprises.etapes.2.texte')}
                     </p>
                   </div>
                 </div>
@@ -183,11 +180,10 @@ export function TradeIn() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-noir mb-2">
-                      Expertise sur place
+                      {t('reprises.etapes.3.titre')}
                     </h3>
                     <p className="text-gris leading-relaxed">
-                      Un rendez-vous est organisé pour examiner le
-                      véhicule et finaliser l'offre.
+                      {t('reprises.etapes.3.texte')}
                     </p>
                   </div>
                 </div>
@@ -198,12 +194,10 @@ export function TradeIn() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-noir mb-2">
-                      Virement immédiat
+                      {t('reprises.etapes.4.titre')}
                     </h3>
                     <p className="text-gris leading-relaxed">
-                      Si vous acceptez l'offre, le paiement est
-                      effectué immédiatement et nous gérons toutes les
-                      démarches.
+                      {t('reprises.etapes.4.texte')}
                     </p>
                   </div>
                 </div>
@@ -216,11 +210,10 @@ export function TradeIn() {
                 <div className="bg-green-50 border-2 border-green-500 rounded-xl p-8 text-center">
                   <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                   <h3 className="text-2xl font-bold text-green-900 mb-2">
-                    Demande envoyée !
+                    {t('reprises.succes.titre')}
                   </h3>
                   <p className="text-green-800">
-                    Nous avons bien reçu votre demande de reprise.
-                    Notre équipe vous contactera sous 24h.
+                    {t('reprises.succes.texte')}
                   </p>
                 </div>
               ) : (
@@ -229,11 +222,11 @@ export function TradeIn() {
                   className="space-y-6 bg-fond p-8 rounded-xl"
                 >
                   <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
-                    Demande de reprise
+                    {t('reprises.formulaire.titre')}
                   </h2>
 
                   <Input
-                    label="Nom complet"
+                    label={t('reprises.formulaire.nom')}
                     name="name"
                     type="text"
                     required
@@ -242,7 +235,7 @@ export function TradeIn() {
                   />
 
                   <Input
-                    label="Email"
+                    label={t('reprises.formulaire.email')}
                     name="email"
                     type="email"
                     required
@@ -251,7 +244,7 @@ export function TradeIn() {
                   />
 
                   <Input
-                    label="Téléphone"
+                    label={t('reprises.formulaire.telephone')}
                     name="phone"
                     type="tel"
                     required
@@ -260,7 +253,7 @@ export function TradeIn() {
                   />
 
                   <Input
-                    label="Marque"
+                    label={t('reprises.formulaire.marque')}
                     name="brand"
                     type="text"
                     required
@@ -269,7 +262,7 @@ export function TradeIn() {
                   />
 
                   <Input
-                    label="Modèle"
+                    label={t('reprises.formulaire.modele')}
                     name="model"
                     type="text"
                     required
@@ -278,7 +271,7 @@ export function TradeIn() {
                   />
 
                   <Input
-                    label="Année"
+                    label={t('reprises.formulaire.annee')}
                     name="year"
                     type="number"
                     required
@@ -289,7 +282,7 @@ export function TradeIn() {
                   />
 
                   <Input
-                    label="Kilométrage"
+                    label={t('reprises.formulaire.kilometrage')}
                     name="mileage"
                     type="number"
                     required
@@ -298,31 +291,31 @@ export function TradeIn() {
                   />
 
                   <Select
-                    label="État général"
+                    label={t('reprises.formulaire.etat.intitule')}
                     name="condition"
                     required
                     value={formData.condition}
                     onChange={handleChange}
                   >
-                    <option value="">Sélectionnez...</option>
-                    <option value="excellent">Excellent</option>
-                    <option value="bon">Bon</option>
-                    <option value="correct">Correct</option>
-                    <option value="a-reviser">À réviser</option>
+                    <option value="">{t('reprises.formulaire.etat.vide')}</option>
+                    <option value="excellent">{t('reprises.formulaire.etat.excellent')}</option>
+                    <option value="bon">{t('reprises.formulaire.etat.bon')}</option>
+                    <option value="correct">{t('reprises.formulaire.etat.correct')}</option>
+                    <option value="a-reviser">{t('reprises.formulaire.etat.a_reviser')}</option>
                   </Select>
 
                   <Textarea
-                    label="Commentaires additionnels"
+                    label={t('reprises.formulaire.commentaires.intitule')}
                     name="comments"
                     rows={4}
-                    placeholder="Historique, modifications, points à signaler..."
+                    placeholder={t('reprises.formulaire.commentaires.exemple')}
                     value={formData.comments}
                     onChange={handleChange}
                   />
 
                   <FileUpload
-                    elements="photos ou documents"
-                    label="Photos du véhicule (fortement recommandé)"
+                    elements={t('reprises.formulaire.photos.elements')}
+                    label={t('reprises.formulaire.photos.intitule')}
                     maxFiles={10}
                     maxSizeMB={10}
                     accept="image/*,application/pdf"
@@ -344,16 +337,14 @@ export function TradeIn() {
                       htmlFor="consent"
                       className="text-sm text-gris"
                     >
-                      J'accepte que mes données soient
-                      utilisées pour traiter ma demande de
-                      reprise conformément à la{' '}
+                      {t('reprises.formulaire.consentement.avant')}{' '}
                       <a
                         href="/politique-confidentialite"
                         className="text-lien underline underline-offset-2 hover:decoration-2"
                       >
-                        politique de confidentialité
+                        {t('reprises.formulaire.consentement.lien')}
                       </a>
-                      .{' '}
+                      {t('reprises.formulaire.consentement.apres')}{' '}
                       <span className="text-lien">
                         *
                       </span>
@@ -369,7 +360,7 @@ export function TradeIn() {
                   {/* Indicateur visuel pendant upload */}
                   {uploadingFiles && (
                     <div className="text-sm text-gris bg-surface/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
-                      Téléversement des documents...
+                      {t('reprises.formulaire.televersement')}
                     </div>
                   )}
 
@@ -380,10 +371,10 @@ export function TradeIn() {
                     size="lg"
                   >
                     {uploadingFiles
-                      ? 'Téléversement des documents...'
+                      ? t('reprises.formulaire.bouton.televersement')
                       : isSubmitting
-                      ? 'Envoi en cours...'
-                      : 'Envoyer ma demande'}
+                      ? t('reprises.formulaire.bouton.envoi')
+                      : t('reprises.formulaire.bouton.texte')}
                   </Button>
                 </form>
               )}

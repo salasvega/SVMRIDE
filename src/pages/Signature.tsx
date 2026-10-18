@@ -14,6 +14,7 @@ import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { appelSignature, ErreurDepot, euros, jour, messageErreur } from '../lib/depot';
 import { useCoordonnees } from '../lib/coordonnees';
+import { useTexte } from '../lib/textes';
 
 interface Resume {
   titre: string;
@@ -38,6 +39,7 @@ interface Resume {
 }
 
 export function Signature() {
+  const t = useTexte();
   const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
   const { jeton = '' } = useParams();
   const [etat, setEtat] = useState<'chargement' | 'erreur' | 'pret' | 'signe'>('chargement');
@@ -81,8 +83,8 @@ export function Signature() {
 
   useEffect(() => {
     if (attente <= 0) return;
-    const t = setTimeout(() => setAttente((a) => a - 1), 1000);
-    return () => clearTimeout(t);
+    const minuteur = setTimeout(() => setAttente((a) => a - 1), 1000);
+    return () => clearTimeout(minuteur);
   }, [attente]);
 
   useEffect(() => {
@@ -112,7 +114,7 @@ export function Signature() {
 
   const demanderCode = async () => {
     setMessage('');
-    setEnvoi('Envoi du code…');
+    setEnvoi(t('signature.code.envoi'));
     try {
       await appelSignature('envoyer-code', { jeton });
       setCodeEnvoye(true);
@@ -130,7 +132,7 @@ export function Signature() {
     e.preventDefault();
     setMessage('');
     if (code.replace(/\D/g, '').length !== 6) return setMessage('Saisissez les 6 chiffres reçus par e-mail.');
-    setEnvoi('Signature en cours…');
+    setEnvoi(t('signature.code.en_cours'));
     try {
       const r = await appelSignature<{ pdf: string | null; signe_le: string }>('signer', { jeton, code, accord, renonciation });
       setSigne({ pdf: r.pdf, le: r.signe_le });
@@ -151,15 +153,15 @@ export function Signature() {
       <SEOHead meta={signatureSeo} />
       <Section background="gray" className="!py-8 md:!py-12 min-h-[70vh]">
         <Container size="md">
-          {etat === 'chargement' && <p className="text-gris" role="status">Chargement du contrat…</p>}
+          {etat === 'chargement' && <p className="text-gris" role="status">{t('signature.chargement')}</p>}
 
           {etat === 'erreur' && (
             <div className="carte p-6 md:p-10 text-center">
               <Lock className="w-12 h-12 text-gris mx-auto mb-4" aria-hidden="true" />
-              <h1 className="text-[26px] md:text-[30px] mb-3">Lien de signature indisponible</h1>
+              <h1 className="text-[26px] md:text-[30px] mb-3">{t('signature.erreur.titre')}</h1>
               <p className="text-gris max-w-xl mx-auto">{erreur}</p>
               <p className="mt-6 text-gris">
-                SVM Ride : <a href={`tel:${tel.replace(/\s/g, '')}`} className="lien">{tel}</a>
+                {t('signature.erreur.contact')}{' '}<a href={`tel:${tel.replace(/\s/g, '')}`} className="lien">{tel}</a>
               </p>
             </div>
           )}
@@ -167,61 +169,60 @@ export function Signature() {
           {etat === 'signe' && contrat && signe && (
             <div className="carte p-6 md:p-10 text-center" role="status">
               <CheckCircle2 className="w-14 h-14 text-green-700 mx-auto mb-4" aria-hidden="true" />
-              <h1 ref={titre} tabIndex={-1} className="text-[26px] md:text-[30px] mb-3 outline-none">C'est signé, merci !</h1>
+              <h1 ref={titre} tabIndex={-1} className="text-[26px] md:text-[30px] mb-3 outline-none">{t('signature.signe.titre')}</h1>
               <p className="text-gris max-w-xl mx-auto">
-                Votre {mandat ? 'contrat de dépôt-vente' : 'avenant'} ({contrat.reference}) est signé. Une copie vient de vous être
-                envoyée par e-mail ({contrat.email_masque}).
+                {t(mandat ? 'signature.signe.texte_mandat' : 'signature.signe.texte_avenant', { reference: contrat.reference, email: contrat.email_masque })}
               </p>
               <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
                 {signe.pdf && (
                   <a href={signe.pdf} rel="noreferrer" tabIndex={-1}>
-                    <Button size="lg" className="w-full sm:w-auto"><Download className="w-4 h-4" aria-hidden="true" /> Télécharger le contrat signé</Button>
+                    <Button size="lg" className="w-full sm:w-auto"><Download className="w-4 h-4" aria-hidden="true" /> {t('signature.signe.telecharger')}</Button>
                   </a>
                 )}
                 <Link to="/suivre-ma-vente" tabIndex={-1}>
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto">Suivre ma vente</Button>
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">{t('signature.signe.suivre')}</Button>
                 </Link>
               </div>
-              <p className="mt-6 text-sm text-gris">Vous pouvez suivre l'avancement de la vente à tout moment sur svmride.com/suivre-ma-vente.</p>
+              <p className="mt-6 text-sm text-gris">{t('signature.signe.mention')}</p>
             </div>
           )}
 
           {etat === 'pret' && contrat && (
             <div className="space-y-5">
               <div>
-                <p className="text-sm text-gris tabular-nums">Référence {contrat.reference}</p>
+                <p className="text-sm text-gris tabular-nums">{t('signature.reference', { reference: contrat.reference })}</p>
                 <h1 className="text-[24px] sm:text-[28px] md:text-[34px] filet-apres mb-2">{contrat.titre}</h1>
                 <p className="text-gris">
-                  Bonjour {contrat.deposant.split(' ')[0]}, voici {mandat ? 'votre contrat' : "l'avenant à votre contrat"} pour votre{' '}
+                  {t(mandat ? 'signature.intro.mandat' : 'signature.intro.avenant', { prenom: contrat.deposant.split(' ')[0] })}{' '}
                   <strong className="text-noir">{contrat.vehicule}</strong>{contrat.immatriculation ? ` (${contrat.immatriculation})` : ''}.
                 </p>
               </div>
 
               <div className="carte p-5 md:p-6">
-                <h2 className="text-lg font-semibold mb-4">L'essentiel</h2>
+                <h2 className="text-lg font-semibold mb-4">{t('signature.essentiel.titre')}</h2>
                 <dl className="grid sm:grid-cols-2 gap-x-6 gap-y-3 text-sm">
-                  <div><dt className="text-gris">Prix de vente affiché</dt><dd className="text-noir font-semibold text-base">{euros(contrat.prix_affiche)}</dd></div>
-                  <div><dt className="text-gris">Vous percevez (net vendeur)</dt><dd className="text-noir font-semibold text-base">{euros(contrat.net_vendeur)}</dd></div>
+                  <div><dt className="text-gris">{t('signature.essentiel.prix')}</dt><dd className="text-noir font-semibold text-base">{euros(contrat.prix_affiche)}</dd></div>
+                  <div><dt className="text-gris">{t('signature.essentiel.net')}</dt><dd className="text-noir font-semibold text-base">{euros(contrat.net_vendeur)}</dd></div>
                   {contrat.avenant ? (
                     <>
-                      <div><dt className="text-gris">Fin actuelle du mandat</dt><dd className="text-noir">{jour(contrat.avenant.ancienne_date_fin)}</dd></div>
-                      <div><dt className="text-gris">Nouvelle fin du mandat</dt><dd className="text-noir font-semibold">{jour(contrat.avenant.nouvelle_date_fin)}</dd></div>
+                      <div><dt className="text-gris">{t('signature.essentiel.fin_actuelle')}</dt><dd className="text-noir">{jour(contrat.avenant.ancienne_date_fin)}</dd></div>
+                      <div><dt className="text-gris">{t('signature.essentiel.nouvelle_fin')}</dt><dd className="text-noir font-semibold">{jour(contrat.avenant.nouvelle_date_fin)}</dd></div>
                     </>
                   ) : (
                     <>
-                      <div><dt className="text-gris">Durée</dt><dd className="text-noir">{contrat.duree_mois} mois, du {jour(contrat.date_debut)} au {jour(contrat.date_fin)}</dd></div>
-                      <div><dt className="text-gris">Paiement</dt><dd className="text-noir">Par virement, sous 48 h après l'encaissement de la vente</dd></div>
-                      <div><dt className="text-gris">Exclusivité</dt><dd className="text-noir">Pas d'autre annonce pendant le mandat</dd></div>
-                      <div><dt className="text-gris">Reprise avant la fin</dt><dd className="text-noir">Indemnité de {euros(contrat.frais_resiliation)}</dd></div>
+                      <div><dt className="text-gris">{t('signature.essentiel.duree')}</dt><dd className="text-noir">{t('signature.essentiel.duree_texte', { mois: contrat.duree_mois, debut: jour(contrat.date_debut), fin: jour(contrat.date_fin) })}</dd></div>
+                      <div><dt className="text-gris">{t('signature.essentiel.paiement')}</dt><dd className="text-noir">{t('signature.essentiel.paiement_texte')}</dd></div>
+                      <div><dt className="text-gris">{t('signature.essentiel.exclusivite')}</dt><dd className="text-noir">{t('signature.essentiel.exclusivite_texte')}</dd></div>
+                      <div><dt className="text-gris">{t('signature.essentiel.reprise')}</dt><dd className="text-noir">{t('signature.essentiel.reprise_texte', { montant: euros(contrat.frais_resiliation) })}</dd></div>
                       <div className="sm:col-span-2">
-                        <dt className="text-gris">Après le mandat</dt>
-                        <dd className="text-noir">Gardiennage de {euros(contrat.gardiennage_par_jour)} par jour à partir du {contrat.gardiennage_delai_jours}e jour si la moto n'est pas récupérée</dd>
+                        <dt className="text-gris">{t('signature.essentiel.apres')}</dt>
+                        <dd className="text-noir">{t('signature.essentiel.apres_texte', { montant: euros(contrat.gardiennage_par_jour), jours: contrat.gardiennage_delai_jours })}</dd>
                       </div>
                     </>
                   )}
                 </dl>
                 <p className="text-xs text-gris mt-4">
-                  Ce résumé ne remplace pas le contrat : lisez le document complet avant de signer.
+                  {t('signature.essentiel.avertissement')}
                 </p>
               </div>
 
@@ -235,21 +236,20 @@ export function Signature() {
                     lu ? 'bg-surface text-noir border-or hover:bg-fond' : 'bg-bleu text-sur-bouton border-transparent hover:bg-bleu-hover'
                   }`}
                 >
-                  <FileText className="w-4 h-4" aria-hidden="true" /> {lu ? 'Relire le contrat (PDF)' : 'Lire le contrat complet (PDF)'}
+                  <FileText className="w-4 h-4" aria-hidden="true" /> {lu ? t('signature.relire') : t('signature.lire')}
                 </a>
-                <p className="text-xs text-gris mt-2">S'ouvre dans un nouvel onglet. Empreinte du document : {contrat.empreinte.slice(0, 16)}…</p>
+                <p className="text-xs text-gris mt-2">{t('signature.lire_aide', { empreinte: contrat.empreinte.slice(0, 16) })}</p>
 
                 <div className="mt-6 space-y-4">
                   <label className="flex items-start gap-3 text-sm text-noir leading-relaxed">
                     <input type="checkbox" checked={accord} onChange={(e) => setAccord(e.target.checked)} className="mt-1 w-5 h-5 flex-shrink-0 accent-bleu" />
-                    <span>J'ai lu l'intégralité du {mandat ? 'contrat' : "de l'avenant"} et j'en accepte les termes.</span>
+                    <span>{t(mandat ? 'signature.accord.mandat' : 'signature.accord.avenant')}</span>
                   </label>
                   {mandat && (
                     <label className="flex items-start gap-3 text-sm text-noir leading-relaxed">
                       <input type="checkbox" checked={renonciation} onChange={(e) => setRenonciation(e.target.checked)} className="mt-1 w-5 h-5 flex-shrink-0 accent-bleu" />
                       <span>
-                        Je demande l'exécution immédiate du mandat (mise en vente dès aujourd'hui) et je renonce expressément au délai de
-                        rétractation, dans la mesure où il s'appliquerait.
+                        {t('signature.renonciation')}
                       </span>
                     </label>
                   )}
@@ -258,19 +258,19 @@ export function Signature() {
 
               <form data-zone="formulaires" onSubmit={signer} className="carte p-5 md:p-6 space-y-4" aria-labelledby="t-signer">
                 <h2 id="t-signer" className="text-lg font-semibold flex items-center gap-2">
-                  <ShieldCheck className="w-5 h-5 text-lien" aria-hidden="true" /> Signer
+                  <ShieldCheck className="w-5 h-5 text-lien" aria-hidden="true" /> {t('signature.signer.titre')}
                 </h2>
                 <p className="text-sm text-gris">
-                  Pour signer, nous vous envoyons un code à 6 chiffres à {contrat.email_masque}. Ce code vaut signature : ne le communiquez à personne.
+                  {t('signature.signer.texte', { email: contrat.email_masque })}
                 </p>
                 {!codeEnvoye ? (
                   <Button type="button" size="lg" onClick={demanderCode} disabled={!pretACoder || !!envoi} className="w-full sm:w-auto">
-                    {envoi ?? 'Recevoir mon code de signature'}
+                    {envoi ?? t('signature.code.demander')}
                   </Button>
                 ) : (
                   <>
                     <div>
-                      <label htmlFor="code" className="block text-sm font-medium text-noir mb-2">Code reçu par e-mail</label>
+                      <label htmlFor="code" className="block text-sm font-medium text-noir mb-2">{t('signature.code.champ')}</label>
                       <input
                         ref={champCode}
                         id="code"
@@ -282,19 +282,19 @@ export function Signature() {
                         onChange={(e) => setCode(e.target.value.replace(/[^\d]/g, '').slice(0, 6))}
                         className="w-full sm:w-56 px-4 py-3 bg-surface text-noir border-[1.5px] border-champ rounded-xl text-2xl tracking-[0.4em] tabular-nums focus:outline-none focus:border-lien focus:ring-4 focus:ring-lien/15"
                       />
-                      <p className="text-xs text-gris mt-1">Valable 10 minutes. Pensez à regarder dans vos courriers indésirables.</p>
+                      <p className="text-xs text-gris mt-1">{t('signature.code.aide')}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Button type="submit" size="lg" disabled={!pretACoder || !!envoi || code.length !== 6} className="w-full sm:w-auto">
-                        {envoi ?? `Signer ${mandat ? 'le contrat' : "l'avenant"}`}
+                        {envoi ?? t(mandat ? 'signature.code.signer_mandat' : 'signature.code.signer_avenant')}
                       </Button>
                       <Button type="button" variant="outline" onClick={demanderCode} disabled={!!envoi || attente > 0} className="w-full sm:w-auto">
-                        {attente > 0 ? `Renvoyer le code (${attente} s)` : 'Renvoyer le code'}
+                        {attente > 0 ? t('signature.code.renvoyer_attente', { n: attente }) : t('signature.code.renvoyer')}
                       </Button>
                     </div>
                   </>
                 )}
-                {!pretACoder && <p className="text-xs text-gris">Cochez d'abord {mandat ? 'les deux cases' : 'la case'} ci-dessus.</p>}
+                {!pretACoder && <p className="text-xs text-gris">{t(mandat ? 'signature.cocher.mandat' : 'signature.cocher.avenant')}</p>}
                 {message && (
                   <div role="alert" className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-xl text-sm">{message}</div>
                 )}
@@ -302,7 +302,7 @@ export function Signature() {
               </form>
 
               <p className="text-sm text-gris">
-                Une question avant de signer ? Appelez-nous au{' '}
+                {t('signature.question')}{' '}
                 <a href={`tel:${tel.replace(/\s/g, '')}`} className="lien whitespace-nowrap">{tel}</a>.
               </p>
             </div>

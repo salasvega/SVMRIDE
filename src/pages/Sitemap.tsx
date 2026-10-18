@@ -4,30 +4,32 @@ import { pageSeo } from '../config/seo';
 import { Section } from '../components/ui/Section';
 import { Container } from '../components/ui/Container';
 import { useEquipe } from '../lib/equipe';
+import { useTexte } from '../lib/textes';
 
 export function Sitemap() {
+  const t = useTexte();
   const equipe = useEquipe();
   const siteStructure = [
     {
-      title: 'Pages principales',
+      title: t('plan.principales.titre'),
       links: [
-        { href: '/', label: 'Accueil' },
-        { href: '/vehicules', label: 'Nos Véhicules' },
-        { href: '/reprises', label: 'Reprise de véhicule' },
-        { href: '/vendre-ma-moto', label: 'Dépôt-vente' },
-        { href: '/financement', label: 'Solutions de financement' },
-        { href: '/recherche-personnalisee', label: 'Recherche personnalisée' },
-        ...(equipe?.affichee ? [{ href: '/equipe', label: 'Notre équipe' }] : []),
-        { href: '/contact', label: 'Contact' },
+        { href: '/', label: t('plan.principales.accueil') },
+        { href: '/vehicules', label: t('plan.principales.vehicules') },
+        { href: '/reprises', label: t('plan.principales.reprises') },
+        { href: '/vendre-ma-moto', label: t('plan.principales.depot_vente') },
+        { href: '/financement', label: t('plan.principales.financement') },
+        { href: '/recherche-personnalisee', label: t('plan.principales.recherche') },
+        ...(equipe?.affichee ? [{ href: '/equipe', label: t('plan.principales.equipe') }] : []),
+        { href: '/contact', label: t('plan.principales.contact') },
       ],
     },
     {
-      title: 'Informations légales',
+      title: t('plan.legales.titre'),
       links: [
-        { href: '/mentions-legales', label: 'Mentions légales' },
-        { href: '/politique-confidentialite', label: 'Politique de confidentialité' },
-        { href: '/politique-cookies', label: 'Politique des cookies' },
-        { href: '/plan-du-site', label: 'Plan du site' },
+        { href: '/mentions-legales', label: t('plan.legales.mentions') },
+        { href: '/politique-confidentialite', label: t('plan.legales.confidentialite') },
+        { href: '/politique-cookies', label: t('plan.legales.cookies') },
+        { href: '/plan-du-site', label: t('plan.legales.plan') },
       ],
     },
   ];
@@ -39,7 +41,7 @@ export function Sitemap() {
       <Section background="gray" className="!pt-8 !pb-8 md:!pt-12 md:!pb-10">
         <Container>
           <h1 className="filet-apres">
-            Plan du Site
+            {t('plan.titre')}
           </h1>
         </Container>
       </Section>

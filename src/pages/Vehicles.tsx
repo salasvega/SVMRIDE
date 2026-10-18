@@ -14,6 +14,9 @@ import { VehicleFilters, VehicleStatus } from '../types/vehicle';
 import { useVehicles } from '../hooks/useVehicles';
 import { useTexte } from '../lib/textes';
 
+/** Fin des clés de texte de chaque statut (page « Nos véhicules » des Textes du site) */
+const CLE_STATUT: Record<VehicleStatus, string> = { available: 'disponible', reserved: 'reserve', sold: 'vendu' };
+
 export function Vehicles() {
   const t = useTexte();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -80,9 +83,11 @@ export function Vehicles() {
 
   const compteur = (() => {
     const total = vehicles.length;
-    const vehicule = `${total} véhicule${total > 1 ? 's' : ''}${nomActif ? ` ${nomActif}` : ''}`;
-    const mot = (st: (typeof STATUTS)[number], n: number) => (n > 1 ? st.pluriel : st.libelle.toLowerCase());
-    if (total === 0) return `Aucun véhicule${nomActif ? ` ${nomActif}` : ''} pour le moment`;
+    const vehicule = nomActif
+      ? t(total > 1 ? 'vehicules.compteur.plusieurs_marque' : 'vehicules.compteur.un_marque', { n: total, marque: nomActif })
+      : t(total > 1 ? 'vehicules.compteur.plusieurs' : 'vehicules.compteur.un', { n: total });
+    const mot = (st: (typeof STATUTS)[number], n: number) => t(`vehicules.compteur.${CLE_STATUT[st.valeur]}${n > 1 ? 's' : ''}`);
+    if (total === 0) return nomActif ? t('vehicules.compteur.aucun_marque', { marque: nomActif }) : t('vehicules.compteur.aucun');
     if (filters.status) {
       const st = STATUTS.find((x) => x.valeur === filters.status)!;
       return `${vehicule} ${mot(st, total)}`;
@@ -151,14 +156,15 @@ export function Vehicles() {
   const activeFiltersCount = Object.values(filters).filter(v => v !== undefined).length;
 
   const getFilterLabel = (key: keyof VehicleFilters, value: string | number) => {
+    const statut = STATUTS.find((st) => st.valeur === value);
     const labels: Record<string, string> = {
       brand: nomMarque(String(value)),
-      status: STATUTS.find((st) => st.valeur === value)?.libelle ?? String(value),
-      type: value === 'moto' ? 'Moto' : 'Scooter',
-      displacementMin: `≥ ${value} cc`,
-      displacementMax: `≤ ${value} cc`,
-      yearMin: `≥ ${value}`,
-      priceMax: `≤ ${value.toLocaleString('fr-FR')} €`,
+      status: statut ? t(`vehicules.filtres.statut.${CLE_STATUT[statut.valeur]}`) : String(value),
+      type: value === 'moto' ? t('vehicules.filtres.type.moto') : t('vehicules.filtres.type.scooter'),
+      displacementMin: t('vehicules.filtres_actifs.cylindree_min', { n: value }),
+      displacementMax: t('vehicules.filtres_actifs.cylindree_max', { n: value }),
+      yearMin: t('vehicules.filtres_actifs.annee_min', { n: value }),
+      priceMax: t('vehicules.filtres_actifs.prix_max', { prix: value.toLocaleString('fr-FR') }),
     };
     return labels[key] || String(value);
   };
@@ -173,7 +179,7 @@ export function Vehicles() {
             {t('vehicules.titre')}
           </h1>
           <p className="text-base md:text-lg text-gris mb-6" aria-live="polite">
-            {loading ? 'Chargement...' : compteur}
+            {loading ? t('vehicules.compteur.chargement') : compteur}
           </p>
 
           <div className="space-y-4 mb-8">
@@ -181,7 +187,7 @@ export function Vehicles() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gris pointer-events-none" aria-hidden="true" />
               <input
                 type="text"
-                placeholder="Rechercher une marque ou un modèle..."
+                placeholder={t('vehicules.recherche.placeholder')}
                 aria-label="Rechercher une marque ou un modèle"
                 value={searchQuery}
                 onChange={(e) => updateSearch(e.target.value)}
@@ -198,7 +204,7 @@ export function Vehicles() {
                 <div className="flex items-center gap-3">
                   <SlidersHorizontal className="w-5 h-5 text-lien" aria-hidden="true" />
                   <span className="font-semibold text-noir">
-                    Filtres avancés
+                    {t('vehicules.filtres.titre')}
                   </span>
                   {activeFiltersCount > 0 && (
                     <span className="min-w-[22px] px-2 py-0.5 bg-bleu text-sur-bouton text-xs font-semibold rounded-full text-center">
@@ -217,11 +223,11 @@ export function Vehicles() {
                 <div className="px-5 md:px-6 pb-6 border-t border-bordure">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
                     <Select
-                      label="Marque"
+                      label={t('vehicules.filtres.marque')}
                       value={cleActive}
                       onChange={(e) => updateFilter('brand', e.target.value)}
                     >
-                      <option value="">Toutes les marques</option>
+                      <option value="">{t('vehicules.filtres.marque_toutes')}</option>
                       {brands.map(({ cle, nom }) => (
                         <option key={cle} value={cle}>
                           {nom}
@@ -230,46 +236,46 @@ export function Vehicles() {
                     </Select>
 
                     <Select
-                      label="Disponibilité"
+                      label={t('vehicules.filtres.statut')}
                       value={filters.status || ''}
                       onChange={(e) => updateFilter('status', e.target.value)}
                     >
-                      <option value="">Tous les statuts</option>
+                      <option value="">{t('vehicules.filtres.statut_tous')}</option>
                       {STATUTS.map((st) => (
                         <option key={st.valeur} value={st.valeur}>
-                          {st.libelle} ({parStatut[st.valeur]})
+                          {t(`vehicules.filtres.statut.${CLE_STATUT[st.valeur]}`)} ({parStatut[st.valeur]})
                         </option>
                       ))}
                     </Select>
 
                     <Select
-                      label="Type"
+                      label={t('vehicules.filtres.type')}
                       value={filters.type || ''}
                       onChange={(e) => updateFilter('type', e.target.value)}
                     >
-                      <option value="">Tous les types</option>
-                      <option value="moto">Moto</option>
-                      <option value="scooter">Scooter</option>
+                      <option value="">{t('vehicules.filtres.type_tous')}</option>
+                      <option value="moto">{t('vehicules.filtres.type.moto')}</option>
+                      <option value="scooter">{t('vehicules.filtres.type.scooter')}</option>
                     </Select>
 
                     <Select
-                      label="Cylindrée min"
+                      label={t('vehicules.filtres.cylindree')}
                       value={filters.displacementMin || ''}
                       onChange={(e) => updateFilter('displacementMin', e.target.value)}
                     >
-                      <option value="">Aucune</option>
-                      <option value="125">125 cc</option>
-                      <option value="300">300 cc</option>
-                      <option value="500">500 cc</option>
-                      <option value="650">650 cc</option>
+                      <option value="">{t('vehicules.filtres.cylindree_aucune')}</option>
+                      <option value="125">{t('vehicules.filtres.cylindree_option', { n: 125 })}</option>
+                      <option value="300">{t('vehicules.filtres.cylindree_option', { n: 300 })}</option>
+                      <option value="500">{t('vehicules.filtres.cylindree_option', { n: 500 })}</option>
+                      <option value="650">{t('vehicules.filtres.cylindree_option', { n: 650 })}</option>
                     </Select>
 
                     <Select
-                      label="Année min"
+                      label={t('vehicules.filtres.annee')}
                       value={filters.yearMin || ''}
                       onChange={(e) => updateFilter('yearMin', e.target.value)}
                     >
-                      <option value="">Toutes</option>
+                      <option value="">{t('vehicules.filtres.annee_toutes')}</option>
                       <option value="2018">2018</option>
                       <option value="2019">2019</option>
                       <option value="2020">2020</option>
@@ -278,15 +284,15 @@ export function Vehicles() {
                     </Select>
 
                     <Select
-                      label="Prix max"
+                      label={t('vehicules.filtres.prix')}
                       value={filters.priceMax || ''}
                       onChange={(e) => updateFilter('priceMax', e.target.value)}
                     >
-                      <option value="">Aucun</option>
-                      <option value="3000">3 000 €</option>
-                      <option value="5000">5 000 €</option>
-                      <option value="7000">7 000 €</option>
-                      <option value="10000">10 000 €</option>
+                      <option value="">{t('vehicules.filtres.prix_aucun')}</option>
+                      <option value="3000">{t('vehicules.filtres.prix_option', { prix: '3 000' })}</option>
+                      <option value="5000">{t('vehicules.filtres.prix_option', { prix: '5 000' })}</option>
+                      <option value="7000">{t('vehicules.filtres.prix_option', { prix: '7 000' })}</option>
+                      <option value="10000">{t('vehicules.filtres.prix_option', { prix: '10 000' })}</option>
                     </Select>
                   </div>
 
@@ -297,7 +303,7 @@ export function Vehicles() {
             {/* Filtres actifs, toujours visibles (même panneau replié) */}
             {activeFiltersCount > 0 && (
               <div className="flex flex-wrap items-center gap-2" aria-label="Filtres actifs" role="group">
-                <span className="text-sm font-semibold text-noir mr-1">Filtres actifs :</span>
+                <span className="text-sm font-semibold text-noir mr-1">{t('vehicules.filtres_actifs.titre')}</span>
                 {Object.entries(filters).map(([key, value]) => {
                   if (value === undefined) return null;
                   const libelle = getFilterLabel(key as keyof VehicleFilters, value);
@@ -319,7 +325,7 @@ export function Vehicles() {
                   );
                 })}
                 <button type="button" onClick={clearAllFilters} className="lien text-sm ml-1">
-                  Tout effacer
+                  {t('vehicules.filtres_actifs.effacer')}
                 </button>
               </div>
             )}
@@ -327,7 +333,7 @@ export function Vehicles() {
 
           {loading ? (
             <div className="text-center py-12">
-              <p className="text-base md:text-lg text-gris">Chargement des véhicules...</p>
+              <p className="text-base md:text-lg text-gris">{t('vehicules.liste.chargement')}</p>
             </div>
           ) : error ? (
             <div className="text-center py-12">
@@ -338,13 +344,13 @@ export function Vehicles() {
               <div className="carte text-center px-6 py-10 md:py-12 mb-8">
                 <p className="titre-display text-[22px] md:text-2xl mb-2">{nomActif}</p>
                 <p className="text-base md:text-lg text-gris mb-6">
-                  Aucune moto disponible actuellement pour cette marque.
+                  {t('vehicules.liste.marque_sans_stock')}
                 </p>
-                <Button type="button" onClick={clearAllFilters}>Voir toutes les motos</Button>
+                <Button type="button" onClick={clearAllFilters}>{t('vehicules.liste.marque_sans_stock_bouton')}</Button>
               </div>
               {vehicles.length > 0 && (
                 <>
-                  <h2 className="text-base font-semibold text-noir mb-4">Déjà réservées ou vendues</h2>
+                  <h2 className="text-base font-semibold text-noir mb-4">{t('vehicules.liste.deja_vendues')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
                     {vehicles.map((vehicle) => (
                       <VehicleCard key={vehicle.id} vehicle={vehicle} />
@@ -356,7 +362,7 @@ export function Vehicles() {
           ) : vehicles.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-base md:text-lg text-gris">
-                Aucun véhicule ne correspond à vos critères. Essayez de modifier les filtres.
+                {t('vehicules.liste.aucun_resultat')}
               </p>
             </div>
           ) : (

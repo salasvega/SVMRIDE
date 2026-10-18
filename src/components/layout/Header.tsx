@@ -9,6 +9,16 @@ import { useFermerAuDefilement } from '../../hooks/useFermerAuDefilement';
 import { useIdentite } from '../../lib/identite';
 import { icones } from '../../config/identite';
 
+// Libellés du menu : textes « navigation.menu.<cle> » (adresse → clé)
+const CLES_MENU: Record<string, string> = {
+  '/': 'accueil',
+  '/vehicules': 'vehicules',
+  '/reprises': 'reprises',
+  '/vendre-ma-moto': 'depot_vente',
+  '/financement': 'financement',
+  '/recherche-personnalisee': 'recherche',
+};
+
 export function Header() {
   const t = useTexte();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,6 +34,8 @@ export function Header() {
     window.addEventListener('keydown', echap);
     return () => window.removeEventListener('keydown', echap);
   }, [mobileMenuOpen]);
+
+  const libelle = (link: (typeof navLinks)[number]) => (CLES_MENU[link.href] ? t(`navigation.menu.${CLES_MENU[link.href]}`) : link.label);
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -70,12 +82,12 @@ export function Header() {
                     : 'text-gris after:opacity-0'
                 }`}
               >
-                {link.label}
+                {libelle(link)}
               </Link>
             ))}
 
             <Link to="/contact" tabIndex={-1}>
-              <Button size="sm" variant="secondary">Contactez-nous</Button>
+              <Button size="sm" variant="secondary">{t('navigation.contact')}</Button>
             </Link>
           </div>
 
@@ -126,7 +138,7 @@ export function Header() {
                 }}
                 onClick={() => setMobileMenuOpen(false)}
               >
-                {link.label}
+                {libelle(link)}
               </Link>
             ))}
 
@@ -143,7 +155,7 @@ export function Header() {
                 transitionDelay: mobileMenuOpen ? `${navLinks.length * 50}ms` : '0ms'
               }}
             >
-              <Button fullWidth>Contactez-nous</Button>
+              <Button fullWidth>{t('navigation.contact')}</Button>
             </Link>
           </div>
         </div>

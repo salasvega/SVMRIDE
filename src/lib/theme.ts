@@ -10,7 +10,8 @@
  *   /?apercu=1 verrait le site normal. Rien n'est enregistré.
  */
 import { cssAdmin, cssDuTheme, themeValide, urlPolices, type CleSection, type ThemeConfig } from '../config/design';
-import { apercuTextes } from './textes';
+import { apercuTextes, marquerTextes } from './textes';
+import { demarrerEdition } from './edition';
 import { apercuFondAccueil } from './medias';
 import type { FondAccueil } from '../config/medias';
 
@@ -22,7 +23,6 @@ export type MessageApercu =
   | { type: 'svm-apercu'; config: ThemeConfig | null }
   | { type: 'svm-apercu-zone'; zone: CleSection | null }
   | { type: 'svm-apercu-textes'; textes: Record<string, string> | null }
-  | { type: 'svm-apercu-repere'; texte: string | null }
   | { type: 'svm-apercu-fond'; fond: FondAccueil | null | undefined }
   | { type: 'svm-apercu-pret'; chemin: string };
 
@@ -82,28 +82,6 @@ export function demarrerApercu() {
       apercuFondAccueil(m.fond && typeof m.fond === 'object' ? m.fond : m.fond === null ? null : undefined);
     } else if (m?.type === 'svm-apercu-textes') {
       apercuTextes(m.textes && typeof m.textes === 'object' ? m.textes : null);
-    } else if (m?.type === 'svm-apercu-repere') {
-      // Entoure le texte en cours de modification et le montre
-      document.querySelectorAll('[data-repere-texte]').forEach((el) => el.removeAttribute('data-repere-texte'));
-      const net = (s: string) => s.replace(/\s+/g, ' ').trim();
-      const cherche = typeof m.texte === 'string' ? net(m.texte).slice(0, 60) : '';
-      if (cherche) {
-        window.setTimeout(() => {
-          const contient = (el: Element) => !el.closest('script,style,noscript') && net(el.textContent ?? '').includes(cherche);
-          if (!contient(document.body)) return;
-          // L'élément le plus précis qui contient tout le texte cherché
-          let el: Element = document.body;
-          for (let suivant = Array.from(el.children).find(contient); suivant; suivant = Array.from(el.children).find(contient)) el = suivant;
-          if (el === document.body) return;
-          el.setAttribute('data-repere-texte', '');
-          // Défilement dans l'aperçu seulement (pas de la page de l'admin autour)
-          const r = el.getBoundingClientRect();
-          if (r.top < 60 || r.bottom > window.innerHeight - 20) {
-            window.scrollTo({ top: Math.max(0, window.scrollY + r.top - window.innerHeight / 2 + r.height / 2), behavior: 'smooth' });
-          }
-        }, 60);
-      }
-      poserStyle('theme-repere-texte', '[data-repere-texte]{outline:4px dashed #E11D48 !important;outline-offset:5px;border-radius:4px}');
     } else if (m?.type === 'svm-apercu-zone') {
       const zone = m.zone && /^[a-z]+$/.test(m.zone) ? m.zone : null;
       poserStyle(
@@ -113,6 +91,8 @@ export function demarrerApercu() {
       if (zone) document.querySelector(`[data-zone="${zone}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
   });
+  // Édition des textes sur la page (admin « Textes du site »)
+  demarrerEdition(marquerTextes);
   // L'admin renvoie le brouillon à chaque page chargée dans le cadre
   const signaler = () => window.parent.postMessage({ type: 'svm-apercu-pret', chemin: window.location.pathname } satisfies MessageApercu, window.location.origin);
   signaler();

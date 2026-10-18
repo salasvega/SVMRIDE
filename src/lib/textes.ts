@@ -10,6 +10,7 @@
 import { useSyncExternalStore } from 'react';
 import { supabase } from './supabase';
 import { CLE_TEXTES, normaliserTextes, texte, type Textes } from '../config/textes';
+import { marquer } from './edition';
 
 const MEMOIRE = 'svm-textes';
 
@@ -38,6 +39,8 @@ function initiaux(): Textes {
 
 let courants: Textes = initiaux();
 let apercu: Textes | null = null;
+/** Aperçu de l'admin : textes entourés de repères invisibles (édition sur la page) */
+let marquage = false;
 let lus = false;
 const abonnes = new Set<() => void>();
 const prevenir = () => abonnes.forEach((f) => f());
@@ -76,6 +79,14 @@ export function apercuTextes(t: Textes | null) {
   prevenir();
 }
 
+/** Édition sur la page (aperçu de l'admin seulement) */
+export function marquerTextes(actif: boolean) {
+  if (marquage === actif) return;
+  marquage = actif;
+  apercu = { ...(apercu ?? courants) }; // nouvel objet : tout le site se redessine
+  prevenir();
+}
+
 const lire = () => apercu ?? courants;
 const sAbonner = (f: () => void) => {
   abonnes.add(f);
@@ -92,5 +103,5 @@ export function useTextes(): Textes {
 export type FonctionTexte = (cle: string, variables?: Record<string, string | number>) => string;
 export function useTexte(): FonctionTexte {
   const t = useTextes();
-  return (cle, variables) => texte(t, cle, variables);
+  return marquage ? (cle, variables) => marquer(cle, texte(t, cle, variables)) : (cle, variables) => texte(t, cle, variables);
 }

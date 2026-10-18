@@ -41,7 +41,7 @@ export function Contact() {
     name: '',
     email: '',
     subject: vehicleRef
-      ? `Demande d'information - ${vehicleRef}`
+      ? t('contact.formulaire.sujet_vehicule', { vehicule: vehicleRef })
       : '',
     message: '',
     consent: false,
@@ -152,7 +152,7 @@ export function Contact() {
             {/* Colonne gauche : infos de contact */}
             <div>
               <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
-                Nos coordonnées
+                {t('contact.coordonnees.titre')}
               </h2>
 
               {/* Carte de visite du contact principal (admin : Édition du site › Contact) */}
@@ -165,7 +165,7 @@ export function Contact() {
                     aria-hidden="true"
                   />
                   <h3 className="font-semibold text-noir text-xl">
-                    Notre showroom
+                    {t('contact.showroom.titre')}
                   </h3>
                 </div>
 
@@ -195,7 +195,7 @@ export function Contact() {
                           </div>
                         )}
                         <div className="text-xs text-lien font-medium mt-2 flex items-center gap-1">
-                          <span>Voir sur Google Maps</span>
+                          <span>{t('contact.showroom.lien_maps')}</span>
                           <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
@@ -211,7 +211,7 @@ export function Contact() {
                       className="w-5 h-5 text-or-texte flex-shrink-0 mt-0.5"
                       aria-hidden="true"
                     />
-                    <h4 className="font-semibold text-noir">Horaires</h4>
+                    <h4 className="font-semibold text-noir">{t('contact.horaires.titre')}</h4>
                   </div>
                   <div className="pl-8 text-sm text-gris space-y-1">
                     {lignesHoraires(c.horaires).map((l) => <div key={l}>{l}</div>)}
@@ -231,12 +231,10 @@ export function Contact() {
                 <div className="bg-green-50 border-2 border-green-500 rounded-xl p-8 text-center">
                   <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                   <h3 className="text-2xl font-bold text-green-900 mb-2">
-                    Message envoyé !
+                    {t('contact.confirmation.titre')}
                   </h3>
                   <p className="text-green-800">
-                    Nous avons bien reçu votre message. Notre
-                    équipe vous répondra dans les plus brefs
-                    délais.
+                    {t('contact.confirmation.texte')}
                   </p>
                 </div>
               ) : (
@@ -245,11 +243,11 @@ export function Contact() {
                   className="space-y-6 bg-fond p-8 rounded-xl"
                 >
                   <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
-                    Envoyez-nous un message
+                    {t('contact.formulaire.titre')}
                   </h2>
 
                   <Input
-                    label="Nom complet"
+                    label={t('contact.formulaire.nom')}
                     name="name"
                     type="text"
                     required
@@ -258,7 +256,7 @@ export function Contact() {
                   />
 
                   <Input
-                    label="Email"
+                    label={t('contact.formulaire.email')}
                     name="email"
                     type="email"
                     required
@@ -267,7 +265,7 @@ export function Contact() {
                   />
 
                   <Input
-                    label="Sujet"
+                    label={t('contact.formulaire.sujet')}
                     name="subject"
                     type="text"
                     required
@@ -276,7 +274,7 @@ export function Contact() {
                   />
 
                   <Textarea
-                    label="Message"
+                    label={t('contact.formulaire.message')}
                     name="message"
                     required
                     rows={6}
@@ -286,7 +284,7 @@ export function Contact() {
 
                   <FileUpload
                     elements="fichiers"
-                    label="Pièces jointes (optionnel)"
+                    label={t('contact.formulaire.pieces')}
                     maxFiles={10}
                     maxSizeMB={10}
                     accept="image/*,application/pdf"
@@ -308,16 +306,14 @@ export function Contact() {
                       htmlFor="consent"
                       className="text-sm text-gris"
                     >
-                      J'accepte que mes données soient
-                      utilisées pour traiter ma demande
-                      conformément à la{' '}
+                      {t('contact.formulaire.consentement_avant')}{' '}
                       <a
                         href="/politique-confidentialite"
                         className="text-lien underline underline-offset-2 hover:decoration-2"
                       >
-                        politique de confidentialité
+                        {t('contact.formulaire.consentement_lien')}
                       </a>
-                      .{' '}
+                      {t('contact.formulaire.consentement_apres')}{' '}
                       <span className="text-lien">
                         *
                       </span>
@@ -333,7 +329,7 @@ export function Contact() {
                   {/* Indicateur visuel pendant l'envoi des pièces jointes */}
                   {uploadingFiles && (
                     <div className="text-sm text-gris bg-surface/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
-                      Téléversement des documents...
+                      {t('contact.formulaire.televersement')}
                     </div>
                   )}
 
@@ -344,10 +340,10 @@ export function Contact() {
                     size="lg"
                   >
                     {uploadingFiles
-                      ? 'Téléversement des documents...'
+                      ? t('contact.formulaire.bouton_televersement')
                       : isSubmitting
-                      ? 'Envoi en cours...'
-                      : 'Envoyer le message'}
+                      ? t('contact.formulaire.bouton_envoi')
+                      : t('contact.formulaire.bouton')}
                   </Button>
                 </form>
               )}

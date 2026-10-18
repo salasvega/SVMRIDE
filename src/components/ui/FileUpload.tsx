@@ -6,6 +6,7 @@ import {
   FileText,
   AlertTriangle,
 } from 'lucide-react';
+import { useTexte } from '../../lib/textes';
 
 // Représente un fichier uploadé enrichi de métadonnées utiles à l'UI
 export type UploadedDoc = {
@@ -37,6 +38,7 @@ export function FileUpload({
   elements = 'fichiers',
   aide,
 }: FileUploadProps) {
+  const t = useTexte();
   // état local visuel
   const [dragOver, setDragOver] = useState(false);
   const [error, setError] = useState('');
@@ -298,18 +300,18 @@ export function FileUpload({
             <UploadIcon className="w-8 h-8 text-doux-62 mb-2 pointer-events-none" />
 
             <p className={`text-sm leading-snug text-center ${SOURIS_SEULEMENT}`}>
-              Glissez-déposez vos {elements}
+              {t('fichiers.multiple.glisser', { elements })}
               <br />
               <span className="text-doux-64">
-                ou cliquez pour parcourir
+                {t('fichiers.multiple.parcourir')}
               </span>
             </p>
             <ChoixSource onFichiers={addFiles} accept={accept} className="mt-1" />
 
             <p className="text-[11px] text-doux-62 mt-2 leading-snug">
-              {value.length}/{maxFiles} fichier(s) ajouté(s)
+              {t('fichiers.multiple.compteur', { n: value.length, max: maxFiles })}
               <br />
-              Max {maxSizeMB} Mo / fichier
+              {t('fichiers.multiple.taille', { taille: maxSizeMB })}
             </p>
           </div>
         </div>
@@ -347,7 +349,7 @@ export function FileUpload({
                       <div className="text-[#D97706] flex items-center gap-1 mt-1 text-[11px] leading-tight">
                         <AlertTriangle className="w-3 h-3 flex-shrink-0" />
                         <span>
-                          Qualité faible : photo floue ou trop petite
+                          {t('fichiers.multiple.qualite')}
                         </span>
                       </div>
                     )}

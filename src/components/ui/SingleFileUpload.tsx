@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Upload, X, FileText, AlertTriangle } from 'lucide-react';
 import { ChoixSource, SOURIS_SEULEMENT } from './ChoixSource';
+import { useTexte } from '../../lib/textes';
 
 interface SingleFileUploadProps {
   label?: string;
@@ -25,6 +26,7 @@ export function SingleFileUpload({
   accept = 'image/*,.pdf',
   required = false,
 }: SingleFileUploadProps) {
+  const t = useTexte();
   const [error, setError] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
@@ -198,7 +200,7 @@ export function SingleFileUpload({
                   <div className="text-[#D97706] flex items-center gap-1 mt-1 text-[11px] leading-tight">
                     <AlertTriangle className="w-3 h-3 flex-shrink-0" />
                     <span>
-                      Qualité faible : photo floue ou trop petite
+                      {t('fichiers.unique.qualite')}
                     </span>
                   </div>
                 )}
@@ -235,7 +237,7 @@ export function SingleFileUpload({
             >
               <Upload className="w-5 h-5 text-doux-62" />
               <span className="text-sm text-gris">
-                Cliquer pour choisir un fichier
+                {t('fichiers.unique.choisir')}
               </span>
             </button>
             <ChoixSource

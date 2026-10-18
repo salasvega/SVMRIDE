@@ -161,7 +161,7 @@ export function Financing() {
               <div className="flex items-center gap-3 mb-6">
                 <Calculator className="w-8 h-8 text-or-clair" strokeWidth={1.6} aria-hidden="true" />
                 <h2 className="text-[26px] md:text-[30px]">
-                  Simulateur de crédit
+                  {t('financement.simulateur.titre')}
                 </h2>
               </div>
 
@@ -169,8 +169,7 @@ export function Financing() {
                 {/* Montant */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Montant du financement:{' '}
-                    {simulatorData.amount.toLocaleString('fr-FR')} €
+                    {t('financement.simulateur.montant', { montant: simulatorData.amount.toLocaleString('fr-FR') })}
                   </label>
                   <input
                     type="range"
@@ -189,7 +188,7 @@ export function Financing() {
                 {/* Durée */}
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Durée: {simulatorData.duration} mois
+                    {t('financement.simulateur.duree', { duree: simulatorData.duration })}
                   </label>
                   <input
                     type="range"
@@ -207,7 +206,7 @@ export function Financing() {
                 </div>
                 <div></div>
 <label className="block text-sm font-medium mb-2">
-                    Taux (TAEG): {simulatorData.rate} %
+                    {t('financement.simulateur.taux', { taux: simulatorData.rate })}
                   </label>
                 {/* Taux *
                 <div>
@@ -233,22 +232,22 @@ export function Financing() {
 
                 {/* Estimation */}
                 <div className="bg-inverse/[0.06] backdrop-blur-sm p-6 rounded-xl mt-8 border border-inverse/15">
-                  <p className="text-sm mb-2">Mensualité estimée</p>
+                  <p className="text-sm mb-2">{t('financement.simulateur.mensualite')}</p>
                   <p className="font-display font-semibold text-[40px] leading-tight">{calculateMonthlyPayment()} €</p>
                   <p className="text-sm mt-2 opacity-90">
-                    par mois sur {simulatorData.duration} mois
+                    {t('financement.simulateur.par_mois', { duree: simulatorData.duration })}
                   </p>
 
                   {vehicleFromURL && (
                     <p className="text-xs opacity-90 mt-4">
-                      Véhicule sélectionné : {vehicleFromURL}
-                      {parsedPrice ? ` (${parsedPrice} €)` : '' }
+                      {t('financement.simulateur.vehicule', { vehicule: vehicleFromURL })}
+                      {parsedPrice ? ` ${t('financement.simulateur.vehicule_prix', { prix: parsedPrice })}` : '' }
                     </p>
                   )}
                 </div>
 
                 <p className="text-xs opacity-80">
-                  Cette simulation est indicative et ne constitue pas une offre de crédit.
+                  {t('financement.simulateur.mention')}
                 </p>
               </div>
             </div>
@@ -259,16 +258,16 @@ export function Financing() {
             {/* Avantages commerciaux */}
           <div>
   <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
-    Pourquoi financer avec nous ?
+    {t('financement.avantages.titre')}
   </h2>
 
   <div className="space-y-4">
     <div className="flex gap-4 p-4 bg-fond rounded-lg">
       <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
       <div>
-        <h3 className="font-semibold text-noir mb-1">Réponse rapide</h3>
+        <h3 className="font-semibold text-noir mb-1">{t('financement.avantages.1.titre')}</h3>
         <p className="text-sm text-gris">
-          Obtenez une réponse de principe en quelques heures
+          {t('financement.avantages.1.texte')}
         </p>
       </div>
     </div>
@@ -276,9 +275,9 @@ export function Financing() {
     <div className="flex gap-4 p-4 bg-fond rounded-lg">
       <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
       <div>
-        <h3 className="font-semibold text-noir mb-1">Taux compétitifs</h3>
+        <h3 className="font-semibold text-noir mb-1">{t('financement.avantages.2.titre')}</h3>
         <p className="text-sm text-gris">
-          Nous négocions les meilleurs taux pour vous
+          {t('financement.avantages.2.texte')}
         </p>
       </div>
     </div>
@@ -291,20 +290,19 @@ export function Financing() {
   />
   <div>
     <h3 className="font-semibold text-noir mb-1">
-      Paiement en 3x, 4x ou 10x par carte
+      {t('financement.avantages.3.titre')}
     </h3>
     <p className="text-sm text-gris leading-snug">
-      Réglez votre moto ou scooter en plusieurs fois par carte bancaire
-      grâce à notre partenaire&nbsp;
+      {t('financement.avantages.3.texte_avant')}&nbsp;
       <a
         href="https://almapay.com/fr-FR"
         target="_blank"
         rel="noopener noreferrer"
         className="text-lien font-medium underline underline-offset-2 hover:decoration-2"
       >
-        Alma
+        {t('financement.avantages.3.lien')}
       </a>
-      . Simple, rapide et 100&nbsp;% en ligne.
+      {t('financement.avantages.3.texte_apres')}
     </p>
 
     {/* Logo Alma (tu peux placer le fichier dans /public/alma-logo_frame.png) */}
@@ -322,7 +320,7 @@ export function Financing() {
     </a>
 
     <p className="text-[11px] text-doux-68 mt-2">
-      Offre de financement soumise à conditions, proposée par Alma.
+      {t('financement.avantages.3.mention')}
     </p>
   </div>
 </div>
@@ -331,9 +329,9 @@ export function Financing() {
     <div className="flex gap-4 p-4 bg-fond rounded-lg">
       <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
       <div>
-        <h3 className="font-semibold text-noir mb-1">Sans frais de dossier</h3>
+        <h3 className="font-semibold text-noir mb-1">{t('financement.avantages.4.titre')}</h3>
         <p className="text-sm text-gris">
-          Aucun frais caché, tout est transparent
+          {t('financement.avantages.4.texte')}
         </p>
       </div>
     </div>
@@ -341,9 +339,9 @@ export function Financing() {
     <div className="flex gap-4 p-4 bg-fond rounded-lg">
       <IconeOr icon={CheckCircle} className="w-6 h-6 flex-shrink-0" />
       <div>
-        <h3 className="font-semibold text-noir mb-1">Accompagnement personnalisé</h3>
+        <h3 className="font-semibold text-noir mb-1">{t('financement.avantages.5.titre')}</h3>
         <p className="text-sm text-gris">
-          Un conseiller dédié pour vous guider
+          {t('financement.avantages.5.texte')}
         </p>
       </div>
     </div>
@@ -460,11 +458,11 @@ export function Financing() {
 
                   <div className="space-y-6 bg-fond p-8 rounded-xl">
                     <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
-                      Demande de financement
+                      {t('financement.demande.titre')}
                     </h2>
 
                     <p className="text-gris leading-relaxed">
-                    Effectuez votre demande de financement via nos partenaires en cliquant sur le bouton ci-dessous :
+                    {t('financement.demande.texte')}
                     </p>
 
                     <Link
@@ -472,7 +470,7 @@ export function Financing() {
                       className="inline-flex items-center justify-center gap-2 w-full px-6 py-3 bg-brand hover:bg-bleu-hover text-sur-bouton font-semibold rounded-lg transition-colors"
                     >
                       <FileText className="w-5 h-5" />
-                      Mon Dossier de Financement
+                      {t('financement.demande.bouton')}
                     </Link>
                   </div>
                 </>

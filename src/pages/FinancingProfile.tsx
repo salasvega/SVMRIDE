@@ -15,6 +15,7 @@ import { DeleteConfirmModal } from '../components/admin/DeleteConfirmModal';
 import { Save, Send, Trash2, CheckCircle, Edit, KeyRound, Copy } from 'lucide-react';
 import { useCoordonnees } from '../lib/coordonnees';
 import { lienTelephone } from '../config/coordonnees';
+import { useTexte } from '../lib/textes';
 
 interface FinancingProfile {
   id?: string;
@@ -60,6 +61,7 @@ interface FinancingProfile {
 
 export function FinancingProfile() {
   const c = useCoordonnees(); // modifiables dans l'admin, onglet « Édition du site »
+  const t = useTexte();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -238,7 +240,7 @@ export function FinancingProfile() {
       const data = await envoyerPiece<Record<string, unknown>>(session, field as string, file);
       setProfile(prev => ({ ...prev, [field]: data[field as string] as string }));
       await chargerLiens(session);
-      setMessage({ type: 'success', text: 'Document envoyé avec succès' });
+      setMessage({ type: 'success', text: t('dossier.messages.document_envoye') });
     } catch (error) {
       gererErreur(error, "Erreur lors de l'envoi du document");
     }
@@ -254,7 +256,7 @@ export function FinancingProfile() {
         delete copie[field as string];
         return copie;
       });
-      setMessage({ type: 'success', text: 'Document supprimé avec succès' });
+      setMessage({ type: 'success', text: t('dossier.messages.document_supprime') });
     } catch (error) {
       gererErreur(error, 'Erreur lors de la suppression du document');
     }
@@ -346,7 +348,7 @@ export function FinancingProfile() {
         profile: champsSaisis(),
       });
       appliquerDossier(data);
-      setMessage({ type: 'success', text: 'Dossier enregistré avec succès' });
+      setMessage({ type: 'success', text: t('dossier.messages.enregistre') });
     } catch (error) {
       gererErreur(error, "Erreur lors de l'enregistrement du dossier");
     } finally {
@@ -364,7 +366,7 @@ export function FinancingProfile() {
         profile: champsSaisis(),
       });
       appliquerDossier(data);
-      setMessage({ type: 'success', text: 'Demande de financement soumise avec succès ! Vous recevrez une réponse par email.' });
+      setMessage({ type: 'success', text: t('dossier.messages.soumis') });
       setTimeout(() => navigate('/financement'), 3000);
     } catch (error) {
       gererErreur(error, 'Erreur lors de la soumission de la demande');
@@ -382,7 +384,7 @@ export function FinancingProfile() {
       await appelDossier('delete', { session });
       setShowDeleteModal(false);
       setSession('');
-      setMessage({ type: 'success', text: 'Dossier supprimé avec succès' });
+      setMessage({ type: 'success', text: t('dossier.messages.supprime') });
       setTimeout(() => navigate('/financement'), 2000);
     } catch (error) {
       setShowDeleteModal(false);
@@ -394,7 +396,7 @@ export function FinancingProfile() {
     try {
       const { profile: data } = await appelDossier<{ profile: Record<string, unknown> }>('reopen', { session });
       appliquerDossier(data);
-      setMessage({ type: 'success', text: 'Dossier réouvert pour modification' });
+      setMessage({ type: 'success', text: t('dossier.messages.reouvert') });
     } catch (error) {
       gererErreur(error, 'Erreur lors de la réouverture du dossier');
     }
@@ -409,7 +411,7 @@ export function FinancingProfile() {
           <Container>
             <div className="max-w-md mx-auto">
               <div className="carte p-6 md:p-8">
-                <h1 className="!text-[28px] md:!text-[32px] filet-apres mb-5">Dossier de financement</h1>
+                <h1 className="!text-[28px] md:!text-[32px] filet-apres mb-5">{t('dossier.acces.titre')}</h1>
 
                 <div className="grid grid-cols-2 gap-1 p-1 mb-6 bg-fond rounded-xl" role="tablist" aria-label="Accès au dossier">
                   <button
@@ -419,7 +421,7 @@ export function FinancingProfile() {
                     onClick={() => { setModeAcces('code'); setErreurAcces(''); }}
                     className={`py-2.5 rounded-lg text-sm font-semibold transition-colors duration-180 ${!creation ? 'bg-surface text-noir shadow-carte' : 'text-gris hover:text-noir'}`}
                   >
-                    J'ai déjà un dossier
+                    {t('dossier.acces.onglet_existant')}
                   </button>
                   <button
                     type="button"
@@ -428,36 +430,36 @@ export function FinancingProfile() {
                     onClick={() => { setModeAcces('creation'); setErreurAcces(''); }}
                     className={`py-2.5 rounded-lg text-sm font-semibold transition-colors duration-180 ${creation ? 'bg-surface text-noir shadow-carte' : 'text-gris hover:text-noir'}`}
                   >
-                    Nouveau dossier
+                    {t('dossier.acces.onglet_nouveau')}
                   </button>
                 </div>
 
                 <p className="text-gris mb-6 text-[15px]">
                   {creation
-                    ? "Indiquez votre adresse e-mail. Un code d'accès personnel vous sera donné : il protège votre dossier et vos documents."
-                    : "Saisissez l'adresse e-mail de votre dossier et le code d'accès qui vous a été donné à sa création."}
+                    ? t('dossier.acces.intro_nouveau')
+                    : t('dossier.acces.intro_existant')}
                 </p>
 
                 <form data-zone="formulaires" onSubmit={handleEmailSubmit} className="space-y-4" noValidate>
                   <Input
-                    label="Adresse e-mail"
+                    label={t('dossier.acces.email')}
                     type="email"
                     autoComplete="email"
                     required
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder="exemple@email.com"
+                    placeholder={t('dossier.acces.email_exemple')}
                   />
                   {!creation && (
                     <Input
-                      label="Code d'accès"
+                      label={t('dossier.acces.code')}
                       autoComplete="one-time-code"
                       autoCapitalize="characters"
                       spellCheck={false}
                       required
                       value={codeInput}
                       onChange={(e) => setCodeInput(e.target.value.toUpperCase())}
-                      placeholder="XXXX-XXXX"
+                      placeholder={t('dossier.acces.code_exemple')}
                       className="font-mono tracking-[0.15em]"
                     />
                   )}
@@ -470,23 +472,23 @@ export function FinancingProfile() {
 
                   <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
                     <Button type="button" variant="secondary" onClick={() => navigate('/financement')} className="sm:flex-1">
-                      Annuler
+                      {t('dossier.acces.annuler')}
                     </Button>
                     <Button
                       type="submit"
                       className="sm:flex-1"
                       disabled={loading || !emailInput.trim() || (!creation && codeInput.replace(/[^A-Z0-9]/gi, '').length !== 8)}
                     >
-                      {loading ? 'Patientez…' : creation ? 'Créer mon dossier' : 'Accéder à mon dossier'}
+                      {loading ? t('dossier.acces.attente') : creation ? t('dossier.acces.creer') : t('dossier.acces.acceder')}
                     </Button>
                   </div>
                 </form>
 
                 {!creation && (
                   <p className="mt-6 text-xs text-doux-68">
-                    Code perdu ? Appelez-nous au{' '}
+                    {t('dossier.acces.perdu_avant')}{' '}
                     <a href={lienTelephone(c.telephone)} className="text-lien underline underline-offset-2">{c.telephone}</a>{' '}
-                    : nous vous en donnerons un nouveau après vérification.
+                    {t('dossier.acces.perdu_apres')}
                   </p>
                 )}
               </div>
@@ -502,7 +504,7 @@ export function FinancingProfile() {
       <div className="min-h-screen bg-fond flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-bleu mx-auto"></div>
-          <p className="mt-4 text-gris">Chargement...</p>
+          <p className="mt-4 text-gris">{t('dossier.acces.chargement')}</p>
         </div>
       </div>
     );
@@ -563,18 +565,18 @@ export function FinancingProfile() {
             <div className="bg-surface rounded-lg shadow-md p-8">
               <div className="flex items-center justify-between mb-8">
                 <div>
-                  <h1 className="text-3xl font-bold text-noir">Mon Dossier Financement</h1>
+                  <h1 className="text-3xl font-bold text-noir">{t('dossier.entete.titre')}</h1>
                   <p className="text-gris mt-2">
-                    Complétez votre dossier pour nous soumettre votre demande de financement
+                    {t('dossier.entete.texte1')}
                   </p>
                   <p className="text-gris mt-2">
-                    Une fois reçu par notre équipe, nous vous contacterons dans les plus brefs délais.
+                    {t('dossier.entete.texte2')}
                   </p>
                 </div>
                 {isSubmitted && (
                   <div className="flex items-center text-green-600">
                     <CheckCircle className="w-6 h-6 mr-2" />
-                    <span className="font-semibold">Soumis</span>
+                    <span className="font-semibold">{t('dossier.entete.soumis')}</span>
                   </div>
                 )}
               </div>
@@ -584,9 +586,9 @@ export function FinancingProfile() {
                   <div className="flex items-start gap-3">
                     <KeyRound className="w-6 h-6 text-or-texte flex-shrink-0 mt-0.5" aria-hidden="true" />
                     <div className="min-w-0">
-                      <p className="font-semibold text-noir">Votre code d'accès personnel</p>
+                      <p className="font-semibold text-noir">{t('dossier.code.titre')}</p>
                       <p className="text-sm text-gris mt-1">
-                        Notez-le précieusement : il vous sera demandé pour revenir sur votre dossier. Pour votre sécurité, il ne sera plus affiché.
+                        {t('dossier.code.texte')}
                       </p>
                       <div className="flex flex-wrap items-center gap-3 mt-3">
                         <span className="font-mono text-2xl font-bold tracking-[0.2em] text-noir bg-surface border border-bordure rounded-lg px-4 py-2 select-all">
@@ -594,7 +596,7 @@ export function FinancingProfile() {
                         </span>
                         <Button type="button" size="sm" variant="secondary" onClick={copierCode}>
                           <Copy className="w-4 h-4" aria-hidden="true" />
-                          {codeCopie ? 'Copié' : 'Copier'}
+                          {codeCopie ? t('dossier.code.copie') : t('dossier.code.copier')}
                         </Button>
                       </div>
                     </div>
@@ -604,24 +606,24 @@ export function FinancingProfile() {
 
               <form data-zone="formulaires" className="space-y-8">
                 <div>
-                  <h2 className="text-xl font-semibold text-noir mb-4">Informations Personnelles</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">{t('dossier.perso.titre')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
-                      label="Nom *"
+                      label={`${t('dossier.perso.nom')} *`}
                       value={profile.last_name}
                       onChange={(e) => handleInputChange('last_name', e.target.value)}
                       disabled={isSubmitted}
                       required
                     />
                     <Input
-                      label="Prénom *"
+                      label={`${t('dossier.perso.prenom')} *`}
                       value={profile.first_name}
                       onChange={(e) => handleInputChange('first_name', e.target.value)}
                       disabled={isSubmitted}
                       required
                     />
                     <Input
-                      label="Code postal de naissance *"
+                      label={`${t('dossier.perso.cp_naissance')} *`}
                       value={profile.birth_postal_code}
                       onChange={(e) => handleInputChange('birth_postal_code', e.target.value)}
                       disabled={isSubmitted}
@@ -629,7 +631,7 @@ export function FinancingProfile() {
                     />
                     <Input
                       type="date"
-                      label="Date de naissance *"
+                      label={`${t('dossier.perso.date_naissance')} *`}
                       value={profile.birth_date}
                       onChange={(e) => handleInputChange('birth_date', e.target.value)}
                       disabled={isSubmitted}
@@ -637,7 +639,7 @@ export function FinancingProfile() {
                     />
                     <div className="md:col-span-2">
                       <Input
-                        label="Adresse actuelle *"
+                        label={`${t('dossier.perso.adresse')} *`}
                         value={profile.current_address}
                         onChange={(e) => handleInputChange('current_address', e.target.value)}
                         disabled={isSubmitted}
@@ -646,7 +648,7 @@ export function FinancingProfile() {
                     </div>
                     <Input
                       type="tel"
-                      label="Numéro de téléphone *"
+                      label={`${t('dossier.perso.telephone')} *`}
                       value={profile.phone_number}
                       onChange={(e) => handleInputChange('phone_number', e.target.value)}
                       disabled={isSubmitted}
@@ -654,7 +656,7 @@ export function FinancingProfile() {
                     />
                     <Input
                       type="email"
-                      label="Adresse email *"
+                      label={`${t('dossier.perso.email')} *`}
                       value={profile.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       disabled={isSubmitted}
@@ -664,31 +666,31 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-noir mb-4">Informations Logement</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">{t('dossier.logement.titre')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
                       type="date"
-                      label="Date d'entrée dans le logement *"
+                      label={`${t('dossier.logement.date_entree')} *`}
                       value={profile.housing_entry_date}
                       onChange={(e) => handleInputChange('housing_entry_date', e.target.value)}
                       disabled={isSubmitted}
                       required
                     />
                     <Select
-                      label="Occupation dans le logement *"
+                      label={`${t('dossier.logement.occupation')} *`}
                       value={profile.housing_status}
                       onChange={(e) => handleInputChange('housing_status', e.target.value)}
                       disabled={isSubmitted}
                       required
                     >
-                      <option value="">Sélectionner</option>
-                      <option value="locataire">Locataire</option>
-                      <option value="propriétaire">Propriétaire</option>
-                      <option value="hébergé">Hébergé</option>
+                      <option value="">{t('dossier.logement.choisir')}</option>
+                      <option value="locataire">{t('dossier.logement.locataire')}</option>
+                      <option value="propriétaire">{t('dossier.logement.proprietaire')}</option>
+                      <option value="hébergé">{t('dossier.logement.heberge')}</option>
                     </Select>
                     <Input
                       type="number"
-                      label="Montant du loyer ou du crédit (€) *"
+                      label={`${t('dossier.logement.loyer')} *`}
                       value={profile.rent_or_credit_amount}
                       onChange={(e) => handleInputChange('rent_or_credit_amount', parseFloat(e.target.value) || 0)}
                       disabled={isSubmitted}
@@ -698,10 +700,10 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-noir mb-4">Informations Professionnelles</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">{t('dossier.pro.titre')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
-                      label="Emploi/poste occupé *"
+                      label={`${t('dossier.pro.emploi')} *`}
                       value={profile.job_title}
                       onChange={(e) => handleInputChange('job_title', e.target.value)}
                       disabled={isSubmitted}
@@ -709,23 +711,23 @@ export function FinancingProfile() {
                     />
                     <Input
                       type="date"
-                      label="Date d'entrée *"
+                      label={`${t('dossier.pro.date_entree')} *`}
                       value={profile.employment_start_date}
                       onChange={(e) => handleInputChange('employment_start_date', e.target.value)}
                       disabled={isSubmitted}
                       required
                     />
                     <Input
-                      label="Type de contrat *"
+                      label={`${t('dossier.pro.contrat')} *`}
                       value={profile.contract_type}
                       onChange={(e) => handleInputChange('contract_type', e.target.value)}
                       disabled={isSubmitted}
-                      placeholder="CDI, CDD, intérim, etc."
+                      placeholder={t('dossier.pro.contrat_exemple')}
                       required
                     />
                     <Input
                       type="number"
-                      label="Salaire net mensuel (€) *"
+                      label={`${t('dossier.pro.salaire')} *`}
                       value={profile.monthly_net_salary}
                       onChange={(e) => handleInputChange('monthly_net_salary', parseFloat(e.target.value) || 0)}
                       disabled={isSubmitted}
@@ -735,47 +737,47 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-noir mb-4">Informations Financières</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">{t('dossier.finances.titre')}</h2>
                   <div className="space-y-4">
                     <Textarea
-                      label="Autres charges ou crédits"
+                      label={t('dossier.finances.charges')}
                       value={profile.other_charges_or_credits}
                       onChange={(e) => handleInputChange('other_charges_or_credits', e.target.value)}
                       disabled={isSubmitted}
                       rows={3}
-                      placeholder="Détaillez vos autres charges mensuelles..."
+                      placeholder={t('dossier.finances.charges_exemple')}
                     />
                     <Textarea
-                      label="Autres sources de revenus"
+                      label={t('dossier.finances.revenus')}
                       value={profile.other_income_sources}
                       onChange={(e) => handleInputChange('other_income_sources', e.target.value)}
                       disabled={isSubmitted}
                       rows={3}
-                      placeholder="Allocation, revenus locatifs, etc..."
+                      placeholder={t('dossier.finances.revenus_exemple')}
                     />
                   </div>
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-noir mb-4">Situation Personnelle</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">{t('dossier.situation.titre')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Select
-                      label="Situation maritale *"
+                      label={`${t('dossier.situation.maritale')} *`}
                       value={profile.marital_status}
                       onChange={(e) => handleInputChange('marital_status', e.target.value)}
                       disabled={isSubmitted}
                       required
                     >
-                      <option value="">Sélectionner</option>
-                      <option value="célibataire">Célibataire</option>
-                      <option value="marié(e)">Marié(e)</option>
-                      <option value="pacsé(e)">Pacsé(e)</option>
-                      <option value="divorcé(e)">Divorcé(e)</option>
-                      <option value="veuf(ve)">Veuf(ve)</option>
+                      <option value="">{t('dossier.situation.choisir')}</option>
+                      <option value="célibataire">{t('dossier.situation.celibataire')}</option>
+                      <option value="marié(e)">{t('dossier.situation.marie')}</option>
+                      <option value="pacsé(e)">{t('dossier.situation.pacse')}</option>
+                      <option value="divorcé(e)">{t('dossier.situation.divorce')}</option>
+                      <option value="veuf(ve)">{t('dossier.situation.veuf')}</option>
                     </Select>
                     <Input
                       type="number"
-                      label="Nombre de personnes à charge"
+                      label={t('dossier.situation.personnes_charge')}
                       value={profile.dependents_count}
                       onChange={(e) => handleInputChange('dependents_count', parseInt(e.target.value) || 0)}
                       disabled={isSubmitted}
@@ -784,28 +786,28 @@ export function FinancingProfile() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-noir mb-4">Détails du Financement</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">{t('dossier.projet.titre')}</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Input
-                      label="Véhicule à financer *"
+                      label={`${t('dossier.projet.vehicule')} *`}
                       value={profile.vehicle_to_finance}
                       onChange={(e) => handleInputChange('vehicle_to_finance', e.target.value)}
                       disabled={isSubmitted}
-                      placeholder="Marque, modèle, année..."
+                      placeholder={t('dossier.projet.vehicule_exemple')}
                       required
                     />
                     <Input
                       type="number"
-                      label="Montant du financement (€) *"
+                      label={`${t('dossier.projet.montant')} *`}
                       value={profile.financing_amount}
                       onChange={(e) => handleInputChange('financing_amount', parseFloat(e.target.value) || 0)}
                       disabled={isSubmitted}
-                      placeholder="Ex: 15000"
+                      placeholder={t('dossier.projet.montant_exemple')}
                       required
                     />
                     <Input
                       type="number"
-                      label="Durée souhaitée (mois) *"
+                      label={`${t('dossier.projet.duree')} *`}
                       value={profile.desired_duration}
                       onChange={(e) => handleInputChange('desired_duration', parseInt(e.target.value) || 0)}
                       disabled={isSubmitted}
@@ -813,23 +815,23 @@ export function FinancingProfile() {
                     />
                   </div>
                   <Textarea
-                    label="Commentaires"
+                    label={t('dossier.projet.commentaires')}
                     value={profile.comments || ''}
                     onChange={(e) => handleInputChange('comments', e.target.value)}
                     disabled={isSubmitted}
                     rows={4}
-                    placeholder="Ajoutez des commentaires ou informations complémentaires..."
+                    placeholder={t('dossier.projet.commentaires_exemple')}
                   />
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-noir mb-4">Documents Obligatoires</h2>
+                  <h2 className="text-xl font-semibold text-noir mb-4">{t('dossier.documents.titre')}</h2>
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-lg font-medium text-noir mb-3">Pièce d'identité</h3>
+                      <h3 className="text-lg font-medium text-noir mb-3">{t('dossier.documents.identite.titre')}</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SingleFileUpload
-                          label="Recto *"
+                          label={`${t('dossier.documents.identite.recto')} *`}
                           value={profile.id_card_front}
                           fileUrl={fileUrls.id_card_front}
                           onChange={(file) => handleSingleFileUpload('id_card_front', file)}
@@ -839,7 +841,7 @@ export function FinancingProfile() {
                           required
                         />
                         <SingleFileUpload
-                          label="Verso *"
+                          label={`${t('dossier.documents.identite.verso')} *`}
                           value={profile.id_card_back}
                           fileUrl={fileUrls.id_card_back}
                           onChange={(file) => handleSingleFileUpload('id_card_back', file)}
@@ -852,10 +854,10 @@ export function FinancingProfile() {
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-medium text-noir mb-3">Permis de conduire</h3>
+                      <h3 className="text-lg font-medium text-noir mb-3">{t('dossier.documents.permis.titre')}</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <SingleFileUpload
-                          label="Recto *"
+                          label={`${t('dossier.documents.permis.recto')} *`}
                           value={profile.driver_license_front}
                           fileUrl={fileUrls.driver_license_front}
                           onChange={(file) => handleSingleFileUpload('driver_license_front', file)}
@@ -864,7 +866,7 @@ export function FinancingProfile() {
                           accept="image/*,.pdf"
                         />
                         <SingleFileUpload
-                          label="Verso *"
+                          label={`${t('dossier.documents.permis.verso')} *`}
                           value={profile.driver_license_back}
                           fileUrl={fileUrls.driver_license_back}
                           onChange={(file) => handleSingleFileUpload('driver_license_back', file)}
@@ -876,7 +878,7 @@ export function FinancingProfile() {
                     </div>
 
                     <SingleFileUpload
-                      label="Justificatif de domicile (moins de 3 mois) *"
+                      label={`${t('dossier.documents.domicile')} *`}
                       value={profile.proof_of_residence}
                           fileUrl={fileUrls.proof_of_residence}
                       onChange={(file) => handleSingleFileUpload('proof_of_residence', file)}
@@ -886,10 +888,10 @@ export function FinancingProfile() {
                     />
 
                     <div>
-                      <h3 className="text-lg font-medium text-noir mb-3">Bulletins de salaire</h3>
+                      <h3 className="text-lg font-medium text-noir mb-3">{t('dossier.documents.salaires.titre')}</h3>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <SingleFileUpload
-                          label="Bulletin 1 *"
+                          label={`${t('dossier.documents.salaires.1')} *`}
                           value={profile.payslip_1}
                           fileUrl={fileUrls.payslip_1}
                           onChange={(file) => handleSingleFileUpload('payslip_1', file)}
@@ -898,7 +900,7 @@ export function FinancingProfile() {
                           accept="image/*,.pdf"
                         />
                         <SingleFileUpload
-                          label="Bulletin 2 *"
+                          label={`${t('dossier.documents.salaires.2')} *`}
                           value={profile.payslip_2}
                           fileUrl={fileUrls.payslip_2}
                           onChange={(file) => handleSingleFileUpload('payslip_2', file)}
@@ -907,7 +909,7 @@ export function FinancingProfile() {
                           accept="image/*,.pdf"
                         />
                         <SingleFileUpload
-                          label="Bulletin 3 *"
+                          label={`${t('dossier.documents.salaires.3')} *`}
                           value={profile.payslip_3}
                           fileUrl={fileUrls.payslip_3}
                           onChange={(file) => handleSingleFileUpload('payslip_3', file)}
@@ -919,7 +921,7 @@ export function FinancingProfile() {
                     </div>
 
                     <SingleFileUpload
-                      label="Dernier avis d'imposition *"
+                      label={`${t('dossier.documents.impots')} *`}
                       value={profile.tax_notice}
                           fileUrl={fileUrls.tax_notice}
                       onChange={(file) => handleSingleFileUpload('tax_notice', file)}
@@ -929,7 +931,7 @@ export function FinancingProfile() {
                     />
 
                     <SingleFileUpload
-                      label="RIB *"
+                      label={`${t('dossier.documents.rib')} *`}
                       value={profile.rib}
                           fileUrl={fileUrls.rib}
                       onChange={(file) => handleSingleFileUpload('rib', file)}
@@ -940,10 +942,10 @@ export function FinancingProfile() {
 
                     {profile.housing_status === 'hébergé' && (
                       <div className="border-t pt-6 mt-6">
-                        <h3 className="text-lg font-medium text-noir mb-3">Documents si hébergé</h3>
+                        <h3 className="text-lg font-medium text-noir mb-3">{t('dossier.documents.heberge.titre')}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <SingleFileUpload
-                            label="Attestation d'hébergement *"
+                            label={`${t('dossier.documents.heberge.attestation')} *`}
                             value={profile.hosting_certificate}
                           fileUrl={fileUrls.hosting_certificate}
                             onChange={(file) => handleSingleFileUpload('hosting_certificate', file)}
@@ -952,7 +954,7 @@ export function FinancingProfile() {
                             accept="image/*,.pdf"
                           />
                           <SingleFileUpload
-                            label="Pièce d'identité hébergeur *"
+                            label={`${t('dossier.documents.heberge.identite')} *`}
                             value={profile.host_id_card}
                           fileUrl={fileUrls.host_id_card}
                             onChange={(file) => handleSingleFileUpload('host_id_card', file)}
@@ -976,7 +978,7 @@ export function FinancingProfile() {
                         variant="secondary"
                       >
                         <Save className="w-4 h-4 mr-2" />
-                        {saving ? 'Enregistrement...' : 'Enregistrer le brouillon'}
+                        {saving ? t('dossier.actions.enregistrement') : t('dossier.actions.enregistrer')}
                       </Button>
                       <Button
                         type="button"
@@ -989,7 +991,7 @@ export function FinancingProfile() {
                         }`}
                       >
                         <Send className="w-4 h-4 mr-2" />
-                        {submitting ? 'Envoi...' : 'Soumettre la demande'}
+                        {submitting ? t('dossier.actions.envoi') : t('dossier.actions.soumettre')}
                       </Button>
                     </>
                   )}
@@ -1001,7 +1003,7 @@ export function FinancingProfile() {
                       className="bg-bleu text-sur-bouton hover:bg-bleu-hover border-2 border-bleu font-semibold"
                     >
                       <Edit className="w-4 h-4 mr-2" />
-                      Modifier le dossier
+                      {t('dossier.actions.modifier')}
                     </Button>
                   )}
                   {profile.id && (
@@ -1012,7 +1014,7 @@ export function FinancingProfile() {
                       className="ml-auto bg-red-600 text-white hover:bg-red-700 border-2 border-red-600 font-semibold"
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
-                      Supprimer le dossier
+                      {t('dossier.actions.supprimer')}
                     </Button>
                   )}
                 </div>
@@ -1024,8 +1026,10 @@ export function FinancingProfile() {
 
       {showDeleteModal && (
         <DeleteConfirmModal
-          title="Supprimer le dossier"
-          message="Êtes-vous sûr de vouloir supprimer ce dossier de financement ? Cette action est irréversible."
+          title={t('dossier.suppression.titre')}
+          message={t('dossier.suppression.texte')}
+          annuler={t('dossier.suppression.annuler')}
+          supprimer={t('dossier.suppression.supprimer')}
           onConfirm={handleDeleteConfirm}
           onCancel={() => setShowDeleteModal(false)}
         />

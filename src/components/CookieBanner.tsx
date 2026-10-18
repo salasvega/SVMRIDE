@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/Button';
+import { useTexte } from '../lib/textes';
 
 export function CookieBanner() {
+  const t = useTexte();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -29,17 +31,17 @@ export function CookieBanner() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex-1">
-            <h3 className="titre-display text-lg mb-2">Gestion des cookies</h3>
+            <h3 className="titre-display text-lg mb-2">{t('cookies.titre')}</h3>
             <p className="text-sm text-gris leading-relaxed">
-              Nous utilisons des cookies pour améliorer votre expérience sur notre site. Les cookies essentiels sont nécessaires au fonctionnement du site, tandis que les cookies analytiques nous aident à comprendre comment vous utilisez notre site.
+              {t('cookies.texte')}
             </p>
           </div>
           <div className="flex gap-3 w-full md:w-auto">
             <Button variant="outline" onClick={acceptEssential} className="flex-1 md:flex-none">
-              Essentiels uniquement
+              {t('cookies.essentiels')}
             </Button>
             <Button onClick={acceptAll} className="flex-1 md:flex-none">
-              Tout accepter
+              {t('cookies.tout')}
             </Button>
           </div>
         </div>

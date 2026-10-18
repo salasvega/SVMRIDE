@@ -17,11 +17,13 @@ import { CarteAvis } from './CarteAvis';
 import { formatDate } from '../../lib/avis/format';
 import { Etoiles } from './Etoiles';
 import { LogoGoogle } from './LogoGoogle';
+import { useTexte } from '../../lib/textes';
 
 const INTERVALLE_MS = 6000;
 const SEUIL_GLISSER = 50;
 
 export function CarrouselAvis({ avis, demo = false }: { avis: Avis[]; demo?: boolean }) {
+  const t = useTexte();
   const reduit = usePrefereMoinsDAnimations();
   const fenetreRef = useRef<HTMLDivElement>(null);
   const pisteRef = useRef<HTMLDivElement>(null);
@@ -88,8 +90,8 @@ export function CarrouselAvis({ avis, demo = false }: { avis: Avis[]; demo?: boo
   const auto = !reduit && !statique && !enPause && !survol && !focusDedans && !enLecture && visible;
   useEffect(() => {
     if (!auto) return;
-    const t = window.setInterval(() => setIndex((i) => (i >= max ? 0 : i + 1)), INTERVALLE_MS);
-    return () => window.clearInterval(t);
+    const minuteur = window.setInterval(() => setIndex((i) => (i >= max ? 0 : i + 1)), INTERVALLE_MS);
+    return () => window.clearInterval(minuteur);
   }, [auto, max]);
 
   const aller = (i: number) => {
@@ -259,7 +261,7 @@ export function CarrouselAvis({ avis, demo = false }: { avis: Avis[]; demo?: boo
             <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-gris">{enLecture.texte}</p>
             <p className="mt-6 flex items-center gap-1.5 text-xs text-gris">
               <LogoGoogle taille={14} decoratif />
-              {demo ? 'Avis de démonstration' : 'Publié sur Google'}
+              {demo ? t('avis.lecture.demo') : t('avis.lecture.google')}
             </p>
           </div>
         )}

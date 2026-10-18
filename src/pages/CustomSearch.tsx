@@ -151,15 +151,11 @@ export function CustomSearch() {
                 reste visible pendant qu'on remplit le formulaire (plus long qu'elle). */}
             <div className="lg:self-start [@media(min-width:1024px)_and_(min-height:900px)]:sticky [@media(min-width:1024px)_and_(min-height:900px)]:top-24">
               <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
-                Un service sur-mesure
+                {t('recherche.service.titre')}
               </h2>
 
               <p className="text-gris leading-relaxed mb-6">
-                Vous cherchez un modèle précis, une configuration
-                particulière ou un véhicule rare ? Notre service de
-                recherche personnalisée met notre expertise et notre
-                réseau à votre disposition pour dénicher le deux-roues
-                qui correspond exactement à vos critères.
+                {t('recherche.service.texte')}
               </p>
 
               <div className="space-y-4">
@@ -168,11 +164,10 @@ export function CustomSearch() {
                     <span className="pastille-etape w-8 h-8 text-sm">
                       1
                     </span>
-                    Définissez vos critères
+                    {t('recherche.etapes.1.titre')}
                   </h3>
                   <p className="text-sm text-gris ml-10">
-                    Remplissez le formulaire avec vos souhaits : marque,
-                    modèle, budget, délai...
+                    {t('recherche.etapes.1.texte')}
                   </p>
                 </div>
 
@@ -181,11 +176,10 @@ export function CustomSearch() {
                     <span className="pastille-etape w-8 h-8 text-sm">
                       2
                     </span>
-                    Nous cherchons pour vous
+                    {t('recherche.etapes.2.titre')}
                   </h3>
                   <p className="text-sm text-gris ml-10">
-                    Notre équipe active son réseau et recherche
-                    activement le véhicule correspondant.
+                    {t('recherche.etapes.2.texte')}
                   </p>
                 </div>
 
@@ -194,11 +188,10 @@ export function CustomSearch() {
                     <span className="pastille-etape w-8 h-8 text-sm">
                       3
                     </span>
-                    Vous recevez des propositions
+                    {t('recherche.etapes.3.titre')}
                   </h3>
                   <p className="text-sm text-gris ml-10">
-                    Nous vous présentons les véhicules trouvés avec
-                    photos, historique et prix.
+                    {t('recherche.etapes.3.texte')}
                   </p>
                 </div>
 
@@ -207,11 +200,10 @@ export function CustomSearch() {
                     <span className="pastille-etape w-8 h-8 text-sm">
                       4
                     </span>
-                    Vous choisissez
+                    {t('recherche.etapes.4.titre')}
                   </h3>
                   <p className="text-sm text-gris ml-10">
-                    Pas de pression, vous décidez librement si une
-                    proposition vous convient.
+                    {t('recherche.etapes.4.texte')}
                   </p>
                 </div>
               </div>
@@ -224,12 +216,10 @@ export function CustomSearch() {
                 <div className="bg-green-50 border-2 border-green-500 rounded-xl p-8 text-center">
                   <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
                   <h3 className="text-2xl font-bold text-green-900 mb-2">
-                    Recherche lancée !
+                    {t('recherche.succes.titre')}
                   </h3>
                   <p className="text-green-800">
-                    Nous avons bien reçu votre demande. Notre équipe
-                    commence immédiatement la recherche et vous tiendra
-                    informé.
+                    {t('recherche.succes.texte')}
                   </p>
                 </div>
               ) : (
@@ -238,11 +228,11 @@ export function CustomSearch() {
                   className="space-y-6 bg-fond p-8 rounded-xl lg:-mt-8"
                 >
                   <h2 className="text-[26px] md:text-[30px] filet-apres mb-4">
-                    Votre recherche
+                    {t('recherche.formulaire.titre')}
                   </h2>
 
                   <Input
-                    label="Nom complet"
+                    label={t('recherche.formulaire.nom')}
                     name="name"
                     type="text"
                     required
@@ -251,7 +241,7 @@ export function CustomSearch() {
                   />
 
                   <Input
-                    label="Email"
+                    label={t('recherche.formulaire.email')}
                     name="email"
                     type="email"
                     required
@@ -260,7 +250,7 @@ export function CustomSearch() {
                   />
 
                   <Input
-                    label="Téléphone"
+                    label={t('recherche.formulaire.telephone')}
                     name="phone"
                     type="tel"
                     required
@@ -269,60 +259,60 @@ export function CustomSearch() {
                   />
 
                   <Select
-                    label="Type de véhicule"
+                    label={t('recherche.formulaire.type.intitule')}
                     name="type"
                     required
                     value={formData.type}
                     onChange={handleChange}
                   >
-                    <option value="">Sélectionnez...</option>
-                    <option value="moto">Moto</option>
-                    <option value="scooter">Scooter</option>
+                    <option value="">{t('recherche.formulaire.type.vide')}</option>
+                    <option value="moto">{t('recherche.formulaire.type.moto')}</option>
+                    <option value="scooter">{t('recherche.formulaire.type.scooter')}</option>
                     <option value="indifferent">
-                      Indifférent
+                      {t('recherche.formulaire.type.indifferent')}
                     </option>
                   </Select>
 
                   <Input
-                    label="Marque souhaitée (optionnel)"
+                    label={t('recherche.formulaire.marque.intitule')}
                     name="brand"
                     type="text"
-                    placeholder="Ex: Yamaha, Honda..."
+                    placeholder={t('recherche.formulaire.marque.exemple')}
                     value={formData.brand}
                     onChange={handleChange}
                   />
 
                   <Select
-                    label="Cylindrée souhaitée"
+                    label={t('recherche.formulaire.cylindree.intitule')}
                     name="displacement"
                     value={formData.displacement}
                     onChange={handleChange}
                   >
                     <option value="">
-                      Indifférent
+                      {t('recherche.formulaire.cylindree.indifferent')}
                     </option>
-                    <option value="125">125 cc</option>
-                    <option value="300">300 cc</option>
-                    <option value="500">500 cc</option>
-                    <option value="650">650 cc</option>
+                    <option value="125">{t('recherche.formulaire.cylindree.125')}</option>
+                    <option value="300">{t('recherche.formulaire.cylindree.300')}</option>
+                    <option value="500">{t('recherche.formulaire.cylindree.500')}</option>
+                    <option value="650">{t('recherche.formulaire.cylindree.650')}</option>
                     <option value="800+">
-                      800 cc et plus
+                      {t('recherche.formulaire.cylindree.800')}
                     </option>
                   </Select>
 
                   <Input
-                    label="Année minimale"
+                    label={t('recherche.formulaire.annee.intitule')}
                     name="yearMin"
                     type="number"
                     min="2000"
                     max={new Date().getFullYear()}
-                    placeholder="Ex: 2018"
+                    placeholder={t('recherche.formulaire.annee.exemple')}
                     value={formData.yearMin}
                     onChange={handleChange}
                   />
 
                   <Input
-                    label="Budget maximum (€)"
+                    label={t('recherche.formulaire.budget')}
                     name="budgetMax"
                     type="number"
                     required
@@ -332,37 +322,37 @@ export function CustomSearch() {
                   />
 
                   <Select
-                    label="Délai souhaité"
+                    label={t('recherche.formulaire.delai.intitule')}
                     name="deadline"
                     required
                     value={formData.deadline}
                     onChange={handleChange}
                   >
-                    <option value="">Sélectionnez...</option>
+                    <option value="">{t('recherche.formulaire.delai.vide')}</option>
                     <option value="urgent">
-                      Urgent (moins de 2 semaines)
+                      {t('recherche.formulaire.delai.urgent')}
                     </option>
-                    <option value="1-month">1 mois</option>
+                    <option value="1-month">{t('recherche.formulaire.delai.1_mois')}</option>
                     <option value="2-months">
-                      2 mois
+                      {t('recherche.formulaire.delai.2_mois')}
                     </option>
                     <option value="flexible">
-                      Flexible
+                      {t('recherche.formulaire.delai.flexible')}
                     </option>
                   </Select>
 
                   <Textarea
-                    label="Détails supplémentaires"
+                    label={t('recherche.formulaire.details.intitule')}
                     name="comments"
                     rows={3}
-                    placeholder="Modèle précis, couleur, équipements souhaités..."
+                    placeholder={t('recherche.formulaire.details.exemple')}
                     value={formData.comments}
                     onChange={handleChange}
                   />
 
                   <FileUpload
-                    elements="fichiers"
-                    label="Pièces jointes (optionnel)"
+                    elements={t('recherche.formulaire.pieces.elements')}
+                    label={t('recherche.formulaire.pieces.intitule')}
                     maxFiles={10}
                     maxSizeMB={10}
                     accept="image/*,application/pdf"
@@ -384,16 +374,14 @@ export function CustomSearch() {
                       htmlFor="consent"
                       className="text-sm text-gris"
                     >
-                      J'accepte que mes données soient utilisées
-                      pour traiter ma recherche conformément à
-                      la{' '}
+                      {t('recherche.formulaire.consentement.avant')}{' '}
                       <a
                         href="/politique-confidentialite"
                         className="text-lien underline underline-offset-2 hover:decoration-2"
                       >
-                        politique de confidentialité
+                        {t('recherche.formulaire.consentement.lien')}
                       </a>
-                      .{' '}
+                      {t('recherche.formulaire.consentement.apres')}{' '}
                       <span className="text-lien">
                         *
                       </span>
@@ -409,7 +397,7 @@ export function CustomSearch() {
                   {/* Indicateur visuel pendant upload */}
                   {uploadingFiles && (
                     <div className="text-sm text-gris bg-surface/70 border border-bordure rounded-lg px-3 py-2 flex items-center justify-center">
-                      Téléversement des documents...
+                      {t('recherche.formulaire.televersement')}
                     </div>
                   )}
 
@@ -420,10 +408,10 @@ export function CustomSearch() {
                     size="lg"
                   >
                     {uploadingFiles
-                      ? 'Téléversement des documents...'
+                      ? t('recherche.formulaire.bouton.televersement')
                       : isSubmitting
-                      ? 'Envoi en cours...'
-                      : 'Lancer la recherche'}
+                      ? t('recherche.formulaire.bouton.envoi')
+                      : t('recherche.formulaire.bouton.texte')}
                   </Button>
                 </form>
               )}

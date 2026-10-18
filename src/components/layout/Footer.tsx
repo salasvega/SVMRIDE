@@ -31,7 +31,7 @@ export function Footer() {
             </p>
 
             <div className="space-y-3">
-              <h3 className="titre-display text-sm tracking-[1px] mb-2">Notre showroom</h3>
+              <h3 className="titre-display text-sm tracking-[1px] mb-2">{t('pied.showroom.titre')}</h3>
               {[c.showroom].map((showroom, index) => (
                 <a
                   key={index}
@@ -57,7 +57,7 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="titre-display text-lg tracking-[1px] mb-4">Contact</h3>
+            <h3 className="titre-display text-lg tracking-[1px] mb-4">{t('pied.contact.titre')}</h3>
             <div className="space-y-3">
               <a
                 href={`mailto:${c.email}`}
@@ -88,45 +88,45 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="titre-display text-lg tracking-[1px] mb-4">Liens utiles</h3>
+            <h3 className="titre-display text-lg tracking-[1px] mb-4">{t('pied.liens.titre')}</h3>
             <div className="space-y-2">
               {equipe?.affichee && (
                 <Link
                   to="/equipe"
                   className="block text-sm text-inverse-66 hover:text-inverse transition-colors duration-180"
                 >
-                  Notre équipe
+                  {t('pied.liens.equipe')}
                 </Link>
               )}
               <Link
                 to="/suivre-ma-vente"
                 className="block text-sm text-inverse-66 hover:text-inverse transition-colors duration-180"
               >
-                Suivre ma vente (dépôt-vente)
+                {t('pied.liens.suivre')}
               </Link>
               <Link
                 to="/mentions-legales"
                 className="block text-sm text-inverse-66 hover:text-inverse transition-colors duration-180"
               >
-                Mentions légales
+                {t('pied.liens.mentions')}
               </Link>
               <Link
                 to="/politique-confidentialite"
                 className="block text-sm text-inverse-66 hover:text-inverse transition-colors duration-180"
               >
-                Politique de confidentialité
+                {t('pied.liens.confidentialite')}
               </Link>
               <Link
                 to="/politique-cookies"
                 className="block text-sm text-inverse-66 hover:text-inverse transition-colors duration-180"
               >
-                Politique des cookies
+                {t('pied.liens.cookies')}
               </Link>
               <Link
                 to="/plan-du-site"
                 className="block text-sm text-inverse-66 hover:text-inverse transition-colors duration-180"
               >
-                Plan du site
+                {t('pied.liens.plan')}
               </Link>
             </div>
           </div>
@@ -135,13 +135,13 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-inverse/10">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-sm text-inverse-66">
-              © {currentYear} {t('site.nom')}. Tous droits réservés.
+              {t('pied.copyright', { annee: currentYear })}
             </p>
             <Link
               to="/admin/login"
               className="text-xs text-inverse-53 hover:text-inverse transition-colors duration-180"
             >
-              Espace pro
+              {t('pied.espace_pro')}
             </Link>
           </div>
         </div>

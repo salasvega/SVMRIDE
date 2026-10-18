@@ -82,7 +82,7 @@ export function Equipe() {
 
                 <div className="flex flex-col justify-center md:border-l md:border-inverse/15 md:pl-10">
                   <p className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-inverse-74">
-                    Sa vision de l'accompagnement
+                    {t('equipe.responsable.surtitre')}
                   </p>
                   <div className="space-y-4 text-base md:text-[17px] leading-relaxed text-inverse-88">
                     {responsable.presentation?.map((p, i) => <p key={i}>{p}</p>)}
@@ -105,7 +105,7 @@ export function Equipe() {
       {collaborateurs.length > 0 && (
         <Section zone="equipe" background="white" className="!pt-0 !pb-12 md:!pb-16">
           <Container>
-            <h2 className="titre-section filet-apres mb-8">À vos côtés au quotidien</h2>
+            <h2 className="titre-section filet-apres mb-8">{t('equipe.collaborateurs.titre')}</h2>
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
               {collaborateurs.map((m) => (
                 <li key={m.id}>
@@ -130,16 +130,16 @@ export function Equipe() {
 
       <Section background="dark" className="!py-12 md:!py-16">
         <Container className="text-center">
-          <h2 className="titre-section filet-avant mb-5">Un projet moto ? Parlons-en</h2>
+          <h2 className="titre-section filet-avant mb-5">{t('equipe.final.titre')}</h2>
           <p className="mx-auto mb-8 max-w-2xl text-base md:text-lg text-inverse-84">
-            Achat, reprise, dépôt-vente ou financement : l'équipe vous répond et vous accueille au showroom.
+            {t('equipe.final.texte')}
           </p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
             <Link to="/contact" tabIndex={-1}>
-              <Button size="lg" fullWidth className="sm:w-auto">Contacter notre équipe</Button>
+              <Button size="lg" fullWidth className="sm:w-auto">{t('equipe.final.bouton1')}</Button>
             </Link>
             <Link to="/vehicules" tabIndex={-1}>
-              <Button size="lg" variant="secondary" fullWidth className="sm:w-auto">Voir nos motos</Button>
+              <Button size="lg" variant="secondary" fullWidth className="sm:w-auto">{t('equipe.final.bouton2')}</Button>
             </Link>
           </div>
         </Container>
