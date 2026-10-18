@@ -2,7 +2,7 @@
  * Textes du site : Page Financement et dossier de financement.
  * Registre : voir src/config/textes-outils.ts (conventions) et src/config/textes.ts.
  */
-import { entete, L, P, type PageTextes } from '../textes-outils.ts';
+import { N, entete, L, P, type PageTextes } from '../textes-outils.ts';
 
 const ETOILE = 'L’astérisque (*) des champs obligatoires est ajouté automatiquement.';
 
@@ -21,7 +21,8 @@ export const PAGES_FINANCEMENT: PageTextes[] = [
           L('financement.simulateur.titre', 'Titre', 'Simulateur de crédit', undefined, 50),
           L('financement.simulateur.montant', 'Curseur du montant : intitulé', 'Montant du financement: {montant} €', '{montant} = montant choisi avec le curseur.', 70),
           L('financement.simulateur.duree', 'Curseur de la durée : intitulé', 'Durée: {duree} mois', '{duree} = nombre de mois choisi.', 40),
-          L('financement.simulateur.taux', 'Taux : intitulé', 'Taux (TAEG): {taux} %', '{taux} = taux utilisé pour le calcul.', 40),
+          N('financement.simulateur.taux_valeur', 'Taux annuel utilisé pour le calcul (TAEG)', 7, { min: 0, max: 25, decimales: 2, unite: '%' }, 'Sert au calcul des mensualités estimées et s’affiche à la place de {taux}. Exemple : 6,9.'),
+          { ...L('financement.simulateur.taux', 'Taux : intitulé', 'Taux (TAEG): {taux} %', '{taux} = valeur du champ « Taux annuel utilisé pour le calcul ».', 40), lie: 'financement.simulateur.taux_valeur' },
           L('financement.simulateur.mensualite', 'Encadré : titre', 'Mensualité estimée', undefined, 40),
           L('financement.simulateur.par_mois', 'Encadré : texte sous la mensualité', 'par mois sur {duree} mois', '{duree} = nombre de mois choisi.', 50),
           L('financement.simulateur.vehicule', 'Encadré : véhicule venant d’une fiche', 'Véhicule sélectionné : {vehicule}', 'Visible quand le visiteur arrive depuis une fiche véhicule. {vehicule} = nom du véhicule.', 60),

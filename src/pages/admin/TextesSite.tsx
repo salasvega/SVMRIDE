@@ -15,7 +15,7 @@ import { AdminLayout } from '../../components/admin/AdminLayout';
 import { ApercuPage } from '../../components/admin/ApercuPage';
 import { supabase } from '../../lib/supabase';
 import { appliquerTextes } from '../../lib/textes';
-import { CLE_TEXTES, normaliserTextes, PAGES_TEXTES, SEO_PAGES, texte, TEXTES, type DefTexte, type PageTextes, type Textes } from '../../config/textes';
+import { CLE_TEXTES, lireNombre, normaliserTextes, PAGES_TEXTES, SEO_PAGES, texte, TEXTES, type DefTexte, type PageTextes, type Textes } from '../../config/textes';
 import {
   cleElement, cleIcone, cleOrdre, elementDeCle, LISTES, LISTES_PAR_ID, lireOrdre, NOMS_ICONES, nouvelId, type ListeDef,
 } from '../../config/textes-listes';
@@ -117,6 +117,8 @@ function afficher(t: Textes, cle: string): string {
     const nom = t[cle] ?? li?.icones?.[id] ?? li?.iconeNouveau ?? '';
     return NOMS_FR[nom] ?? nom;
   }
+  const def = TEXTES[cle];
+  if (def?.type === 'nombre') return `${(t[cle] ?? def.defaut).replace('.', ',')} ${def.nombre?.unite ?? ''}`.trim();
   return texte(t, cle);
 }
 
@@ -136,7 +138,48 @@ function libelleComplet(cle: string): string {
   return cle;
 }
 
+/** Nombre saisi hors des bornes ou illisible */
+const nombreInvalide = (def: DefTexte | undefined, v: string) => {
+  if (def?.type !== 'nombre' || !def.nombre) return false;
+  const n = lireNombre(v);
+  return n === null || n < def.nombre.min || n > def.nombre.max;
+};
+/** Champ d'un nombre (valeur de calcul : taux…) */
+function ChampNombre({ def, valeur, onChange, onFocus, compact = false }: { def: DefTexte; valeur: string; onChange: (v: string) => void; onFocus?: () => void; compact?: boolean }) {
+  const id = `t-${def.cle}`;
+  const b = def.nombre!;
+  const invalide = nombreInvalide(def, valeur);
+  const modifie = lireNombre(valeur) !== lireNombre(def.defaut);
+  return (
+    <div className={compact ? 'mt-3 border-t border-[#EEEEEE] pt-2.5' : 'py-3'}>
+      <div className="mb-1.5 flex flex-wrap items-center justify-between gap-2">
+        <label htmlFor={id} className="text-sm font-semibold text-[#111111]">
+          {def.libelle}
+          {modifie && !invalide && <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-900">Modifié</span>}
+        </label>
+        {modifie && (
+          <button type="button" onClick={() => onChange(def.defaut)} className="inline-flex items-center gap-1 text-xs font-semibold text-[#444444] hover:text-[#111111]">
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" /> Valeur d'origine
+          </button>
+        )}
+      </div>
+      <div className="flex items-center gap-2">
+        <input id={id} value={valeur.replace('.', ',')} inputMode="decimal" onFocus={onFocus} onChange={(e) => onChange(e.target.value.replace(',', '.').replace(/[^\d.]/g, ''))}
+          aria-invalid={invalide} aria-describedby={`${id}-aide`}
+          className={`w-28 rounded-xl border-2 px-3 py-2 text-right text-[15px] tabular-nums text-[#111111] focus:outline-none ${invalide ? 'border-red-400' : modifie ? 'border-amber-300 focus:border-[#111111]' : 'border-[#D1D5DB] focus:border-[#111111]'}`} />
+        <span className="text-sm font-semibold text-[#444444]">{b.unite}</span>
+      </div>
+      <p id={`${id}-aide`} className="mt-1 text-xs text-[#666666]">
+        {invalide
+          ? <span className="text-red-700">Indiquez un nombre entre {b.min.toLocaleString('fr-FR')} et {b.max.toLocaleString('fr-FR')} (ex. 6,9).</span>
+          : <>{def.aide}{modifie && <span className="block">Origine : {def.defaut.replace('.', ',')} {b.unite}</span>}</>}
+      </p>
+    </div>
+  );
+}
+
 function Champ({ def, valeur, onChange, onFocus }: { def: DefTexte; valeur: string; onChange: (v: string) => void; onFocus: () => void }) {
+  if (def.type === 'nombre' && def.nombre) return <ChampNombre def={def} valeur={valeur} onChange={onChange} onFocus={onFocus} />;
   const id = `t-${def.cle}`;
   const modifie = valeur !== def.defaut;
   const max = def.max ?? 420;
@@ -312,8 +355,10 @@ function EditeurListe({ liste: l, ids, valeur, textesSection, onChange, onFocus,
 }
 
 /** Bulle d'édition posée à côté du texte cliqué (« Modifier sur la page ») */
-function BulleTexte({ def, valeur, onChange, onFermer, onListe }: {
+function BulleTexte({ def, valeur, onChange, onFermer, onListe, lie }: {
   def: DefTexte; valeur: string; onChange: (v: string) => void; onFermer: () => void; onListe: () => void;
+  /** Texte lié modifiable dans la même bulle (ex. valeur du taux) */
+  lie?: { def: DefTexte; valeur: string; onChange: (v: string) => void };
 }) {
   const champ = useRef<HTMLTextAreaElement>(null);
   const ou = ouDe(def.cle);
@@ -357,6 +402,7 @@ function BulleTexte({ def, valeur, onChange, onFermer, onListe }: {
         </span>
         <span className={valeur.length > max * 0.9 ? 'font-semibold text-amber-800' : ''}>{valeur.length}/{max}</span>
       </div>
+      {lie && <ChampNombre compact def={lie.def} valeur={lie.valeur} onChange={lie.onChange} />}
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
         <button type="button" onClick={onListe} className="text-xs font-semibold text-[#444444] underline underline-offset-2 hover:text-[#111111]">Voir dans la liste</button>
         <div className="flex gap-2">
@@ -428,7 +474,7 @@ export function TextesSite() {
   const valeur = (cle: string) => modifs[cle] ?? enregistres?.[cle] ?? TEXTES[cle]?.defaut ?? '';
   const changements = useMemo(() => (enregistres ? differences(enregistres, courants) : []), [enregistres, courants]);
   // (calculé sur la saisie brute : la normalisation écarte déjà les adresses invalides)
-  const lienInvalide = Object.entries(modifs).some(([k, v]) => TEXTES[k]?.type === 'lien' && v.trim() !== '' && !/^(\/[^\s]*|https:\/\/[^\s]+)$/.test(v.trim()));
+  const lienInvalide = Object.entries(modifs).some(([k, v]) => (defDe(k)?.type === 'lien' && v.trim() !== '' && !/^(\/[^\s]*|https:\/\/[^\s]+)$/.test(v.trim())) || nombreInvalide(TEXTES[k], v));
   const nonEnregistres = changements.length > 0;
 
   useEffect(() => {
@@ -656,6 +702,7 @@ export function TextesSite() {
                 );
               })() : actif && defDe(actif) ? (
                 <BulleTexte def={defDe(actif)!} valeur={valeur(actif)} onChange={(v) => maj(actif, v)} onFermer={() => setActif(null)}
+                  lie={defDe(actif)?.lie && TEXTES[defDe(actif)!.lie!] ? (() => { const cl = defDe(actif)!.lie!; return { def: TEXTES[cl], valeur: valeur(cl), onChange: (v: string) => setModifs((m) => ({ ...m, [cl]: v })) }; })() : undefined}
                   onListe={() => { const ou = ouDe(actif); if (ou) setPageCle(ou.page.cle); setVue('liste'); setAFocaliser(actif); }} />
               ) : null}
             />
@@ -773,7 +820,7 @@ export function TextesSite() {
         <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#E5E5E5] bg-white/95 backdrop-blur">
           <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
             {lienInvalide ? (
-              <p className="text-sm text-red-700" role="alert">Une adresse de lien est invalide : corrigez-la pour enregistrer.</p>
+              <p className="text-sm text-red-700" role="alert">Une valeur est invalide (adresse de lien ou nombre) : corrigez-la pour enregistrer.</p>
             ) : (
               <p className="text-sm text-[#444444]"><strong className="text-[#111111]">{changements.length} texte{changements.length > 1 ? 's' : ''}</strong> non enregistré{changements.length > 1 ? 's' : ''}</p>
             )}

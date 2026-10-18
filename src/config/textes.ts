@@ -50,6 +50,20 @@ const sansControle = (v: string) =>
 const nettoyer = (v: string, max: number) => sansControle(v.replace(/\r\n?/g, '\n')).trim().slice(0, max);
 const LIEN = /^(\/[^\s]*|https:\/\/[^\s]+)$/;
 
+/** Nombre écrit à la française ou non (« 6,9 », « 6.9 », « 7 % ») ; null si illisible */
+export function lireNombre(v: string): number | null {
+  const s = v.replace(/[\s%€\u00a0\u202f]/g, '').replace(',', '.');
+  if (!/^-?\d+(\.\d+)?$/.test(s)) return null;
+  return Number(s);
+}
+
+/** Nombre d'un texte de type « nombre » (valeur enregistrée, sinon d'origine) */
+export function nombre(t: Textes, cle: string): number {
+  const def = TEXTES[cle];
+  const n = lireNombre(t[cle] ?? '') ?? lireNombre(def?.defaut ?? '') ?? 0;
+  return def?.nombre ? Math.min(Math.max(n, def.nombre.min), def.nombre.max) : n;
+}
+
 /** Garde les seuls textes connus, nettoyés et limités ; ignore les valeurs identiques à l'origine */
 export function normaliserTextes(brut: unknown): Textes {
   const sortie: Textes = {};
@@ -58,6 +72,13 @@ export function normaliserTextes(brut: unknown): Textes {
   for (const [cle, v] of Object.entries(entree)) {
     if (typeof v !== 'string') continue;
     const def = TEXTES[cle];
+    if (def?.type === 'nombre' && def.nombre) {
+      const n = lireNombre(v);
+      if (n === null || n < def.nombre.min || n > def.nombre.max) continue;
+      const propre = String(Math.round(n * 10 ** def.nombre.decimales) / 10 ** def.nombre.decimales);
+      if (propre !== def.defaut) sortie[cle] = propre;
+      continue;
+    }
     if (def) {
       const propre = nettoyer(v, def.max ?? 420);
       if (def.type === 'lien' && propre && !LIEN.test(propre)) continue;

@@ -45,7 +45,7 @@ function indexDe(cle: string): number {
   }
   return i;
 }
-const estLien = (cle: string) => (TEXTES[cle]?.type ?? elementDeCle(cle)?.champ.type) === 'lien';
+const estLien = (cle: string) => ['lien', 'nombre'].includes(TEXTES[cle]?.type ?? elementDeCle(cle)?.champ.type ?? '');
 /** Libellé d'un texte (bulle « ✎ ») */
 export const libelleTexte = (cle: string) => TEXTES[cle]?.libelle ?? elementDeCle(cle)?.champ.libelle ?? 'Texte';
 

@@ -10,7 +10,8 @@ import { Textarea } from '../components/ui/Textarea';
 import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
 import { useFormSubmit } from '../hooks/useFormSubmit';
-import { useTexte } from '../lib/textes';
+import { useTexte, useTextes } from '../lib/textes';
+import { nombre } from '../config/textes';
 import { useListe } from '../lib/listes';
 
 export function Financing() {
@@ -28,8 +29,9 @@ export function Financing() {
   const [simulatorData, setSimulatorData] = useState({
     amount: parsedPrice && !Number.isNaN(parsedPrice) ? parsedPrice : 5000,
     duration: 24,
-    rate: 7,
   });
+  // Taux annuel du simulateur : réglable dans l'admin (« Textes du site », Financement › Simulateur)
+  const rate = nombre(useTextes(), 'financement.simulateur.taux_valeur');
 
   // Formulaire envoyé côté serveur
   // On rajoute vehicleSlug dans formData pour lier la demande au stock
@@ -65,12 +67,14 @@ export function Financing() {
 
   // Calcul mensualité estimée (crédit amortissable)
   const calculateMonthlyPayment = () => {
-    const { amount, duration, rate } = simulatorData;
+    const { amount, duration } = simulatorData;
     const monthlyRate = rate / 100 / 12;
 
-    if (duration <= 0 || monthlyRate <= 0) {
+    if (duration <= 0) {
       return '0.00';
     }
+    // Crédit à 0 % : le montant réparti sur la durée
+    if (monthlyRate <= 0) return (amount / duration).toFixed(2);
 
     const top = amount * monthlyRate * Math.pow(1 + monthlyRate, duration);
     const bottom = Math.pow(1 + monthlyRate, duration) - 1;
@@ -208,12 +212,12 @@ export function Financing() {
                 </div>
                 <div></div>
 <label className="block text-sm font-medium mb-2">
-                    {t('financement.simulateur.taux', { taux: simulatorData.rate })}
+                    {t('financement.simulateur.taux', { taux: rate.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) })}
                   </label>
                 {/* Taux *
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Taux (TAEG): {simulatorData.rate} %
+                    Taux (TAEG): {rate} %
                   </label>
                   <input
                     type="range"
@@ -221,7 +225,7 @@ export function Financing() {
                     min="2"
                     max="10"
                     step="0.5"
-                    value={simulatorData.rate}
+                    value={rate}
                     onChange={(e) =>
                       setSimulatorData((prev) => ({
                         ...prev,

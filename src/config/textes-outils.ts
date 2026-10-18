@@ -18,8 +18,12 @@ export interface DefTexte {
   cle: string;
   libelle: string;
   defaut: string;
-  /** Une ligne (titre, bouton), un paragraphe, ou une adresse de lien */
-  type?: 'ligne' | 'paragraphe' | 'lien';
+  /** Une ligne (titre, bouton), un paragraphe, une adresse de lien, ou un nombre (valeur de calcul) */
+  type?: 'ligne' | 'paragraphe' | 'lien' | 'nombre';
+  /** Nombre : bornes, décimales et unité affichée */
+  nombre?: { min: number; max: number; decimales: number; unite: string };
+  /** Autre texte modifiable dans la même bulle d'édition (ex. la valeur du taux sous son intitulé) */
+  lie?: string;
   max?: number;
   aide?: string;
 }
@@ -45,6 +49,10 @@ export const L = (cle: string, libelle: string, defaut: string, aide?: string, m
 export const P = (cle: string, libelle: string, defaut: string, aide?: string, max = 420): DefTexte => ({ cle, libelle, defaut, type: 'paragraphe', max, aide });
 /** Adresse de lien (page du site « /contact » ou « https://… ») */
 export const U = (cle: string, libelle: string, defaut: string, aide?: string): DefTexte => ({ cle, libelle, defaut, type: 'lien', max: 300, aide });
+
+/** Nombre utilisé dans un calcul (ex. taux du simulateur), enregistré avec un point décimal */
+export const N = (cle: string, libelle: string, defaut: number, nombre: { min: number; max: number; decimales: number; unite: string }, aide?: string): DefTexte =>
+  ({ cle, libelle, defaut: String(defaut), type: 'nombre', max: 10, nombre, aide });
 
 /** Série de cartes « titre + texte » numérotées : <prefixe>1.titre, <prefixe>1.texte… */
 export const atouts = (prefixe: string, liste: [string, string][], quoi = 'Atout', maxTitre = 50, maxTexte = 200): DefTexte[] =>
