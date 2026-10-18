@@ -63,11 +63,12 @@ export function Miniature({ config, petit = false, className = '' }: { config: T
   const cartes = zone('cartes');
   const pied = zone('footer');
   const titre = (v: Vars, sombre = false): CSSProperties => ({
-    fontFamily: 'Oswald, Impact, sans-serif', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.3,
-    color: sombre ? v.inverse : v.noir, fontSize: petit ? 10 : 15, lineHeight: 1.1,
+    fontFamily: v['police-titres'], fontWeight: Number(v['graisse-titres']), textTransform: v['casse-titres'] as CSSProperties['textTransform'],
+    letterSpacing: v['casse-titres'] === 'uppercase' ? 0.3 : 0, fontSynthesisWeight: 'none',
+    color: sombre ? v.inverse : v.noir, fontSize: (petit ? 10 : 15) * Number(v['echelle-titres']), lineHeight: 1.1,
   });
   return (
-    <div className={`overflow-hidden select-none ${className}`} style={{ background: cat.fond, fontFamily: 'Inter, system-ui, sans-serif' }} aria-hidden="true">
+    <div className={`overflow-hidden select-none ${className}`} style={{ background: cat.fond, fontFamily: cat['police-texte'] }} aria-hidden="true">
       {/* Barre du haut */}
       <div style={{ background: h.surface, padding: petit ? '5px 8px' : '7px 12px', display: 'flex', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: petit ? 8 : 10, fontWeight: 700, color: h.noir }}>SVM Ride</span>

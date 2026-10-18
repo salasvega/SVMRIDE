@@ -28,9 +28,10 @@ export default {
         // Alias historiques, utilisés dans tout le site et l'admin
         brand: { DEFAULT: token('bleu'), dark: token('bleu-hover'), light: token('bleu-clair') },
       },
+      // Polices réglables dans le Studio Design (variables de src/index.css)
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        display: ['Oswald', 'Impact', 'Arial Narrow', 'sans-serif'],
+        sans: 'var(--police-texte)',
+        display: 'var(--police-titres)',
       },
       // Ombres et arrondis réglables dans le Studio Design (variables de src/index.css)
       boxShadow: {

@@ -4,7 +4,7 @@
  * En cas d'erreur ou de configuration invalide : rien n'est injecté et le site
  * garde SVM Signature (variables de src/index.css).
  */
-import { cssDuTheme, couleursDuTheme, themeValide } from '../../src/config/design.ts';
+import { cssDuTheme, couleursDuTheme, themeValide, urlPolices } from '../../src/config/design.ts';
 import { SUPABASE_KEY, SUPABASE_URL } from '../generated/supabase-config.ts';
 
 export interface ThemePublie {
@@ -12,6 +12,8 @@ export interface ThemePublie {
   css: string;
   /** Couleur de la barre du navigateur sur mobile */
   primaire: string;
+  /** Polices Google Fonts à charger en plus d'Inter et Oswald */
+  polices: string | null;
 }
 
 let memoire: { valeur: ThemePublie | null; lu: number } | null = null;
@@ -29,7 +31,7 @@ export async function themePublie(): Promise<ThemePublie | null> {
     const v = rows[0]?.valeur;
     let valeur: ThemePublie | null = null;
     if (v && themeValide(v.config)) {
-      valeur = { version: Number(v.version) || 0, css: cssDuTheme(v.config), primaire: couleursDuTheme(v.config).primaire };
+      valeur = { version: Number(v.version) || 0, css: cssDuTheme(v.config), primaire: couleursDuTheme(v.config).primaire, polices: urlPolices(v.config) };
     } else if (v) {
       console.error('thème : configuration invalide, SVM Signature conservé');
     }
@@ -46,5 +48,9 @@ export function injecterTheme(html: string, theme: ThemePublie | null): string {
   if (!theme) return html;
   return html
     .replace(/<meta name="theme-color" content="#[0-9A-Fa-f]{6}" \/>/, `<meta name="theme-color" content="${theme.primaire}" />`)
-    .replace('</head>', `  <style id="theme-svm" data-version="${theme.version}">${theme.css}</style>\n  </head>`);
+    .replace(
+      '</head>',
+      (theme.polices ? `  <link id="theme-svm-polices" rel="stylesheet" href="${theme.polices}" />\n` : '') +
+        `  <style id="theme-svm" data-version="${theme.version}">${theme.css}</style>\n  </head>`,
+    );
 }

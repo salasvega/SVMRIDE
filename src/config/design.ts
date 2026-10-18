@@ -108,11 +108,16 @@ export interface OptionStyle {
   libelle: string;
   /** Variables posées par ce choix (la fonction reçoit les couleurs du thème) */
   variables: (c: Record<string, string>) => Record<string, string>;
+  /** Police Google Fonts à charger quand ce choix est utilisé (paramètre « family » de l'adresse) */
+  google?: string;
+  /** Une ligne de présentation (polices) */
+  aide?: string;
 }
 
 export interface ReglageStyle {
-  cle: 'arrondi_boutons' | 'arrondi_cartes' | 'ombres';
+  cle: 'police_titres' | 'police_texte' | 'taille_titres' | 'graisse_titres' | 'casse_titres' | 'arrondi_boutons' | 'arrondi_cartes' | 'ombres';
   libelle: string;
+  groupe: 'typographie' | 'formes';
   defaut: string;
   options: OptionStyle[];
 }
@@ -127,10 +132,82 @@ const ombreBoutons = (hex: string, a1: number, a2: number) => {
 
 const SANS_OMBRE = '0 0 #0000';
 
+/** Polices des titres (gratuites, Google Fonts) ; Oswald est déjà chargée par le site */
+const titres = (cle: string, libelle: string, pile: string, aide: string, google?: string): OptionStyle => ({
+  cle, libelle, aide, google, variables: () => ({ 'police-titres': pile }),
+});
+const texte = (cle: string, libelle: string, pile: string, aide: string, google?: string): OptionStyle => ({
+  cle, libelle, aide, google, variables: () => ({ 'police-texte': pile }),
+});
+const SECOURS_TEXTE = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+
 export const STYLE: ReglageStyle[] = [
+  {
+    cle: 'police_titres',
+    libelle: 'Police des titres',
+    groupe: 'typographie',
+    defaut: 'oswald',
+    options: [
+      titres('oswald', 'Oswald', 'Oswald, Impact, "Arial Narrow", sans-serif', 'Condensée et sportive, comme le logo (actuelle)'),
+      titres('bebas', 'Bebas Neue', '"Bebas Neue", Impact, sans-serif', 'Affiche, très impactante', 'Bebas+Neue'),
+      titres('barlow', 'Barlow Condensed', '"Barlow Condensed", "Arial Narrow", sans-serif', 'Condensée, nette et moderne', 'Barlow+Condensed:wght@500;600;700'),
+      titres('anton', 'Anton', 'Anton, Impact, sans-serif', 'Très grasse, esprit compétition', 'Anton'),
+      titres('rajdhani', 'Rajdhani', 'Rajdhani, sans-serif', 'Technique, esprit tableau de bord', 'Rajdhani:wght@500;600;700'),
+      titres('montserrat', 'Montserrat', 'Montserrat, sans-serif', 'Géométrique, moderne et lisible', 'Montserrat:wght@500;600;700'),
+      titres('playfair', 'Playfair Display', '"Playfair Display", Georgia, serif', 'Élégante, haut de gamme', 'Playfair+Display:wght@500;600;700'),
+    ],
+  },
+  {
+    cle: 'police_texte',
+    libelle: 'Police du texte',
+    groupe: 'typographie',
+    defaut: 'inter',
+    options: [
+      texte('inter', 'Inter', `Inter, ${SECOURS_TEXTE}`, 'Très lisible sur écran (actuelle)'),
+      texte('dmsans', 'DM Sans', `"DM Sans", ${SECOURS_TEXTE}`, 'Douce et moderne', 'DM+Sans:wght@400;500;600;700'),
+      texte('roboto', 'Roboto', `Roboto, ${SECOURS_TEXTE}`, 'Neutre et technique', 'Roboto:wght@400;500;700'),
+      texte('lato', 'Lato', `Lato, ${SECOURS_TEXTE}`, 'Chaleureuse et classique', 'Lato:wght@400;700'),
+      texte('opensans', 'Open Sans', `"Open Sans", ${SECOURS_TEXTE}`, 'Ouverte et accessible', 'Open+Sans:wght@400;500;600;700'),
+      texte('sourcesans', 'Source Sans 3', `"Source Sans 3", ${SECOURS_TEXTE}`, 'Sobre et compacte', 'Source+Sans+3:wght@400;500;600;700'),
+    ],
+  },
+  {
+    cle: 'taille_titres',
+    libelle: 'Taille des titres',
+    groupe: 'typographie',
+    defaut: 'normale',
+    options: [
+      { cle: 'compacte', libelle: 'Compacte', variables: () => ({ 'echelle-titres': '0.9' }) },
+      { cle: 'normale', libelle: 'Normale', variables: () => ({ 'echelle-titres': '1' }) },
+      { cle: 'grande', libelle: 'Grande', variables: () => ({ 'echelle-titres': '1.12' }) },
+      { cle: 'tres_grande', libelle: 'Très grande', variables: () => ({ 'echelle-titres': '1.25' }) },
+    ],
+  },
+  {
+    cle: 'graisse_titres',
+    libelle: 'Graisse des titres',
+    groupe: 'typographie',
+    defaut: 'semi_grasse',
+    options: [
+      { cle: 'normale', libelle: 'Normale', variables: () => ({ 'graisse-titres': '500' }) },
+      { cle: 'semi_grasse', libelle: 'Semi-grasse', variables: () => ({ 'graisse-titres': '600' }) },
+      { cle: 'grasse', libelle: 'Grasse', variables: () => ({ 'graisse-titres': '700' }) },
+    ],
+  },
+  {
+    cle: 'casse_titres',
+    libelle: 'Écriture des titres',
+    groupe: 'typographie',
+    defaut: 'majuscules',
+    options: [
+      { cle: 'majuscules', libelle: 'MAJUSCULES', variables: () => ({ 'casse-titres': 'uppercase', 'espacement-titres': '0.5px' }) },
+      { cle: 'normale', libelle: 'Normale', variables: () => ({ 'casse-titres': 'none', 'espacement-titres': 'normal' }) },
+    ],
+  },
   {
     cle: 'arrondi_boutons',
     libelle: 'Arrondi des boutons',
+    groupe: 'formes',
     defaut: 'arrondi',
     options: [
       { cle: 'carre', libelle: 'Carré', variables: () => ({ 'rayon-bouton': '0px' }) },
@@ -142,6 +219,7 @@ export const STYLE: ReglageStyle[] = [
   {
     cle: 'arrondi_cartes',
     libelle: 'Arrondi des cartes',
+    groupe: 'formes',
     defaut: 'arrondi',
     options: [
       { cle: 'carre', libelle: 'Carré', variables: () => ({ 'rayon-carte': '0px', 'rayon-carte-moto': '0px' }) },
@@ -152,6 +230,7 @@ export const STYLE: ReglageStyle[] = [
   {
     cle: 'ombres',
     libelle: 'Ombres',
+    groupe: 'formes',
     defaut: 'legeres',
     options: [
       {
@@ -188,6 +267,24 @@ export const STYLE: ReglageStyle[] = [
 ];
 
 export type Style = Partial<Record<ReglageStyle['cle'], string>>;
+
+/**
+ * Adresse Google Fonts des polices choisies par un thème (celles qui ne sont
+ * pas déjà chargées par le site), ou null. Construite uniquement à partir du
+ * registre : aucune saisie n'y entre.
+ */
+export function urlPolices(t: ThemeConfig): string | null {
+  const familles = STYLE.filter((r) => r.groupe === 'typographie')
+    .map((r) => r.options.find((o) => o.cle === t.style?.[r.cle])?.google)
+    .filter((g): g is string => !!g);
+  return familles.length ? `https://fonts.googleapis.com/css2?${[...new Set(familles)].map((f) => `family=${f}`).join('&')}&display=swap` : null;
+}
+
+/** Toutes les polices proposées (pour les échantillons de l'éditeur) */
+export function urlToutesPolices(): string {
+  const familles = STYLE.flatMap((r) => r.options.map((o) => o.google)).filter((g): g is string => !!g);
+  return `https://fonts.googleapis.com/css2?${familles.map((f) => `family=${f}`).join('&')}&display=swap`;
+}
 
 /* ===== Sections (attribut data-zone posé sur leur élément racine) ===== */
 
@@ -259,7 +356,7 @@ export const THEME_SIGNATURE: ThemeConfig = {
   couleurs: { ...COULEURS_SIGNATURE },
   derivees: { ...DERIVEES_SIGNATURE },
   sections: {},
-  style: { arrondi_boutons: 'arrondi', arrondi_cartes: 'arrondi', ombres: 'legeres' },
+  style: Object.fromEntries(STYLE.map((r) => [r.cle, r.defaut])) as Style,
 };
 
 const estObjet = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);

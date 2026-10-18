@@ -164,26 +164,51 @@ export function OngletPersonnaliser({ session, onCouleur, onSection, onSectionGl
           </ul>
         </Bloc>
 
-        <Bloc titre="Style" sousTitre="Formes et profondeur des éléments.">
-          <div className="space-y-4 py-1">
-            {STYLE.map((g) => {
+        <Bloc titre="Typographie" sousTitre="Polices gratuites (Google Fonts), chargées seulement si elles sont choisies.">
+          <div className="space-y-5 py-1">
+            <div className="rounded-xl p-4" style={{ background: vars.fond }}>
+              <p style={{ fontFamily: vars['police-titres'], fontWeight: Number(vars['graisse-titres']), textTransform: vars['casse-titres'] as 'none', letterSpacing: vars['espacement-titres'], fontSize: `${28 * Number(vars['echelle-titres'])}px`, lineHeight: 1.1, color: vars.noir, fontSynthesisWeight: 'none' }}>
+                Bienvenue chez SVM Ride
+              </p>
+              <p className="mt-2 text-[15px]" style={{ fontFamily: vars['police-texte'], color: vars['gris-texte'] }}>
+                Votre spécialiste du deux-roues basé en Île-de-France : motos et scooters d'occasion contrôlés, reprise et financement.
+              </p>
+            </div>
+            {STYLE.filter((g) => g.cle === 'police_titres' || g.cle === 'police_texte').map((g) => {
               const actuel = config.style?.[g.cle] ?? g.defaut;
+              const variable = g.cle === 'police_titres' ? 'police-titres' : 'police-texte';
               return (
                 <fieldset key={g.cle}>
                   <legend className="mb-2 text-sm font-semibold text-[#111111]">{g.libelle}</legend>
-                  <div className="flex flex-wrap gap-2">
-                    {g.options.map((o) => (
-                      <label key={o.cle} className={`cursor-pointer rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-colors ${actuel === o.cle ? 'border-[#111111] bg-[#111111] text-white' : 'border-[#D1D5DB] bg-white text-[#111111] hover:border-[#111111]'}`}>
-                        <input type="radio" name={g.cle} value={o.cle} checked={actuel === o.cle} onChange={() => onStyle(g.cle, o.cle)} className="sr-only" />
-                        {o.libelle}
-                      </label>
-                    ))}
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {g.options.map((o) => {
+                      const choisi = actuel === o.cle;
+                      return (
+                        <label key={o.cle} className={`cursor-pointer rounded-xl border-2 px-3 py-2.5 transition-colors ${choisi ? 'border-[#111111] bg-[#F9F9F9]' : 'border-[#D1D5DB] bg-white hover:border-[#111111]'}`}>
+                          <input type="radio" name={g.cle} value={o.cle} checked={choisi} onChange={() => onStyle(g.cle, o.cle)} className="sr-only" />
+                          <span className="block text-lg leading-tight text-[#111111]" style={{ fontFamily: o.variables({})[variable], fontWeight: g.cle === 'police_titres' ? 600 : 400 }}>
+                            {g.cle === 'police_titres' ? 'Derniers arrivages' : 'Moto contrôlée et garantie'}
+                          </span>
+                          <span className="mt-1 flex items-center justify-between gap-2 text-xs text-[#666666]">
+                            <span><strong className="text-[#111111]">{o.libelle}</strong> · {o.aide}</span>
+                            {choisi && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#111111]" aria-hidden="true" />}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
                 </fieldset>
               );
             })}
+            <ChoixPastilles reglages={STYLE.filter((g) => g.groupe === 'typographie' && g.cle !== 'police_titres' && g.cle !== 'police_texte')} config={config} onStyle={onStyle} />
+          </div>
+        </Bloc>
+
+        <Bloc titre="Formes" sousTitre="Arrondis et profondeur des éléments.">
+          <div className="space-y-4 py-1">
+            <ChoixPastilles reglages={STYLE.filter((g) => g.groupe === 'formes')} config={config} onStyle={onStyle} />
             <div className="rounded-xl border border-dashed border-[#D1D5DB] px-3 py-2 text-xs text-[#666666]">
-              Bientôt : typographies, tailles des titres, espacements et animations.
+              Bientôt : espacements et animations.
             </div>
           </div>
         </Bloc>
@@ -204,6 +229,29 @@ export function OngletPersonnaliser({ session, onCouleur, onSection, onSectionGl
         </div>
       </aside>
     </div>
+  );
+}
+
+function ChoixPastilles({ reglages, config, onStyle }: { reglages: typeof STYLE; config: ThemeConfig; onStyle: Props['onStyle'] }) {
+  return (
+    <>
+      {reglages.map((g) => {
+        const actuel = config.style?.[g.cle] ?? g.defaut;
+        return (
+          <fieldset key={g.cle}>
+            <legend className="mb-2 text-sm font-semibold text-[#111111]">{g.libelle}</legend>
+            <div className="flex flex-wrap gap-2">
+              {g.options.map((o) => (
+                <label key={o.cle} className={`cursor-pointer rounded-xl border-2 px-3 py-2 text-sm font-semibold transition-colors ${actuel === o.cle ? 'border-[#111111] bg-[#111111] text-white' : 'border-[#D1D5DB] bg-white text-[#111111] hover:border-[#111111]'}`}>
+                  <input type="radio" name={g.cle} value={o.cle} checked={actuel === o.cle} onChange={() => onStyle(g.cle, o.cle)} className="sr-only" />
+                  {o.libelle}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        );
+      })}
+    </>
   );
 }
 

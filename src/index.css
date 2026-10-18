@@ -83,7 +83,15 @@
   --degrade-or: linear-gradient(90deg, #2A2112, #B8902F 55%, #D9B965);
   --degrade-or-sombre: linear-gradient(90deg, #6E5418, #B8902F 55%, #D9B965); /* sur fond sombre */
 
-  /* Style */
+  /* Typographie */
+  --police-titres: Oswald, Impact, "Arial Narrow", sans-serif;
+  --police-texte: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --echelle-titres: 1;
+  --graisse-titres: 600;
+  --casse-titres: uppercase;
+  --espacement-titres: 0.5px;
+
+  /* Formes */
   --rayon-bouton: 12px;
   --rayon-carte: 16px;
   --rayon-carte-moto: 18px;
@@ -131,6 +139,7 @@
 .site {
   background: var(--fond);
   color: var(--gris-texte);
+  font-family: var(--police-texte);
   font-size: 15px;
 }
 
@@ -138,30 +147,33 @@
   .site { font-size: 16px; }
 }
 
-/* Titres : Oswald en majuscules, comme le logo */
+/* Titres : Oswald en majuscules, comme le logo (police, graisse, écriture et
+   taille réglables dans le Studio Design ; sans gras simulé si la police n'a
+   qu'une graisse) */
 .site h1,
 .site h2,
 .titre-display {
-  font-family: 'Oswald', 'Impact', 'Arial Narrow', sans-serif;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  font-family: var(--police-titres);
+  font-weight: var(--graisse-titres);
+  font-synthesis-weight: none;
+  text-transform: var(--casse-titres);
+  letter-spacing: var(--espacement-titres);
   line-height: 1.1;
   color: var(--noir);
 }
 
-.site h1 { font-size: 38px; }
-@media (min-width: 768px) { .site h1 { font-size: 46px; } }
-@media (min-width: 1024px) { .site h1 { font-size: 52px; } }
+.site h1 { font-size: calc(38px * var(--echelle-titres)); }
+@media (min-width: 768px) { .site h1 { font-size: calc(46px * var(--echelle-titres)); } }
+@media (min-width: 1024px) { .site h1 { font-size: calc(52px * var(--echelle-titres)); } }
 
 /* Titre principal du hero (photo plein cadre) */
-.site h1.titre-hero { font-size: 40px; color: var(--inverse); }
-@media (min-width: 768px) { .site h1.titre-hero { font-size: 56px; } }
-@media (min-width: 1024px) { .site h1.titre-hero { font-size: 66px; } }
+.site h1.titre-hero { font-size: calc(40px * var(--echelle-titres)); color: var(--inverse); }
+@media (min-width: 768px) { .site h1.titre-hero { font-size: calc(56px * var(--echelle-titres)); } }
+@media (min-width: 1024px) { .site h1.titre-hero { font-size: calc(66px * var(--echelle-titres)); } }
 
 /* Titres de section */
-.site h2.titre-section { font-size: 28px; }
-@media (min-width: 768px) { .site h2.titre-section { font-size: 36px; } }
+.site h2.titre-section { font-size: calc(28px * var(--echelle-titres)); }
+@media (min-width: 768px) { .site h2.titre-section { font-size: calc(36px * var(--echelle-titres)); } }
 
 /* Sur fond sombre, les titres passent en blanc */
 .site .sur-sombre h1,

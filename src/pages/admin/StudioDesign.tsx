@@ -12,14 +12,14 @@ import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, History, LayoutGrid, Loader2, MonitorSmartphone, Palette as IconePalette, Rocket, SlidersHorizontal, X } from 'lucide-react';
 import { AdminLayout } from '../../components/admin/AdminLayout';
 import {
-  controlerTheme, couleursDuTheme, deriveesPour, STYLE, themeComplet,
+  controlerTheme, couleursDuTheme, deriveesPour, STYLE, themeComplet, urlToutesPolices,
   type CleRole, type CleSection, type ReglageSection, type ThemeConfig,
 } from '../../config/design';
 import {
   chargerStudio, creerTheme, messageErreur, modifierTheme, publierTheme, restaurerVersion, supprimerTheme,
   type Publication, type ThemeEnLigne, type ThemeLigne,
 } from '../../lib/studioDesign';
-import { appliquerThemePublie } from '../../lib/theme';
+import { appliquerThemePublie, chargerToutesPolices } from '../../lib/theme';
 import { OngletThemes, Statut } from '../../components/admin/studio/OngletThemes';
 import { OngletPersonnaliser, type Session } from '../../components/admin/studio/OngletPersonnaliser';
 import { OngletApercu } from '../../components/admin/studio/OngletApercu';
@@ -107,6 +107,8 @@ export function StudioDesign() {
     }
   }, []);
   useEffect(() => { charger(); }, [charger]);
+  // Échantillons des polices proposées (cartes, éditeur, miniatures)
+  useEffect(() => chargerToutesPolices(urlToutesPolices()), []);
 
   useEffect(() => {
     if (!message) return;
