@@ -17,6 +17,7 @@ import { Button } from '../components/ui/Button';
 import { Portrait } from '../components/equipe/Portrait';
 import { NotFound } from './NotFound';
 import { useTexte } from '../lib/textes';
+import { Masquable } from '../components/ui/Masquable';
 
 export function Equipe() {
   const t = useTexte();
@@ -103,47 +104,51 @@ export function Equipe() {
       )}
 
       {collaborateurs.length > 0 && (
-        <Section zone="equipe" background="white" className="!pt-0 !pb-12 md:!pb-16">
-          <Container>
-            <h2 className="titre-section filet-apres mb-8">{t('equipe.collaborateurs.titre')}</h2>
-            <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
-              {collaborateurs.map((m) => (
-                <li key={m.id}>
-                  <article className="carte flex h-full flex-col items-center px-6 pb-7 pt-8 text-center transition-[box-shadow,transform] duration-180 hover:-translate-y-1 hover:shadow-vehicule motion-reduce:hover:translate-y-0">
-                    <Portrait membre={m} taille={128} decoratif={false} />
-                    <h3 className="mt-5 text-xl font-semibold text-noir">
-                      {nomAffiche(m)}
-                    </h3>
-                    <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-or-texte">{m.fonction}</p>
-                    {m.citation && (
-                      <p className="mt-4 border-t border-bordure pt-4 text-[15px] italic leading-relaxed text-gris">
-                        « {m.citation} »
-                      </p>
-                    )}
-                  </article>
-                </li>
-              ))}
-            </ul>
-          </Container>
-        </Section>
+        <Masquable id="equipe.collaborateurs">
+          <Section zone="equipe" background="white" className="!pt-0 !pb-12 md:!pb-16">
+            <Container>
+              <h2 className="titre-section filet-apres mb-8">{t('equipe.collaborateurs.titre')}</h2>
+              <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
+                {collaborateurs.map((m) => (
+                  <li key={m.id}>
+                    <article className="carte flex h-full flex-col items-center px-6 pb-7 pt-8 text-center transition-[box-shadow,transform] duration-180 hover:-translate-y-1 hover:shadow-vehicule motion-reduce:hover:translate-y-0">
+                      <Portrait membre={m} taille={128} decoratif={false} />
+                      <h3 className="mt-5 text-xl font-semibold text-noir">
+                        {nomAffiche(m)}
+                      </h3>
+                      <p className="mt-1 text-xs font-semibold uppercase tracking-[0.12em] text-or-texte">{m.fonction}</p>
+                      {m.citation && (
+                        <p className="mt-4 border-t border-bordure pt-4 text-[15px] italic leading-relaxed text-gris">
+                          « {m.citation} »
+                        </p>
+                      )}
+                    </article>
+                  </li>
+                ))}
+              </ul>
+            </Container>
+          </Section>
+        </Masquable>
       )}
 
-      <Section background="dark" className="!py-12 md:!py-16">
-        <Container className="text-center">
-          <h2 className="titre-section filet-avant mb-5">{t('equipe.final.titre')}</h2>
-          <p className="mx-auto mb-8 max-w-2xl text-base md:text-lg text-inverse-84">
-            {t('equipe.final.texte')}
-          </p>
-          <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <Link to="/contact" tabIndex={-1}>
-              <Button size="lg" fullWidth className="sm:w-auto">{t('equipe.final.bouton1')}</Button>
-            </Link>
-            <Link to="/vehicules" tabIndex={-1}>
-              <Button size="lg" variant="secondary" fullWidth className="sm:w-auto">{t('equipe.final.bouton2')}</Button>
-            </Link>
-          </div>
-        </Container>
-      </Section>
+      <Masquable id="equipe.final">
+        <Section background="dark" className="!py-12 md:!py-16">
+          <Container className="text-center">
+            <h2 className="titre-section filet-avant mb-5">{t('equipe.final.titre')}</h2>
+            <p className="mx-auto mb-8 max-w-2xl text-base md:text-lg text-inverse-84">
+              {t('equipe.final.texte')}
+            </p>
+            <div className="flex flex-col justify-center gap-3 sm:flex-row">
+              <Link to="/contact" tabIndex={-1}>
+                <Button size="lg" fullWidth className="sm:w-auto">{t('equipe.final.bouton1')}</Button>
+              </Link>
+              <Link to="/vehicules" tabIndex={-1}>
+                <Button size="lg" variant="secondary" fullWidth className="sm:w-auto">{t('equipe.final.bouton2')}</Button>
+              </Link>
+            </div>
+          </Container>
+        </Section>
+      </Masquable>
     </>
   );
 }

@@ -12,6 +12,7 @@ import type { LucideIcon } from 'lucide-react';
 import { useTextes } from './textes';
 import { EN_APERCU } from './apercuDemo';
 import { cleElement, cleIcone, cleOrdre, LISTES_PAR_ID, lireOrdre } from '../config/textes-listes';
+import { cleMasquee } from '../config/textes-sections';
 import { ICONES } from '../config/icones';
 
 export interface Liste {
@@ -49,4 +50,9 @@ export function useListe(listeId: string): Liste {
 export function colonnes(n: number, origine: { n: number; classes: string }, parNombre: Record<number, string>): string {
   if (n === origine.n) return origine.classes;
   return parNombre[n] ?? parNombre[0] ?? origine.classes;
+}
+
+/** Vrai si la section est masquée (admin, « Textes du site ») */
+export function useMasquee(id: string): boolean {
+  return useTextes()[cleMasquee(id)] === 'oui';
 }

@@ -20,6 +20,7 @@ import {
   cleElement, cleIcone, cleOrdre, elementDeCle, LISTES, LISTES_PAR_ID, lireOrdre, NOMS_ICONES, nouvelId, type ListeDef,
 } from '../../config/textes-listes';
 import { ICONES, NOMS_FR } from '../../config/icones';
+import { cleMasquee, sectionMasquable, SECTIONS_MASQUABLES } from '../../config/textes-sections';
 import type { ActionListe } from '../../lib/edition';
 
 interface Version {
@@ -117,6 +118,7 @@ function afficher(t: Textes, cle: string): string {
     const nom = t[cle] ?? li?.icones?.[id] ?? li?.iconeNouveau ?? '';
     return NOMS_FR[nom] ?? nom;
   }
+  if (cle.endsWith('.masquee')) return t[cle] === 'oui' ? 'Masquée' : 'Affichée';
   const def = TEXTES[cle];
   if (def?.type === 'nombre') return `${(t[cle] ?? def.defaut).replace('.', ',')} ${def.nombre?.unite ?? ''}`.trim();
   return texte(t, cle);
@@ -127,6 +129,8 @@ function libelleComplet(cle: string): string {
     const t = s.textes.find((x) => x.cle === cle);
     if (t) return `${p.libelle} › ${s.titre} › ${t.libelle}`;
   }
+  const sm = SECTIONS_MASQUABLES.find((x) => cleMasquee(x.id) === cle);
+  if (sm) return `${PAGES.find((p) => p.cle === sm.page)?.libelle ?? sm.page} › ${sm.libelle} › Affichage de la section`;
   const l = LISTES.find((x) => cle.startsWith(`${x.id}.`));
   const ou = ouDe(cle);
   if (l && ou) {
@@ -519,6 +523,7 @@ export function TextesSite() {
     setOutil(null);
     setModifs((m) => ({ ...m, [cleOrdre(l)]: ids.join(',') }));
   };
+  const basculerSection = (id: string, masquer: boolean) => setModifs((m) => ({ ...m, [cleMasquee(id)]: masquer ? 'oui' : '' }));
   const changerIcone = (l: ListeDef, id: string, nom: string) => setModifs((m) => ({ ...m, [cleIcone(l, id)]: nom }));
   const origineListe = (l: ListeDef) => setModifs((m) => ({
     ...m,
@@ -690,7 +695,7 @@ export function TextesSite() {
               textes={courants}
               hauteurMax={1400}
               onNavigation={surNavigation}
-              edition={{ actif, tous, utiliser, onClic: (cle) => { setOutil(null); setActif(cle); }, onListe: actionListe }}
+              edition={{ actif, tous, utiliser, onClic: (cle) => { setOutil(null); setActif(cle); }, onListe: actionListe, onSection: basculerSection }}
               legende="Un clic sur le texte d’un lien ou d’un bouton le modifie : pour changer de page ou avancer dans un formulaire, utilisez la liste « Page » ou « Utiliser la page ». Les visiteurs verront les changements après « Enregistrer »."
               bulle={outil && LISTES_PAR_ID[outil.liste] ? (() => {
                 const l = LISTES_PAR_ID[outil.liste];
@@ -731,7 +736,28 @@ export function TextesSite() {
               {resultats.map(({ page: p, sections }) =>
                 sections.map((s) => (
                   <section key={`${p.cle}-${s.titre}`} className="rounded-xl border-2 border-[#D1D5DB] bg-white px-4 pt-3 md:px-5">
-                    <h2 className="text-lg font-bold text-[#111111]">{q ? `${p.libelle} › ${s.titre}` : s.titre}</h2>
+                    {(() => {
+                      const sm = sectionMasquable(p.cle, s.titre);
+                      const masquee = !!sm && valeur(cleMasquee(sm.id)) === 'oui';
+                      return (
+                        <>
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <h2 className={`text-lg font-bold ${masquee ? 'text-[#888888]' : 'text-[#111111]'}`}>{q ? `${p.libelle} › ${s.titre}` : s.titre}</h2>
+                            {sm && (
+                              <label className="inline-flex cursor-pointer items-center gap-2 text-sm font-semibold text-[#111111]">
+                                <span className={masquee ? 'text-[#888888]' : ''}>{masquee ? 'Section masquée' : 'Section affichée'}</span>
+                                <input type="checkbox" role="switch" className="peer sr-only" checked={!masquee} onChange={(e) => basculerSection(sm.id, !e.target.checked)}
+                                  aria-label={`Afficher la section « ${sm.libelle} » sur le site`} />
+                                <span aria-hidden="true" className={`relative inline-flex h-6 w-11 rounded-full transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-[#111111] peer-focus-visible:ring-offset-2 ${masquee ? 'bg-[#D1D5DB]' : 'bg-[#111111]'}`}>
+                                  <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${masquee ? 'translate-x-0.5' : 'translate-x-[22px]'}`} />
+                                </span>
+                              </label>
+                            )}
+                          </div>
+                          {masquee && <p className="mt-1 rounded-lg bg-[#F5F5F5] px-3 py-2 text-sm text-[#555555]">Cette section n’apparaît plus sur le site. Ses textes restent modifiables et réapparaîtront si vous l’affichez de nouveau.</p>}
+                        </>
+                      );
+                    })()}
                     {s.aide && <p className="text-sm text-[#666666]">{s.aide}</p>}
                     {(() => {
                       const l = !q ? listeDe(p.cle, s.titre) : undefined;
@@ -796,7 +822,7 @@ export function TextesSite() {
             {/* Aperçu */}
             <aside className="hidden xl:block xl:sticky xl:top-24 xl:self-start">
               {page.chemin || q ? (
-                <ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp, onListe: actionListe }}
+                <ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp, onListe: actionListe, onSection: basculerSection }}
                   legende="Cliquez sur un texte de l’aperçu pour aller à son champ. Les visiteurs verront les changements après « Enregistrer »." />
               ) : (
                 <p className="rounded-xl border-2 border-dashed border-[#D1D5DB] p-4 text-sm text-[#666666]">Aperçu des résultats Google sous chaque page, à gauche.</p>
@@ -811,7 +837,7 @@ export function TextesSite() {
               className="inline-flex items-center gap-2 rounded-xl border-2 border-[#111111] bg-white px-4 py-2.5 text-sm font-semibold text-[#111111]">
               <Eye className="h-4 w-4" aria-hidden="true" /> {apercuMobile ? 'Masquer l’aperçu' : 'Voir l’aperçu de la page'}
             </button>
-            {apercuMobile && <div className="mt-3"><ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp, onListe: actionListe }} /></div>}
+            {apercuMobile && <div className="mt-3"><ApercuPage chemin={cheminApercu} textes={courants} edition={{ actif, montrer, onClic: allerAuChamp, onListe: actionListe, onSection: basculerSection }} /></div>}
           </div>
         )}
       </div>

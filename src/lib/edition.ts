@@ -10,6 +10,7 @@
  */
 import { TEXTES } from '../config/textes';
 import { elementDeCle, LISTES_PAR_ID } from '../config/textes-listes';
+import { SECTIONS_PAR_ID } from '../config/textes-sections';
 
 const DEBUT = '⁣';
 const FIN = '⁤';
@@ -66,7 +67,8 @@ export type MessageEdition =
   | { type: 'svm-edition-actif'; cle: string | null; montrer?: boolean }
   | { type: 'svm-edition-clic'; cle: string; boite: Rect }
   | { type: 'svm-edition-position'; cle: string; boite: Rect | null; hauteurVue: number }
-  | { type: 'svm-liste'; action: ActionListe; liste: string; id: string; boite: Rect };
+  | { type: 'svm-liste'; action: ActionListe; liste: string; id: string; boite: Rect }
+  | { type: 'svm-section'; id: string; masquer: boolean };
 
 export type ActionListe = 'monter' | 'descendre' | 'ajouter' | 'supprimer' | 'icone';
 
@@ -142,6 +144,11 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
   const outils = document.createElement('div');
   outils.id = 'svm-outils';
   outils.setAttribute('role', 'toolbar');
+  /** Section survolée (barre : masquer / afficher) */
+  let section: HTMLElement | null = null;
+  const outilsSection = document.createElement('div');
+  outilsSection.id = 'svm-outils-section';
+  outilsSection.setAttribute('role', 'toolbar');
   const envoyer = (m: MessageEdition) => window.parent.postMessage(m, window.location.origin);
 
   const style = document.createElement('style');
@@ -158,6 +165,10 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
     #svm-outils button:hover{background:rgba(255,255,255,.16)}
     #svm-outils button[disabled]{opacity:.3;cursor:not-allowed;background:none}
     #svm-outils button[data-action=supprimer]:not([disabled]):hover{background:#E11D48}
+    #svm-outils-section{position:fixed;z-index:2147483647;display:none;align-items:center;gap:6px;padding:4px 4px 4px 10px;background:#fff;border:1.5px solid #111;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.18);font:600 12px/1 system-ui,sans-serif;color:#111}
+    #svm-outils-section button{all:unset;cursor:pointer;padding:6px 9px;border-radius:7px;background:#111;color:#fff;font:600 12px/1 system-ui,sans-serif;white-space:nowrap}
+    #svm-outils-section button:hover{background:#333}
+    #svm-outils-section span{white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
     #svm-edition-calque .crayon{position:fixed;transform:translate(-50%,-100%);background:#E11D48;color:#fff;border-radius:999px;font:600 11px/1 system-ui,sans-serif;padding:4px 8px;white-space:nowrap}
     html.svm-edition-survol, html.svm-edition-survol *{cursor:text !important}`;
 
@@ -209,6 +220,23 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
       outils.style.left = `${Math.min(Math.max(4, r.right - largeur), window.innerWidth - largeur - 4)}px`;
       outils.style.top = `${Math.max(4, r.top - 34)}px`;
     } else outils.style.display = 'none';
+    // Section survolée : masquer / afficher
+    if (section && !document.body.contains(section)) section = null;
+    const rs = section?.getBoundingClientRect();
+    if (section && rs && !utiliser && rs.bottom > 40 && rs.top < window.innerHeight - 30) {
+      const id = section.dataset.section ?? '';
+      const masquee = section.dataset.masquee === 'oui';
+      const cle = `${id}/${masquee}`;
+      if (outilsSection.dataset.cle !== cle) {
+        const nom = (SECTIONS_PAR_ID[id]?.libelle ?? id).replace(/[<>&"]/g, '');
+        outilsSection.innerHTML = `<span>Section « ${nom} »</span><button type="button" data-section-action="${masquee ? 'afficher' : 'masquer'}">${masquee ? 'Afficher la section' : 'Masquer la section'}</button>`;
+        outilsSection.dataset.cle = cle;
+      }
+      const r = section.getBoundingClientRect();
+      outilsSection.style.display = 'flex';
+      outilsSection.style.left = `${Math.max(6, r.left + 10)}px`;
+      outilsSection.style.top = `${Math.min(Math.max(6, r.top + 8), window.innerHeight - 40)}px`;
+    } else outilsSection.style.display = 'none';
     calque.innerHTML = morceaux.join('');
     if (courant) {
       const z = zones.find((x) => x.cle === courant && x.boite.y + x.boite.h > 0 && x.boite.y < window.innerHeight) ?? zones.find((x) => x.cle === courant);
@@ -234,10 +262,13 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
   const surMouvement = (e: MouseEvent) => {
     if (!actif || utiliser) return;
     const cible = e.target instanceof Element ? e.target : null;
-    if (!cible?.closest('#svm-outils')) {
-      const el = (document.elementFromPoint(e.clientX, e.clientY)?.closest('[data-element]') as HTMLElement | null) ?? null;
-      if (el !== element) {
+    if (!cible?.closest('#svm-outils, #svm-outils-section')) {
+      const sousPointeur = document.elementFromPoint(e.clientX, e.clientY);
+      const el = (sousPointeur?.closest('[data-element]') as HTMLElement | null) ?? null;
+      const sec = (sousPointeur?.closest('[data-section]') as HTMLElement | null) ?? null;
+      if (el !== element || sec !== section) {
         element = el;
+        section = sec;
         planifier();
       }
     }
@@ -251,6 +282,16 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
   };
   const surClic = (e: MouseEvent) => {
     if (!actif || utiliser) return;
+    const boutonSection = e.target instanceof Element ? e.target.closest<HTMLButtonElement>('#svm-outils-section button') : null;
+    if (boutonSection || (e.target instanceof Element && e.target.closest('#svm-outils-section'))) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (boutonSection && section?.dataset.section) {
+        envoyer({ type: 'svm-section', id: section.dataset.section, masquer: boutonSection.dataset.sectionAction === 'masquer' });
+        outilsSection.dataset.cle = '';
+      }
+      return;
+    }
     const bouton = e.target instanceof Element ? e.target.closest<HTMLButtonElement>('#svm-outils button') : null;
     if (bouton || (e.target instanceof Element && e.target.closest('#svm-outils'))) {
       e.preventDefault();
@@ -273,7 +314,7 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
   // Les textes des boutons et liens s'éditent : pas d'action au clic ni au toucher
   const bloquer = (e: Event) => {
     if (!actif || utiliser) return;
-    if (e.target instanceof Element && e.target.closest('#svm-outils')) {
+    if (e.target instanceof Element && e.target.closest('#svm-outils, #svm-outils-section')) {
       e.preventDefault();
       e.stopPropagation();
       return;
@@ -286,13 +327,20 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
   };
 
   window.addEventListener('mousemove', surMouvement, true);
+  // Pointeur sorti de l'aperçu : barres d'outils masquées
+  document.documentElement.addEventListener('mouseleave', () => {
+    if (!element && !section) return;
+    element = null;
+    section = null;
+    planifier();
+  });
   window.addEventListener('click', surClic, true);
   window.addEventListener('pointerdown', bloquer, true);
   window.addEventListener('mousedown', bloquer, true);
   window.addEventListener('scroll', planifier, true);
   window.addEventListener('resize', planifier);
   new MutationObserver((liste) => {
-    if (liste.every((m) => (calque && calque.contains(m.target)) || outils.contains(m.target))) return;
+    if (liste.every((m) => (calque && calque.contains(m.target)) || outils.contains(m.target) || outilsSection.contains(m.target))) return;
     planifier();
   }).observe(document.body, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['class', 'style', 'placeholder', 'open', 'hidden'] });
 
@@ -306,9 +354,11 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
         if (actif) {
           document.head.appendChild(style);
           document.body.appendChild(outils);
+          document.body.appendChild(outilsSection);
         } else {
           style.remove();
           outils.remove();
+          outilsSection.remove();
           calque?.remove();
           calque = null;
           document.documentElement.classList.remove('svm-edition-survol');
@@ -319,6 +369,7 @@ export function demarrerEdition(changerMarquage: (actif: boolean) => void) {
         utiliser = !!m.utiliser;
         survol = null;
         element = null;
+        section = null;
         document.documentElement.classList.remove('svm-edition-survol');
       }
       planifier();

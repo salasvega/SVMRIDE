@@ -13,11 +13,13 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 import { compresserImage, extensionDe } from '../lib/compressionImage';
 import { useTexte } from '../lib/textes';
-import { useListe } from '../lib/listes';
+import { useListe, useMasquee } from '../lib/listes';
+import { Masquable } from '../components/ui/Masquable';
 
 export function TradeIn() {
   const t = useTexte();
   const etapes = useListe('reprises.etapes');
+  const etapesMasquees = useMasquee('reprises.etapes');
   // Données du formulaire de reprise
   const [formData, setFormData] = useState({
     name: '',
@@ -140,31 +142,33 @@ export function TradeIn() {
 
       <Section background="white" className="!py-8">
         <Container size="md">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Colonne gauche : explication du process */}
-            <div>
-              <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
-                {t('reprises.etapes.titre')}
-              </h2>
+          <div className={etapesMasquees ? 'grid gap-12 max-w-2xl mx-auto' : 'grid lg:grid-cols-2 gap-12'}>
+            {/* Colonne gauche : explication du process (masquable dans l'admin) */}
+<Masquable id="reprises.etapes">
+              <div>
+                <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
+                  {t('reprises.etapes.titre')}
+                </h2>
 
-              <div className="space-y-6">
-                {etapes.ids.map((id, i) => (
-                  <div key={id} {...etapes.attrs(id)} className="flex gap-4">
-                    <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
-                      {i + 1}
+                <div className="space-y-6">
+                  {etapes.ids.map((id, i) => (
+                    <div key={id} {...etapes.attrs(id)} className="flex gap-4">
+                      <div className="flex-shrink-0 pastille-etape w-12 h-12 text-lg">
+                        {i + 1}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-noir mb-2">
+                          {t(etapes.cle(id, 'titre'))}
+                        </h3>
+                        <p className="text-gris leading-relaxed">
+                          {t(etapes.cle(id, 'texte'))}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-noir mb-2">
-                        {t(etapes.cle(id, 'titre'))}
-                      </h3>
-                      <p className="text-gris leading-relaxed">
-                        {t(etapes.cle(id, 'texte'))}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+</Masquable>
 
             {/* Colonne droite : formulaire de reprise */}
             <div>

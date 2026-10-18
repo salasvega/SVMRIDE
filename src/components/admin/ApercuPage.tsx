@@ -24,6 +24,8 @@ export interface OptionsEdition {
   onClic?: (cle: string) => void;
   /** Bouton de la barre d'outils d'un élément de liste (monter, ajouter, supprimer…) */
   onListe?: (action: ActionListe, liste: string, id: string) => void;
+  /** Bouton « Masquer / Afficher la section » */
+  onSection?: (id: string, masquer: boolean) => void;
 }
 
 export function ApercuPage({
@@ -92,6 +94,7 @@ export function ApercuPage({
 
   const onClic = edition?.onClic;
   const onListe = edition?.onListe;
+  const onSection = edition?.onSection;
   useEffect(() => {
     const ecouter = (e: MessageEvent<MessageApercu | MessageEdition>) => {
       if (e.origin !== window.location.origin || e.source !== cadre.current?.contentWindow) return;
@@ -104,6 +107,8 @@ export function ApercuPage({
         setPosition({ boite: m.boite, vue: 0 });
       } else if (m?.type === 'svm-edition-position') {
         setPosition({ boite: m.boite, vue: m.hauteurVue });
+      } else if (m?.type === 'svm-section') {
+        onSection?.(m.id, m.masquer);
       } else if (m?.type === 'svm-liste') {
         setPosition({ boite: m.boite, vue: 0 });
         onListe?.(m.action, m.liste, m.id);
@@ -111,7 +116,7 @@ export function ApercuPage({
     };
     window.addEventListener('message', ecouter);
     return () => window.removeEventListener('message', ecouter);
-  }, [envoyer, onClic, onListe, onNavigation]);
+  }, [envoyer, onClic, onListe, onSection, onNavigation]);
 
   const avecBulle = !!bulle;
   useEffect(() => {

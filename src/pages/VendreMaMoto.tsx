@@ -21,6 +21,7 @@ import { useCoordonnees } from '../lib/coordonnees';
 import { lienTelephone } from '../config/coordonnees';
 import { useTexte } from '../lib/textes';
 import { colonnes, useListe } from '../lib/listes';
+import { Masquable } from '../components/ui/Masquable';
 import { demo } from '../lib/apercuDemo';
 
 // Étapes, avantages et questions fréquentes : listes modulables, réglables dans
@@ -152,76 +153,82 @@ export function VendreMaMoto() {
                 </Button>
               </a>
             </div>
-            <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-or/50 bg-surface p-5 shadow-carte sm:flex-row sm:items-center md:p-6">
-              <IconeOr icon={Eye} className="hidden h-10 w-10 flex-shrink-0 sm:block" />
-              <div className="flex-1">
-                <h2 className="text-lg md:text-xl font-semibold text-noir">{t('vendre.suivi.titre')}</h2>
-                <p className="mt-1 text-sm text-gris leading-relaxed">
-                  {t('vendre.suivi.texte')}
+            <Masquable id="vendre.suivi">
+              <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-or/50 bg-surface p-5 shadow-carte sm:flex-row sm:items-center md:p-6">
+                <IconeOr icon={Eye} className="hidden h-10 w-10 flex-shrink-0 sm:block" />
+                <div className="flex-1">
+                  <h2 className="text-lg md:text-xl font-semibold text-noir">{t('vendre.suivi.titre')}</h2>
+                  <p className="mt-1 text-sm text-gris leading-relaxed">
+                    {t('vendre.suivi.texte')}
+                  </p>
+                </div>
+                <Link to="/suivre-ma-vente" tabIndex={-1} className="flex-shrink-0">
+                  <Button size="lg" className="w-full sm:w-auto">{t('vendre.suivi.bouton')}</Button>
+                </Link>
+              </div>
+            </Masquable>
+          </div>
+        </Container>
+      </Section>
+
+      <Masquable id="vendre.etapes">
+        <Section background="white" className="!py-10 md:!py-14">
+          <Container>
+            <h2 className="titre-section filet-apres mb-8">{t('vendre.etapes.titre')}</h2>
+            <ol className={colonnes(parcours.ids.length, { n: 5, classes: 'grid gap-4 md:gap-5 md:grid-cols-5' }, {
+              2: 'grid gap-4 md:gap-5 md:grid-cols-2',
+              3: 'grid gap-4 md:gap-5 md:grid-cols-3',
+              4: 'grid gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-4',
+              6: 'grid gap-4 md:gap-5 md:grid-cols-3',
+              0: 'grid gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-4',
+            })}>
+              {parcours.ids.map((id, i) => (
+                <li key={id} {...parcours.attrs(id)} className="carte p-5 md:p-6 flex md:flex-col gap-4 md:gap-0">
+                  <div className="flex-shrink-0 pastille-etape w-11 h-11 text-base md:mb-4" aria-hidden="true">
+                    {i + 1}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-noir mb-1.5">{t(parcours.cle(id, 'titre'))}</h3>
+                    <p className="text-sm text-gris leading-relaxed">{t(parcours.cle(id, 'texte'))}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </Container>
+        </Section>
+      </Masquable>
+
+      <Masquable id="vendre.avantages">
+        <Section background="dark" className="!py-10 md:!py-14">
+          <Container>
+            <h2 className="titre-section filet-avant mb-8">{t('vendre.avantages.titre')}</h2>
+            <div className={colonnes(avantages.ids.length, { n: 4, classes: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4' }, {
+              1: 'grid grid-cols-1 gap-3 md:gap-4',
+              2: 'grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4',
+              0: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4',
+              7: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4',
+              8: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4',
+            })}>
+              {avantages.ids.map((id) => (
+                <div key={id} {...avantages.attrs(id)} className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-5 md:p-6">
+                  <IconeOr icon={avantages.icone(id)} className="w-7 h-7 mb-3" />
+                  <h3 className="font-semibold text-inverse mb-1.5">{t(avantages.cle(id, 'titre'))}</h3>
+                  <p className="text-sm text-inverse-74 leading-relaxed">{t(avantages.cle(id, 'texte'))}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 rounded-2xl border border-or/40 bg-inverse/[0.04] p-5 md:p-6 flex gap-4 items-start">
+              <IconeOr icon={BadgeEuro} className="w-7 h-7 flex-shrink-0" />
+              <div>
+                <h3 className="font-semibold text-inverse mb-1">{t('vendre.avantages.net.titre')}</h3>
+                <p className="text-sm text-inverse-84 leading-relaxed">
+                  {t('vendre.avantages.net.texte')}
                 </p>
               </div>
-              <Link to="/suivre-ma-vente" tabIndex={-1} className="flex-shrink-0">
-                <Button size="lg" className="w-full sm:w-auto">{t('vendre.suivi.bouton')}</Button>
-              </Link>
             </div>
-          </div>
-        </Container>
-      </Section>
-
-      <Section background="white" className="!py-10 md:!py-14">
-        <Container>
-          <h2 className="titre-section filet-apres mb-8">{t('vendre.etapes.titre')}</h2>
-          <ol className={colonnes(parcours.ids.length, { n: 5, classes: 'grid gap-4 md:gap-5 md:grid-cols-5' }, {
-            2: 'grid gap-4 md:gap-5 md:grid-cols-2',
-            3: 'grid gap-4 md:gap-5 md:grid-cols-3',
-            4: 'grid gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-4',
-            6: 'grid gap-4 md:gap-5 md:grid-cols-3',
-            0: 'grid gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-4',
-          })}>
-            {parcours.ids.map((id, i) => (
-              <li key={id} {...parcours.attrs(id)} className="carte p-5 md:p-6 flex md:flex-col gap-4 md:gap-0">
-                <div className="flex-shrink-0 pastille-etape w-11 h-11 text-base md:mb-4" aria-hidden="true">
-                  {i + 1}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-noir mb-1.5">{t(parcours.cle(id, 'titre'))}</h3>
-                  <p className="text-sm text-gris leading-relaxed">{t(parcours.cle(id, 'texte'))}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
-        </Container>
-      </Section>
-
-      <Section background="dark" className="!py-10 md:!py-14">
-        <Container>
-          <h2 className="titre-section filet-avant mb-8">{t('vendre.avantages.titre')}</h2>
-          <div className={colonnes(avantages.ids.length, { n: 4, classes: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4' }, {
-            1: 'grid grid-cols-1 gap-3 md:gap-4',
-            2: 'grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4',
-            0: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4',
-            7: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4',
-            8: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4',
-          })}>
-            {avantages.ids.map((id) => (
-              <div key={id} {...avantages.attrs(id)} className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-5 md:p-6">
-                <IconeOr icon={avantages.icone(id)} className="w-7 h-7 mb-3" />
-                <h3 className="font-semibold text-inverse mb-1.5">{t(avantages.cle(id, 'titre'))}</h3>
-                <p className="text-sm text-inverse-74 leading-relaxed">{t(avantages.cle(id, 'texte'))}</p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-6 rounded-2xl border border-or/40 bg-inverse/[0.04] p-5 md:p-6 flex gap-4 items-start">
-            <IconeOr icon={BadgeEuro} className="w-7 h-7 flex-shrink-0" />
-            <div>
-              <h3 className="font-semibold text-inverse mb-1">{t('vendre.avantages.net.titre')}</h3>
-              <p className="text-sm text-inverse-84 leading-relaxed">
-                {t('vendre.avantages.net.texte')}
-              </p>
-            </div>
-          </div>
-        </Container>
-      </Section>
+          </Container>
+        </Section>
+      </Masquable>
 
       <Section background="white" className="!py-10 md:!py-14">
         <Container size="md">
@@ -439,36 +446,38 @@ export function VendreMaMoto() {
         </Container>
       </Section>
 
-      <Section background="gray" className="!py-10 md:!py-14">
-        <Container size="md">
-          <h2 className="titre-section filet-apres mb-6">{t('vendre.faq.titre')}</h2>
-          <div className="space-y-3">
-            {faq.ids.map((id) => (
-              <details key={id} {...faq.attrs(id)} className="group carte px-5 py-4">
-                <summary className="cursor-pointer list-none flex items-center justify-between gap-4 font-semibold text-noir">
-                  {t(faq.cle(id, 'question'))}
-                  <span className="text-or-texte text-xl leading-none transition-transform duration-180 group-open:rotate-45" aria-hidden="true">
-                    +
-                  </span>
-                </summary>
-                <p className="mt-3 text-gris leading-relaxed">{t(faq.cle(id, 'reponse'))}</p>
-              </details>
-            ))}
-          </div>
-          <p className="mt-8 text-gris">
-            {t('vendre.faq.contact.avant')}{' '}
-            <a href={lienTelephone(c.telephone)} className="lien whitespace-nowrap">
-              {c.telephone}
-            </a>{' '}
-            {t('vendre.faq.contact.apres')}
-          </p>
-          <p className="mt-3 text-sm text-gris">
-            {t('vendre.faq.reprise.avant')}{' '}
-            <Link to="/reprises" className="lien">{t('vendre.faq.reprise.lien')}</Link>
-            {t('vendre.faq.reprise.apres')}
-          </p>
-        </Container>
-      </Section>
+      <Masquable id="vendre.faq">
+        <Section background="gray" className="!py-10 md:!py-14">
+          <Container size="md">
+            <h2 className="titre-section filet-apres mb-6">{t('vendre.faq.titre')}</h2>
+            <div className="space-y-3">
+              {faq.ids.map((id) => (
+                <details key={id} {...faq.attrs(id)} className="group carte px-5 py-4">
+                  <summary className="cursor-pointer list-none flex items-center justify-between gap-4 font-semibold text-noir">
+                    {t(faq.cle(id, 'question'))}
+                    <span className="text-or-texte text-xl leading-none transition-transform duration-180 group-open:rotate-45" aria-hidden="true">
+                      +
+                    </span>
+                  </summary>
+                  <p className="mt-3 text-gris leading-relaxed">{t(faq.cle(id, 'reponse'))}</p>
+                </details>
+              ))}
+            </div>
+            <p className="mt-8 text-gris">
+              {t('vendre.faq.contact.avant')}{' '}
+              <a href={lienTelephone(c.telephone)} className="lien whitespace-nowrap">
+                {c.telephone}
+              </a>{' '}
+              {t('vendre.faq.contact.apres')}
+            </p>
+            <p className="mt-3 text-sm text-gris">
+              {t('vendre.faq.reprise.avant')}{' '}
+              <Link to="/reprises" className="lien">{t('vendre.faq.reprise.lien')}</Link>
+              {t('vendre.faq.reprise.apres')}
+            </p>
+          </Container>
+        </Section>
+      </Masquable>
     </>
   );
 }

@@ -13,11 +13,13 @@ import { useFormSubmit } from '../hooks/useFormSubmit';
 import { supabase } from '../lib/supabase';
 import { compresserImage, extensionDe } from '../lib/compressionImage';
 import { useTexte } from '../lib/textes';
-import { useListe } from '../lib/listes';
+import { useListe, useMasquee } from '../lib/listes';
+import { Masquable } from '../components/ui/Masquable';
 
 export function CustomSearch() {
   const t = useTexte();
   const etapes = useListe('recherche.etapes');
+  const serviceMasque = useMasquee('recherche.service');
   // Données du formulaire "je cherche un véhicule précis"
   const [formData, setFormData] = useState({
     name: '',
@@ -148,35 +150,37 @@ export function CustomSearch() {
 
       <Section background="white" className="!py-8 lg:!pt-16">
         <Container size="md">
-          <div className="grid lg:grid-cols-2 gap-12">
-            {/* Colonne gauche : explication du service. Sur grand écran assez haut, elle
+          <div className={serviceMasque ? 'grid gap-12 max-w-2xl mx-auto' : 'grid lg:grid-cols-2 gap-12'}>
+            {/* Colonne gauche : explication du service (masquable dans l'admin). Sur grand écran assez haut, elle
                 reste visible pendant qu'on remplit le formulaire (plus long qu'elle). */}
-            <div className="lg:self-start [@media(min-width:1024px)_and_(min-height:900px)]:sticky [@media(min-width:1024px)_and_(min-height:900px)]:top-24">
-              <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
-                {t('recherche.service.titre')}
-              </h2>
+            <Masquable id="recherche.service" className="lg:self-start [@media(min-width:1024px)_and_(min-height:900px)]:sticky [@media(min-width:1024px)_and_(min-height:900px)]:top-24">
+              <div className="lg:self-start [@media(min-width:1024px)_and_(min-height:900px)]:sticky [@media(min-width:1024px)_and_(min-height:900px)]:top-24">
+                <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
+                  {t('recherche.service.titre')}
+                </h2>
 
-              <p className="text-gris leading-relaxed mb-6">
-                {t('recherche.service.texte')}
-              </p>
+                <p className="text-gris leading-relaxed mb-6">
+                  {t('recherche.service.texte')}
+                </p>
 
-              <div className="space-y-4">
-                {etapes.ids.map((id, i) => (
-                  <div key={id} {...etapes.attrs(id)} className="bg-fond p-6 rounded-xl">
-                    <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
-                      <span className="pastille-etape w-8 h-8 text-sm">
-                        {i + 1}
-                      </span>
-                      {t(etapes.cle(id, 'titre'))}
-                    </h3>
-                    <p className="text-sm text-gris ml-10">
-                      {t(etapes.cle(id, 'texte'))}
-                    </p>
-                  </div>
-                ))}
+                <div className="space-y-4">
+                  {etapes.ids.map((id, i) => (
+                    <div key={id} {...etapes.attrs(id)} className="bg-fond p-6 rounded-xl">
+                      <h3 className="font-semibold text-noir mb-2 flex items-center gap-2">
+                        <span className="pastille-etape w-8 h-8 text-sm">
+                          {i + 1}
+                        </span>
+                        {t(etapes.cle(id, 'titre'))}
+                      </h3>
+                      <p className="text-sm text-gris ml-10">
+                        {t(etapes.cle(id, 'texte'))}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
               </div>
-
-            </div>
+            </Masquable>
 
             {/* Colonne droite : formulaire */}
             <div>

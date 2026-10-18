@@ -12,11 +12,13 @@ import { IconeOr } from '../components/ui/IconeOr';
 import { useFormSubmit } from '../hooks/useFormSubmit';
 import { useTexte, useTextes } from '../lib/textes';
 import { nombre } from '../config/textes';
-import { useListe } from '../lib/listes';
+import { useListe, useMasquee } from '../lib/listes';
+import { Masquable } from '../components/ui/Masquable';
 
 export function Financing() {
   const t = useTexte();
   const avantages = useListe('financement.avantages');
+  const avantagesMasques = useMasquee('financement.avantages');
   // Lecture des paramètres passés depuis la fiche véhicule
   // ex: /financement?vehicle=Yamaha%20MT-07%202021&price=6500&slug=yamaha-mt07-2021
   const [searchParams] = useSearchParams();
@@ -152,178 +154,182 @@ export function Financing() {
       <Section background="white" className="!py-8">
         <Container size="md">
           {/* Bloc simulateur */}
-          <div className="sur-sombre relative bg-noir-profond text-inverse p-6 md:p-12 rounded-2xl mb-12 overflow-hidden border border-or/30 shadow-vehicule">
-            <div className="absolute inset-0 opacity-20">
-              <img
-                src="/simulateur-fond.webp"
-                loading="lazy"
-                alt=""
-                className="w-full h-full object-cover"
-                aria-hidden="true"
-              />
-            </div>
-
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-6">
-                <Calculator className="w-8 h-8 text-or-clair" strokeWidth={1.6} aria-hidden="true" />
-                <h2 className="text-[26px] md:text-[30px]">
-                  {t('financement.simulateur.titre')}
-                </h2>
+          <Masquable id="financement.simulateur">
+            <div className="sur-sombre relative bg-noir-profond text-inverse p-6 md:p-12 rounded-2xl mb-12 overflow-hidden border border-or/30 shadow-vehicule">
+              <div className="absolute inset-0 opacity-20">
+                <img
+                  src="/simulateur-fond.webp"
+                  loading="lazy"
+                  alt=""
+                  className="w-full h-full object-cover"
+                  aria-hidden="true"
+                />
               </div>
 
-              <div className="space-y-6">
-                {/* Montant */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('financement.simulateur.montant', { montant: simulatorData.amount.toLocaleString('fr-FR') })}
-                  </label>
-                  <input
-                    type="range"
-                    aria-label="Montant du financement"
-                    min="1000"
-                    max="20000"
-                    step="500"
-                    value={simulatorData.amount}
-                    onChange={(e) =>
-                      handleSimulatorAmountChange(Number(e.target.value))
-                    }
-                    className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
-                  />
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-6">
+                  <Calculator className="w-8 h-8 text-or-clair" strokeWidth={1.6} aria-hidden="true" />
+                  <h2 className="text-[26px] md:text-[30px]">
+                    {t('financement.simulateur.titre')}
+                  </h2>
                 </div>
 
-                {/* Durée */}
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    {t('financement.simulateur.duree', { duree: simulatorData.duration })}
-                  </label>
-                  <input
-                    type="range"
-                    aria-label="Durée du financement"
-                    min="12"
-                    max="72"
-                    step="6"
-                    value={simulatorData.duration}
-                    onChange={(e) =>
-                      handleSimulatorDurationChange(Number(e.target.value))
-                    }
-                    className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
-                  />
+                <div className="space-y-6">
+                  {/* Montant */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      {t('financement.simulateur.montant', { montant: simulatorData.amount.toLocaleString('fr-FR') })}
+                    </label>
+                    <input
+                      type="range"
+                      aria-label="Montant du financement"
+                      min="1000"
+                      max="20000"
+                      step="500"
+                      value={simulatorData.amount}
+                      onChange={(e) =>
+                        handleSimulatorAmountChange(Number(e.target.value))
+                      }
+                      className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
+                    />
+                  </div>
+
+                  {/* Durée */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      {t('financement.simulateur.duree', { duree: simulatorData.duration })}
+                    </label>
+                    <input
+                      type="range"
+                      aria-label="Durée du financement"
+                      min="12"
+                      max="72"
+                      step="6"
+                      value={simulatorData.duration}
+                      onChange={(e) =>
+                        handleSimulatorDurationChange(Number(e.target.value))
+                      }
+                      className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
+                    />
                   
-                </div>
-                <div></div>
-<label className="block text-sm font-medium mb-2">
-                    {t('financement.simulateur.taux', { taux: rate.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) })}
-                  </label>
-                {/* Taux *
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Taux (TAEG): {rate} %
-                  </label>
-                  <input
-                    type="range"
-                    aria-label="Taux (TAEG)"
-                    min="2"
-                    max="10"
-                    step="0.5"
-                    value={rate}
-                    onChange={(e) =>
-                      setSimulatorData((prev) => ({
-                        ...prev,
-                        rate: Number(e.target.value),
-                      }))
-                    }
-                    className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
-                  />
-                </div>*/}
+                  </div>
+                  <div></div>
+  <label className="block text-sm font-medium mb-2">
+                      {t('financement.simulateur.taux', { taux: rate.toLocaleString('fr-FR', { maximumFractionDigits: 2 }) })}
+                    </label>
+                  {/* Taux *
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Taux (TAEG): {rate} %
+                    </label>
+                    <input
+                      type="range"
+                      aria-label="Taux (TAEG)"
+                      min="2"
+                      max="10"
+                      step="0.5"
+                      value={rate}
+                      onChange={(e) =>
+                        setSimulatorData((prev) => ({
+                          ...prev,
+                          rate: Number(e.target.value),
+                        }))
+                      }
+                      className="w-full h-2 bg-inverse rounded-lg appearance-none cursor-pointer range-slider"
+                    />
+                  </div>*/}
 
-                {/* Estimation */}
-                <div className="bg-inverse/[0.06] backdrop-blur-sm p-6 rounded-xl mt-8 border border-inverse/15">
-                  <p className="text-sm mb-2">{t('financement.simulateur.mensualite')}</p>
-                  <p className="font-display font-semibold text-[40px] leading-tight">{calculateMonthlyPayment()} €</p>
-                  <p className="text-sm mt-2 opacity-90">
-                    {t('financement.simulateur.par_mois', { duree: simulatorData.duration })}
-                  </p>
-
-                  {vehicleFromURL && (
-                    <p className="text-xs opacity-90 mt-4">
-                      {t('financement.simulateur.vehicule', { vehicule: vehicleFromURL })}
-                      {parsedPrice ? ` ${t('financement.simulateur.vehicule_prix', { prix: parsedPrice })}` : '' }
+                  {/* Estimation */}
+                  <div className="bg-inverse/[0.06] backdrop-blur-sm p-6 rounded-xl mt-8 border border-inverse/15">
+                    <p className="text-sm mb-2">{t('financement.simulateur.mensualite')}</p>
+                    <p className="font-display font-semibold text-[40px] leading-tight">{calculateMonthlyPayment()} €</p>
+                    <p className="text-sm mt-2 opacity-90">
+                      {t('financement.simulateur.par_mois', { duree: simulatorData.duration })}
                     </p>
-                  )}
-                </div>
 
-                <p className="text-xs opacity-80">
-                  {t('financement.simulateur.mention')}
-                </p>
+                    {vehicleFromURL && (
+                      <p className="text-xs opacity-90 mt-4">
+                        {t('financement.simulateur.vehicule', { vehicule: vehicleFromURL })}
+                        {parsedPrice ? ` ${t('financement.simulateur.vehicule_prix', { prix: parsedPrice })}` : '' }
+                      </p>
+                    )}
+                  </div>
+
+                  <p className="text-xs opacity-80">
+                    {t('financement.simulateur.mention')}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
+          </Masquable>
 
           {/* Deux colonnes */}
-          <div className="grid lg:grid-cols-2 gap-12 lg:items-start">
+          <div className={avantagesMasques ? 'grid gap-12 max-w-2xl mx-auto' : 'grid lg:grid-cols-2 gap-12 lg:items-start'}>
             {/* Avantages commerciaux */}
-          <div>
-  <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
-    {t('financement.avantages.titre')}
-  </h2>
+<Masquable id="financement.avantages">
+            <div>
+    <h2 className="text-[26px] md:text-[30px] filet-apres mb-6">
+      {t('financement.avantages.titre')}
+    </h2>
 
-  <div className="space-y-4">
-    {avantages.ids.map((id) => avantages.special(id) ? (
-      /* Paiement en plusieurs fois via Alma */
-<div key={id} {...avantages.attrs(id)} className="flex gap-4 p-4 bg-fond rounded-lg">
-  <CheckCircle
-    className="w-6 h-6 text-lien flex-shrink-0"
-    aria-hidden="true"
-  />
-  <div>
-    <h3 className="font-semibold text-noir mb-1">
-      {t('financement.avantages.3.titre')}
-    </h3>
-    <p className="text-sm text-gris leading-snug">
-      {t('financement.avantages.3.texte_avant')}&nbsp;
+    <div className="space-y-4">
+      {avantages.ids.map((id) => avantages.special(id) ? (
+        /* Paiement en plusieurs fois via Alma */
+  <div key={id} {...avantages.attrs(id)} className="flex gap-4 p-4 bg-fond rounded-lg">
+    <CheckCircle
+      className="w-6 h-6 text-lien flex-shrink-0"
+      aria-hidden="true"
+    />
+    <div>
+      <h3 className="font-semibold text-noir mb-1">
+        {t('financement.avantages.3.titre')}
+      </h3>
+      <p className="text-sm text-gris leading-snug">
+        {t('financement.avantages.3.texte_avant')}&nbsp;
+        <a
+          href="https://almapay.com/fr-FR"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-lien font-medium underline underline-offset-2 hover:decoration-2"
+        >
+          {t('financement.avantages.3.lien')}
+        </a>
+        {t('financement.avantages.3.texte_apres')}
+      </p>
+
+      {/* Logo Alma (tu peux placer le fichier dans /public/alma-logo_frame.png) */}
       <a
         href="https://almapay.com/fr-FR"
         target="_blank"
         rel="noopener noreferrer"
-        className="text-lien font-medium underline underline-offset-2 hover:decoration-2"
+        className="inline-block mt-3"
       >
-        {t('financement.avantages.3.lien')}
+        <img
+          src="/alma-logo_frame.png"
+          alt="Paiement en plusieurs fois avec Alma"
+          className="h-6 opacity-90 hover:opacity-100 transition-opacity"
+        />
       </a>
-      {t('financement.avantages.3.texte_apres')}
-    </p>
 
-    {/* Logo Alma (tu peux placer le fichier dans /public/alma-logo_frame.png) */}
-    <a
-      href="https://almapay.com/fr-FR"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="inline-block mt-3"
-    >
-      <img
-        src="/alma-logo_frame.png"
-        alt="Paiement en plusieurs fois avec Alma"
-        className="h-6 opacity-90 hover:opacity-100 transition-opacity"
-      />
-    </a>
-
-    <p className="text-[11px] text-doux-68 mt-2">
-      {t('financement.avantages.3.mention')}
-    </p>
+      <p className="text-[11px] text-doux-68 mt-2">
+        {t('financement.avantages.3.mention')}
+      </p>
+    </div>
   </div>
-</div>
-    ) : (
-      <div key={id} {...avantages.attrs(id)} className="flex gap-4 p-4 bg-fond rounded-lg">
-        <IconeOr icon={avantages.icone(id)} className="w-6 h-6 flex-shrink-0" />
-        <div>
-          <h3 className="font-semibold text-noir mb-1">{t(avantages.cle(id, 'titre'))}</h3>
-          <p className="text-sm text-gris">
-            {t(avantages.cle(id, 'texte'))}
-          </p>
+      ) : (
+        <div key={id} {...avantages.attrs(id)} className="flex gap-4 p-4 bg-fond rounded-lg">
+          <IconeOr icon={avantages.icone(id)} className="w-6 h-6 flex-shrink-0" />
+          <div>
+            <h3 className="font-semibold text-noir mb-1">{t(avantages.cle(id, 'titre'))}</h3>
+            <p className="text-sm text-gris">
+              {t(avantages.cle(id, 'texte'))}
+            </p>
+          </div>
         </div>
-      </div>
-    ))}
+      ))}
+    </div>
   </div>
-</div>
+</Masquable>
 
 
             {/* Formulaire */}

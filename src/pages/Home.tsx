@@ -6,6 +6,7 @@ import { Container } from '../components/ui/Container';
 import { Button } from '../components/ui/Button';
 import { IconeOr } from '../components/ui/IconeOr';
 import { colonnes, useListe } from '../lib/listes';
+import { Masquable } from '../components/ui/Masquable';
 import { DerniersArrivages } from '../components/DerniersArrivages';
 import { ExplorezLesMarques } from '../components/ExplorezLesMarques';
 import { SectionEquipe } from '../components/equipe/SectionEquipe';
@@ -69,157 +70,175 @@ export function Home() {
         </Container>
       </Section>
 
-      <Section background="gray">
-        <Container>
-          <div className="text-center mb-10 md:mb-12">
-            <h2 className="titre-section filet-apres mb-5">
-              {t('accueil.vente.titre')}
-            </h2>
-            <p className="text-base md:text-lg text-gris max-w-2xl mx-auto">
-              {t('accueil.vente.texte')}
-            </p>
-          </div>
-
-          <div className={colonnes(vente.ids.length, { n: 4, classes: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6' }, {
-            1: 'grid grid-cols-1 gap-4 md:gap-6 max-w-md mx-auto',
-            2: 'grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto',
-            0: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6',
-            7: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6',
-            8: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6',
-          })}>
-            {vente.ids.map((id) => (
-              <div
-                key={id}
-                {...vente.attrs(id)}
-                className="carte p-6 md:p-7 flex gap-4 sm:flex-col sm:gap-0 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule"
-              >
-                <div className="flex-shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-fond border border-bordure sm:mb-5">
-                  <IconeOr icon={vente.icone(id)} />
-                </div>
-                <div>
-                  <h3 className="text-base md:text-lg font-semibold text-noir mb-1.5">{t(vente.cle(id, 'titre'))}</h3>
-                  <p className="text-sm text-gris leading-relaxed">{t(vente.cle(id, 'texte'))}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Container>
-      </Section>
-
-      <DerniersArrivages />
-
-      <ExplorezLesMarques />
-
-      <Section background="dark">
-        <Container>
-          <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
-            <div>
-              <h2 className="titre-section filet-avant mb-5">
-                {t('accueil.reprise.titre')}
+      <Masquable id="accueil.vente">
+        <Section background="gray">
+          <Container>
+            <div className="text-center mb-10 md:mb-12">
+              <h2 className="titre-section filet-apres mb-5">
+                {t('accueil.vente.titre')}
               </h2>
-              <p className="text-base md:text-lg text-inverse-84 mb-8 leading-relaxed">
-                {t('accueil.reprise.texte')}
-              </p>
-              <Link to="/reprises" tabIndex={-1}>
-                <Button>{t('accueil.reprise.bouton')}</Button>
-              </Link>
-              <p className="mt-6 text-sm text-inverse-84">
-                {t('accueil.reprise.depot')}{' '}
-                <Link to="/vendre-ma-moto" className="text-or-clair underline underline-offset-4 hover:decoration-2">
-                  {t('accueil.reprise.depot_lien')}
-                </Link>
+              <p className="text-base md:text-lg text-gris max-w-2xl mx-auto">
+                {t('accueil.vente.texte')}
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              {reprise.ids.map((id) => (
-                <div key={id} {...reprise.attrs(id)} className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
-                  <IconeOr icon={reprise.icone(id)} className="w-7 h-7 mb-3" />
-                  <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t(reprise.cle(id, 'titre'))}</h3>
-                  <p className="text-sm text-inverse-74">{t(reprise.cle(id, 'texte'))}</p>
+
+            <div className={colonnes(vente.ids.length, { n: 4, classes: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6' }, {
+              1: 'grid grid-cols-1 gap-4 md:gap-6 max-w-md mx-auto',
+              2: 'grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto',
+              0: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6',
+              7: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6',
+              8: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6',
+            })}>
+              {vente.ids.map((id) => (
+                <div
+                  key={id}
+                  {...vente.attrs(id)}
+                  className="carte p-6 md:p-7 flex gap-4 sm:flex-col sm:gap-0 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule"
+                >
+                  <div className="flex-shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-xl bg-fond border border-bordure sm:mb-5">
+                    <IconeOr icon={vente.icone(id)} />
+                  </div>
+                  <div>
+                    <h3 className="text-base md:text-lg font-semibold text-noir mb-1.5">{t(vente.cle(id, 'titre'))}</h3>
+                    <p className="text-sm text-gris leading-relaxed">{t(vente.cle(id, 'texte'))}</p>
+                  </div>
                 </div>
               ))}
             </div>
-          </div>
-        </Container>
-      </Section>
+          </Container>
+        </Section>
+      </Masquable>
 
-      <Section background="white">
-        <Container>
-          <div className={colonnes(services.ids.length, { n: 3, classes: 'grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6' }, {
-            1: 'grid grid-cols-1 gap-4 md:gap-6 max-w-2xl mx-auto',
-            2: 'grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6',
-            0: 'grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6',
-            4: 'grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6',
-          })}>
-            {services.ids.map((id) => {
-              const adresse = t(services.cle(id, 'adresse')).trim() || '/contact';
-              const classeLien = 'lien self-start';
-              return (
-                <div key={id} {...services.attrs(id)} className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
-                  <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t(services.cle(id, 'titre'))}</h3>
-                  <p className="text-gris mb-6 leading-relaxed flex-1">
-                    {t(services.cle(id, 'texte'))}
-                  </p>
-                  {adresse.startsWith('/') ? (
-                    <Link to={adresse} className={classeLien}>
-                      {t(services.cle(id, 'lien'))}
-                    </Link>
-                  ) : (
-                    <a href={adresse} target="_blank" rel="noopener noreferrer" className={classeLien}>
-                      {t(services.cle(id, 'lien'))}
-                    </a>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </Container>
-      </Section>
+      <Masquable id="accueil.arrivages">
+        <DerniersArrivages />
+      </Masquable>
 
-      <Section background="gray">
-        <Container>
-          <div className="text-center mb-10 md:mb-12">
-            <h2 className="titre-section filet-apres">
-              {t('accueil.pourquoi.titre')}
-            </h2>
-          </div>
+      <Masquable id="accueil.marques">
+        <ExplorezLesMarques />
+      </Masquable>
 
-          <div className={colonnes(pourquoi.ids.length, { n: 3, classes: 'grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12' }, {
-            1: 'grid grid-cols-1 gap-10 md:gap-12',
-            2: 'grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 max-w-3xl mx-auto',
-            0: 'grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12',
-            4: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12',
-          })}>
-            {pourquoi.ids.map((id) => (
-              <div key={id} {...pourquoi.attrs(id)} className="text-center">
-                <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
-                  <IconeOr icon={pourquoi.icone(id)} className="w-8 h-8" />
-                </div>
-                <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t(pourquoi.cle(id, 'titre'))}</h3>
-                <p className="text-gris leading-relaxed max-w-xs mx-auto">
-                  {t(pourquoi.cle(id, 'texte'))}
+      <Masquable id="accueil.reprise">
+        <Section background="dark">
+          <Container>
+            <div className="grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
+              <div>
+                <h2 className="titre-section filet-avant mb-5">
+                  {t('accueil.reprise.titre')}
+                </h2>
+                <p className="text-base md:text-lg text-inverse-84 mb-8 leading-relaxed">
+                  {t('accueil.reprise.texte')}
+                </p>
+                <Link to="/reprises" tabIndex={-1}>
+                  <Button>{t('accueil.reprise.bouton')}</Button>
+                </Link>
+                <p className="mt-6 text-sm text-inverse-84">
+                  {t('accueil.reprise.depot')}{' '}
+                  <Link to="/vendre-ma-moto" className="text-or-clair underline underline-offset-4 hover:decoration-2">
+                    {t('accueil.reprise.depot_lien')}
+                  </Link>
                 </p>
               </div>
-            ))}
-          </div>
-        </Container>
-      </Section>
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
+                {reprise.ids.map((id) => (
+                  <div key={id} {...reprise.attrs(id)} className="rounded-2xl border border-inverse/10 bg-inverse/[0.04] p-4 md:p-6">
+                    <IconeOr icon={reprise.icone(id)} className="w-7 h-7 mb-3" />
+                    <h3 className="font-semibold text-inverse mb-1.5 text-[15px] md:text-base">{t(reprise.cle(id, 'titre'))}</h3>
+                    <p className="text-sm text-inverse-74">{t(reprise.cle(id, 'texte'))}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Container>
+        </Section>
+      </Masquable>
 
-      <SectionAvisGoogle />
+      <Masquable id="accueil.services">
+        <Section background="white">
+          <Container>
+            <div className={colonnes(services.ids.length, { n: 3, classes: 'grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6' }, {
+              1: 'grid grid-cols-1 gap-4 md:gap-6 max-w-2xl mx-auto',
+              2: 'grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6',
+              0: 'grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6',
+              4: 'grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6',
+            })}>
+              {services.ids.map((id) => {
+                const adresse = t(services.cle(id, 'adresse')).trim() || '/contact';
+                const classeLien = 'lien self-start';
+                return (
+                  <div key={id} {...services.attrs(id)} className="flex flex-col bg-fond border border-bordure rounded-2xl p-6 md:p-8 transition-[box-shadow,transform] duration-180 hover:-translate-y-0.5 hover:shadow-vehicule">
+                    <h3 className="titre-display text-[22px] md:text-2xl mb-3">{t(services.cle(id, 'titre'))}</h3>
+                    <p className="text-gris mb-6 leading-relaxed flex-1">
+                      {t(services.cle(id, 'texte'))}
+                    </p>
+                    {adresse.startsWith('/') ? (
+                      <Link to={adresse} className={classeLien}>
+                        {t(services.cle(id, 'lien'))}
+                      </Link>
+                    ) : (
+                      <a href={adresse} target="_blank" rel="noopener noreferrer" className={classeLien}>
+                        {t(services.cle(id, 'lien'))}
+                      </a>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </Container>
+        </Section>
+      </Masquable>
 
-      <SectionEquipe />
+      <Masquable id="accueil.pourquoi">
+        <Section background="gray">
+          <Container>
+            <div className="text-center mb-10 md:mb-12">
+              <h2 className="titre-section filet-apres">
+                {t('accueil.pourquoi.titre')}
+              </h2>
+            </div>
 
-      <Section background="dark">
-        <Container className="text-center">
-          <h2 className="titre-section filet-avant mb-5">{t('accueil.final.titre')}</h2>
-          <p className="text-base md:text-xl text-inverse-84 mb-8 max-w-2xl mx-auto">
-            {t('accueil.final.texte')}
-          </p>
-          <Link to="/contact" tabIndex={-1}>
-            <Button size="lg">{t('accueil.final.bouton')}</Button>
-          </Link>
-        </Container>
-      </Section>
+            <div className={colonnes(pourquoi.ids.length, { n: 3, classes: 'grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12' }, {
+              1: 'grid grid-cols-1 gap-10 md:gap-12',
+              2: 'grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 max-w-3xl mx-auto',
+              0: 'grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12',
+              4: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12',
+            })}>
+              {pourquoi.ids.map((id) => (
+                <div key={id} {...pourquoi.attrs(id)} className="text-center">
+                  <div className="inline-flex items-center justify-center w-[72px] h-[72px] bg-surface rounded-full mb-5 border border-or/50 shadow-carte">
+                    <IconeOr icon={pourquoi.icone(id)} className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-lg md:text-xl font-semibold text-noir mb-2">{t(pourquoi.cle(id, 'titre'))}</h3>
+                  <p className="text-gris leading-relaxed max-w-xs mx-auto">
+                    {t(pourquoi.cle(id, 'texte'))}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      </Masquable>
+
+      <Masquable id="accueil.avis">
+        <SectionAvisGoogle />
+      </Masquable>
+
+      <Masquable id="accueil.equipe">
+        <SectionEquipe />
+      </Masquable>
+
+      <Masquable id="accueil.final">
+        <Section background="dark">
+          <Container className="text-center">
+            <h2 className="titre-section filet-avant mb-5">{t('accueil.final.titre')}</h2>
+            <p className="text-base md:text-xl text-inverse-84 mb-8 max-w-2xl mx-auto">
+              {t('accueil.final.texte')}
+            </p>
+            <Link to="/contact" tabIndex={-1}>
+              <Button size="lg">{t('accueil.final.bouton')}</Button>
+            </Link>
+          </Container>
+        </Section>
+      </Masquable>
     </>
   );
 }

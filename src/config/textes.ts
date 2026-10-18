@@ -24,6 +24,7 @@ import { PAGES_SUIVRE } from './textes-pages/suivre.ts';
 import { PAGES_COMMUN } from './textes-pages/commun.ts';
 import { PAGES_SEO } from './textes-pages/seo.ts';
 import { cleOrdre, ID_AJOUTE, LISTES, lireOrdre, NOMS_ICONES } from './textes-listes.ts';
+import { cleMasquee, SECTIONS_MASQUABLES } from './textes-sections.ts';
 
 /** Pages de l'admin « Textes du site », dans l'ordre du menu */
 export const PAGES_TEXTES: PageTextes[] = [
@@ -83,6 +84,11 @@ export function normaliserTextes(brut: unknown): Textes {
       const propre = nettoyer(v, def.max ?? 420);
       if (def.type === 'lien' && propre && !LIEN.test(propre)) continue;
       if (propre !== def.defaut) sortie[cle] = propre;
+      continue;
+    }
+    // Sections masquées
+    if (cle.endsWith('.masquee')) {
+      if (v === 'oui' && SECTIONS_MASQUABLES.some((x) => cleMasquee(x.id) === cle)) sortie[cle] = 'oui';
       continue;
     }
     // Listes modulables : ordre, icônes, textes des éléments ajoutés
